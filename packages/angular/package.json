@@ -9,6 +9,9 @@
         "aria",
         "dialog",
         "tabs",
+        "menu",
+        "popover",
+        "tooltip",
         "primitives",
         "ui"
     ],
@@ -45,10 +48,25 @@
             "types": "./dist/types/fragiola-primitives-angular-dialog.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-dialog.mjs"
         },
+        "./menu": {
+            "@fragiola/source": "./menu/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-menu.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-menu.mjs"
+        },
+        "./popover": {
+            "@fragiola/source": "./popover/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-popover.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-popover.mjs"
+        },
         "./tabs": {
             "@fragiola/source": "./tabs/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
+        },
+        "./tooltip": {
+            "@fragiola/source": "./tooltip/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-tooltip.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-tooltip.mjs"
         },
         "./package.json": "./package.json"
     },
