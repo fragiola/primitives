@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
 import { isInertOrHidden } from "../../src/focus.ts";
 import { expectOutput } from "../../src/output.ts";
@@ -169,4 +169,46 @@ test("dialog / rejected-close: a consumer that keeps open: true keeps the dialog
             }),
         ),
     ).toBe(true);
+});
+
+test.describe("dialog / nested-popover", () => {
+    const dialog = (page: Page) =>
+        page.getByRole("dialog", { name: "Edit profile" });
+    const popover = (page: Page) =>
+        page.getByRole("dialog", { name: "About names" });
+    const moreInfo = (page: Page) =>
+        page.getByRole("button", { name: "More info" });
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/dialog/nested-popover");
+        await page.getByRole("button", { name: "Open dialog" }).click();
+        await moreInfo(page).click();
+        await expect(popover(page)).toBeVisible();
+    });
+
+    test("focus moves into the popover", async ({ page }) => {
+        await expect(
+            page.getByRole("button", { name: "Got it" }),
+        ).toBeFocused();
+    });
+
+    test("Escape closes the popover first, then the dialog", async ({
+        page,
+    }) => {
+        await page.keyboard.press("Escape");
+        await expect(popover(page)).toBeHidden();
+        await expect(dialog(page)).toBeVisible();
+        await expect(moreInfo(page)).toBeFocused();
+        await page.keyboard.press("Escape");
+        await expect(dialog(page)).toBeHidden();
+    });
+
+    test("a press inside the dialog closes only the popover", async ({
+        page,
+    }) => {
+        await page.getByRole("heading", { name: "Edit profile" }).click();
+        await expect(popover(page)).toBeHidden();
+        await expect(dialog(page)).toBeVisible();
+        await expect(moreInfo(page)).toBeFocused();
+    });
 });
