@@ -138,7 +138,7 @@ fails on a tracked name that is not kebab-case and on a non-entry file at the ro
   | `primitives` | one folder per mechanism, each an entry: `positioning/`, `overlay/`, `layers/`, `focus/`, `scroll-lock/`, `inert/`, `collection/`, `presence/`, `pointer/`, `hover/`, `range/`, `form/`, `id/`, `direction/`, `date/` |
   | `react` | `components/<component>/` (its parts, its context, `parts.ts` the namespace), `hooks/`, `utils/` |
   | `vue` | `components/<component>/`, `composables/`, `utils/` |
-  | `angular` | `src/lib/directives/<component>/`, `src/lib/inject/`, `src/lib/utils/`; one secondary entry point per component (`packages/angular/<component>/ng-package.json` + `public-api.ts`) |
+  | `angular` | one ng-packagr secondary entry point per component, its folder organized like a `src/`: `packages/angular/<component>/` (`public-api.ts`, `ng-package.json`, `directives/`, `inject/`); the code the entries share in `packages/angular/internal/` (`utils/`, the `/internal` entry: not an app's API); `src/public-api.ts` only re-exports the components' entries. ng-packagr compiles an entry point from its own folder (a file outside fails with TS6059), as Tree's feature entries; `check:layout` also keeps an entry folder's root to `public-api.ts` and `ng-package.json` |
 
 - **One public component, hook or function per file**, with its types beside it.
 - **A primitive has the same file name in every framework** (`dialog-popup.tsx`,

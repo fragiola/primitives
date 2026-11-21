@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import {
     isLayoutName,
+    isLooseEntryFile,
     isLooseSourceFile,
     layoutProblems,
 } from "../../scripts/check-layout.ts";
@@ -67,12 +68,32 @@ describe("the source layout check", () => {
                 "packages/react/src/components/dialog/dialog-popup.tsx",
             ),
         ).toBe(false);
+        expect(isLooseSourceFile("packages/angular/src/dialog.ts")).toBe(true);
+        expect(isLooseSourceFile("fixtures/react/src/main.tsx")).toBe(false);
+    });
+
+    it("finds a non-entry file at the root of an Angular entry point's folder", () => {
         expect(
-            isLooseSourceFile(
-                "packages/angular/src/lib/directives/dialog/dialog-popup.directive.ts",
+            isLooseEntryFile(
+                "packages/angular/dialog/dialog-popup.directive.ts",
+            ),
+        ).toBe(true);
+        expect(isLooseEntryFile("packages/angular/dialog/public-api.ts")).toBe(
+            false,
+        );
+        expect(isLooseEntryFile("packages/angular/tabs/ng-package.json")).toBe(
+            false,
+        );
+        expect(
+            isLooseEntryFile(
+                "packages/angular/dialog/directives/dialog-popup.directive.ts",
             ),
         ).toBe(false);
-        expect(isLooseSourceFile("fixtures/react/src/main.tsx")).toBe(false);
+        expect(isLooseEntryFile("packages/angular/package.json")).toBe(false);
+        expect(
+            isLooseEntryFile("packages/angular/scripts/publish-manifest.ts"),
+        ).toBe(false);
+        expect(isLooseEntryFile("packages/react/dialog/foo.ts")).toBe(false);
     });
 
     it("reports each bad name once, with the folder it belongs to", () => {

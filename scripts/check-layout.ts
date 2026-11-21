@@ -3,7 +3,8 @@
 // tracked file or folder whose name is not kebab-case, or a source file at the root of a package's
 // `src/` that is not one of its entries. Inside the responsibility folders, a component has a
 // folder of its own (`components/dialog/dialog-popup.tsx`, `lib/directives/dialog/`), and the
-// toolkit one folder per mechanism (`src/overlay/`): only the `src/` root is restricted. Run by
+// toolkit one folder per mechanism (`src/overlay/`); an Angular secondary entry point's folder
+// (`packages/angular/dialog/`) is organized like a `src/`. Run by
 // `pnpm check` (`check:layout`), over `git ls-files`.
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
@@ -50,6 +51,28 @@ export function isLooseSourceFile(path: string): boolean {
     return match?.[1] !== undefined && !SRC_ENTRIES.has(match[1]);
 }
 
+/** The files an Angular entry point's folder (`packages/angular/<entry>/`) may hold at its root. */
+export const ANGULAR_ENTRY_FILES: ReadonlySet<string> = new Set([
+    "public-api.ts",
+    "ng-package.json",
+]);
+
+/** The folders of `packages/angular/` that are not an entry point. */
+const ANGULAR_TOOLING = new Set(["src", "scripts", "tests"]);
+
+/**
+ * Whether a tracked path is a non-entry file at the root of an Angular secondary entry point's
+ * folder (`packages/angular/dialog/dialog-popup.directive.ts`): ng-packagr builds an entry point
+ * from its own folder, which is organized like a `src/` (`directives/`, `inject/`, `utils/`).
+ */
+export function isLooseEntryFile(path: string): boolean {
+    const match = /^packages\/angular\/([^/]+)\/([^/]+)$/.exec(path);
+    if (match?.[1] === undefined || match[2] === undefined) {
+        return false;
+    }
+    return !ANGULAR_TOOLING.has(match[1]) && !ANGULAR_ENTRY_FILES.has(match[2]);
+}
+
 /** Every rule a tracked path breaks, as a message naming it. */
 export function layoutProblems(paths: readonly string[]): string[] {
     const problems: string[] = [];
@@ -70,6 +93,11 @@ export function layoutProblems(paths: readonly string[]): string[] {
                 problems.push(`${prefix}: not kebab-case`);
             }
         });
+        if (isLooseEntryFile(path)) {
+            problems.push(
+                `${path}: an Angular entry point's folder holds only ${[...ANGULAR_ENTRY_FILES].join(" and ")} at its root; move it into a folder named after its responsibility`,
+            );
+        }
         if (isLooseSourceFile(path)) {
             problems.push(
                 `${path}: a package's src/ root holds only its entries (${[...SRC_ENTRIES].join(", ")}); move it into a folder named after its responsibility`,

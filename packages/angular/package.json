@@ -1,0 +1,83 @@
+{
+    "name": "@fragiola/primitives-angular",
+    "version": "0.0.0",
+    "description": "Headless, accessible Angular primitives (Dialog, Tabs, ...) of Fragiola Primitives: standalone directives, one secondary entry point per component, styled by you.",
+    "keywords": [
+        "angular",
+        "headless",
+        "accessibility",
+        "aria",
+        "dialog",
+        "tabs",
+        "primitives",
+        "ui"
+    ],
+    "license": "MIT",
+    "type": "module",
+    "author": {
+        "name": "Mauro de Souza",
+        "email": "maurodesouza.me@gmail.com",
+        "url": "https://github.com/maurodesouza"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fragiola/primitives.git",
+        "directory": "packages/angular"
+    },
+    "homepage": "https://fragiola.com/primitives",
+    "bugs": {
+        "url": "https://github.com/fragiola/primitives/issues"
+    },
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "@fragiola/source": "./src/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular.mjs"
+        },
+        "./internal": {
+            "@fragiola/source": "./internal/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-internal.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-internal.mjs"
+        },
+        "./dialog": {
+            "@fragiola/source": "./dialog/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-dialog.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-dialog.mjs"
+        },
+        "./tabs": {
+            "@fragiola/source": "./tabs/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "publishConfig": {
+        "directory": "dist",
+        "linkDirectory": false
+    },
+    "scripts": {
+        "build": "ng-packagr -p ng-package.json -c tsconfig.build.json && node scripts/publish-manifest.ts",
+        "typecheck": "ngc -p tsconfig.json",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@fragiola/primitives": "workspace:*"
+    },
+    "peerDependencies": {
+        "@angular/core": "^22.0.0"
+    },
+    "devDependencies": {
+        "@angular/common": "22.2.6",
+        "@angular/compiler": "22.2.6",
+        "@angular/compiler-cli": "22.2.6",
+        "@angular/core": "22.2.6",
+        "@angular/platform-browser": "22.2.6",
+        "jsdom": "31.0.1",
+        "ng-packagr": "22.2.6",
+        "rxjs": "7.8.2",
+        "typescript": "6.0.3",
+        "vitest": "5.1.0",
+        "vite": "8.3.8"
+    }
+}
