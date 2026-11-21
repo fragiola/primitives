@@ -1,0 +1,29 @@
+{
+    "name": "examples-vue",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "generate": "node ../shared/scripts/generate.ts vue",
+        "dev": "pnpm run generate && vite",
+        "build": "pnpm run generate && vite build",
+        "typecheck": "pnpm run generate && vue-tsc -p tsconfig.json --noEmit",
+        "e2e": "playwright test"
+    },
+    "dependencies": {
+        "@fragiola/primitives-vue": "workspace:*",
+        "examples-shared": "workspace:*",
+        "vue": "3.5.45"
+    },
+    "devDependencies": {
+        "@playwright/test": "1.65.1",
+        "@tailwindcss/vite": "4.3.5",
+        "@types/node": "26.6.6",
+        "@vitejs/plugin-vue": "6.0.11",
+        "tailwindcss": "4.3.5",
+        "typescript": "6.0.3",
+        "vite": "8.3.8",
+        "vitest": "5.1.0",
+        "vue-tsc": "3.3.14"
+    }
+}

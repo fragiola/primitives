@@ -91,11 +91,7 @@ describe("the E2E suites a change runs", () => {
 
     it("finds the fixtures and examples apps the repository has", () => {
         const found = repositoryFrameworks();
-        for (const list of [found.conformance, found.examples]) {
-            expect([...list].sort()).toEqual(list);
-            for (const name of list) {
-                expect(["angular", "react", "vue"]).toContain(name);
-            }
-        }
+        expect(found.conformance).toEqual(["angular", "react", "vue"]);
+        expect(found.examples).toEqual(["angular", "react", "vue"]);
     });
 });

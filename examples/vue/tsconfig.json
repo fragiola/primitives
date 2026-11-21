@@ -1,0 +1,17 @@
+{
+    // TypeScript 6.0.3, pinned in this app only: vue-tsc (the SFC type checker) does not run on
+    // TypeScript 7 yet (as fixtures/vue).
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "jsx": "preserve",
+        "types": ["node", "vite/client"],
+        "allowImportingTsExtensions": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.vue",
+        "tests",
+        "*.config.ts",
+        "vite.shared.ts"
+    ]
+}
