@@ -10,10 +10,13 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | --- | --- |
 | [dialog.md](dialog.md) | Dialog |
 | [tabs.md](tabs.md) | Tabs |
+| [popover.md](popover.md) | Popover |
+| [tooltip.md](tooltip.md) | Tooltip |
+| [menu.md](menu.md) | Menu (with submenus) |
 
-The POC's other specs (Popover, Tooltip, Menu; Field, Checkbox, CheckboxGroup, Slider, Select,
-Combobox; Calendar, RangeCalendar, DatePicker, DateRangePicker) move here with the Epic that ports
-their component (`docs/handoff.md` §5, stage 0), with §3's changes applied.
+The POC's other specs (Field, Checkbox, CheckboxGroup, Slider, Select, Combobox; Calendar,
+RangeCalendar, DatePicker, DateRangePicker) move here with the Epic that ports their component
+(`docs/handoff.md` §5, stage 0), with §3's changes applied.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -67,7 +70,7 @@ The vocabulary is shared by every component:
 | `data-pressed` | not used in these specs |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
 | `data-activation` | `automatic` or `manual` on Tabs (a value) |
-| `data-side` | the side an overlay ended up on (a value; its names follow Base UI's `inline-start` / `inline-end` plus the physical `left` / `right`, applied with the first positioned overlay, D4 §3 "Naming") |
+| `data-side` | the side an overlay ended up on (a value: `top`, `bottom`, the logical `inline-start` / `inline-end`, or the physical `left` / `right`, named as the overlay asked for it; Base UI's names, D4 §3 "Naming", [popover.md](popover.md#positioning)) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-today` | the calendar cell of today |
 | `data-outside-month` | a calendar cell of the previous or next month |
@@ -129,7 +132,8 @@ shared:
 | orientation | `orientation` |
 | arrow keys wrap around | `loopFocus` (Base UI's name, D4 §3 "Naming") |
 | an element to focus | `initialFocus`, `finalFocus` (an element, a ref, or `false` for none; Vue and Angular also take a getter, read when the focus moves; Angular also an `ElementRef`) |
-| positioning | `side`, `align`, `sideOffset`, `alignOffset`, `collisionPadding` |
+| positioning | `side` (`top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`), `align` (`start`, `center`, `end`), `sideOffset`, `alignOffset`, `collisionPadding` |
+| a modal overlay that is non-modal by default | `modal` (Menu; scroll lock and a blocked outside pointer, [menu.md](menu.md#modal)) |
 | locale | `locale` (a BCP 47 tag; defaults to the document's `lang`, then the browser's) |
 
 Controlled and uncontrolled: when `value` (or `open`) is given, the component is controlled and
@@ -186,7 +190,8 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | children function (collections, calendar weeks, a combobox's List and Value) | `children={(item) => ...}` | default scoped slot (`v-slot="{ week }"`) | `@for` over the directive's signal, read through `exportAs` (`@for (week of body.weeks(); ...)`, `{{ cell.dayNumber() }}`); a part rendered only in some states is structural (`*tabsPanel="'account'"`) |
 | field context (a control inside `Field.Root`) | `useContext` of the field's context | `inject` of the field's provided state | `injectField()` (optional injection of the enclosing `[fieldRoot]`) |
 | field validation (`validate`, `validationMode`) | `validate={(value) => ...}` `validationMode="onBlur"` | `:validate="(value) => ..."` `validation-mode="onBlur"` | `[validate]="fn"` `validationMode="onBlur"` (inputs of `[fieldRoot]`) |
-| part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()` → `{ state, ... }` of the enclosing root (the parts are the directives themselves) |
+| part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()` → `{ state, ... }` of the enclosing root (the parts are the directives themselves) |
+| a menu item's activation | `onClick` on `Menu.Item` | `@click` on `Menu.Item` | `(click)` on the `[menuItem]` element |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
