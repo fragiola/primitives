@@ -220,7 +220,7 @@ function vueProps(component: string, sources: Sources) {
         ];
     };
     const option = (text: string, name: string): string[] => {
-        const match = new RegExp(String.raw`\n {4}${name}:\s*(\{|[\w$]+)`).exec(
+        const match = new RegExp(String.raw`\n\s+${name}:\s*(\{|[\w$]+)`).exec(
             text,
         );
         if (!match) return [];
@@ -577,7 +577,7 @@ describe("the docs reference check", () => {
     it("fails when a Vue event drifts", () => {
         const sources = planted(
             "packages/vue/src/components/tabs/tabs-root.ts",
-            (text) => text.replace("valueChange: (", "change: ("),
+            (text) => text.replaceAll("valueChange: (", "change: ("),
         );
         const problems = docsReferenceProblems(PAGES, sources);
         expect(problems).toContain("api/tabs: Root: vue has no onValueChange");

@@ -53,9 +53,9 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 14,569 B | 5,112 B | 10,411 B | 3,604 B |
-| `@fragiola/primitives-vue/dialog` | 9,429 B | 3,666 B | 5,734 B | 2,271 B |
-| `@fragiola/primitives-vue/tabs` | 6,114 B | 2,369 B | 5,713 B | 2,175 B |
+| `@fragiola/primitives-vue` | 14,630 B | 5,121 B | 10,472 B | 3,616 B |
+| `@fragiola/primitives-vue/dialog` | 9,475 B | 3,674 B | 5,778 B | 2,286 B |
+| `@fragiola/primitives-vue/tabs` | 6,152 B | 2,379 B | 5,751 B | 2,186 B |
 
 ## @fragiola/primitives-angular
 
