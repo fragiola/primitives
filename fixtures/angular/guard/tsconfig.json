@@ -1,0 +1,13 @@
+{
+    // the guard app alone, the packages from their built declarations (no source condition)
+    "extends": "../../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "useDefineForClassFields": false,
+        "customConditions": []
+    },
+    "angularCompilerOptions": {
+        "strictTemplates": true
+    },
+    "files": ["main.ts"]
+}
