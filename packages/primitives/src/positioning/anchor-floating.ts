@@ -31,11 +31,11 @@ export interface AnchorOptions {
 }
 
 /**
- * Keeps `floating` next to `anchor` (spec/popover.md, "Positioning"): flip, shift, logical sides,
- * and it follows scroll and resize until the returned function is called. It writes structural
- * inline style only (`position`, `top`, `left`), the CSS variables `--anchor-width`,
- * `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin`, and the
- * arrow's offset.
+ * Keeps `floating` next to `anchor` (spec/popover.md, "Positioning"): flip, shift, logical and
+ * physical sides, and it follows scroll and resize until the returned function is called. It
+ * writes structural inline style only (`position`, `top`, `left`), the CSS variables
+ * `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`,
+ * `--transform-origin`, and the arrow's offset.
  */
 export function anchorFloating(
     anchor: Element,
@@ -91,7 +91,7 @@ export function anchorFloating(
         });
         floating.style.left = `${result.x}px`;
         floating.style.top = `${result.y}px`;
-        const placed = fromPlacement(result.placement, direction);
+        const placed = fromPlacement(result.placement, direction, side);
         floating.style.setProperty(
             "--transform-origin",
             transformOrigin(result.placement),

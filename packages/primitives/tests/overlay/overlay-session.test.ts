@@ -76,4 +76,45 @@ describe("openOverlaySession", () => {
         second.end();
         expect(document.activeElement).toBe(outside);
     });
+
+    it("after an outside press, returns focus only when the press left focus nowhere", async () => {
+        const { trigger, popup, inside, outside } = setup();
+        const open = (onDismiss: () => void) =>
+            openOverlaySession(document, {
+                elements: () => [popup],
+                dismiss: onDismiss,
+                returnFocus: {
+                    whenUnfocused: new Set(["outside-press"]),
+                    reason: () => "outside-press",
+                    to: () => trigger,
+                },
+            });
+        const settle = () => new Promise((resolve) => setTimeout(resolve, 5));
+
+        // a press on a non-focusable element: focus lands on the body, then goes to the trigger
+        inside.focus();
+        const first = open(() => first.end());
+        document.body.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        inside.blur();
+        await settle();
+        expect(document.activeElement).toBe(document.body);
+        document.body.dispatchEvent(
+            new PointerEvent("pointerup", { bubbles: true }),
+        );
+        await settle();
+        expect(document.activeElement).toBe(trigger);
+
+        // a press on a focusable element keeps the focus it gave
+        inside.focus();
+        const second = open(() => second.end());
+        outside.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        outside.focus();
+        outside.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+        await settle();
+        expect(document.activeElement).toBe(outside);
+    });
 });
