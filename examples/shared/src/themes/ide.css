@@ -1,0 +1,65 @@
+/* Theme "ide": A dense code-editor look: square corners, hairlines, no motion.
+
+   One file per theme, selected by data-example-theme="ide" on any element (the embed and the
+   fixtures put it on <body>, as an app would). A theme only sets values; it styles no markup
+   (tests/themes.test.ts). It declares:
+     1. the shape tokens (--pr-*) the recipes read: the font and its size (--pr-font, --pr-size),
+        a control's radius and height (--pr-radius, --pr-control-height), an overlay's radius,
+        padding and width (--pr-popup-radius, --pr-popup-padding, --pr-popup-width), the gap
+        between parts (--pr-gap), an overlay's shadow (--pr-shadow), motion (--pr-motion), the
+        focus ring's width (--pr-focus-width), the tabs indicator's thickness
+        (--pr-indicator-size) and the backdrop's colour (--pr-backdrop);
+     2. the three palettes the recipes use (surface: the page; raised: overlays; brand: the
+        selection and the focus ring), each with all SIX Fragiola UI roles (base, soft, line,
+        contrast, accent, ring). A palette that omitted one would inherit it from the page and
+        leak across the theme boundary.
+
+   Specificity: the palette rules are ":root [data-example-theme="ide"] .palette-x", so a theme
+   set on an element wins over any page palette above it. */
+
+[data-example-theme="ide"] {
+    color-scheme: dark;
+    --pr-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --pr-size: 0.8125rem;
+    --pr-radius: 0px;
+    --pr-control-height: 1.625rem;
+    --pr-popup-radius: 2px;
+    --pr-popup-padding: 1rem;
+    --pr-popup-width: 22rem;
+    --pr-gap: 0.5rem;
+    --pr-shadow: 0 0 0 1px oklch(0 0 0 / 0.5), 0 8px 16px oklch(0 0 0 / 0.5);
+    --pr-motion: 0ms;
+    --pr-focus-width: 1px;
+    --pr-indicator-size: 1px;
+    --pr-backdrop: oklch(0 0 0 / 0.5);
+}
+
+:root [data-example-theme="ide"] .palette-surface,
+:root [data-example-theme="ide"].palette-surface {
+    --palette-base: oklch(0.2 0.006 260);
+    --palette-soft: oklch(0.26 0.008 260);
+    --palette-line: oklch(0.32 0.008 260);
+    --palette-contrast: oklch(0.9 0.005 260);
+    --palette-accent: oklch(0.82 0.006 260);
+    --palette-ring: oklch(0.75 0.13 245);
+}
+
+:root [data-example-theme="ide"] .palette-raised,
+:root [data-example-theme="ide"].palette-raised {
+    --palette-base: oklch(0.235 0.006 260);
+    --palette-soft: oklch(0.19 0.006 260);
+    --palette-line: oklch(0.32 0.008 260);
+    --palette-contrast: oklch(0.92 0.005 260);
+    --palette-accent: oklch(0.8 0.006 260);
+    --palette-ring: oklch(0.75 0.13 245);
+}
+
+:root [data-example-theme="ide"] .palette-brand,
+:root [data-example-theme="ide"].palette-brand {
+    --palette-base: oklch(0.55 0.16 245);
+    --palette-soft: oklch(0.3 0.08 245);
+    --palette-line: oklch(0.42 0.1 245);
+    --palette-contrast: oklch(0.99 0 0);
+    --palette-accent: oklch(0.75 0.13 245);
+    --palette-ring: oklch(0.75 0.13 245);
+}

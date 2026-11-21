@@ -1,0 +1,67 @@
+/* Theme "paper": Warm and spacious: a serif face, soft round corners, slow motion.
+
+   One file per theme, selected by data-example-theme="paper" on any element (the embed and the
+   fixtures put it on <body>, as an app would). A theme only sets values; it styles no markup
+   (tests/themes.test.ts). It declares:
+     1. the shape tokens (--pr-*) the recipes read: the font and its size (--pr-font, --pr-size),
+        a control's radius and height (--pr-radius, --pr-control-height), an overlay's radius,
+        padding and width (--pr-popup-radius, --pr-popup-padding, --pr-popup-width), the gap
+        between parts (--pr-gap), an overlay's shadow (--pr-shadow), motion (--pr-motion), the
+        focus ring's width (--pr-focus-width), the tabs indicator's thickness
+        (--pr-indicator-size) and the backdrop's colour (--pr-backdrop);
+     2. the three palettes the recipes use (surface: the page; raised: overlays; brand: the
+        selection and the focus ring), each with all SIX Fragiola UI roles (base, soft, line,
+        contrast, accent, ring). A palette that omitted one would inherit it from the page and
+        leak across the theme boundary.
+
+   Specificity: the palette rules are ":root [data-example-theme="paper"] .palette-x", so a theme
+   set on an element wins over any page palette above it. */
+
+[data-example-theme="paper"] {
+    color-scheme: light;
+    --pr-font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --pr-size: 0.9375rem;
+    --pr-radius: 999px;
+    --pr-control-height: 2.5rem;
+    --pr-popup-radius: 20px;
+    --pr-popup-padding: 2rem;
+    --pr-popup-width: 28rem;
+    --pr-gap: 1rem;
+    --pr-shadow:
+        0 1px 2px oklch(0.4 0.04 60 / 0.08),
+        0 24px 48px -16px oklch(0.4 0.04 60 / 0.35);
+    --pr-motion: 240ms;
+    --pr-focus-width: 2px;
+    --pr-indicator-size: 3px;
+    --pr-backdrop: oklch(0.4 0.04 60 / 0.3);
+}
+
+:root [data-example-theme="paper"] .palette-surface,
+:root [data-example-theme="paper"].palette-surface {
+    --palette-base: oklch(0.955 0.014 85);
+    --palette-soft: oklch(0.92 0.02 85);
+    --palette-line: oklch(0.84 0.028 80);
+    --palette-contrast: oklch(0.25 0.03 60);
+    --palette-accent: oklch(0.33 0.035 60);
+    --palette-ring: oklch(0.46 0.09 220);
+}
+
+:root [data-example-theme="paper"] .palette-raised,
+:root [data-example-theme="paper"].palette-raised {
+    --palette-base: oklch(0.99 0.006 85);
+    --palette-soft: oklch(0.945 0.016 85);
+    --palette-line: oklch(0.87 0.022 80);
+    --palette-contrast: oklch(0.25 0.03 60);
+    --palette-accent: oklch(0.33 0.035 60);
+    --palette-ring: oklch(0.46 0.09 220);
+}
+
+:root [data-example-theme="paper"] .palette-brand,
+:root [data-example-theme="paper"].palette-brand {
+    --palette-base: oklch(0.46 0.09 220);
+    --palette-soft: oklch(0.93 0.03 220);
+    --palette-line: oklch(0.82 0.05 220);
+    --palette-contrast: oklch(0.99 0.005 85);
+    --palette-accent: oklch(0.4 0.08 220);
+    --palette-ring: oklch(0.4 0.08 220);
+}

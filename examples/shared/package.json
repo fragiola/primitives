@@ -1,0 +1,23 @@
+{
+    "name": "examples-shared",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "sideEffects": [
+        "*.css"
+    ],
+    "exports": {
+        "./theme.css": "./src/theme/theme.css",
+        "./themes": "./src/themes/themes.ts",
+        "./themes/*.css": "./src/themes/*.css",
+        "./recipes/*": "./src/recipes/*.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/node": "26.6.6",
+        "typescript": "7.0.2",
+        "vitest": "5.1.0"
+    }
+}
