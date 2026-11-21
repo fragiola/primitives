@@ -34,6 +34,9 @@ describe("the manifest", () => {
             const manifest = await buildManifest(app);
             expect(manifest.examples.map((example) => example.id)).toEqual([
                 "dialog",
+                "popover",
+                "tooltip",
+                "menu",
                 "tabs",
             ]);
             for (const example of manifest.examples) {
@@ -41,10 +44,12 @@ describe("the manifest", () => {
                 expect(example.files).toEqual([
                     `${example.id}/${entry}`,
                     `${example.id}/styles.ts`,
-                    ...(example.id === "dialog" ? ["_recipes/dialog.ts"] : []),
-                    "_recipes/recipe.ts",
-                    "_recipes/shared.ts",
-                    ...(example.id === "tabs" ? ["_recipes/tabs.ts"] : []),
+                    // its component's recipe and the recipes' shared files, in name order
+                    ...[
+                        `_recipes/${example.id}.ts`,
+                        "_recipes/recipe.ts",
+                        "_recipes/shared.ts",
+                    ].sort(),
                 ]);
                 expect(example.packages).toEqual([
                     PRIMITIVES_PACKAGES[framework],
