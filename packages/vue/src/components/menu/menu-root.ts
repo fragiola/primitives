@@ -35,13 +35,13 @@ export type MenuRootEmits = {
     openChange: (open: boolean, details: ChangeDetails) => true;
 };
 
-const submenuProps = {
+export const submenuProps = {
     ...overlayRootProps,
     /** Arrow keys wrap at the ends (default `true`). */
     loopFocus: { type: Boolean, default: true },
 };
 
-const menuProps = {
+export const menuProps = {
     ...submenuProps,
     /** Locks the scroll and blocks the outside pointer while open (default `false`). */
     modal: { type: Boolean, default: false },

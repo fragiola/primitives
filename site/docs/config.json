@@ -52,6 +52,18 @@
                     "path": "api/dialog"
                 },
                 {
+                    "label": "Popover",
+                    "path": "api/popover"
+                },
+                {
+                    "label": "Tooltip",
+                    "path": "api/tooltip"
+                },
+                {
+                    "label": "Menu",
+                    "path": "api/menu"
+                },
+                {
                     "label": "Tabs",
                     "path": "api/tabs"
                 }

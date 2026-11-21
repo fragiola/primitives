@@ -1,0 +1,219 @@
+---
+title: Popover
+description: Non-modal floating content anchored to a trigger, following the APG's non-modal dialog disclosed by a button, in each framework.
+---
+
+A panel the user opens, uses and leaves, next to its trigger. The page stays usable while it is
+open: focus is not trapped and nothing is inert. It is a non-modal `dialog` disclosed by a button
+(WAI-ARIA APG [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), without
+the modal parts). A menu of actions is a [Menu](/docs/api/menu); a description shown on hover is a
+[Tooltip](/docs/api/tooltip).
+
+<Example id="popover" />
+
+## Behaviour
+
+- **Open**: a press on the Trigger toggles it. Focus moves to `initialFocus`, else the **first
+  tabbable element** of the popup, else the popup itself (the APG dialog pattern).
+- **Inside**: in the tab order, the popup comes right after its trigger, even though it is
+  portalled. Tab from its last element moves on to the element after the trigger and closes it;
+  Shift+Tab from its first goes back to the trigger and closes it (reason `focus-out`).
+- **Close**: Escape (`escape-key`) or a Close part (`close-press`) or the Trigger again
+  (`trigger-press`) return focus to `finalFocus`, else the trigger. A press outside
+  (`outside-press`) returns it to the trigger **unless the press landed on a focusable element**,
+  which keeps the focus it got (Base UI's rule).
+- **Layers**: the popover is a layer. Opened inside a dialog, it closes first on Escape and on a
+  press inside the dialog.
+- **Positioning**: `side` of the anchor, flipped to the other side when there is no room, shifted
+  along it to stay in the viewport, following scroll and resize. `inline-start` and `inline-end`
+  follow the direction; `left` and `right` do not. `data-side` says where it ended up.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state |
+| Trigger | `button` | `popover-trigger` | toggles the popover, and anchors it |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `popover-positioner` | places the popup next to the anchor |
+| Popup | `div` | `popover-popup` | the popover |
+| Arrow | `div` | `popover-arrow` | points at the anchor (optional) |
+| Title | `h2` | `popover-title` | names the popover |
+| Description | `p` | `popover-description` | describes it |
+| Close | `button` | `popover-close` | closes it |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Popover } from "@fragiola/primitives-react/popover";
+
+<Popover.Root onOpenChange={(open, { reason }) => console.log(open, reason)}>
+    <Popover.Trigger>Notifications</Popover.Trigger>
+    <Popover.Portal>
+        <Popover.Positioner side="bottom" sideOffset={8}>
+            <Popover.Popup>
+                <Popover.Arrow />
+                <Popover.Title>Notifications</Popover.Title>
+                <Popover.Description>You have 2 unread messages.</Popover.Description>
+                <Popover.Close>Mark all as read</Popover.Close>
+            </Popover.Popup>
+        </Popover.Positioner>
+    </Popover.Portal>
+</Popover.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Popover } from "@fragiola/primitives-vue/popover";
+import { ref } from "vue";
+
+const open = ref(false);
+</script>
+
+<template>
+    <Popover.Root v-model:open="open">
+        <Popover.Trigger>Notifications</Popover.Trigger>
+        <Popover.Portal>
+            <Popover.Positioner side="bottom" :side-offset="8">
+                <Popover.Popup>
+                    <Popover.Arrow />
+                    <Popover.Title>Notifications</Popover.Title>
+                    <Popover.Description>You have 2 unread messages.</Popover.Description>
+                    <Popover.Close>Mark all as read</Popover.Close>
+                </Popover.Popup>
+            </Popover.Positioner>
+        </Popover.Portal>
+    </Popover.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [PopoverRoot, PopoverTrigger, PopoverPortal, PopoverPositioner, PopoverPopup, PopoverArrow, PopoverTitle, PopoverDescription, PopoverClose],
+    template: `
+        <ng-container popoverRoot [(open)]="open">
+            <button popoverTrigger>Notifications</button>
+            <ng-container *popoverPortal>
+                <div popoverPositioner side="bottom" [sideOffset]="8">
+                    <div popoverPopup>
+                        <div popoverArrow></div>
+                        <h2 popoverTitle>Notifications</h2>
+                        <p popoverDescription>You have 2 unread messages.</p>
+                        <button popoverClose>Mark all as read</button>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class Notifications {
+    protected readonly open = signal(false);
+}
+```
+
+`injectPopover()` gives a child component the popover's state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
+`@open-change`, `:side-offset`), and Angular as inputs and outputs (`[(open)]`,
+`(openChangeDetails)`, `[sideOffset]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`, `focus-out`) |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*popoverPortal="element"`) |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the anchor; `inline-*` follow the direction |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the anchor, in px |
+| `alignOffset` | `number` | `0` | the shift along the anchor's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the popup next to |
+
+### Popup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `initialFocus` | an element, a ref, or `false` | the first tabbable element, else the popup | focused on open (`false`: nothing moves); Vue and Angular also take a getter |
+| `finalFocus` | an element, a ref, or `false` | the trigger | focused when focus returns on close (`false`: nothing moves) |
+
+### Arrow
+
+No props of its own.
+
+### Title
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Description
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-describedby` points at; React and Vue take it as a plain attribute |
+
+### Close
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin` |
+| Popup | `role="dialog"` (no `aria-modal`), `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
+| Title, Description | an `id` (generated unless given) |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space on the Trigger | toggles |
+| Tab | through the popup's content; from its last element, to the element after the trigger, closing it |
+| Shift+Tab | from the popup's first element, back to the trigger, closing it |
+| Escape | closes, focus on the trigger (only the topmost layer, when one is open inside) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/popover` | `Popover`, `PopoverRootProps`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/popover` | `Popover`, `PopoverRootProps`, `PopoverRootEmits`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PopoverArrowState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/popover` | `PopoverRoot`, `PopoverTrigger`, `PopoverPortal`, `PopoverPositioner`, `PopoverPopup`, `PopoverArrow`, `PopoverTitle`, `PopoverDescription`, `PopoverClose`, `injectPopover`, `PopoverState`, `PopoverTriggerState`, `PopoverPositionerState`, `PopoverPopupState`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |

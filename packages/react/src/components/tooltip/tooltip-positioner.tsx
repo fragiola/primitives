@@ -14,8 +14,9 @@ export interface TooltipPositionerState {
     align: string;
 }
 
-export type TooltipPositionerProps = PartProps<TooltipPositionerState> &
-    PositionerProps;
+export interface TooltipPositionerProps
+    extends PartProps<TooltipPositionerState>,
+        PositionerProps {}
 
 /** Places the popup next to its anchor (spec/tooltip.md, "Positioning"). */
 export function TooltipPositioner({

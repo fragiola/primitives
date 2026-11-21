@@ -8,12 +8,15 @@ import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { MenuContext } from "./menu-context.ts";
 
-export type MenuPositionerProps = PartProps<{
+export interface MenuPositionerState {
     open: boolean;
     side: string;
     align: string;
-}> &
-    PositionerProps;
+}
+
+export interface MenuPositionerProps
+    extends PartProps<MenuPositionerState>,
+        PositionerProps {}
 
 /** Places a menu level: below its trigger, or at the end side of its submenu trigger. */
 export function MenuPositioner({

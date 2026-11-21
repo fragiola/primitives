@@ -1,0 +1,276 @@
+---
+title: Menu
+description: A menu of actions opened by a button, with submenus, roving focus and typeahead, non-modal by default, following the APG menu button pattern in each framework.
+---
+
+A list of actions opened by a button, with nested submenus. The highlighted item is the focused
+one (roving focus), typing jumps to an item, and each level is a layer. It follows the WAI-ARIA
+APG [menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/): **non-modal by
+default**, with a `modal` option that locks the page's scroll and blocks the pointer outside.
+Checkbox and radio items, context menus and menubars come later.
+
+<Example id="menu" />
+
+## Behaviour
+
+- **Open**: ArrowDown, Enter or Space on the Trigger opens it on the first item, ArrowUp on the
+  last; a press opens it with the popup focused and no item highlighted.
+- **Inside**: ArrowDown and ArrowUp move (wrapping with `loopFocus`), Home and End jump, a typed
+  character moves to the next item that starts with it. A disabled item stays focusable but is
+  never activated (APG). Hovering an item highlights it.
+- **Activate**: Enter, Space or a click fires the item's `click`, then closes every level
+  (reason `item-press`) and focuses the trigger.
+- **Submenus**: ArrowRight (ArrowLeft in RTL), Enter or Space on a SubmenuTrigger opens its
+  submenu on its first item, hovering it opens it after `delay`; ArrowLeft closes it. While the
+  pointer travels to an open submenu, crossing other items does not close it (a safe area).
+- **Close**: Escape closes one level (`escape-key`), focus back on its trigger. Tab closes every
+  level (`focus-out`) and moves on from the trigger. A press outside closes them all
+  (`outside-press`).
+- **Modal** (`modal`): while open, the page does not scroll and a press outside reaches no
+  element of the page: it only closes the menu, focus back on the trigger. The keyboard is
+  unchanged.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state of one menu level |
+| Trigger | `button` | `menu-trigger` | opens the menu |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `menu-positioner` | places a level next to its trigger |
+| Popup | `div` | `menu-popup` | the menu |
+| Item | `div` | `menu-item` | an action |
+| Separator | `div` | `menu-separator` | separates items |
+| Group | `div` | `menu-group` | groups items under a label |
+| GroupLabel | `div` | `menu-group-label` | names its group |
+| SubmenuRoot | none | | a nested level |
+| SubmenuTrigger | `div` | `menu-submenu-trigger` | the item that opens a submenu |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Menu } from "@fragiola/primitives-react/menu";
+
+<Menu.Root>
+    <Menu.Trigger>File</Menu.Trigger>
+    <Menu.Portal>
+        <Menu.Positioner sideOffset={4}>
+            <Menu.Popup>
+                <Menu.Item onClick={() => create()}>New file</Menu.Item>
+                <Menu.SubmenuRoot>
+                    <Menu.SubmenuTrigger>Share</Menu.SubmenuTrigger>
+                    <Menu.Portal>
+                        <Menu.Positioner>
+                            <Menu.Popup>
+                                <Menu.Item onClick={() => share("email")}>Email</Menu.Item>
+                            </Menu.Popup>
+                        </Menu.Positioner>
+                    </Menu.Portal>
+                </Menu.SubmenuRoot>
+                <Menu.Separator />
+                <Menu.Item disabled>Export</Menu.Item>
+            </Menu.Popup>
+        </Menu.Positioner>
+    </Menu.Portal>
+</Menu.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Menu } from "@fragiola/primitives-vue/menu";
+</script>
+
+<template>
+    <Menu.Root>
+        <Menu.Trigger>File</Menu.Trigger>
+        <Menu.Portal>
+            <Menu.Positioner :side-offset="4">
+                <Menu.Popup>
+                    <Menu.Item @click="create()">New file</Menu.Item>
+                    <Menu.SubmenuRoot>
+                        <Menu.SubmenuTrigger>Share</Menu.SubmenuTrigger>
+                        <Menu.Portal>
+                            <Menu.Positioner>
+                                <Menu.Popup>
+                                    <Menu.Item @click="share('email')">Email</Menu.Item>
+                                </Menu.Popup>
+                            </Menu.Positioner>
+                        </Menu.Portal>
+                    </Menu.SubmenuRoot>
+                    <Menu.Separator />
+                    <Menu.Item disabled>Export</Menu.Item>
+                </Menu.Popup>
+            </Menu.Positioner>
+        </Menu.Portal>
+    </Menu.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [MenuRoot, MenuTrigger, MenuPortal, MenuPositioner, MenuPopup, MenuItem, MenuSeparator, MenuSubmenuTrigger],
+    template: `
+        <ng-container menuRoot>
+            <button menuTrigger>File</button>
+            <ng-container *menuPortal>
+                <div menuPositioner [sideOffset]="4">
+                    <div menuPopup>
+                        <div menuItem (click)="create()">New file</div>
+                        <ng-container menuSubmenuRoot>
+                            <div menuSubmenuTrigger>Share</div>
+                            <ng-container *menuPortal>
+                                <div menuPositioner>
+                                    <div menuPopup>
+                                        <div menuItem (click)="share('email')">Email</div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <div menuSeparator></div>
+                        <div menuItem disabled>Export</div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class FileMenu {}
+```
+
+`[menuRoot]` and `[menuSubmenuRoot]` are one directive, `MenuRoot`. `injectMenu()` gives a child
+component its level's state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
+`@open-change`, `:loop-focus`), and Angular as inputs and outputs (`[(open)]`,
+`(openChangeDetails)`, `[loopFocus]`). An item's activation is its `click` event (`onClick`,
+`@click`, `(click)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `list-navigation`, `item-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+| `modal` | `boolean` | `false` | locks the page's scroll and blocks the pointer outside while open |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*menuPortal="element"`) |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"`; a submenu's `"inline-end"` | the side of the trigger; `inline-*` follow the direction |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along the trigger's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the level next to |
+
+### Popup
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | focusable, but never activated |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `true` | activating it closes every level |
+
+### Separator
+
+No props of its own.
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id its group's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### SubmenuRoot
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the submenu's open state, controlled |
+| `defaultOpen` | `boolean` | `false` | its initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason |
+| `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+| `modal` (angular) | `boolean` | | read on the root menu only (`[menuSubmenuRoot]` is the `MenuRoot` directive): a submenu follows its root |
+
+### SubmenuTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | focusable, but opens nothing |
+| `label` | `string` | its text | the text typeahead matches |
+| `openOnHover` | `boolean` | `true` | hovering opens the submenu |
+| `delay` | `number` | `100` | ms of hover before it opens |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`, `data-nested` (a submenu) |
+| Popup | `role="menu"`, `aria-labelledby` (its trigger), `aria-orientation="vertical"`, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-nested`, `data-starting-style`, `data-ending-style` |
+| Item | `role="menuitem"`, `tabindex="-1"`, `aria-disabled`, `data-highlighted`, `data-disabled` |
+| SubmenuTrigger | as an Item, plus `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-popup-open` |
+| Separator | `role="separator"`, `aria-orientation="horizontal"` |
+| Group | `role="group"`, `aria-labelledby` (its GroupLabel) |
+| GroupLabel | an `id` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowDown, Enter, Space on the Trigger | opens on the first item |
+| ArrowUp on the Trigger | opens on the last item |
+| ArrowDown, ArrowUp | the next or previous item (wrapping with `loopFocus`) |
+| Home, End | the first or last item |
+| a character | the next item that starts with the typed text |
+| Enter, Space | activates the item, closing every level |
+| ArrowRight (ArrowLeft in RTL) on a SubmenuTrigger | opens its submenu on its first item |
+| ArrowLeft (ArrowRight in RTL) in a submenu | closes it |
+| Escape | closes the current level |
+| Tab, Shift+Tab | closes every level and moves on from the trigger |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/menu` | `Menu`, `MenuRootProps`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerProps`, `MenuPositionerState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/menu` | `Menu`, `MenuRootProps`, `MenuRootEmits`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerState`, `MenuPopupState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/menu` | `MenuRoot`, `MenuTrigger`, `MenuPortal`, `MenuPositioner`, `MenuPopup`, `MenuItem`, `MenuSeparator`, `MenuGroup`, `MenuGroupLabel`, `MenuSubmenuTrigger`, `injectMenu`, `MenuState`, `MenuTriggerState`, `MenuPositionerState`, `MenuPopupState`, `MenuItemState`, `MenuSubmenuTriggerState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |

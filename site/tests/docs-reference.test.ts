@@ -235,9 +235,21 @@ function vueProps(component: string, sources: Sources) {
         name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
     return new Map(
         [...parts].map(([part, implementation]) => {
-            const text = sources.read(
-                `${dir}/components/${component}/${kebab(implementation)}.ts`,
-            );
+            // the part's own file, else the component file that declares it (Menu's
+            // `MenuSubmenuRoot`, beside `MenuRoot`); read from its declaration on
+            const folder = `${dir}/components/${component}`;
+            const declaration = `export const ${implementation}:`;
+            const file =
+                [
+                    `${folder}/${kebab(implementation)}.ts`,
+                    ...sources.files(folder),
+                ].find(
+                    (path) =>
+                        sources.files(folder).includes(path) &&
+                        sources.read(path).includes(declaration),
+                ) ?? `${folder}/${kebab(implementation)}.ts`;
+            const whole = sources.read(file);
+            const text = whole.slice(Math.max(0, whole.indexOf(declaration)));
             const props = option(text, "props").filter((p) => p !== "as");
             const events = option(text, "emits")
                 .filter((event) => !event.startsWith("update:"))
@@ -258,9 +270,24 @@ function angularProps(
     return new Map(
         parts.map((part) => {
             const directive = `${capitalize(component)}${part}`;
-            const text = sources.read(
-                `packages/angular/${component}/directives/${kebab(directive)}.directive.ts`,
-            );
+            const dir = `packages/angular/${component}/directives`;
+            const own = `${dir}/${kebab(directive)}.directive.ts`;
+            // a part may share another part's directive, which lists its selector too (Menu's
+            // `[menuRoot], [menuSubmenuRoot]`)
+            const selector = `[${directive.charAt(0).toLowerCase()}${directive.slice(1)}]`;
+            const file =
+                sources.files(dir).find((path) => path === own) ??
+                sources
+                    .files(dir)
+                    .find(
+                        (path) =>
+                            path.endsWith(".directive.ts") &&
+                            new RegExp(
+                                String.raw`selector:\s*"[^"]*${selector.replace(/[[\]]/g, "\\$&")}`,
+                            ).test(sources.read(path)),
+                    ) ??
+                own;
+            const text = sources.read(file);
             const inputs = [
                 ...text.matchAll(/readonly (\w+) = input(?:\.required)?[<(]/g),
             ].map((match) => match[1] ?? "");

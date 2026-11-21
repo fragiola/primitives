@@ -9,19 +9,29 @@ first; where the APG has no rule, Base UI.**
 ## The APG first
 
 The APG describes each pattern's roles, states, keyboard and focus: the [Dialog](/docs/api/dialog)
-follows the modal dialog pattern, the [Tabs](/docs/api/tabs) the tabs pattern. Where it gives a
-rule, the primitive follows it, even when a popular library does something else. Two examples:
+follows the modal dialog pattern, the [Popover](/docs/api/popover) the dialog pattern without its
+modal parts, the [Tooltip](/docs/api/tooltip) the tooltip pattern, the [Menu](/docs/api/menu) the
+menu button pattern and the [Tabs](/docs/api/tabs) the tabs pattern. Where it gives a rule, the
+primitive follows it, even when a popular library does something else. Some examples:
 
 - A modal dialog's popup sets `aria-modal="true"`, as the APG asks; Base UI relies on making the
   outside inert instead.
 - Tabs select on focus by default (automatic activation, the APG's recommendation when a panel
   shows without delay); manual activation is an option.
+- A popover focuses its first tabbable element on open ("generally, focus is initially set on the
+  first focusable element").
+- A tooltip wires itself: its popup is a `tooltip` and its trigger's `aria-describedby` points at
+  it; Base UI leaves both to you.
+- A menu is non-modal by default, as the APG's menu button; `modal` gives Base UI's behaviour
+  (scroll lock, a blocked outside pointer).
 
 ## Base UI where the APG is silent
 
 The APG says nothing of naming, animation states or many edge cases: there, the primitive follows
 Base UI. That is why the attributes are `data-popup-open`, `data-starting-style` and
-`data-ending-style`, and why the wrap-around prop is `loopFocus`.
+`data-ending-style`, why the wrap-around prop is `loopFocus`, why the sides are `inline-start` and
+`inline-end` (plus the physical `left` and `right`), and why a popover closed by a press outside
+gives focus back to its trigger unless the press landed on something focusable.
 
 ## A new difference
 

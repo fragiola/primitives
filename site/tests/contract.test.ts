@@ -183,6 +183,9 @@ describe("the sidebar", () => {
             "concepts/tree-shaking",
             "concepts/behaviour-rule",
             "api/dialog",
+            "api/popover",
+            "api/tooltip",
+            "api/menu",
             "api/tabs",
             "api/toolkit",
             "limitations",
@@ -191,7 +194,13 @@ describe("the sidebar", () => {
     });
 
     it("gives every component an API page with the decided sections", () => {
-        for (const path of ["api/dialog", "api/tabs"]) {
+        for (const path of [
+            "api/dialog",
+            "api/popover",
+            "api/tooltip",
+            "api/menu",
+            "api/tabs",
+        ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
             expect(headings, path).toEqual([

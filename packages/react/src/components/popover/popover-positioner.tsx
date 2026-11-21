@@ -14,8 +14,9 @@ export interface PopoverPositionerState {
     align: string;
 }
 
-export type PopoverPositionerProps = PartProps<PopoverPositionerState> &
-    PositionerProps;
+export interface PopoverPositionerProps
+    extends PartProps<PopoverPositionerState>,
+        PositionerProps {}
 
 /** Places the popup next to its anchor (spec/popover.md, "Positioning"). */
 export function PopoverPositioner({

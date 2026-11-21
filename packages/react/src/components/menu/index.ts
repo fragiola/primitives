@@ -13,7 +13,10 @@ export type {
 export type { RenderProp } from "../../utils/render-element.tsx";
 export type { MenuItemProps, MenuItemState } from "./menu-item.tsx";
 export type { MenuPortalProps } from "./menu-portal.tsx";
-export type { MenuPositionerProps } from "./menu-positioner.tsx";
+export type {
+    MenuPositionerProps,
+    MenuPositionerState,
+} from "./menu-positioner.tsx";
 export type { MenuRootProps, MenuSubmenuRootProps } from "./menu-root.tsx";
 export type {
     MenuSubmenuTriggerProps,

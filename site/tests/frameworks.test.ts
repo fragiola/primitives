@@ -109,13 +109,23 @@ describe("the embeds", () => {
         const ids = FRAMEWORKS.map((framework) =>
             listExampleIds(examplesApp(framework)),
         );
-        expect(ids[0]).toEqual(["dialog", "tabs"]);
+        expect(ids[0]).toEqual([
+            "dialog",
+            "menu",
+            "popover",
+            "tabs",
+            "tooltip",
+        ]);
         for (const list of ids) expect(list).toEqual(ids[0]);
         const manifests = await buildManifests();
         expect([...manifests.keys()]).toEqual([...FRAMEWORKS]);
         for (const [framework, manifest] of manifests) {
+            // by category (overlays, then navigation), then by order
             expect(manifest.examples.map((example) => example.id)).toEqual([
                 "dialog",
+                "popover",
+                "tooltip",
+                "menu",
                 "tabs",
             ]);
             for (const example of manifest.examples) {

@@ -1,0 +1,197 @@
+---
+title: Tooltip
+description: A control's short description, shown on hover and keyboard focus, wired as its accessible description, following the APG tooltip pattern in each framework.
+---
+
+A short description of a control, shown while the control is hovered or keyboard-focused. It
+never takes focus and holds nothing interactive. The primitive wires it itself: the popup is a
+`tooltip` and the trigger's `aria-describedby` points at it, so what it says is the control's
+accessible **description** (the control still needs its own name). It follows the WAI-ARIA APG
+[tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/), and stays open while hovered
+(WCAG 1.4.13).
+
+<Example id="tooltip" />
+
+## Behaviour
+
+- **Hover**: the pointer entering the Trigger opens it after `delay` (reason `trigger-hover`);
+  leaving before then cancels. A touch tap never opens it.
+- **Hoverable**: leaving the Trigger closes it after `closeDelay`, unless the pointer moves onto
+  the popup (across the gap): it stays open while hovered, and closes when the pointer leaves both.
+- **Keyboard**: keyboard focus on the Trigger opens it at once (`trigger-focus`, `data-instant`);
+  blur closes it. Escape closes it (`escape-key`), keeps focus on the trigger, and stops there: an
+  enclosing dialog stays open.
+- **Press**: a press on the Trigger closes it (`trigger-press`); it does not reopen until the
+  pointer leaves and comes back.
+- **Delay group**: within one Provider, one tooltip is open at a time. Moving from an open
+  tooltip's trigger to another one opens it at once (`data-instant`), also within `timeout` ms of
+  the last close.
+- **Positioning**: as the [Popover's](/docs/api/popover), from the Trigger, on the `top` by
+  default.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Provider | none | | a delay group: shared delays and the instant hand-off |
+| Root | none | | holds the state |
+| Trigger | `button` | `tooltip-trigger` | the described control, and the anchor |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `tooltip-positioner` | places the popup next to the trigger |
+| Popup | `div` | `tooltip-popup` | the tooltip |
+| Arrow | `div` | `tooltip-arrow` | points at the trigger (optional) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Tooltip } from "@fragiola/primitives-react/tooltip";
+
+<Tooltip.Provider delay={500}>
+    <Tooltip.Root>
+        <Tooltip.Trigger>Bold</Tooltip.Trigger>
+        <Tooltip.Portal>
+            <Tooltip.Positioner sideOffset={8}>
+                <Tooltip.Popup>
+                    <Tooltip.Arrow />
+                    Bold (Ctrl+B)
+                </Tooltip.Popup>
+            </Tooltip.Positioner>
+        </Tooltip.Portal>
+    </Tooltip.Root>
+</Tooltip.Provider>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Tooltip } from "@fragiola/primitives-vue/tooltip";
+</script>
+
+<template>
+    <Tooltip.Provider :delay="500">
+        <Tooltip.Root>
+            <Tooltip.Trigger>Bold</Tooltip.Trigger>
+            <Tooltip.Portal>
+                <Tooltip.Positioner :side-offset="8">
+                    <Tooltip.Popup>
+                        <Tooltip.Arrow />
+                        Bold (Ctrl+B)
+                    </Tooltip.Popup>
+                </Tooltip.Positioner>
+            </Tooltip.Portal>
+        </Tooltip.Root>
+    </Tooltip.Provider>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [TooltipProvider, TooltipRoot, TooltipTrigger, TooltipPortal, TooltipPositioner, TooltipPopup, TooltipArrow],
+    template: `
+        <ng-container tooltipProvider [delay]="500">
+            <ng-container tooltipRoot>
+                <button tooltipTrigger>Bold</button>
+                <ng-container *tooltipPortal>
+                    <div tooltipPositioner [sideOffset]="8">
+                        <div tooltipPopup><div tooltipArrow></div>Bold (Ctrl+B)</div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class BoldButton {}
+```
+
+`injectTooltip()` gives a child component the tooltip's state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
+`@open-change`), and Angular as inputs and outputs (`[(open)]`, `(openChangeDetails)`).
+
+### Provider
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `delay` | `number` | `600` | ms before a hovered trigger opens its tooltip |
+| `closeDelay` | `number` | `0` | ms before a tooltip closes once the pointer left |
+| `timeout` | `number` | `400` | ms after a close during which another tooltip of the group opens at once |
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-hover`, `trigger-focus`, `trigger-press`, `escape-key`) |
+| `delay` | `number` | the Provider's, else `600` | ms before a hovered trigger opens it |
+| `closeDelay` | `number` | the Provider's, else `0` | ms before it closes once the pointer left |
+| `disabled` | `boolean` | `false` | a disabled tooltip never opens |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*tooltipPortal="element"`) |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"top"` | the side of the trigger; `inline-*` follow the direction |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along the trigger's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+### Arrow
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-describedby` (the popup while open, added to the consumer's own), `data-popup-open` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the anchor CSS variables, as the Popover's |
+| Popup | `role="tooltip"`, an `id`, `data-side`, `data-align`, `data-open`, `data-instant` (opened with no delay), `data-starting-style`, `data-ending-style` |
+| Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab onto the Trigger | opens at once |
+| Tab away | closes |
+| Escape | closes, focus stays on the trigger |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipPortalProps`, `TooltipPositionerProps`, `TooltipPositionerState`, `TooltipPopupState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipRootEmits`, `TooltipTriggerState`, `TooltipPortalProps`, `TooltipPositionerState`, `TooltipPopupState`, `TooltipArrowState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/tooltip` | `TooltipProvider`, `TooltipRoot`, `TooltipTrigger`, `TooltipPortal`, `TooltipPositioner`, `TooltipPopup`, `TooltipArrow`, `injectTooltip`, `TooltipState`, `TooltipPopupState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |
