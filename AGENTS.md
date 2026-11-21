@@ -94,13 +94,29 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
    - sides are logical: Base UI's `inline-start` / `inline-end`, plus the physical `left` /
      `right`; `loopFocus`; `data-popup-open` on triggers (D4, §3 "Naming").
 8. **No Fragiola model API in the components.** Components use controlled and uncontrolled state:
-   `value` / `defaultValue` / `onValueChange` in React, `v-model` in Vue, a `model()` input with
-   its `*Change` output in Angular, as `spec/README.md` maps it.
+   `value` / `defaultValue` / `onValueChange` in React, `v-model:<prop>` in Vue, a two-way
+   `[(prop)]` binding in Angular (an `input()` with its `*Change` output, the shape of a `model()`
+   input; a plain input plus output where a one-way binding must stay controlled, since `model()`
+   writes its own value), as `spec/README.md` maps it. Only React takes `className` / `style` as
+   functions of the state; Vue and Angular style state through `data-*`, the `render` slot or the
+   part's `state()` (`exportAs`).
 9. **Dates** are a plain `{ year, month, day }` value with no time zone; no external date library:
    the date math is the toolkit's `/date` entry, the locale comes from `Intl`.
 10. **Nothing is released yet.** No `release.yml`, no npm publishing, no `npm trust`, no `0.0.0`
     stubs, no registration in `../www/projects.json` and no www trigger, until the maintainer
     validates the library (`site/tests/ci-workflow.test.ts` checks the workflow).
+
+## Decisions
+
+The guideline gaps of this domain were decided on 2026-11-21 (Epic #5, Issue #2) and written in the
+guidelines: the pattern page `../guidelines/architecture/native-primitives.md`, and rows of
+`../guidelines/decisions.md` (`library-pattern`, `np-*`). [`docs/decisions.md`](docs/decisions.md)
+mirrors every row: the part attribute, the toolkit re-export (framework packages never
+`export *` the toolkit; a toolkit type in a component's API is re-exported as a type from that
+component's entry), the entries, the source layout, the test layers (no playground), the examples
+styling (the recipes and the five themes in `examples/shared`, not Fragiola UI), the Vue and
+Angular idioms, the bundle guard, the modal overlays in the embeds, the site IA, the runtime
+dependency exception and the site contract (v1.7, dev port 5191).
 
 ## Source layout
 
