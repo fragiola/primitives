@@ -1,0 +1,27 @@
+{
+    "name": "fixture-react",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite --port 5320 --strictPort",
+        "build": "vite build",
+        "preview": "vite preview",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@fragiola/primitives-react": "workspace:*",
+        "examples-shared": "workspace:*",
+        "react": "19.3.1",
+        "react-dom": "19.3.1"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "4.3.5",
+        "@types/react": "19.3.0",
+        "@types/react-dom": "19.3.0",
+        "@vitejs/plugin-react": "6.3.0",
+        "tailwindcss": "4.3.5",
+        "typescript": "7.0.2",
+        "vite": "8.3.8"
+    }
+}

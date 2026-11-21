@@ -1,0 +1,29 @@
+{
+    // TypeScript 6.0.3, pinned in this app only: the Angular compiler (ngc, the Analog Vite plugin)
+    // supports `typescript >=6.0 <6.1`. The package's sources compile with the app (from their
+    // sources: the `@fragiola/source` condition), so they are part of the program.
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "types": ["vite/client"],
+        "useDefineForClassFields": false,
+        "customConditions": ["@fragiola/source"]
+    },
+    "angularCompilerOptions": {
+        "strictTemplates": true,
+        "strictInjectionParameters": true,
+        "strictInputAccessModifiers": true,
+        "strictStandalone": true,
+        "typeCheckHostBindings": true,
+        "extendedDiagnostics": {
+            "defaultCategory": "error"
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "../../packages/angular/src/**/*.ts",
+        "../../packages/angular/internal/**/*.ts",
+        "../../packages/angular/dialog/**/*.ts",
+        "../../packages/angular/tabs/**/*.ts",
+        "vite.config.ts"
+    ]
+}

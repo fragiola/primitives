@@ -21,7 +21,10 @@
         "test": "vitest run",
         "build": "pnpm -r --if-present build && node scripts/check-dts.ts",
         "changeset": "changeset",
-        "release:version": "changeset version"
+        "release:version": "changeset version",
+        "conformance": "pnpm --filter conformance e2e",
+        "e2e": "pnpm conformance && pnpm --workspace-concurrency=1 --filter \"./examples/*\" --if-present e2e",
+        "dev": "node scripts/dev-fixtures.ts"
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "0.18.5",

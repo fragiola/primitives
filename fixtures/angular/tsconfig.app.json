@@ -1,0 +1,14 @@
+{
+    // the app's compilation (@analogjs/vite-plugin-angular emits through it: no `noEmit`)
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false
+    },
+    "include": [
+        "src/**/*.ts",
+        "../../packages/angular/src/**/*.ts",
+        "../../packages/angular/internal/**/*.ts",
+        "../../packages/angular/dialog/**/*.ts",
+        "../../packages/angular/tabs/**/*.ts"
+    ]
+}
