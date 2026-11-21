@@ -141,7 +141,8 @@ Checks (after opening the dialog, then the popover):
 2. Escape closes the popover only, with focus back on "More info"; the dialog stays open. Escape
    again closes the dialog.
 3. A press inside the dialog, outside the popover (on its title), closes only the popover; focus
-   returns to "More info" (the press landed on nothing focusable), still inside the dialog.
+   goes to the dialog's popup, the focusable element (`tabindex="-1"`) the press landed in, so it
+   stays inside the dialog ([popover.md](popover.md#focus), "After an outside press").
 
 ### `/dialog/controlled`
 

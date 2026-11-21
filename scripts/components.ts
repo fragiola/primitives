@@ -3,7 +3,13 @@
 // from it, Angular has one ng-packagr secondary entry point per name (`packages/angular/<name>/`),
 // and site/tests/entries.test.ts checks every manifest's `exports`, every root entry and the
 // Angular folders against it. A new component is added here first.
-export const COMPONENTS = ["dialog", "tabs"] as const;
+export const COMPONENTS = [
+    "dialog",
+    "tabs",
+    "popover",
+    "tooltip",
+    "menu",
+] as const;
 
 export type ComponentName = (typeof COMPONENTS)[number];
 

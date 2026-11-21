@@ -209,6 +209,7 @@ test.describe("dialog / nested-popover", () => {
         await page.getByRole("heading", { name: "Edit profile" }).click();
         await expect(popover(page)).toBeHidden();
         await expect(dialog(page)).toBeVisible();
-        await expect(moreInfo(page)).toBeFocused();
+        // the press landed in the dialog's popup (focusable): it keeps the focus
+        await expect(dialog(page)).toBeFocused();
     });
 });

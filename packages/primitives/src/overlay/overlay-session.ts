@@ -89,7 +89,12 @@ export function openOverlaySession(
                   ...focusOut(),
                   ...layer.elementsAbove(),
               ],
-              () => options.dismiss("focus-out"),
+              () => {
+                  // the outside press that already dismissed the overlay moved the focus
+                  if (!pressing) {
+                      options.dismiss("focus-out");
+                  }
+              },
           )
         : () => {};
     let ended = false;

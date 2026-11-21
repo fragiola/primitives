@@ -117,4 +117,22 @@ describe("openOverlaySession", () => {
         await settle();
         expect(document.activeElement).toBe(outside);
     });
+
+    it("reports an outside press once, not again as focus-out when the press moves focus", () => {
+        const { trigger, popup, inside, outside } = setup();
+        const dismiss = vi.fn();
+        inside.focus();
+        const session = openOverlaySession(document, {
+            elements: () => [popup],
+            dismiss,
+            focusOut: () => [trigger],
+        });
+        outside.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        outside.focus();
+        outside.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+        expect(dismiss.mock.calls).toEqual([["outside-press"]]);
+        session.end();
+    });
 });
