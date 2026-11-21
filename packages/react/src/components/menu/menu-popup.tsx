@@ -7,7 +7,7 @@ import {
 import { blockOutsidePointer } from "@fragiola/primitives/inert";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
 import { lockScroll } from "@fragiola/primitives/scroll-lock";
-import { type KeyboardEvent, useEffect } from "react";
+import { type KeyboardEvent, useEffect, useRef } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -49,6 +49,8 @@ export function MenuPopup(
     } = context;
     const nested = context.parent !== null;
     const modal = context.modal && !nested;
+    const modalNow = useRef(modal);
+    modalNow.current = modal;
 
     useEffect(() => {
         if (!open || popup === null) {
@@ -63,9 +65,10 @@ export function MenuPopup(
             dismiss: (reason) => setOpen(false, reason),
             returnFocus: {
                 when: nested ? SUBMENU_RETURNS_FOCUS : ROOT_RETURNS_FOCUS,
-                whenUnfocused: modal
-                    ? MODAL_RETURNS_FOCUS_UNFOCUSED
-                    : undefined,
+                whenUnfocused: () =>
+                    modalNow.current
+                        ? MODAL_RETURNS_FOCUS_UNFOCUSED
+                        : undefined,
                 reason: () => lastReason.current,
                 to: () => trigger,
             },
@@ -80,16 +83,8 @@ export function MenuPopup(
                   ? items.at(-1)
                   : undefined;
         (target ?? popup).focus({ preventScroll: true });
-        // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside pointer
-        const unlock = modal ? lockScroll(doc) : undefined;
-        const unblock = modal ? blockOutsidePointer(doc) : undefined;
-        return () => {
-            unblock?.();
-            unlock?.();
-            session.end();
-        };
+        return session.end;
     }, [
-        modal,
         open,
         popup,
         positioner,
@@ -100,8 +95,28 @@ export function MenuPopup(
         nested,
     ]);
 
+    // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside pointer while
+    // open; on its own, so toggling `modal` while open keeps the session (and the focus) as it is
+    useEffect(() => {
+        if (!open || popup === null || !modal) {
+            return undefined;
+        }
+        const doc = popup.ownerDocument;
+        const unlock = lockScroll(doc);
+        const unblock = blockOutsidePointer(doc);
+        return () => {
+            unblock();
+            unlock();
+        };
+    }, [open, popup, modal]);
+
     const onKeyDown = (event: KeyboardEvent) => {
-        if (popup === null || event.defaultPrevented) {
+        // a submenu's keys bubble through its portal in React's tree: each level handles its own
+        if (
+            popup === null ||
+            event.defaultPrevented ||
+            !popup.contains(event.target as Node)
+        ) {
             return;
         }
         const items = menuItems(popup);

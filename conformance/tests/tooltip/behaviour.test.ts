@@ -173,3 +173,23 @@ test.describe("tooltip / group", () => {
         expect(elapsed).toBeGreaterThanOrEqual(700);
     });
 });
+
+test("tooltip / in-dialog: Escape closes the tooltip, not the dialog around it", async ({
+    page,
+}) => {
+    await openScenario(page, "/tooltip/in-dialog");
+    await page.getByRole("button", { name: "Open dialog" }).click();
+    const dialog = page.getByRole("dialog", { name: "Formatting" });
+    await expect(dialog).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).focus();
+    await page.keyboard.press("Shift+Tab");
+    const bold = button(page, "Bold");
+    await expect(bold).toBeFocused();
+    await expect(tooltip(page, "Bold (Ctrl+B)")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("tooltip")).toHaveCount(0);
+    await expect(dialog).toBeVisible();
+    await expect(bold).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+});

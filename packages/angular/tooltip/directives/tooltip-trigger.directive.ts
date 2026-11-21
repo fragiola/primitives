@@ -24,7 +24,8 @@ function isFocusVisible(element: Element): boolean {
         "[attr.data-popup-open]": "data().open",
         "(pointerenter)": "onPointerEnter($event)",
         "(pointerleave)": "onPointerLeave($event)",
-        "(pointerdown)": "root.press()",
+        // a tap neither opens nor blocks it (the block ends on a pointer leave touch has not)
+        "(pointerdown)": "$event.pointerType === 'touch' || root.press()",
         "(focus)": "onFocus()",
         "(blur)": "onBlur()",
     },

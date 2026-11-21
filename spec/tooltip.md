@@ -86,7 +86,9 @@ closed; after that, the next one waits for `delay` again.
 ## Dismissal and layering
 
 The open tooltip is not a layer: it takes no outside press and never closes an enclosing overlay.
-Escape closes it and stops there (an enclosing dialog stays open).
+Escape closes it and stops there (an enclosing dialog stays open): it takes the key before the
+layers do (`@fragiola/primitives/layers`, `interceptEscape`). Scenario
+[`/tooltip/in-dialog`](#tooltipin-dialog).
 
 ## Positioning
 
@@ -135,6 +137,18 @@ Checks:
    (Ctrl+B)": only one `tooltip` is visible.
 3. Moving to "Elsewhere", waiting 1 s (past `timeout`), then hovering "Underline": no tooltip for
    the first 400 ms; it opens after the delay.
+
+### `/tooltip/in-dialog`
+
+A [Dialog](dialog.md) Trigger **"Open dialog"**; its popup has Title **"Formatting"**, a Tooltip
+whose Trigger is a button **"Bold"** and whose popup says **"Bold (Ctrl+B)"**, and a Close
+**"Close"**.
+
+Checks (the tooltip is not a layer, and its Escape stops there):
+
+1. Open the dialog, Tab to "Close", Shift+Tab back to "Bold": the tooltip "Bold (Ctrl+B)" opens.
+2. Escape closes the tooltip only: the dialog stays open, focus on "Bold".
+3. Escape again closes the dialog.
 
 ## Differences from Base UI
 

@@ -15,6 +15,7 @@ export const ROUTES: readonly string[] = [
     "/popover/arrow",
     "/tooltip/basic",
     "/tooltip/group",
+    "/tooltip/in-dialog",
     "/menu/basic",
     "/menu/submenu",
     "/menu/groups",

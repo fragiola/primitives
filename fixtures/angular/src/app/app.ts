@@ -17,6 +17,7 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
+import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.ts";
 import { ROUTES } from "./routes.ts";
 
 /**
@@ -40,6 +41,7 @@ import { ROUTES } from "./routes.ts";
         PopoverArrow,
         TooltipBasic,
         TooltipGroup,
+        TooltipInDialog,
         MenuBasic,
         MenuSubmenu,
         MenuGroups,
@@ -62,6 +64,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/popover/arrow") { <main class="p-6" scenario-popover-arrow></main> }
             @case ("/tooltip/basic") { <main class="p-6" scenario-tooltip-basic></main> }
             @case ("/tooltip/group") { <main class="p-6" scenario-tooltip-group></main> }
+            @case ("/tooltip/in-dialog") { <main class="p-6" scenario-tooltip-in-dialog></main> }
             @case ("/menu/basic") { <main class="p-6" scenario-menu-basic></main> }
             @case ("/menu/submenu") { <main class="p-6" scenario-menu-submenu></main> }
             @case ("/menu/groups") { <main class="p-6" scenario-menu-groups></main> }

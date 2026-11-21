@@ -81,7 +81,6 @@ export class MenuPopup {
             const open = overlay.open();
             const positioner = overlay.positioner();
             const trigger = overlay.trigger();
-            const modal = level.isModal() && !level.nested;
             if (!open) {
                 return;
             }
@@ -97,9 +96,10 @@ export class MenuPopup {
                         when: level.nested
                             ? SUBMENU_RETURNS_FOCUS
                             : ROOT_RETURNS_FOCUS,
-                        whenUnfocused: modal
-                            ? MODAL_RETURNS_FOCUS_UNFOCUSED
-                            : undefined,
+                        whenUnfocused: () =>
+                            !level.nested && untracked(level.isModal)
+                                ? MODAL_RETURNS_FOCUS_UNFOCUSED
+                                : undefined,
                         reason: () => overlay.lastReason.current,
                         to: () => trigger,
                     },
@@ -114,14 +114,21 @@ export class MenuPopup {
                           ? items.at(-1)
                           : undefined;
                 (target ?? popup).focus({ preventScroll: true });
-                // spec/menu.md, "Modal": the root level locks the scroll and blocks the pointer
-                const unlock = modal ? lockScroll(doc) : undefined;
-                const unblock = modal ? blockOutsidePointer(doc) : undefined;
-                onCleanup(() => {
-                    unblock?.();
-                    unlock?.();
-                    session.end();
-                });
+                onCleanup(() => session.end());
+            });
+        });
+        // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside pointer
+        // while open; on its own, so toggling `modal` while open keeps the session as it is
+        afterRenderEffect((onCleanup) => {
+            if (!overlay.open() || level.nested || !level.isModal()) {
+                return;
+            }
+            const doc = popup.ownerDocument;
+            const unlock = lockScroll(doc);
+            const unblock = blockOutsidePointer(doc);
+            onCleanup(() => {
+                unblock();
+                unlock();
             });
         });
     }

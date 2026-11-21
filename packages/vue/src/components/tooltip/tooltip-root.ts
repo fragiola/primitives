@@ -2,6 +2,7 @@ import {
     createDelayGroup,
     createHoverIntent,
 } from "@fragiola/primitives/hover";
+import { interceptEscape } from "@fragiola/primitives/layers";
 import { trackHoverBridge } from "@fragiola/primitives/pointer";
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import {
@@ -121,24 +122,18 @@ export const TooltipRoot: PublicComponent<
                 { immediate: true },
             );
 
-            // Escape closes it and stops there
+            // Escape closes it and stops there: an enclosing layer stays open
             watch(
                 () => [root.open.value, root.trigger.value] as const,
                 ([open, trigger], _, onCleanup) => {
                     if (!open || trigger === null) {
                         return;
                     }
-                    const doc = trigger.ownerDocument;
-                    const onKeydown = (event: KeyboardEvent) => {
-                        if (event.key === "Escape") {
-                            event.stopPropagation();
+                    onCleanup(
+                        interceptEscape(trigger.ownerDocument, () => {
                             intent.cancel();
                             hide("escape-key");
-                        }
-                    };
-                    doc.addEventListener("keydown", onKeydown, true);
-                    onCleanup(() =>
-                        doc.removeEventListener("keydown", onKeydown, true),
+                        }),
                     );
                 },
                 { immediate: true },

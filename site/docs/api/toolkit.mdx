@@ -35,7 +35,7 @@ Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option,
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/inert` | `inertOutside`, `blockOutsidePointer` |
-| `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside` |
+| `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement` |
@@ -50,7 +50,8 @@ Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option,
   returns only once the press has ended, and only when the press focused nothing
   (`returnFocus.whenUnfocused`).
 - **Layers**: the stack of a document's open overlays. Escape and an outside press go to the
-  topmost layer only; a layer opened inside another is its child.
+  topmost layer only; a layer opened inside another is its child. A tooltip, which is no layer,
+  takes Escape before them (`interceptEscape`), so an enclosing dialog stays open.
 - **Focus**: the tabbable elements of a container, the focus trap, the initial focus, and whether
   the last interaction was the keyboard.
 - **Inert and scroll lock**: everything outside some elements made inert, the pointer blocked

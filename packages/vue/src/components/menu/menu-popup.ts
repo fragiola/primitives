@@ -71,7 +71,6 @@ export const MenuPopup: PartComponent<
                     }
                     const trigger = context.trigger.value;
                     const doc = popup.ownerDocument;
-                    const modal = !nested && context.modal();
                     // Escape, an item and the trigger give focus back to this level's trigger; the
                     // closing arrow of a submenu gives it back to its submenu trigger
                     const session = openOverlaySession(doc, {
@@ -82,9 +81,10 @@ export const MenuPopup: PartComponent<
                             when: nested
                                 ? SUBMENU_RETURNS_FOCUS
                                 : ROOT_RETURNS_FOCUS,
-                            whenUnfocused: modal
-                                ? MODAL_RETURNS_FOCUS_UNFOCUSED
-                                : undefined,
+                            whenUnfocused: () =>
+                                !nested && context.modal()
+                                    ? MODAL_RETURNS_FOCUS_UNFOCUSED
+                                    : undefined,
                             reason: () => context.lastReason.current,
                             to: () => trigger,
                         },
@@ -99,16 +99,30 @@ export const MenuPopup: PartComponent<
                               ? items.at(-1)
                               : undefined;
                     (target ?? popup).focus({ preventScroll: true });
-                    // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside
-                    // pointer
-                    const unlock = modal ? lockScroll(doc) : undefined;
-                    const unblock = modal
-                        ? blockOutsidePointer(doc)
-                        : undefined;
+                    onCleanup(() => session.end());
+                },
+                { flush: "post", immediate: true },
+            );
+
+            // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside pointer
+            // while open; on its own, so toggling `modal` while open keeps the session as it is
+            watch(
+                () =>
+                    [
+                        context.open.value,
+                        context.popup.value,
+                        !nested && context.modal(),
+                    ] as const,
+                ([open, popup, modal], _, onCleanup) => {
+                    if (!open || popup === null || !modal) {
+                        return;
+                    }
+                    const doc = popup.ownerDocument;
+                    const unlock = lockScroll(doc);
+                    const unblock = blockOutsidePointer(doc);
                     onCleanup(() => {
-                        unblock?.();
-                        unlock?.();
-                        session.end();
+                        unblock();
+                        unlock();
                     });
                 },
                 { flush: "post", immediate: true },

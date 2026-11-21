@@ -18,6 +18,7 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
 import TooltipGroup from "../scenarios/tooltip/tooltip-group.vue";
+import TooltipInDialog from "../scenarios/tooltip/tooltip-in-dialog.vue";
 
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
 export const routes: Record<string, Component> = {
@@ -36,6 +37,7 @@ export const routes: Record<string, Component> = {
     "/popover/arrow": PopoverArrow,
     "/tooltip/basic": TooltipBasic,
     "/tooltip/group": TooltipGroup,
+    "/tooltip/in-dialog": TooltipInDialog,
     "/menu/basic": MenuBasic,
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,

@@ -62,7 +62,13 @@ export const TooltipTrigger: PartComponent<
                                 context.hoverEnd();
                             }
                         },
-                        onPointerdown: () => context.press(),
+                        onPointerdown: (event: PointerEvent) => {
+                            // a tap neither opens nor blocks it (the block ends on a pointer leave
+                            // touch has not)
+                            if (event.pointerType !== "touch") {
+                                context.press();
+                            }
+                        },
                         onFocus: (event: FocusEvent) => {
                             if (
                                 !context.disabled() &&

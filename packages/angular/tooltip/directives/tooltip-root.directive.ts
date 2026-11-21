@@ -14,6 +14,7 @@ import {
     createDelayGroup,
     createHoverIntent,
 } from "@fragiola/primitives/hover";
+import { interceptEscape } from "@fragiola/primitives/layers";
 import { trackHoverBridge } from "@fragiola/primitives/pointer";
 import {
     type ChangeReason,
@@ -113,24 +114,18 @@ export class TooltipRoot {
             );
         });
 
-        // Escape closes it and stops there
+        // Escape closes it and stops there: an enclosing layer stays open
         effect((onCleanup) => {
             const open = overlay.open();
             const trigger = overlay.trigger();
             if (!open || trigger === null) {
                 return;
             }
-            const doc = trigger.ownerDocument;
-            const onKeyDown = (event: KeyboardEvent) => {
-                if (event.key === "Escape") {
-                    event.stopPropagation();
+            onCleanup(
+                interceptEscape(trigger.ownerDocument, () => {
                     this.intent.cancel();
                     this.hide("escape-key");
-                }
-            };
-            doc.addEventListener("keydown", onKeyDown, true);
-            onCleanup(() =>
-                doc.removeEventListener("keydown", onKeyDown, true),
+                }),
             );
         });
     }
