@@ -63,7 +63,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 31,220 B | 6,842 B | 27,058 B | 5,337 B |
+| `@fragiola/primitives-angular` | 31,260 B | 6,857 B | 27,098 B | 5,352 B |
 | `@fragiola/primitives-angular/internal` | 3,217 B | 1,438 B | 3,006 B | 1,341 B |
 | `@fragiola/primitives-angular/dialog` | 18,709 B | 4,641 B | 15,002 B | 3,279 B |
-| `@fragiola/primitives-angular/tabs` | 13,574 B | 3,452 B | 13,165 B | 3,236 B |
+| `@fragiola/primitives-angular/tabs` | 13,614 B | 3,469 B | 13,205 B | 3,251 B |
