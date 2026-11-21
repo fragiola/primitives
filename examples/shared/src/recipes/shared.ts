@@ -15,3 +15,10 @@ export const BUTTON = `inline-flex items-center justify-center gap-2 h-(--pr-con
 /** The enter and exit states of an overlay (`data-starting-style`, `data-ending-style`). */
 export const POPUP_MOTION =
     "transition-[opacity,scale] duration-(--pr-motion) data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95";
+
+/** A floating box (popover, menu), growing from its anchor (`--transform-origin`). */
+export const FLOATING_BOX = `palette-raised bg-palette-base text-palette-contrast font-primitives text-(length:--pr-size) border border-palette-line rounded-popup shadow-popup origin-(--transform-origin) ${POPUP_MOTION}`;
+
+/** A row of a list (menu item, submenu trigger). */
+export const LIST_ITEM =
+    "flex items-center gap-2 h-(--pr-control-height) px-2 rounded-control cursor-default select-none outline-none data-highlighted:bg-palette-soft data-disabled:opacity-50";
