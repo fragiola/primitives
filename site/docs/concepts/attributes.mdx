@@ -1,0 +1,54 @@
+---
+title: Part and state attributes
+description: How to select and style every part with data-primitives-part, and its state with data-* and ARIA attributes, the same in every framework.
+---
+
+Every element a primitive renders says which part it is, and its state is attributes: select and
+style them, never class names the library does not have.
+
+## The part attribute
+
+Every element carries `data-primitives-part="<component>-<part>"`:
+
+| element | attribute |
+| --- | --- |
+| a dialog's trigger | `data-primitives-part="dialog-trigger"` |
+| a dialog's popup | `data-primitives-part="dialog-popup"` |
+| a tab | `data-primitives-part="tabs-tab"` |
+| the tab indicator | `data-primitives-part="tabs-indicator"` |
+
+One attribute for the whole library, since many components have parts of the same name. Your
+tests, styles and tools can rely on it in every framework.
+
+## State attributes
+
+A boolean state is an attribute that is **present** (with an empty value) or **absent**, never
+`"false"`, so `[data-open]` and Tailwind's `data-open:` variant just work.
+
+| attribute | on |
+| --- | --- |
+| `data-open` | an open overlay (a dialog's popup and backdrop) |
+| `data-popup-open` | a trigger while its overlay is open |
+| `data-starting-style` | an element that just mounted, for one frame: transition from it |
+| `data-ending-style` | an element whose exit animation runs; it unmounts once its animations end |
+| `data-selected` | a selected tab, and its panel |
+| `data-disabled` | a disabled part |
+| `data-orientation` | `horizontal` or `vertical` (a value) |
+| `data-activation` | `automatic` or `manual` on tabs (a value) |
+
+ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-modal`, `aria-controls`.
+
+## An enter and exit transition
+
+```css
+[data-primitives-part="dialog-popup"] {
+    transition: opacity 150ms, scale 150ms;
+}
+[data-primitives-part="dialog-popup"][data-starting-style],
+[data-primitives-part="dialog-popup"][data-ending-style] {
+    opacity: 0;
+    scale: 0.95;
+}
+```
+
+The popup stays mounted while its exit transition runs, and unmounts when it ends.

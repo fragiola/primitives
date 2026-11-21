@@ -1,0 +1,18 @@
+/* The embed's stylesheet: Tailwind, the styling layer's theme (palette roles, --pr-* tokens) and
+   the five example themes, scoped to [data-example-theme] (on <body>). The recipes' classes live
+   in examples-shared, so Tailwind reads them there. */
+
+@import "tailwindcss";
+@import "examples-shared/theme.css";
+@import "examples-shared/themes/index.css";
+
+@source "../../node_modules/examples-shared/src/recipes";
+@source "../../index.html";
+@source "../examples";
+@source "./";
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}

@@ -1,0 +1,85 @@
+{
+    "sections": [
+        {
+            "label": "Getting started",
+            "pages": [
+                {
+                    "label": "Introduction",
+                    "path": "getting-started/introduction"
+                },
+                {
+                    "label": "Installation",
+                    "path": "getting-started/installation"
+                },
+                {
+                    "label": "Your first component",
+                    "path": "getting-started/first-component"
+                }
+            ]
+        },
+        {
+            "label": "Concepts",
+            "collapsible": true,
+            "pages": [
+                {
+                    "label": "The pattern",
+                    "path": "concepts/native-primitives"
+                },
+                {
+                    "label": "The primitive contract",
+                    "path": "concepts/primitive-contract"
+                },
+                {
+                    "label": "Part and state attributes",
+                    "path": "concepts/attributes"
+                },
+                {
+                    "label": "Tree-shaking",
+                    "path": "concepts/tree-shaking"
+                },
+                {
+                    "label": "The behaviour rule",
+                    "path": "concepts/behaviour-rule"
+                }
+            ]
+        },
+        {
+            "label": "API: components",
+            "collapsible": true,
+            "pages": [
+                {
+                    "label": "Dialog",
+                    "path": "api/dialog"
+                },
+                {
+                    "label": "Tabs",
+                    "path": "api/tabs"
+                }
+            ]
+        },
+        {
+            "label": "API: DOM toolkit (@fragiola/primitives)",
+            "collapsible": true,
+            "pages": [
+                {
+                    "label": "The toolkit",
+                    "path": "api/toolkit"
+                }
+            ]
+        },
+        {
+            "label": "More",
+            "pages": [
+                {
+                    "label": "Known limitations",
+                    "path": "limitations"
+                },
+                {
+                    "label": "Found a problem?",
+                    "href": "https://github.com/fragiola/primitives/issues",
+                    "external": true
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+---
+title: Tree-shaking
+description: One entry per component and per toolkit mechanism, ESM only and no side effects, so an app that uses two components ships only those two.
+---
+
+An app that uses Dialog and Tabs gets Dialog, Tabs and the toolkit code they use, nothing else.
+That is a hard requirement of the library, checked on every build.
+
+## One entry per component
+
+Every framework package has one entry per component, and a root entry that only re-exports them:
+
+```ts
+import { Dialog } from "@fragiola/primitives-react/dialog";
+import { Tabs } from "@fragiola/primitives-react/tabs";
+```
+
+Importing from the root (`@fragiola/primitives-react`) tree-shakes to the same output. In Angular
+each component is an ng-packagr secondary entry point (`@fragiola/primitives-angular/dialog`).
+
+## No registry
+
+There is no Vue `app.use()` plugin and no Angular NgModule of every directive: nothing references
+every component. A component imports only the toolkit mechanisms it uses, each its own entry
+(`@fragiola/primitives/focus`, `/overlay`, `/scroll-lock`, ...).
+
+## ESM, no side effects
+
+Every package is ESM only, with `"sideEffects": false`, and no module runs code when it is
+imported.
+
+## The bundle guard
+
+The repository builds a small app per framework that imports Dialog and Tabs, and fails when any
+other component or an unused mechanism (the dates, the range math) is in its output.

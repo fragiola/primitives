@@ -1,0 +1,118 @@
+---
+title: Installation
+description: Add the primitives to a React 19, Vue 3.5 or Angular 22 app with one package, the one for your framework, which brings the DOM toolkit with it.
+---
+
+Each framework has its own package. It depends on the framework-free DOM toolkit,
+`@fragiola/primitives`, at the exact same version, so you install one package.
+
+<Framework name="react">
+
+## React
+
+`@fragiola/primitives-react` needs React 19 (`react` and `react-dom`).
+
+<Tabs items={["pnpm", "npm", "yarn"]}>
+    <Tab value="pnpm">
+        ```sh
+        pnpm add @fragiola/primitives-react
+        ```
+    </Tab>
+    <Tab value="npm">
+        ```sh
+        npm install @fragiola/primitives-react
+        ```
+    </Tab>
+    <Tab value="yarn">
+        ```sh
+        yarn add @fragiola/primitives-react
+        ```
+    </Tab>
+</Tabs>
+
+Import each component from its own entry:
+
+```tsx
+import { Dialog } from "@fragiola/primitives-react/dialog";
+import { Tabs } from "@fragiola/primitives-react/tabs";
+```
+
+</Framework>
+
+<Framework name="vue">
+
+## Vue
+
+`@fragiola/primitives-vue` needs Vue 3.5. There is no plugin to install with `app.use()`: a
+component imports the primitives it uses.
+
+<Tabs items={["pnpm", "npm", "yarn"]}>
+    <Tab value="pnpm">
+        ```sh
+        pnpm add @fragiola/primitives-vue
+        ```
+    </Tab>
+    <Tab value="npm">
+        ```sh
+        npm install @fragiola/primitives-vue
+        ```
+    </Tab>
+    <Tab value="yarn">
+        ```sh
+        yarn add @fragiola/primitives-vue
+        ```
+    </Tab>
+</Tabs>
+
+Import each component from its own entry:
+
+```ts
+import { Dialog } from "@fragiola/primitives-vue/dialog";
+import { Tabs } from "@fragiola/primitives-vue/tabs";
+```
+
+</Framework>
+
+<Framework name="angular">
+
+## Angular
+
+`@fragiola/primitives-angular` needs Angular 22. The primitives are standalone directives, one
+secondary entry point per component, and they run zoneless.
+
+<Tabs items={["pnpm", "npm", "yarn"]}>
+    <Tab value="pnpm">
+        ```sh
+        pnpm add @fragiola/primitives-angular
+        ```
+    </Tab>
+    <Tab value="npm">
+        ```sh
+        npm install @fragiola/primitives-angular
+        ```
+    </Tab>
+    <Tab value="yarn">
+        ```sh
+        yarn add @fragiola/primitives-angular
+        ```
+    </Tab>
+</Tabs>
+
+Import the directives a component uses from their entry:
+
+```ts
+import { DialogRoot, DialogTrigger } from "@fragiola/primitives-angular/dialog";
+import { TabsRoot, TabsTab } from "@fragiola/primitives-angular/tabs";
+```
+
+</Framework>
+
+## Styling
+
+The packages ship no CSS. Style the parts with any tool, by their class (React's `className`,
+`class` in Vue and Angular) and by their [part and state attributes](/docs/concepts/attributes).
+The examples use Tailwind CSS v4 recipes, one class string per part.
+
+<Callout type="info" title="Not published yet">
+The packages are not on npm yet: they are published once the maintainer validates the library.
+</Callout>

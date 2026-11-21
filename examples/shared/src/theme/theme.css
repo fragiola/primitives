@@ -1,0 +1,31 @@
+/*
+ * The styling layer's Tailwind v4 theme: the Fragiola UI palette roles and the example themes'
+ * shape tokens as utilities. Adapted from the POC (@poc/styles, theme.css). An app imports
+ * Tailwind, this file and the themes, and points Tailwind at the recipes (`@source`), since their
+ * classes live in this package:
+ *
+ *     @import "tailwindcss";
+ *     @import "examples-shared/theme.css";
+ *     @import "examples-shared/themes/index.css";
+ *     @source "../node_modules/examples-shared/src/recipes";
+ *
+ * Six roles per palette: base (its background), soft (a subtle background), line (strokes),
+ * contrast (content on base), accent (emphasis, secondary text at /85), ring (focus). A palette
+ * class (`palette-surface`, `palette-raised`, `palette-brand`) sets them for a subtree; the
+ * recipes paint with `bg-palette-base`, `text-palette-contrast`, ... The values and the shape
+ * tokens come from the theme set by `data-example-theme` (themes/).
+ */
+
+@theme inline {
+    --color-palette-base: var(--palette-base);
+    --color-palette-soft: var(--palette-soft);
+    --color-palette-line: var(--palette-line);
+    --color-palette-contrast: var(--palette-contrast);
+    --color-palette-accent: var(--palette-accent);
+    --color-palette-ring: var(--palette-ring, var(--palette-accent));
+    --color-backdrop: var(--pr-backdrop);
+    --font-primitives: var(--pr-font);
+    --radius-control: var(--pr-radius);
+    --radius-popup: var(--pr-popup-radius);
+    --shadow-popup: var(--pr-shadow);
+}

@@ -1,0 +1,209 @@
+# Specs
+
+The source of truth for every component. Each framework implementation, each style recipe
+(`examples/shared/src/recipes/`) and each conformance test (`conformance/`) follows these pages. A
+behaviour change starts here (with its reason), then the tests, then the implementations
+(AGENTS.md rule 5). Moved from the POC (`maurodesouza/poc-cross-framework-primitives`, `spec/`) and
+updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`).
+
+| spec | components |
+| --- | --- |
+| [dialog.md](dialog.md) | Dialog |
+| [tabs.md](tabs.md) | Tabs |
+
+The POC's other specs (Popover, Tooltip, Menu; Field, Checkbox, CheckboxGroup, Slider, Select,
+Combobox; Calendar, RangeCalendar, DatePicker, DateRangePicker) move here with the Epic that ports
+their component (`docs/handoff.md` §5, stage 0), with §3's changes applied.
+
+Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
+`~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
+**APG first; where the APG has no rule, Base UI** (`references/base-ui`; D4, `docs/handoff.md`):
+a spec says which one it follows wherever they differ.
+
+## The format of a spec
+
+Every spec has these sections, in this order:
+
+1. **Purpose**: what the component is for, and what it is not.
+2. **Anatomy**: each part, its default element and its part attribute value.
+3. **API**: the props of each part, their defaults, the events, controlled and uncontrolled state.
+   Names are the normalized names below; each framework expresses them as the mapping table says.
+4. **State attributes and ARIA**: per part, what the primitive sets.
+5. **Keyboard**: the key map.
+6. **Focus**: where focus goes on open, close and inside.
+7. **Pointer**: mouse, touch and pen.
+8. **Dismissal and layering** (overlays).
+9. **Positioning** (positioned overlays).
+10. **Animation**: the enter and exit states.
+11. **RTL**: what changes in right-to-left.
+12. **Scenarios**: the fixtures every implementation renders, and what each one checks.
+13. **Differences from Base UI**: where the spec departs from Base UI, and why (D4).
+
+## Shared conventions
+
+### Part attribute
+
+Every element a primitive renders carries `data-primitives-part="<component>-<part>"`, the
+component's slug and the part in kebab-case (guidelines `decisions.md#np-part-attribute`):
+`data-primitives-part="dialog-popup"`, `"tabs-tab"`, `"menu-submenu-trigger"`. One attribute for
+the whole library, since many components have parts of the same name; the POC's
+`data-<component>-part` is converted during the port. The conformance contract layer and the style
+recipes select by it, never by class names.
+
+### State attributes
+
+A boolean state is an attribute that is **present** (empty value) or **absent**, never `"false"`.
+The vocabulary is shared by every component:
+
+| attribute | meaning |
+| --- | --- |
+| `data-open` | an overlay while open |
+| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming") |
+| `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
+| `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
+| `data-disabled` | the part is disabled |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, combobox item) |
+| `data-selected` | a selected tab, combobox item or calendar date |
+| `data-pressed` | not used in these specs |
+| `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
+| `data-activation` | `automatic` or `manual` on Tabs (a value) |
+| `data-side` | the side an overlay ended up on (a value; its names follow Base UI's `inline-start` / `inline-end` plus the physical `left` / `right`, applied with the first positioned overlay, D4 §3 "Naming") |
+| `data-align` | `start`, `center` or `end` (a value) |
+| `data-today` | the calendar cell of today |
+| `data-outside-month` | a calendar cell of the previous or next month |
+| `data-unavailable` | a calendar date the app marked unavailable |
+| `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
+| `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
+| `data-empty` | a combobox list with no item |
+| `data-nested` | a submenu's positioner and popup |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) |
+| `data-required` | a required form control |
+| `data-placeholder` | a Select showing its placeholder |
+| `data-instant` | a tooltip that opened with no delay |
+| `data-dragging` | a slider while a pointer drags a thumb |
+| `data-index` | a slider thumb's value index (a value) |
+| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation) |
+| `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus |
+
+### No text, and the one exception
+
+Primitives render only their children: no UI copy and no accessible name of their own. The
+fixtures give every name (`aria-label`, `<label>`, text children). **The exception is locale data**
+in the calendar family: the month heading, the weekday names, the day numbers and each cell's full
+date name come from `Intl` for the given locale. They are data, not copy, and no app could provide
+them cell by cell; the consumer can still replace each one (`calendar.md`, with its Epic).
+
+### Change details
+
+Every `on<Value>Change` receives the new value and a details object: `{ reason }`. The reasons are
+shared:
+
+| reason | when |
+| --- | --- |
+| `trigger-press` | the trigger toggled the overlay |
+| `close-press` | a `Close` part was pressed |
+| `escape-key` | Escape dismissed the overlay |
+| `outside-press` | a press outside the overlay (and its child layers) dismissed it |
+| `focus-out` | focus left a non-modal overlay |
+| `item-press` | a menu or combobox item was chosen |
+| `list-navigation` | the keyboard opened a menu or combobox |
+| `input-change` | typing opened or changed a combobox |
+| `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
+| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
+| `clear-press` | a combobox's Clear was pressed |
+| `chip-remove-press` | a combobox chip's remove button was pressed |
+| `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup) |
+| `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
+| `keyboard` | a key changed a slider's value |
+| `track-press` | a press on a slider's control moved a thumb |
+| `drag` | a pointer drag moved a slider's thumb |
+| `none` | anything else (a programmatic change) |
+
+### Normalized API names
+
+| concept | name |
+| --- | --- |
+| open state | `open`, `defaultOpen`, `onOpenChange(open, details)` |
+| value | `value`, `defaultValue`, `onValueChange(value, details)` |
+| disabled | `disabled` |
+| orientation | `orientation` |
+| arrow keys wrap around | `loopFocus` (Base UI's name, D4 §3 "Naming") |
+| an element to focus | `initialFocus`, `finalFocus` (an element, a ref, or `false` for none; Vue and Angular also take a getter, read when the focus moves; Angular also an `ElementRef`) |
+| positioning | `side`, `align`, `sideOffset`, `alignOffset`, `collisionPadding` |
+| locale | `locale` (a BCP 47 tag; defaults to the document's `lang`, then the browser's) |
+
+Controlled and uncontrolled: when `value` (or `open`) is given, the component is controlled and
+only reports changes; otherwise it keeps its own state, seeded by `defaultValue`.
+
+**A controlled value the consumer rejects stays the consumer's value.** A controlled component
+reports a change and then shows whatever the consumer gives back. When the consumer keeps the
+value unchanged (an `inputValue` that refuses some characters, an `open` that stays `true`), the
+component shows the consumer's value, not the user's input: the input's text goes back to the
+kept value within the same event, and a kept `open` leaves the overlay open and working (focus
+inside, the outside inert). Frameworks that write a native element before the consumer answers
+(an `<input>`'s text) must re-assert the kept value after the consumer's update has rendered.
+Scenarios: [`/dialog/rejected-close`](dialog.md#dialogrejected-close) (and Combobox's
+`/combobox/rejected-input`, with its Epic).
+
+### Forms
+
+The form controls (Select, Checkbox, Slider, Combobox) take `name` and render a **hidden input** that
+carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
+an uncontrolled control to its default) and, where `required` applies, validates them as the
+native control would. A hidden input is never in the accessibility tree nor in the tab order
+(`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
+only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
+`hidden-input`, since its `input` is the visible Input).
+
+**The Field layer** (`field.md`, with its Epic) sits above the controls. A `Field.Root` around a
+`Field.Control` (a native input), a Checkbox, a Select, a Slider or a Combobox gives the control:
+
+- its label (`Field.Label`, linked with `for` and `aria-labelledby`);
+- its description (`Field.Description`, in `aria-describedby`);
+- its validation: the native validity of the element the form validates, plus a `validate`
+  function, shown on submit, on blur or on change (`validationMode`), with `Field.Error` parts and
+  `aria-invalid`;
+- the states `data-invalid`, `data-valid`, `data-dirty`, `data-touched`, `data-filled` and
+  `data-focused`.
+
+Each control follows the spec's integration contract: it takes the field's ids, `name` and
+`disabled`, and reports its focus and its changes. Outside a field, it behaves as before.
+
+## API mapping by framework
+
+The specs describe one API. Each framework expresses it with its own means, never as a foreign API:
+
+| concept | React | Vue | Angular |
+| --- | --- | --- | --- |
+| namespace | `Dialog.Popup` (object of components) | `Dialog.Popup` (object of components) | one standalone directive per part, selector `[dialogPopup]`, class `DialogPopup` |
+| element override (`render`) | `render={<section />}` or `render={(props, state) => ...}` | `as="section"`, or the `#render="{ props, state, children }"` scoped slot | the directive sits on the consumer's own element (Angular's `render`) |
+| portal | `<Dialog.Portal>` (`createPortal` into `body`) | `<Dialog.Portal>` (`Teleport`) | the structural `*dialogPortal` on an `<ng-container>`: its view moves to `body`, in the declaration's injectors and change detection |
+| controlled state | `open` + `onOpenChange` | `v-model:open` (`open` prop + `update:open` emit) | `open = input<boolean>()` + `openChange = output<boolean>()` (two-way `[(open)]` or one-way `[open]`; not `model()`, which writes its own value) |
+| uncontrolled seed | `defaultOpen` | `default-open` | `defaultOpen = input()` |
+| change details | `onOpenChange(open, details)` | `@open-change="(open, details) => ..."` (besides `update:open`) | `openChangeDetails = output<{ open, details }>()` (`(openChange)` emits the value alone) |
+| class and style from state | `className` / `style` as a value or `(state) => value` | `class` / `style` values; state through `data-*` or the `render` slot | the consumer's own `class`; state through `data-*` or the directive's `state()` signal (`exportAs`) |
+| element reference | `ref` prop | template ref (the component instance, element as `$el`) | the host element: a template reference variable (`#cancel`); `#cancel="dialogClose"` gives the directive |
+| children function (collections, calendar weeks, a combobox's List and Value) | `children={(item) => ...}` | default scoped slot (`v-slot="{ week }"`) | `@for` over the directive's signal, read through `exportAs` (`@for (week of body.weeks(); ...)`, `{{ cell.dayNumber() }}`); a part rendered only in some states is structural (`*tabsPanel="'account'"`) |
+| field context (a control inside `Field.Root`) | `useContext` of the field's context | `inject` of the field's provided state | `injectField()` (optional injection of the enclosing `[fieldRoot]`) |
+| field validation (`validate`, `validationMode`) | `validate={(value) => ...}` `validationMode="onBlur"` | `:validate="(value) => ..."` `validation-mode="onBlur"` | `[validate]="fn"` `validationMode="onBlur"` (inputs of `[fieldRoot]`) |
+| part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()` → `{ state, ... }` of the enclosing root (the parts are the directives themselves) |
+
+Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
+(the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
+and `splitter/packages/*`.
+
+## Scenarios and fixtures
+
+Every scenario is a page at `/<component>/<scenario>` in every fixture (`fixtures/<framework>`).
+The specs fix:
+
+- the content and the **accessible names** (text, `aria-label`, `<label>`), so the behaviour tests
+  find elements by role and name and never by implementation detail;
+- what the fixture prints outside the component (`data-testid="output"`): the last value, the last
+  open state and the last change reason, as `key: value` lines;
+- a `data-testid` on an element the behaviour layer must find but that has no role (a popover's
+  Arrow), named in the scenario;
+- query parameters: `?locale=<tag>` and `?dir=rtl` where a scenario says so.
+
+The conformance suite fixes "today" with Playwright's clock: **2026-11-20** (a Friday) in every
+calendar scenario.

@@ -1,0 +1,58 @@
+---
+title: Primitives — headless UI for React, Vue and Angular
+description: Headless, accessible UI primitives that ship the same Dialog and Tabs, with the same behaviour, natively in React, Vue and Angular. Every pixel is yours.
+layout: landing
+---
+
+<Hero
+    eyebrow="Headless · accessible · three frameworks"
+    title="The same primitives, natively, in React, Vue and Angular."
+    description="Dialog and Tabs today, the whole catalog next: the WAI-ARIA keyboard, focus and ARIA of each pattern, written natively for each framework from one spec, and checked by one conformance suite. It ships behaviour. You ship the look."
+    actions={[
+        { label: "Browse {examples} examples", href: "/examples", variant: "primary", icon: "arrow" },
+        { label: "Set up your agent", href: "/ai", variant: "secondary" },
+        { label: "Read the docs", href: "/docs/getting-started/introduction", variant: "ghost" },
+    ]}
+/>
+
+<Example
+    id="dialog"
+    variant="showcase"
+    theme="light"
+    height={360}
+    label="One dialog, five themes:"
+/>
+
+<Features columns={4}>
+<Feature title="One spec, three frameworks">
+Each component has one spec: its anatomy, API, states, keyboard and focus. React, Vue and Angular
+each implement it natively, in their own idioms.
+</Feature>
+<Feature title="Accessible by default">
+The WAI-ARIA Authoring Practices first, Base UI where they are silent: roles, keyboard, focus
+trap, inert page, roving tab stop.
+</Feature>
+<Feature title="Styled by you">
+No CSS, no icons, no text. State is data-\* attributes and ARIA, and every element names its part
+with `data-primitives-part`.
+</Feature>
+<Feature title="Only what you import">
+One entry per component and per toolkit mechanism, ESM only, no side effects: an app that uses
+two components ships those two.
+</Feature>
+</Features>
+
+<Section title="What it never ships">
+<Pills strike items={["CSS", "Icons", "Text", "Accessible names", "A design system"]} />
+
+The primitives render your children and nothing else. The examples are styled with Tailwind
+recipes keyed on the part and state attributes, in five themes that change shape, not only colour.
+</Section>
+
+<Section title="Start here">
+<Cards>
+<Card title="Introduction" href="/docs/getting-started/introduction" description="What the primitives are, and what they leave to you." />
+<Card title="Your first component" href="/docs/getting-started/first-component" description="A styled dialog in each framework, part by part." />
+<Card title="The pattern" href="/docs/concepts/native-primitives" description="Why each framework gets a native implementation instead of an adapter." />
+</Cards>
+</Section>

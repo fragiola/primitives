@@ -1,0 +1,65 @@
+/* Theme "dark": The same shapes as Light, on dark palettes.
+
+   One file per theme, selected by data-example-theme="dark" on any element (the embed and the
+   fixtures put it on <body>, as an app would). A theme only sets values; it styles no markup
+   (tests/themes.test.ts). It declares:
+     1. the shape tokens (--pr-*) the recipes read: the font and its size (--pr-font, --pr-size),
+        a control's radius and height (--pr-radius, --pr-control-height), an overlay's radius,
+        padding and width (--pr-popup-radius, --pr-popup-padding, --pr-popup-width), the gap
+        between parts (--pr-gap), an overlay's shadow (--pr-shadow), motion (--pr-motion), the
+        focus ring's width (--pr-focus-width), the tabs indicator's thickness
+        (--pr-indicator-size) and the backdrop's colour (--pr-backdrop);
+     2. the three palettes the recipes use (surface: the page; raised: overlays; brand: the
+        selection and the focus ring), each with all SIX Fragiola UI roles (base, soft, line,
+        contrast, accent, ring). A palette that omitted one would inherit it from the page and
+        leak across the theme boundary.
+
+   Specificity: the palette rules are ":root [data-example-theme="dark"] .palette-x", so a theme
+   set on an element wins over any page palette above it. */
+
+[data-example-theme="dark"] {
+    color-scheme: dark;
+    --pr-font: var(--font-sans);
+    --pr-size: 0.875rem;
+    --pr-radius: 6px;
+    --pr-control-height: 2.25rem;
+    --pr-popup-radius: 12px;
+    --pr-popup-padding: 1.5rem;
+    --pr-popup-width: 24rem;
+    --pr-gap: 0.75rem;
+    --pr-shadow: 0 10px 30px -8px oklch(0 0 0 / 0.6);
+    --pr-motion: 150ms;
+    --pr-focus-width: 2px;
+    --pr-indicator-size: 2px;
+    --pr-backdrop: oklch(0 0 0 / 0.6);
+}
+
+:root [data-example-theme="dark"] .palette-surface,
+:root [data-example-theme="dark"].palette-surface {
+    --palette-base: oklch(0.13 0.01 250);
+    --palette-soft: oklch(0.22 0.012 250);
+    --palette-line: oklch(0.3 0.012 250);
+    --palette-contrast: oklch(0.95 0.005 250);
+    --palette-accent: oklch(0.88 0.005 250);
+    --palette-ring: oklch(0.7 0.18 300);
+}
+
+:root [data-example-theme="dark"] .palette-raised,
+:root [data-example-theme="dark"].palette-raised {
+    --palette-base: oklch(0.19 0.01 250);
+    --palette-soft: oklch(0.27 0.012 250);
+    --palette-line: oklch(0.33 0.012 250);
+    --palette-contrast: oklch(0.95 0.005 250);
+    --palette-accent: oklch(0.88 0.005 250);
+    --palette-ring: oklch(0.7 0.18 300);
+}
+
+:root [data-example-theme="dark"] .palette-brand,
+:root [data-example-theme="dark"].palette-brand {
+    --palette-base: oklch(0.7 0.18 300);
+    --palette-soft: oklch(0.3 0.08 300);
+    --palette-line: oklch(0.4 0.1 300);
+    --palette-contrast: oklch(0.12 0.02 300);
+    --palette-accent: oklch(0.78 0.15 300);
+    --palette-ring: oklch(0.78 0.15 300);
+}

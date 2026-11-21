@@ -1,0 +1,238 @@
+{
+    "name": "@fragiola/primitives",
+    "version": "0.0.0",
+    "description": "The framework-free DOM toolkit of Fragiola Primitives: overlays, layers, focus, scroll lock, positioning, collections, dates and more, one entry per mechanism.",
+    "keywords": [
+        "headless",
+        "accessibility",
+        "aria",
+        "dom",
+        "focus-trap",
+        "overlay",
+        "positioning",
+        "primitives"
+    ],
+    "license": "MIT",
+    "type": "module",
+    "author": {
+        "name": "Mauro de Souza",
+        "email": "maurodesouza.me@gmail.com",
+        "url": "https://github.com/maurodesouza"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fragiola/primitives.git",
+        "directory": "packages/primitives"
+    },
+    "homepage": "https://fragiola.com/primitives",
+    "bugs": {
+        "url": "https://github.com/fragiola/primitives/issues"
+    },
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "@fragiola/source": "./src/index.ts",
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./collection": {
+            "@fragiola/source": "./src/collection/index.ts",
+            "types": "./dist/collection.d.ts",
+            "import": "./dist/collection.js",
+            "default": "./dist/collection.js"
+        },
+        "./date": {
+            "@fragiola/source": "./src/date/index.ts",
+            "types": "./dist/date.d.ts",
+            "import": "./dist/date.js",
+            "default": "./dist/date.js"
+        },
+        "./direction": {
+            "@fragiola/source": "./src/direction/index.ts",
+            "types": "./dist/direction.d.ts",
+            "import": "./dist/direction.js",
+            "default": "./dist/direction.js"
+        },
+        "./focus": {
+            "@fragiola/source": "./src/focus/index.ts",
+            "types": "./dist/focus.d.ts",
+            "import": "./dist/focus.js",
+            "default": "./dist/focus.js"
+        },
+        "./form": {
+            "@fragiola/source": "./src/form/index.ts",
+            "types": "./dist/form.d.ts",
+            "import": "./dist/form.js",
+            "default": "./dist/form.js"
+        },
+        "./hover": {
+            "@fragiola/source": "./src/hover/index.ts",
+            "types": "./dist/hover.d.ts",
+            "import": "./dist/hover.js",
+            "default": "./dist/hover.js"
+        },
+        "./id": {
+            "@fragiola/source": "./src/id/index.ts",
+            "types": "./dist/id.d.ts",
+            "import": "./dist/id.js",
+            "default": "./dist/id.js"
+        },
+        "./inert": {
+            "@fragiola/source": "./src/inert/index.ts",
+            "types": "./dist/inert.d.ts",
+            "import": "./dist/inert.js",
+            "default": "./dist/inert.js"
+        },
+        "./layers": {
+            "@fragiola/source": "./src/layers/index.ts",
+            "types": "./dist/layers.d.ts",
+            "import": "./dist/layers.js",
+            "default": "./dist/layers.js"
+        },
+        "./overlay": {
+            "@fragiola/source": "./src/overlay/index.ts",
+            "types": "./dist/overlay.d.ts",
+            "import": "./dist/overlay.js",
+            "default": "./dist/overlay.js"
+        },
+        "./pointer": {
+            "@fragiola/source": "./src/pointer/index.ts",
+            "types": "./dist/pointer.d.ts",
+            "import": "./dist/pointer.js",
+            "default": "./dist/pointer.js"
+        },
+        "./positioning": {
+            "@fragiola/source": "./src/positioning/index.ts",
+            "types": "./dist/positioning.d.ts",
+            "import": "./dist/positioning.js",
+            "default": "./dist/positioning.js"
+        },
+        "./presence": {
+            "@fragiola/source": "./src/presence/index.ts",
+            "types": "./dist/presence.d.ts",
+            "import": "./dist/presence.js",
+            "default": "./dist/presence.js"
+        },
+        "./range": {
+            "@fragiola/source": "./src/range/index.ts",
+            "types": "./dist/range.d.ts",
+            "import": "./dist/range.js",
+            "default": "./dist/range.js"
+        },
+        "./scroll-lock": {
+            "@fragiola/source": "./src/scroll-lock/index.ts",
+            "types": "./dist/scroll-lock.d.ts",
+            "import": "./dist/scroll-lock.js",
+            "default": "./dist/scroll-lock.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ],
+    "publishConfig": {
+        "exports": {
+            ".": {
+                "types": "./dist/index.d.ts",
+                "import": "./dist/index.js",
+                "default": "./dist/index.js"
+            },
+            "./collection": {
+                "types": "./dist/collection.d.ts",
+                "import": "./dist/collection.js",
+                "default": "./dist/collection.js"
+            },
+            "./date": {
+                "types": "./dist/date.d.ts",
+                "import": "./dist/date.js",
+                "default": "./dist/date.js"
+            },
+            "./direction": {
+                "types": "./dist/direction.d.ts",
+                "import": "./dist/direction.js",
+                "default": "./dist/direction.js"
+            },
+            "./focus": {
+                "types": "./dist/focus.d.ts",
+                "import": "./dist/focus.js",
+                "default": "./dist/focus.js"
+            },
+            "./form": {
+                "types": "./dist/form.d.ts",
+                "import": "./dist/form.js",
+                "default": "./dist/form.js"
+            },
+            "./hover": {
+                "types": "./dist/hover.d.ts",
+                "import": "./dist/hover.js",
+                "default": "./dist/hover.js"
+            },
+            "./id": {
+                "types": "./dist/id.d.ts",
+                "import": "./dist/id.js",
+                "default": "./dist/id.js"
+            },
+            "./inert": {
+                "types": "./dist/inert.d.ts",
+                "import": "./dist/inert.js",
+                "default": "./dist/inert.js"
+            },
+            "./layers": {
+                "types": "./dist/layers.d.ts",
+                "import": "./dist/layers.js",
+                "default": "./dist/layers.js"
+            },
+            "./overlay": {
+                "types": "./dist/overlay.d.ts",
+                "import": "./dist/overlay.js",
+                "default": "./dist/overlay.js"
+            },
+            "./pointer": {
+                "types": "./dist/pointer.d.ts",
+                "import": "./dist/pointer.js",
+                "default": "./dist/pointer.js"
+            },
+            "./positioning": {
+                "types": "./dist/positioning.d.ts",
+                "import": "./dist/positioning.js",
+                "default": "./dist/positioning.js"
+            },
+            "./presence": {
+                "types": "./dist/presence.d.ts",
+                "import": "./dist/presence.js",
+                "default": "./dist/presence.js"
+            },
+            "./range": {
+                "types": "./dist/range.d.ts",
+                "import": "./dist/range.js",
+                "default": "./dist/range.js"
+            },
+            "./scroll-lock": {
+                "types": "./dist/scroll-lock.d.ts",
+                "import": "./dist/scroll-lock.js",
+                "default": "./dist/scroll-lock.js"
+            },
+            "./package.json": "./package.json"
+        }
+    },
+    "scripts": {
+        "build": "tsdown",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@floating-ui/dom": "1.8.0"
+    },
+    "devDependencies": {
+        "@types/node": "26.6.6",
+        "jsdom": "31.0.1",
+        "rolldown": "1.3.2",
+        "tsdown": "0.23.7",
+        "typescript": "7.0.2",
+        "vitest": "5.1.0"
+    }
+}
