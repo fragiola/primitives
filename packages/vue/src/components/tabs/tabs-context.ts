@@ -21,7 +21,9 @@ export interface TabsContext {
 
 export const TabsKey: InjectionKey<TabsContext> = Symbol("Tabs");
 
+// A value may hold any character (`"my account"`): it is encoded, so the id holds no whitespace
+// and `aria-controls` / `aria-labelledby` (lists of ids) still name one element.
 export const tabId = (baseId: string, value: string) =>
-    `${baseId}-tab-${value}`;
+    `${baseId}-tab-${encodeURIComponent(value)}`;
 export const panelId = (baseId: string, value: string) =>
-    `${baseId}-panel-${value}`;
+    `${baseId}-panel-${encodeURIComponent(value)}`;

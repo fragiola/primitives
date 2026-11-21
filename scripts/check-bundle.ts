@@ -135,6 +135,31 @@ export function bundleLeaks(
     return [...leaks].sort();
 }
 
+/**
+ * Whether the guard can read a bundle at all: its source map must reach the packages' sources
+ * (a component's and a mechanism's), never stop at a package's built file. Without the chain,
+ * every leak would go unseen and the guard would pass.
+ */
+export function chainProblems(sources: readonly string[]): string[] {
+    const problems: string[] = [];
+    const built = sources.filter((source) =>
+        /^packages\/[^/]+\/dist\//.test(source.replaceAll("\\", "/")),
+    );
+    if (built.length > 0) {
+        problems.push(
+            `the source map stops at built files (${built.join(", ")}): their source maps are not chained`,
+        );
+    }
+    const kinds = new Set(sources.map((source) => ownerOf(source)?.kind));
+    if (!kinds.has("component")) {
+        problems.push("the source map names no component source");
+    }
+    if (!kinds.has("mechanism")) {
+        problems.push("the source map names no toolkit mechanism source");
+    }
+    return problems;
+}
+
 /** The guard app's built bundle: its code and its sources, relative to the repository. */
 function readBundle(framework: FrameworkName): {
     sources: string[];
@@ -183,11 +208,8 @@ function main(): void {
             { cwd: root, stdio: ["ignore", "ignore", "inherit"] },
         );
         const { sources, code } = readBundle(framework);
-        const own = sources.filter((source) => ownerOf(source) !== null);
-        if (!own.some((source) => ownerOf(source)?.kind === "component")) {
-            problems.push(
-                `${framework}: the guard bundle names no component source (are the source maps chained?)`,
-            );
+        for (const problem of chainProblems(sources)) {
+            problems.push(`${framework}: ${problem}`);
         }
         for (const leak of bundleLeaks(sources, code, {
             framework,

@@ -1,27 +1,33 @@
-let lastInputWasKeyboard = false;
-let listening = false;
+/** Per document: whether its last input was a key (a document starts listening on first call). */
+const keyboardInput = /* @__PURE__ */ new WeakMap<
+    Document,
+    { keyboard: boolean }
+>();
 
 /**
- * Whether the last focus came from the keyboard (for overlays that highlight on keyboard open
- * only). Starts listening on first call.
+ * Whether the last focus in `doc` came from the keyboard (for overlays that highlight on keyboard
+ * open only). Each document is tracked on its own (an iframe's, a test's), from its first call.
  */
 export function isKeyboardModality(doc: Document): boolean {
-    if (!listening) {
-        listening = true;
+    let state = keyboardInput.get(doc);
+    if (state === undefined) {
+        const tracked = { keyboard: false };
+        state = tracked;
+        keyboardInput.set(doc, tracked);
         doc.addEventListener(
             "keydown",
             () => {
-                lastInputWasKeyboard = true;
+                tracked.keyboard = true;
             },
             true,
         );
         doc.addEventListener(
             "pointerdown",
             () => {
-                lastInputWasKeyboard = false;
+                tracked.keyboard = false;
             },
             true,
         );
     }
-    return lastInputWasKeyboard;
+    return state.keyboard;
 }

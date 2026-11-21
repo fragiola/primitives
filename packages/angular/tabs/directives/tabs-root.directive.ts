@@ -99,11 +99,13 @@ export class TabsRoot {
         this.selection.set(value, { reason });
     }
 
+    // A value may hold any character (`"my account"`): it is encoded, so the id holds no
+    // whitespace and `aria-controls` / `aria-labelledby` (lists of ids) still name one element.
     tabId(value: string): string {
-        return `${this.baseId}-tab-${value}`;
+        return `${this.baseId}-tab-${encodeURIComponent(value)}`;
     }
 
     panelId(value: string): string {
-        return `${this.baseId}-panel-${value}`;
+        return `${this.baseId}-panel-${encodeURIComponent(value)}`;
     }
 }

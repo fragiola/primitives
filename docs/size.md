@@ -20,11 +20,11 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 36,607 B | 13,846 B |
+| `@fragiola/primitives` | 36,707 B | 13,863 B |
 | `@fragiola/primitives/collection` | 3,550 B | 1,582 B |
 | `@fragiola/primitives/date` | 3,478 B | 1,508 B |
 | `@fragiola/primitives/direction` | 126 B | 125 B |
-| `@fragiola/primitives/focus` | 1,898 B | 872 B |
+| `@fragiola/primitives/focus` | 2,002 B | 927 B |
 | `@fragiola/primitives/form` | 2,353 B | 1,161 B |
 | `@fragiola/primitives/hover` | 424 B | 271 B |
 | `@fragiola/primitives/id` | 81 B | 98 B |
@@ -43,9 +43,9 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 13,119 B | 4,967 B | 8,963 B | 3,469 B |
+| `@fragiola/primitives-react` | 13,159 B | 4,983 B | 9,003 B | 3,483 B |
 | `@fragiola/primitives-react/dialog` | 9,059 B | 3,558 B | 5,364 B | 2,207 B |
-| `@fragiola/primitives-react/tabs` | 5,694 B | 2,423 B | 5,255 B | 2,219 B |
+| `@fragiola/primitives-react/tabs` | 5,734 B | 2,439 B | 5,295 B | 2,236 B |
 
 ## @fragiola/primitives-vue
 
@@ -53,9 +53,9 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 14,630 B | 5,121 B | 10,472 B | 3,616 B |
+| `@fragiola/primitives-vue` | 14,670 B | 5,135 B | 10,512 B | 3,630 B |
 | `@fragiola/primitives-vue/dialog` | 9,475 B | 3,674 B | 5,778 B | 2,286 B |
-| `@fragiola/primitives-vue/tabs` | 6,152 B | 2,379 B | 5,751 B | 2,186 B |
+| `@fragiola/primitives-vue/tabs` | 6,192 B | 2,394 B | 5,791 B | 2,200 B |
 
 ## @fragiola/primitives-angular
 

@@ -19,9 +19,13 @@ Layered sections of content, one visible at a time, chosen from a list of tabs (
 **Root**: `value`, `defaultValue` (the first enabled tab's value), `onValueChange(value,
 details)`, `orientation` (`"horizontal"`), `activation` (`"automatic"`, the APG's recommendation when panels show without latency, D4 §3: moving focus selects;
 `"manual"`: Enter or Space selects), `loopFocus` (`true`: the arrow keys wrap from the last tab
-to the first and back; Base UI's name, D4 §3 "Naming", the POC's `loop`).
+to the first and back; Base UI's name, D4 §3 "Naming", the POC's `loop`). With neither `value`
+nor `defaultValue`, the first enabled tab is selected once the tabs are known, and reported
+through `onValueChange` with the reason `none` (as the POC; Base UI does not report its default),
+so a consumer that mirrors the value sees it.
 
-**Tab**: `value` (string, required), `disabled`.
+**Tab**: `value` (any string, required; the tab's and its panel's ids encode it, so a value with
+spaces still gives valid `aria-controls` / `aria-labelledby`), `disabled`.
 
 **Panel**: `value` (string, required), `keepMounted` (`false`: an inactive panel is not rendered;
 `true`: it is rendered with `hidden`).
@@ -29,7 +33,8 @@ to the first and back; Base UI's name, D4 §3 "Naming", the POC's `loop`).
 **Indicator**: no props. It exposes the selected tab's box, relative to the List, as structural
 CSS variables: `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
 `--tabs-indicator-inline-size`, `--tabs-indicator-block-size`. It is not rendered while no tab is
-selected.
+selected. In Angular, the Indicator is an attribute directive on the consumer's element, which
+stays in the DOM: while no tab is selected it carries no variables (wrap it in `@if` to remove it).
 
 ## State attributes and ARIA
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     bundleLeaks,
+    chainProblems,
     GUARD,
     type GuardRules,
     ownerOf,
@@ -107,5 +108,22 @@ describe("the bundle guard", () => {
             name: "angular",
         });
         expect(ownerOf("node_modules/x/packages/core/src/a.ts")).toBeNull();
+    });
+
+    it("fails a bundle it cannot read: source maps that stop at built files", () => {
+        expect(chainProblems(CLEAN)).toEqual([]);
+        expect(
+            chainProblems([
+                "packages/react/src/components/dialog/dialog-popup.tsx",
+                "packages/primitives/dist/overlay.js",
+            ]),
+        ).toEqual([
+            "the source map stops at built files (packages/primitives/dist/overlay.js): their source maps are not chained",
+            "the source map names no toolkit mechanism source",
+        ]);
+        expect(chainProblems(["fixtures/react/guard/main.tsx"])).toEqual([
+            "the source map names no component source",
+            "the source map names no toolkit mechanism source",
+        ]);
     });
 });
