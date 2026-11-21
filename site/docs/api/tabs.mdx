@@ -1,0 +1,159 @@
+---
+title: Tabs
+description: Layered sections of content, one visible at a time, chosen from a tab list with the APG keyboard - arrow keys, Home and End, automatic or manual activation.
+---
+
+Layered sections of content, one shown at a time, chosen from a list of tabs. It follows the
+WAI-ARIA APG [tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+
+<Example id="tabs" />
+
+## Behaviour
+
+- **Roving focus**: the tab list is one tab stop (the selected tab, else the first); the arrow keys
+  move between tabs, Home and End jump to the first and last, wrapping when `loopFocus`.
+- **Activation**: `automatic` (the default, the APG's recommendation when a panel shows without
+  delay) selects the tab focus moves to (reason `list-navigation`); `manual` waits for Enter or
+  Space. A click selects and focuses (reason `trigger-press`).
+- **Disabled tabs stay focusable**, so they can be discovered, but are never selected.
+- **Panels**: Tab moves from the tab list to the selected panel, which is a tab stop of its own.
+  An inactive panel is not rendered, unless `keepMounted` keeps it, `hidden`.
+- **Indicator**: it exposes the selected tab's box, relative to the list, as CSS variables, for a
+  line that follows the selection.
+- **RTL**: in a horizontal list, ArrowRight and ArrowLeft swap.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `tabs-root` | holds the state |
+| List | `div` | `tabs-list` | the `tablist` |
+| Tab | `button` | `tabs-tab` | a `tab` |
+| Indicator | `span` | `tabs-indicator` | follows the selected tab (optional) |
+| Panel | `div` | `tabs-panel` | a `tabpanel` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Tabs } from "@fragiola/primitives-react/tabs";
+
+<Tabs.Root defaultValue="account">
+    <Tabs.List aria-label="Account settings">
+        <Tabs.Tab value="account">Account</Tabs.Tab>
+        <Tabs.Tab value="password">Password</Tabs.Tab>
+        <Tabs.Indicator />
+    </Tabs.List>
+    <Tabs.Panel value="account">Your account.</Tabs.Panel>
+    <Tabs.Panel value="password">Your password.</Tabs.Panel>
+</Tabs.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Tabs.Root v-model:value="tab">
+        <Tabs.List aria-label="Account settings">
+            <Tabs.Tab value="account">Account</Tabs.Tab>
+            <Tabs.Tab value="password">Password</Tabs.Tab>
+            <Tabs.Indicator />
+        </Tabs.List>
+        <Tabs.Panel value="account">Your account.</Tabs.Panel>
+        <Tabs.Panel value="password">Your password.</Tabs.Panel>
+    </Tabs.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<div tabsRoot [(value)]="tab">
+    <div tabsList aria-label="Account settings">
+        <button tabsTab value="account">Account</button>
+        <button tabsTab value="password">Password</button>
+        <span tabsIndicator></span>
+    </div>
+    <div *tabsPanel="'account'">Your account.</div>
+    <div *tabsPanel="'password'">Your password.</div>
+</div>
+```
+
+`*tabsPanel` renders its panel only while it is selected;
+`*tabsPanel="'account'; keepMounted: true"` keeps it in the page, `hidden`. `injectTabs()` gives a child component the tabs' state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them as `v-model:value` and `@value-change`, Angular as
+`[(value)]` and `(valueChangeDetails)`.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | the selected tab, controlled |
+| `defaultValue` | `string` | the first enabled tab | the initial selection, uncontrolled |
+| `onValueChange` | `(value: string, details: { reason }) => void` | | every change, with its reason (`list-navigation`, `trigger-press`) |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | which arrow keys move between tabs |
+| `activation` | `"automatic" \| "manual"` | `"automatic"` | whether focus selects, or Enter and Space do |
+| `loopFocus` | `boolean` | `true` | whether the arrow keys wrap around |
+
+### List
+
+No props of its own. Give it an accessible name (`aria-label` or `aria-labelledby`).
+
+### Tab
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the tab's value, matching its panel |
+| `disabled` | `boolean` | `false` | focusable, never selected |
+
+### Indicator
+
+No props of its own. It sets `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
+`--tabs-indicator-inline-size` and `--tabs-indicator-block-size`, and is not rendered while no tab
+is selected.
+
+### Panel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the value of its tab (Angular: `*tabsPanel="value"`) |
+| `keepMounted` | `boolean` | `false` | keep an inactive panel rendered, `hidden` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-orientation`, `data-activation` |
+| List | `role="tablist"`, `aria-orientation`, `data-orientation` |
+| Tab | `role="tab"`, `aria-selected`, `aria-controls`, `tabindex`, `aria-disabled` and `data-disabled` when disabled, `data-selected`, `data-orientation` |
+| Indicator | `aria-hidden="true"`, `data-orientation` |
+| Panel | `role="tabpanel"`, `aria-labelledby`, `tabindex="0"`, `data-selected`, `hidden` when kept mounted and inactive, `data-orientation` |
+
+## Keyboard
+
+| key | horizontal | vertical |
+| --- | --- | --- |
+| next tab | ArrowRight (ArrowLeft in RTL) | ArrowDown |
+| previous tab | ArrowLeft (ArrowRight in RTL) | ArrowUp |
+| Home, End | the first, the last tab | the same |
+| Enter, Space | selects the focused tab (`manual`) | the same |
+| Tab | from the tab list to the selected panel | the same |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsPanelProps`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/tabs` | `Tabs`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |

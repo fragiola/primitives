@@ -1,0 +1,64 @@
+---
+title: The DOM toolkit
+description: "@fragiola/primitives: the framework-free DOM behaviours every component is built on, one entry per mechanism, from the focus trap to the date math."
+---
+
+`@fragiola/primitives` is the framework-free toolkit the three framework packages build their
+components on. Each framework package depends on it at the exact same version: you rarely import
+it yourself, but you can, to build a primitive of your own.
+
+## What it is, and what it is not
+
+It holds **DOM behaviours and pure math**: functions and small classes that take elements and
+options and return values or a cleanup. It never holds a component's open, selected or value
+state, its lifecycle or its API, and it never imports a framework. It never touches the global
+`document` or `window`, only an element's own document, so it works inside iframes and popup
+windows. Its only runtime dependency is `@floating-ui/dom`, in the positioning entry.
+
+## One entry per mechanism
+
+Each mechanism is its own entry, so a component pulls in only the ones it uses: Dialog uses
+`/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and `/direction`. The root
+entry, `@fragiola/primitives`, only re-exports them.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives/collection` | `tabsKeyTarget`, `TabsKeyOptions`, `menuKeyTarget`, `submenuKeys`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear` |
+| `@fragiola/primitives/direction` | `getDirection`, `Direction` |
+| `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality` |
+| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `ValidityKey` |
+| `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
+| `@fragiola/primitives/id` | `createId` |
+| `@fragiola/primitives/inert` | `inertOutside` |
+| `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside` |
+| `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason` |
+| `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks` |
+| `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement` |
+| `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
+| `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions` |
+| `@fragiola/primitives/scroll-lock` | `lockScroll` |
+
+## The mechanisms
+
+- **Overlay**: an overlay session ties a layer, the focus-out watch and the focus return of one
+  open overlay together, and ends them with one call.
+- **Layers**: the stack of a document's open overlays. Escape and an outside press go to the
+  topmost layer only; a layer opened inside another is its child.
+- **Focus**: the tabbable elements of a container, the focus trap, the initial focus, and whether
+  the last interaction was the keyboard.
+- **Inert and scroll lock**: everything outside some elements made inert, and the document's
+  scroll locked (counted, so nested locks release in order), keeping the scrollbar gutter.
+- **Presence**: the next frame and the end of an element's animations, for the
+  `data-starting-style` and `data-ending-style` states.
+- **Collection**: the key maps of tabs, menus and chips, list navigation, typeahead and the
+  combobox's item helpers.
+- **Positioning**: a floating element anchored to its trigger, with logical sides
+  (`inline-start`, `inline-end`) and aligns (Floating UI).
+- **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
+  delay groups.
+- **Range, form, id, direction, date**: slider math and keys, the form bridge and field validity,
+  document-unique ids, the reading direction, and plain dates with their math and locale data
+  from `Intl`.

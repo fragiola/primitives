@@ -1,0 +1,7 @@
+{
+    "levels": [
+        { "id": "overlays", "title": "Overlays" },
+        { "id": "navigation", "title": "Navigation" }
+    ],
+    "themes": ["light", "dark", "ide", "paper", "terminal"]
+}

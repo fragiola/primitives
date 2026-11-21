@@ -1,0 +1,135 @@
+---
+title: Your first component
+description: Build a styled "Edit profile" dialog in React, Vue or Angular, part by part, with focus, Escape and the backdrop handled by the primitive.
+---
+
+A dialog is a Root that holds its state, a Trigger, a Portal, and the Backdrop and Popup it moves
+to the end of `body`, with a Title, a Description and Close buttons inside.
+
+<Example id="dialog" />
+
+## The parts
+
+<Framework name="react">
+
+```tsx title="edit-profile.tsx"
+import { Dialog } from "@fragiola/primitives-react/dialog";
+import { styles } from "./styles.ts";
+
+export function EditProfile() {
+    return (
+        <Dialog.Root>
+            <Dialog.Trigger className={styles.trigger}>Edit profile</Dialog.Trigger>
+            <Dialog.Portal>
+                <Dialog.Backdrop className={styles.backdrop} />
+                <Dialog.Popup className={styles.popup}>
+                    <Dialog.Title className={styles.title}>Edit profile</Dialog.Title>
+                    <Dialog.Description className={styles.description}>
+                        Change how others see you.
+                    </Dialog.Description>
+                    <label>
+                        Name
+                        <input defaultValue="Ada Lovelace" />
+                    </label>
+                    <Dialog.Close className={styles.close}>Save</Dialog.Close>
+                </Dialog.Popup>
+            </Dialog.Portal>
+        </Dialog.Root>
+    );
+}
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue title="edit-profile.vue"
+<script setup lang="ts">
+import { Dialog } from "@fragiola/primitives-vue/dialog";
+import { styles } from "./styles.ts";
+</script>
+
+<template>
+    <Dialog.Root>
+        <Dialog.Trigger :class="styles.trigger">Edit profile</Dialog.Trigger>
+        <Dialog.Portal>
+            <Dialog.Backdrop :class="styles.backdrop" />
+            <Dialog.Popup :class="styles.popup">
+                <Dialog.Title :class="styles.title">Edit profile</Dialog.Title>
+                <Dialog.Description :class="styles.description">
+                    Change how others see you.
+                </Dialog.Description>
+                <label>Name <input value="Ada Lovelace" /></label>
+                <Dialog.Close :class="styles.close">Save</Dialog.Close>
+            </Dialog.Popup>
+        </Dialog.Portal>
+    </Dialog.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts title="edit-profile.ts"
+import { Component } from "@angular/core";
+import {
+    DialogBackdrop, DialogClose, DialogDescription, DialogPopup,
+    DialogPortal, DialogRoot, DialogTitle, DialogTrigger,
+} from "@fragiola/primitives-angular/dialog";
+import { styles } from "./styles.ts";
+
+@Component({
+    selector: "app-edit-profile",
+    imports: [DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogPopup, DialogTitle, DialogDescription, DialogClose],
+    template: `
+        <ng-container dialogRoot>
+            <button dialogTrigger [class]="styles.trigger">Edit profile</button>
+            <ng-container *dialogPortal>
+                <div dialogBackdrop [class]="styles.backdrop"></div>
+                <div dialogPopup [class]="styles.popup">
+                    <h2 dialogTitle [class]="styles.title">Edit profile</h2>
+                    <p dialogDescription [class]="styles.description">Change how others see you.</p>
+                    <label>Name <input value="Ada Lovelace" /></label>
+                    <button dialogClose [class]="styles.close">Save</button>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class EditProfile {
+    protected readonly styles = styles;
+}
+```
+
+</Framework>
+
+## What the primitive does
+
+- The trigger is a `button` with `aria-haspopup="dialog"` and `aria-expanded`, and
+  `data-popup-open` while the dialog is open.
+- On open, focus moves to the first field; Tab and Shift+Tab stay inside the popup, and the rest
+  of the page is inert and does not scroll.
+- Escape, a press outside the popup and the Close buttons close it; focus goes back to the
+  trigger.
+- The popup is named by its Title and described by its Description.
+
+## The styles
+
+The class strings live in a `styles.ts` beside the component, one per part, so the markup holds
+none. The examples read them from the recipes of `examples/shared`, keyed on the part and state
+attributes (`data-starting-style` for the opening transition, `data-ending-style` for the closing
+one):
+
+```ts title="styles.ts"
+export const styles = {
+    trigger: "h-9 px-3 rounded-md border",
+    backdrop: "fixed inset-0 bg-black/40 transition-opacity data-starting-style:opacity-0 data-ending-style:opacity-0",
+    popup: "fixed top-1/2 start-1/2 -translate-1/2 w-96 p-6 rounded-xl bg-white",
+    title: "text-lg font-semibold",
+    description: "opacity-85",
+    close: "h-9 px-3 rounded-md border",
+};
+```
+
+Next: the [Dialog API](/docs/api/dialog), or the [Tabs](/docs/api/tabs).

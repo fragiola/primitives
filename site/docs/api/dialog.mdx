@@ -1,0 +1,197 @@
+---
+title: Dialog
+description: A modal dialog that takes focus, traps it, makes the page inert and returns focus on close, following the APG modal dialog pattern in each framework.
+---
+
+A window over the page: it takes focus, keeps it inside, makes the rest of the page inert and
+stops it scrolling, and gives focus back when it closes. It follows the WAI-ARIA APG
+[modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Non-modal floating
+content is a popover; alert dialogs are out of its scope.
+
+<Example id="dialog" />
+
+## Behaviour
+
+- **Open**: a press on the Trigger (Enter and Space, as any button). Focus moves to
+  `initialFocus`, else the first tabbable element of the popup, else the popup itself.
+- **Inside**: Tab and Shift+Tab wrap inside the popup; everything outside the portal is inert,
+  and the page does not scroll (its scrollbar gutter is kept, so nothing shifts).
+- **Close**: Escape (reason `escape-key`), a press outside the popup (`outside-press`), a Close
+  part (`close-press`) or the Trigger again (`trigger-press`). Focus moves to `finalFocus`, else
+  the trigger, else the element focused before it opened.
+- **Layers**: the dialog is a layer. Escape and outside presses go to the topmost open layer, so a
+  popover opened inside the dialog closes first.
+- **Animation**: the Backdrop and the Popup carry `data-starting-style` on their first frame and
+  `data-ending-style` while closing, and unmount when their animations end.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state |
+| Trigger | `button` | `dialog-trigger` | opens the dialog |
+| Portal | none | | moves the Backdrop and the Popup to the end of `body` |
+| Backdrop | `div` | `dialog-backdrop` | covers the page (optional) |
+| Popup | `div` | `dialog-popup` | the dialog |
+| Title | `h2` | `dialog-title` | names the dialog |
+| Description | `p` | `dialog-description` | describes the dialog |
+| Close | `button` | `dialog-close` | closes the dialog |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Dialog } from "@fragiola/primitives-react/dialog";
+
+<Dialog.Root onOpenChange={(open, { reason }) => console.log(open, reason)}>
+    <Dialog.Trigger>Edit profile</Dialog.Trigger>
+    <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup>
+            <Dialog.Title>Edit profile</Dialog.Title>
+            <Dialog.Description>Change how others see you.</Dialog.Description>
+            <Dialog.Close>Close</Dialog.Close>
+        </Dialog.Popup>
+    </Dialog.Portal>
+</Dialog.Root>;
+```
+
+Controlled: `open` and `onOpenChange`, with `useState`.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Dialog } from "@fragiola/primitives-vue/dialog";
+import { ref } from "vue";
+
+const open = ref(false);
+</script>
+
+<template>
+    <Dialog.Root v-model:open="open" @open-change="(open, { reason }) => console.log(reason)">
+        <Dialog.Trigger>Edit profile</Dialog.Trigger>
+        <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Popup>
+                <Dialog.Title>Edit profile</Dialog.Title>
+                <Dialog.Description>Change how others see you.</Dialog.Description>
+                <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+        </Dialog.Portal>
+    </Dialog.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogPopup, DialogTitle, DialogDescription, DialogClose],
+    template: `
+        <ng-container dialogRoot [(open)]="open" (openChangeDetails)="log($event.details.reason)">
+            <button dialogTrigger>Edit profile</button>
+            <ng-container *dialogPortal>
+                <div dialogBackdrop></div>
+                <div dialogPopup>
+                    <h2 dialogTitle>Edit profile</h2>
+                    <p dialogDescription>Change how others see you.</p>
+                    <button dialogClose>Close</button>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class EditProfile {
+    protected readonly open = signal(false);
+}
+```
+
+`*dialogPortal="element"` portals into another container. `injectDialog()` gives a child
+component the dialog's state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
+`@open-change`), and Angular as inputs and outputs (`[(open)]`, `(openChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`) |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `document.body` | where the Backdrop and the Popup go (Angular: `*dialogPortal="element"`) |
+
+### Backdrop
+
+No props of its own.
+
+### Popup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `initialFocus` | an element, a ref, or `false` | the first tabbable element | focused on open (`false`: the popup itself); Vue and Angular also take a getter |
+| `finalFocus` | an element, a ref, or `false` | the trigger | focused on close (`false`: nothing moves) |
+
+### Title
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Description
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-describedby` points at; React and Vue take it as a plain attribute |
+
+### Close
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
+| Backdrop | `aria-hidden="true"`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Popup | `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Title, Description | an `id` (generated unless given) |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space on the Trigger | opens |
+| Tab, Shift+Tab | the next or previous tabbable element of the popup, wrapping |
+| Escape | closes (only the topmost layer, when one is open inside) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/dialog` | `Dialog`, `DialogRootProps`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/dialog` | `Dialog`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/dialog` | `DialogRoot`, `DialogTrigger`, `DialogPortal`, `DialogBackdrop`, `DialogPopup`, `DialogTitle`, `DialogDescription`, `DialogClose`, `injectDialog`, `DialogState`, `DialogTriggerState`, `DialogBackdropState`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |

@@ -1,0 +1,31 @@
+---
+title: The pattern - native primitives
+description: Why each framework gets its own native implementation from one spec, instead of a shared core with adapters, and what the three still share.
+---
+
+Most Fragiola libraries are a framework-free **core** with thin **adapters**: the core holds the
+state and a model API, each adapter binds it to a framework. This library is the other pattern:
+**native primitives**.
+
+## Why not a core and adapters
+
+A primitive's behaviour is its framework's lifecycle: when a popup mounts and unmounts, how state
+is controlled, how a ref reaches an element, how a portal keeps its context. A shared stateful core
+would make every framework speak a foreign idiom, and its adapters would be as large as the
+components. So each framework package **owns its components' state, lifecycle and API**, in that
+framework's idioms: there is no model API, no command bus and no stateful core.
+
+## What is shared
+
+| shared | what it is |
+| --- | --- |
+| **The spec** | one page per component: its anatomy, API, state attributes and ARIA, keyboard, focus, pointer, dismissal, animation and the scenarios every implementation renders |
+| **The DOM toolkit** | `@fragiola/primitives`: framework-free behaviours that take elements and return a cleanup (focus trap, inert outside, scroll lock, layers, positioning, key maps), one entry per mechanism. It holds no component state ([the toolkit](/docs/api/toolkit)). |
+| **The styling layer** | the recipes and the five themes of the examples and the test fixtures: never published |
+| **The conformance suite** | one Playwright suite (behaviour with axe, contract, screenshots) run against a fixture app per framework. A component is done when React, Vue and Angular all pass it. |
+
+## The duplication is the design
+
+The three Dialogs look alike because they implement one spec, not because they share code. A fix
+starts in the spec (with its reason), then the tests, then the three implementations. The suite is
+the referee: it never has a test written for one framework only.

@@ -1,0 +1,61 @@
+---
+title: The primitive contract
+description: What every part of every primitive accepts and guarantees - namespaces, render instead of asChild, refs, forwarded props, structural style only, no text.
+---
+
+Every primitive follows the same contract, in each framework's idiom.
+
+## One namespace per component
+
+A component's parts are one namespace: `Dialog.Root`, `Dialog.Trigger`, `Dialog.Popup`, ... in
+React and Vue; in Angular, one standalone directive per part, `[dialogRoot]`, `[dialogTrigger]`,
+`[dialogPopup]`, applied to your own elements.
+
+## render, never asChild
+
+A part renders a default element (a `button` for a trigger, a `div` for a popup), and you can
+replace it:
+
+<Framework name="react">
+
+`render={<a href="/profile" />}` merges the part's props into your element;
+`render={(props, state) => ...}` receives them with the part's state. `className` and `style`
+take a value or a function of the state.
+
+</Framework>
+
+<Framework name="vue">
+
+`as="section"` (or a component) changes the element; the `render` scoped slot receives the part's
+`props` and `state` to spread on your own element. `class` and `style` are values; style the
+state through its `data-*` attributes.
+
+</Framework>
+
+<Framework name="angular">
+
+The directive goes on your own element, which is the part: there is nothing to replace. A part's
+`state()` is available through its `exportAs` name (`#popup="dialogPopup"`).
+
+</Framework>
+
+## Props, refs and handlers
+
+- `ref` is a plain prop in React 19; in Vue a template ref gives the part's element (`$el`); in
+  Angular a template reference variable does.
+- Any other prop is forwarded to the element: `id`, `aria-*`, `data-*`, event handlers.
+- Handlers compose: the part's own handler runs first, then yours.
+
+## Controlled and uncontrolled
+
+A value is controlled when you pass it (`open`, `value`) and uncontrolled otherwise (seeded by
+`defaultOpen`, `defaultValue`). Every change is reported with its reason:
+`onOpenChange(open, { reason })` in React, `v-model:open` and `@open-change` in Vue, `[(open)]`
+and `(openChangeDetails)` in Angular. A controlled value you keep unchanged stays yours: a dialog
+whose `open` you keep `true` stays open and working.
+
+## No text, structural style only
+
+A primitive renders only your children: no text and no accessible name of its own. Its inline
+style is structural only (a position, a size, a CSS variable your styles read, like the tab
+indicator's `--tabs-indicator-inline-size`), never cosmetic.

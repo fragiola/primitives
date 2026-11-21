@@ -19,12 +19,16 @@
         "check:layout": "node scripts/check-layout.ts",
         "typecheck": "pnpm -r --if-present typecheck",
         "test": "vitest run",
-        "build": "pnpm -r --if-present build && node scripts/check-dts.ts",
-        "changeset": "changeset",
-        "release:version": "changeset version",
+        "build": "pnpm -r --if-present build && node scripts/check-dts.ts && node scripts/check-bundle.ts",
+        "size": "node scripts/size-report.ts",
+        "check:package": "pnpm --filter \"./packages/*\" build && node scripts/check-package.ts",
         "conformance": "pnpm --filter conformance e2e",
         "e2e": "pnpm conformance && pnpm --workspace-concurrency=1 --filter \"./examples/*\" --if-present e2e",
-        "dev": "node scripts/dev-fixtures.ts"
+        "dev": "node scripts/dev-fixtures.ts",
+        "site:export": "node site/export.ts",
+        "site:dev": "node site/dev.ts",
+        "changeset": "changeset",
+        "release:version": "changeset version"
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "0.18.5",

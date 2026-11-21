@@ -1,0 +1,24 @@
+---
+title: Known limitations
+description: What the first release does not do yet - the rest of the catalog, other frameworks, npm packages - and what stays yours by design.
+---
+
+The first release proves the whole pipeline on two components. Here is what it leaves out, on
+purpose or for a later release.
+
+## Not in this release
+
+- **Two components.** Dialog and Tabs ship today. Popover, Tooltip and Menu come next, then the
+  form controls (Field, Checkbox, Slider, Select, Combobox) and the date pickers.
+- **Not on npm yet.** The packages are published once the maintainer validates the library.
+- **React, Vue and Angular.** Svelte and Solid are not planned for now.
+- **No alert dialog.** A modal dialog only; an alert dialog comes with its own spec.
+- **No screen reader sign-off yet.** The conformance suite checks roles, names, focus and axe in
+  every framework, but a person has not yet checked each pattern with a screen reader.
+
+## Yours by design
+
+- **The look**: no CSS, no icons, no themes ship with the packages.
+- **The words**: no text and no accessible names of their own, not even "Close".
+- **Markup and CSS components**: cards, badges, alerts and spinners are Fragiola UI's, not
+  primitives'.
