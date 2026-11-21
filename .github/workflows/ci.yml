@@ -1,0 +1,263 @@
+# CI: the Fragiola project jobs. From Tree and Dockable (fragiola/tree, fragiola/dockable,
+# .github/workflows/ci.yml), with the conformance suite of the POC
+# (maurodesouza/poc-cross-framework-primitives, .github/workflows/ci.yml).
+#
+#   Checks            Biome and the source layout (`pnpm check`), TypeScript, the unit tests, the
+#                     build (with the .d.ts check and the bundle guard: a fixture app per framework
+#                     importing two components must contain no other component and no unused
+#                     toolkit mechanism) and the size report (`pnpm size --check`: docs/size.md is
+#                     up to date).
+#   Package           `pnpm check:package`: builds and packs every package with pnpm, lints the
+#                     tarballs (dist-only exports, every subpath, publint, attw esm-only), checks
+#                     each framework package pins the toolkit's exact version, then installs each
+#                     framework package into its own scratch app outside the workspace that
+#                     typechecks, builds and loads its dev server (React's, Vue's and Angular's).
+#   Changesets        on a pull request, `pnpm changeset status` fails when the PR changes what a
+#                     package ships (`changedFilePatterns` in .changeset/config.json) without
+#                     adding a changeset. Skipped for the Version Packages PR (changeset-release/*),
+#                     which consumes them.
+#   Changes           the E2E suites the pull request can affect (scripts/e2e-suites.ts, a `git
+#                     diff` against the base): none for docs only (site/docs, *.md, AGENTS.md);
+#                     packages/<framework>, fixtures/<framework> or examples/<framework>: that
+#                     framework's conformance project and examples app; anything else (the toolkit,
+#                     the specs' tests, conformance/, examples/shared, the lockfile, root configs,
+#                     .github, scripts, site) and a manual run: every suite. It also lists what the
+#                     repository has: every fixtures/<framework> (a conformance project each) and
+#                     every examples/<framework> with a playwright.config.ts.
+#   Conformance       the Playwright conformance suite (conformance/: behaviour with axe, contract,
+#                     visual), one parallel job per framework, against its fixture app (built and
+#                     served by the suite itself). The visual layer compares with ONE golden set,
+#                     made by React here, in Playwright's image: a React run without them writes
+#                     them (and fails) and uploads them as the `conformance-snapshots` artifact, to
+#                     download and commit (conformance/README.md). Vue and Angular never write
+#                     goldens: a difference is fixed in their DOM.
+#   E2E               one job per framework's examples app, each running the shared specs of
+#                     examples/shared/e2e against its own embed, built against the packages' dist.
+#   Site export       fragiola.com builds /primitives from `pnpm site:export` (contract v1.7,
+#                     fragiola/www CONTRACT.md), validated the way www's deploy runs it: it fails on
+#                     anything www would reject.
+#
+# Every Playwright job runs in Playwright's image (mcr.microsoft.com/playwright, the tag of the
+# pinned @playwright/test: no browser install; site/tests/ci-workflow.test.ts checks both). No
+# shards: add `--shard` only for a suite whose tests take more than ~3 min.
+#
+# Tests run only on pull requests (and on a manual run): main is what its PR tested. Nothing is
+# released or published, and fragiola.com is not told about this project yet: release.yml, npm
+# publishing and the www trigger come after the maintainer validates the library (AGENTS.md, "CI").
+
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pnpm version from `packageManager` in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - run: pnpm typecheck
+
+      - run: pnpm test
+
+      - run: pnpm build
+
+      - run: pnpm size --check
+
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # builds the packages first, then packs, lints and smoke-tests the tarballs
+      - run: pnpm check:package
+
+  changesets:
+    name: Changesets
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'changeset-release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `--since` diffs from the merge base with the base branch: the full history is needed
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # the root's tools only (@changesets/cli): the check reads the packages' manifests and git
+      - run: pnpm install --frozen-lockfile --filter "{.}"
+
+      - name: A changeset for every package change
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: pnpm changeset status --since="origin/$BASE_REF"
+
+  # The E2E suites the pull request can affect (scripts/e2e-suites.ts): the conformance and E2E
+  # jobs run only what it selects. An empty selection runs no job.
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      conformance: ${{ steps.suites.outputs.conformance }}
+      examples: ${{ steps.suites.outputs.examples }}
+    steps:
+      # a pull request checks out its merge commit: its first parent is the base it merges into
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - id: suites
+        run: |
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            node scripts/e2e-suites.ts --diff HEAD^1
+          else
+            node scripts/e2e-suites.ts --all
+          fi
+
+  conformance:
+    name: Conformance (${{ matrix.framework }})
+    needs: changes
+    if: needs.changes.outputs.conformance != '[]' && needs.changes.outputs.conformance != ''
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: ${{ fromJson(needs.changes.outputs.conformance) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Only React may write a missing golden screenshot; Vue and Angular compare against them.
+      - name: Run the conformance suite
+        run: |
+          if [ "${{ matrix.framework }}" = react ]; then
+            pnpm conformance --project ${{ matrix.framework }}
+          else
+            pnpm conformance --project ${{ matrix.framework }} --update-snapshots none
+          fi
+
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-results-${{ matrix.framework }}
+          path: conformance/test-results
+          retention-days: 7
+
+      # The golden screenshots are made by React, here, in Playwright's image: a run without them
+      # writes them (and fails). Download this artifact and commit it (conformance/README.md).
+      - name: Upload the golden screenshots
+        if: always() && matrix.framework == 'react'
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-snapshots
+          path: conformance/snapshots
+          if-no-files-found: ignore
+          retention-days: 7
+
+  e2e-examples:
+    name: E2E (examples ${{ matrix.framework }})
+    needs: changes
+    if: needs.changes.outputs.examples != '[]' && needs.changes.outputs.examples != ''
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: ${{ fromJson(needs.changes.outputs.examples) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The examples suite builds the embed against the packages' dist.
+      - name: Build the packages
+        run: pnpm --filter "./packages/*" build
+
+      - name: Run Playwright
+        run: pnpm --filter examples-${{ matrix.framework }} run e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-examples-${{ matrix.framework }}
+          path: examples/${{ matrix.framework }}/playwright-report/
+          retention-days: 14
+
+  site-export:
+    name: Site export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm site:export --base /primitives --out "$RUNNER_TEMP/site-export"

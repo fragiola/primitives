@@ -1,0 +1,27 @@
+packages:
+  # the DOM toolkit (@fragiola/primitives) and one native package per framework
+  - "packages/*"
+  # one fixture app per framework, rendering every spec scenario at /<component>/<scenario>
+  - "fixtures/*"
+  # the Playwright conformance suite (behaviour, contract, visual), run against every fixture
+  - "conformance"
+  # the site export (fragiola.com): one embed app per framework, and what they share
+  - "examples/*"
+  - "site"
+
+# Dependencies allowed to run install scripts (pnpm refuses an ignored build script in CI).
+allowBuilds:
+  esbuild: true
+  # the Angular tools' native helpers: their prebuilt binaries come as optional dependencies, so
+  # their install scripts (node-gyp fallbacks) never need to run (as in Dockable and Tree)
+  "@parcel/watcher": false
+  lmdb: false
+  msgpackr-extract: false
+
+# @analogjs/vite-plugin-angular imports `typescript` without declaring it: as a peer, it gets the
+# TypeScript of the Angular workspace that installs it (6.0.x, which the Angular compiler supports),
+# not the root's TypeScript 7 (as in Tree and the POC)
+packageExtensions:
+  "@analogjs/vite-plugin-angular":
+    peerDependencies:
+      typescript: "*"
