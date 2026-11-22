@@ -11,7 +11,7 @@ import { CONTEXT_MENU_PARTS } from "./context-menu-parts.ts";
     imports: [CONTEXT_MENU_PARTS, Output],
     template: `
         <ng-container contextMenuRoot (openChangeDetails)="onOpenChange($event)">
-            <div contextMenuTrigger class="h-48 w-96">
+            <div contextMenuTrigger [class]="styles.trigger + ' h-48 w-96'">
                 <span>Files</span>
                 <div class="flex gap-2">
                     <button type="button">report.pdf</button>

@@ -11,7 +11,7 @@ import { CONTEXT_MENU_PARTS } from "./context-menu-parts.ts";
     imports: [CONTEXT_MENU_PARTS, Output],
     template: `
         <ng-container contextMenuRoot (openChangeDetails)="lifecycle.onOpenChange($event)" (openChangeComplete)="lifecycle.onOpenChangeComplete($event)">
-            <div contextMenuTrigger class="h-32 w-64">Right-click here</div>
+            <div contextMenuTrigger [class]="styles.trigger + ' h-32 w-64'">Right-click here</div>
             <ng-container *contextMenuPortal="{ keepMounted: true }">
                 <div contextMenuPositioner [class]="styles.positioner">
                     <div contextMenuPopup aria-label="Actions" [class]="styles.popup">

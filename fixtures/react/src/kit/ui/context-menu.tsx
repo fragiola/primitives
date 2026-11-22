@@ -6,8 +6,18 @@ export const ContextMenu = {
     Root: Primitive.Root,
     SubmenuRoot: Primitive.SubmenuRoot,
     Portal: Primitive.Portal,
-    Trigger: (props: ComponentProps<typeof Primitive.Trigger>) => (
-        <Primitive.Trigger className={contextMenu.trigger} {...props} />
+    Trigger: ({
+        className,
+        ...props
+    }: ComponentProps<typeof Primitive.Trigger>) => (
+        <Primitive.Trigger
+            className={
+                typeof className === "string"
+                    ? `${contextMenu.trigger} ${className}`
+                    : contextMenu.trigger
+            }
+            {...props}
+        />
     ),
     Positioner: (props: ComponentProps<typeof Primitive.Positioner>) => (
         <Primitive.Positioner className={contextMenu.positioner} {...props} />
