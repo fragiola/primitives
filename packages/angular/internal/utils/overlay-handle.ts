@@ -1,4 +1,5 @@
 import {
+    computed,
     effect,
     type Signal,
     signal,
@@ -28,11 +29,18 @@ export interface HandleRoot {
     readonly overlay: OverlayRoot;
 }
 
-/** The handle object of every overlay (each component types it with its own name). */
+/**
+ * The handle object of every overlay (each component types it with its own name). The roots
+ * attached to it form a stack: the newest one serves the handle, and detaching it gives the
+ * handle back to the previous one.
+ */
 export class OverlayHandleStore<Payload = unknown>
     implements OverlayHandle<Payload>
 {
-    private readonly attached: WritableSignal<HandleRoot | null> = signal(null);
+    private readonly stack: WritableSignal<readonly HandleRoot[]> = signal([]);
+    private readonly attached: Signal<HandleRoot | null> = computed(
+        () => this.stack().at(-1) ?? null,
+    );
 
     /** The component it belongs to (`"dialog"`, `"menu"`, ...): a handle serves one kind. */
     readonly component: string;
@@ -42,15 +50,22 @@ export class OverlayHandleStore<Payload = unknown>
     }
 
     /** The attached root, `null` until one is attached (a signal its triggers render from). */
-    readonly root: Signal<HandleRoot | null> = this.attached.asReadonly();
+    readonly root: Signal<HandleRoot | null> = this.attached;
 
+    /** Puts a root on top of the stack (again, if it already was attached). */
     attach(root: HandleRoot): void {
-        this.attached.set(root);
+        this.stack.update((roots) => [
+            ...roots.filter((other) => other !== root),
+            root,
+        ]);
     }
 
+    /** Takes a root off the stack: the previous one serves the handle when it was on top. */
     detach(root: HandleRoot): void {
-        if (untracked(this.attached) === root) {
-            this.attached.set(null);
+        if (untracked(this.stack).includes(root)) {
+            this.stack.update((roots) =>
+                roots.filter((other) => other !== root),
+            );
         }
     }
 

@@ -9,6 +9,7 @@ import {
 } from "react";
 import type {
     HandleBinding,
+    HandleSlot,
     OverlayHandle,
     OverlayHandleStore,
 } from "../utils/overlay-handle.ts";
@@ -17,19 +18,32 @@ import type { OverlayRoot } from "./use-overlay-root.ts";
 const NO_SUBSCRIPTION = () => () => {};
 const NONE = () => null;
 
-/** Attaches a Root's context value to its handle while it is mounted. */
+/**
+ * Attaches a Root to its handle while it is mounted (spec/README.md, "Detached triggers"): once,
+ * on top of the Roots already attached, and keeps the handle's view of its context value current
+ * without attaching it again (which would take the handle from a Root attached later).
+ */
 export function useAttachHandle(
     handle: OverlayHandle<never> | undefined,
     binding: HandleBinding,
 ): void {
+    const slot = useRef<HandleSlot | null>(null);
+    if (slot.current === null) {
+        slot.current = { binding };
+    }
+    const own = slot.current;
+    const store = handle as OverlayHandleStore<never> | undefined;
+    // before the attachment on the first commit: a new value of a Root not yet attached waits
     useLayoutEffect(() => {
-        if (handle === undefined) {
+        store?.update(own, binding);
+    }, [store, own, binding]);
+    useLayoutEffect(() => {
+        if (store === undefined) {
             return undefined;
         }
-        const store = handle as OverlayHandleStore<never>;
-        store.attach(binding);
-        return () => store.detach(binding);
-    }, [handle, binding]);
+        store.attach(own);
+        return () => store.detach(own);
+    }, [store, own]);
 }
 
 /** The props every Trigger of an overlay with detached triggers takes. */

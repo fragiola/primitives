@@ -1,4 +1,4 @@
-import { type ShallowRef, shallowRef } from "vue";
+import { computed, type ShallowRef, shallowRef } from "vue";
 
 /**
  * A handle of detached triggers (spec/README.md, "Detached triggers"): it connects a Root and
@@ -24,13 +24,20 @@ export interface HandleBinding {
     closeFromHandle: () => void;
 }
 
-/** The handle object of every overlay (each component types it with its own name). */
+/**
+ * The handle object of every overlay (each component types it with its own name). The Roots
+ * attached to it form a stack: the newest one serves the handle, and detaching it gives the
+ * handle back to the previous one.
+ */
 export class OverlayHandleStore<Payload = unknown>
     implements OverlayHandle<Payload>
 {
     // reactive: a Trigger rendered before its Root renders again once the Root is attached
-    private readonly binding: ShallowRef<HandleBinding | null> =
-        shallowRef(null);
+    private readonly attached: ShallowRef<readonly HandleBinding[]> =
+        shallowRef([]);
+    private readonly binding = computed(
+        () => this.attached.value.at(-1) ?? null,
+    );
 
     /** The component it belongs to (`"dialog"`, `"menu"`, ...): a handle serves one kind. */
     readonly component: string;
@@ -39,13 +46,20 @@ export class OverlayHandleStore<Payload = unknown>
         this.component = component;
     }
 
+    /** Puts a Root on top of the stack (again, if it already was attached). */
     attach(binding: HandleBinding): void {
-        this.binding.value = binding;
+        this.attached.value = [
+            ...this.attached.value.filter((other) => other !== binding),
+            binding,
+        ];
     }
 
+    /** Takes a Root off the stack: the previous one serves the handle when it was on top. */
     detach(binding: HandleBinding): void {
-        if (this.binding.value === binding) {
-            this.binding.value = null;
+        if (this.attached.value.includes(binding)) {
+            this.attached.value = this.attached.value.filter(
+                (other) => other !== binding,
+            );
         }
     }
 

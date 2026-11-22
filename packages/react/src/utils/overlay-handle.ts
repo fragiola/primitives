@@ -22,11 +22,21 @@ export interface HandleBinding {
     closeFromHandle: () => void;
 }
 
-/** The handle object of every overlay (each component types it with its own name). */
+/** A Root's place on its handle: the same object while the Root stays mounted. */
+export interface HandleSlot {
+    /** The Root's context value now. */
+    binding: HandleBinding;
+}
+
+/**
+ * The handle object of every overlay (each component types it with its own name). The Roots
+ * attached to it form a stack: the newest one serves the handle, and detaching it gives the
+ * handle back to the previous one.
+ */
 export class OverlayHandleStore<Payload = unknown>
     implements OverlayHandle<Payload>
 {
-    private binding: HandleBinding | null = null;
+    private readonly slots: HandleSlot[] = [];
     private readonly listeners = new Set<() => void>();
 
     /** The component it belongs to (`"dialog"`, `"menu"`, ...): a handle serves one kind. */
@@ -36,19 +46,43 @@ export class OverlayHandleStore<Payload = unknown>
         this.component = component;
     }
 
-    attach(binding: HandleBinding): void {
-        this.binding = binding;
+    private get binding(): HandleBinding | null {
+        return this.slots.at(-1)?.binding ?? null;
+    }
+
+    private notify(): void {
         for (const listener of this.listeners) {
             listener();
         }
     }
 
-    detach(binding: HandleBinding): void {
-        if (this.binding === binding) {
-            this.binding = null;
-            for (const listener of this.listeners) {
-                listener();
-            }
+    /** Puts a Root on top of the stack (again, if it already was attached). */
+    attach(slot: HandleSlot): void {
+        const index = this.slots.indexOf(slot);
+        if (index !== -1) {
+            this.slots.splice(index, 1);
+        }
+        this.slots.push(slot);
+        this.notify();
+    }
+
+    /** Takes a Root off the stack: the previous one serves the handle when it was on top. */
+    detach(slot: HandleSlot): void {
+        const index = this.slots.indexOf(slot);
+        if (index === -1) {
+            return;
+        }
+        this.slots.splice(index, 1);
+        if (index === this.slots.length) {
+            this.notify();
+        }
+    }
+
+    /** A Root's context value changed: its Triggers render again when it serves the handle. */
+    update(slot: HandleSlot, binding: HandleBinding): void {
+        slot.binding = binding;
+        if (this.slots.at(-1) === slot) {
+            this.notify();
         }
     }
 
