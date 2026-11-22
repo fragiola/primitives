@@ -3,6 +3,7 @@ import { getDirection } from "@fragiola/primitives/direction";
 import { defineComponent, nextTick } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -36,6 +37,7 @@ export const ComboboxInput: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(ComboboxKey, "Combobox.Input");
             const setInput = elementSetter(context.trigger);
             const openWith = (highlight: PendingHighlight) => {
@@ -119,8 +121,9 @@ export const ComboboxInput: PartComponent<
                         if (
                             context.multiple() &&
                             event.key ===
-                                chipArrows(getDirection(input) === "rtl")
-                                    .previous &&
+                                chipArrows(
+                                    getDirection(input, direction()) === "rtl",
+                                ).previous &&
                             input.selectionStart === 0 &&
                             input.selectionEnd === 0 &&
                             chips.length > 0

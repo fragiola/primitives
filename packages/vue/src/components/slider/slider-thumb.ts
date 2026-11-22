@@ -7,6 +7,7 @@ import {
 import { defineComponent, type PropType, shallowRef, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -78,9 +79,15 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                         step: context.step(),
                         minStepsBetweenValues: context.minStepsBetweenValues(),
                     });
-                const rtl = () =>
+                const direction = useProvidedDirection();
+                // the keys follow a provider's direction; the thumb's placement follows the
+                // layout's (its `inset-inline-start`), so the computed one
+                const rtl = (provided: boolean) =>
                     element.value !== null &&
-                    getDirection(element.value) === "rtl";
+                    getDirection(
+                        element.value,
+                        provided ? direction() : null,
+                    ) === "rtl";
 
                 const onKeydown = (event: KeyboardEvent) => {
                     if (props.disabled || context.disabled()) {
@@ -100,7 +107,7 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                             min,
                             max,
                             orientation: context.orientation(),
-                            rtl: rtl(),
+                            rtl: rtl(true),
                         },
                     );
                     if (target === null) {
@@ -145,7 +152,9 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                                   position: "absolute",
                                   insetInlineStart: `${percent}%`,
                                   top: "50%",
-                                  translate: rtl() ? "50% -50%" : "-50% -50%",
+                                  translate: rtl(false)
+                                      ? "50% -50%"
+                                      : "-50% -50%",
                               };
                     return renderPart(
                         "div",
