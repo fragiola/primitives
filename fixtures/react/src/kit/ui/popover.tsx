@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 
 export const Popover = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: (props: ComponentProps<typeof Primitive.Trigger>) => (
         <Primitive.Trigger className={popover.trigger} {...props} />

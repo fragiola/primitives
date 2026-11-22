@@ -4,8 +4,9 @@
 
 Choose **one** value from a list that pops up from a button (APG "select-only combobox": a
 `combobox` that is not editable, with a `listbox` popup). It works in a native `<form>`: it
-submits, resets and validates as a `<select>` would. Multiple selection, groups, a search field
-and scroll arrows are out of scope.
+submits, resets and validates as a `<select>` would. Its items may be grouped under labels and
+divided by separators (Issue #34). Multiple selection, a search field and scroll arrows are out of
+scope.
 
 ## Anatomy
 
@@ -19,7 +20,11 @@ and scroll arrows are out of scope.
 | Popup | `div` | `select-popup` | the floating container |
 | List | `div` | `select-list` | the `listbox` |
 | Item | `div` | `select-item` | an `option` |
+| ItemText | `span` | `select-item-text` | inside an Item: the text that is its label (optional) |
 | ItemIndicator | `span` | `select-item-indicator` | inside an Item, rendered only while it is selected |
+| Group | `div` | `select-group` | groups items under its GroupLabel |
+| GroupLabel | `div` | `select-group-label` | names its Group |
+| Separator | `div` | `select-separator` | divides items or groups |
 | (hidden input) | `input` | `select-input` | rendered by the Root; what the form submits and validates |
 
 ## API
@@ -28,19 +33,32 @@ and scroll arrows are out of scope.
 
 - `value`, `defaultValue` (`null`), `onValueChange(value, details)`: the selected item's `value`
   (a string), or `null`.
-- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)`.
-- `items`: every item, `{ value, label, disabled? }[]`. The Root needs them while the list is
-  closed (the Value's label, typeahead on the closed trigger, the hidden input); the consumer
-  renders the Items from the same array.
+- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)` (an `OpenChangeDetails`,
+  [README](README.md#open-change-details); `trigger` is the Trigger), `onOpenChangeComplete(open)`,
+  the actions (`close()`, `unmount()`; React `actionsRef`).
+- `items` (optional): every item, `{ value, label, disabled? }[]`. With it, the Root knows every
+  label while the list is closed (the Value's label, typeahead on the closed trigger); the consumer
+  renders the Items from the same array, in the same order. **Without it** (Base UI), the Items
+  register themselves while they are mounted, in DOM order: an item's label is its ItemText's text,
+  else its own text content; the Value shows the selected item's label once that item has
+  rendered, else the raw value; typeahead and the keyboard use the registered items. A Select
+  without `items` should keep its list mounted (`Portal keepMounted`), so the labels are known
+  while it is closed ([`/select/groups`](#selectgroups)).
 - `name`, `required`, `disabled`.
 - `modal` (`false`): see "Modal".
 
 **Value**: `placeholder` (shown, as the Value's text, while nothing is selected).
 
-**Item**: `value` (string, required), `disabled`. Its label is the matching `items` entry's
-`label`.
+**Item**: `value` (string, required), `disabled`, `label` (the text typeahead matches and the
+Value shows, without `items`; default: its ItemText's text, else its text content). With `items`,
+its label is the matching entry's `label`.
+
+**ItemText**, **Group**, **GroupLabel**, **Separator**: nothing beyond the contract.
 
 **ItemIndicator**: `keepMounted` (`false`).
+
+**Portal**: `container`, `keepMounted` (`false`: the list stays rendered, hidden, while closed;
+[README](README.md#lifecycle)).
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`, `sideOffset` `4`.
 `--anchor-width` lets the consumer make the popup at least as wide as the trigger.
@@ -63,10 +81,14 @@ only one, and the list never covers what the user just read.
 | --- | --- |
 | Trigger | `role="combobox"`, `type="button"`, `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls` (the List's id, while open), `aria-activedescendant` (the highlighted item's id, while open), `aria-required="true"` when required, `disabled` and `data-disabled`, `data-popup-open` while the list is open (Base UI's name, D4 §3 "Naming"), `data-placeholder` while nothing is selected |
 | Value | `data-placeholder` while nothing is selected |
-| Positioner, Popup | as Popover's (Popup has no role) |
+| Positioner, Popup | as Popover's (Popup has no role): `data-open` / `data-closed`; the Positioner `hidden` while kept mounted and closed |
 | List | `role="listbox"`, an `id`, `aria-labelledby` (the trigger's labels: the consumer's `<label>` and the trigger) |
 | Item | `role="option"`, an `id`, `aria-selected` (`"true"` on the selected item, `"false"` on the others), `aria-disabled="true"` and `data-disabled`, `data-highlighted`, `data-selected` |
 | ItemIndicator | `aria-hidden="true"` |
+| ItemText | none beyond the part attribute |
+| Group | `role="group"`, `aria-labelledby` (its GroupLabel's id) |
+| GroupLabel | an `id` (generated unless given) |
+| Separator | `role="presentation"` (a `listbox` owns only groups and options, as Combobox's Separator), `data-orientation="horizontal"` |
 | hidden input | `name`, `value` (`""` when nothing is selected), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, structural inline style (visually hidden; not `type="hidden"`, which a browser never validates) |
 
 The Trigger's accessible name comes from the consumer: `<label for>` (a `button` is labelable) or
@@ -89,7 +111,8 @@ and Tab").
 | Tab | moves on | chooses the highlighted item (APG), closes (reason `focus-out`, for the value too) and lets focus move on; a disabled highlighted item is not chosen |
 
 Disabled items can be highlighted (as Combobox and Tabs: options stay discoverable) but cannot be
-chosen.
+chosen. The keys move through the items only, in DOM order, across groups: GroupLabels and
+Separators are never highlighted.
 
 ### Typing while closed
 
@@ -160,7 +183,9 @@ As [popover.md](popover.md#positioning), from the Trigger (see "Item alignment")
 
 ## Animation
 
-As [popover.md](popover.md#animation).
+As [popover.md](popover.md#animation); `keepMounted`, `onOpenChangeComplete` and the actions as
+[README](README.md#lifecycle). A canceled close (`details.cancel()`) leaves the list open with its
+highlight; a choice whose close is canceled still changes the value.
 
 ## RTL
 
@@ -235,6 +260,40 @@ Checks ("Modal"):
 The non-modal default is checked by `/select/basic` (check 10: while open, the page keeps the
 pointer and its scroll).
 
+### `/select/groups`
+
+A Select with groups and no `items`: a `<label for>` **"Food"** for the Trigger, the Value's
+placeholder **"Choose a food"**, `defaultValue` `"carrot"`, and a Portal with `keepMounted`. The
+List holds a Group labelled by the GroupLabel **"Fruits"** with the Items **Apple** (`apple`) and
+**Banana** (`banana`), a Separator, and a Group labelled **"Vegetables"** with **Carrot**
+(`carrot`), **Leek** (`leek`, disabled) and **Potato** (`potato`). Each Item holds an ItemText with
+its name and an ItemIndicator `✓` after it. Output: `value: ...`, `open: ...`, `reason: ...`.
+
+Checks:
+
+1. Before any opening, the trigger shows "Carrot" (the kept-mounted item's label) and is a
+   `combobox` named "Food".
+2. Click the trigger: a `listbox` with two `group`s named "Fruits" and "Vegetables", five
+   `option`s; "Carrot" is highlighted (`aria-activedescendant`) and `aria-selected="true"`.
+3. ArrowUp from "Carrot" moves to "Banana" (across the separator and the group label), ArrowDown
+   back to "Carrot", ArrowDown to "Leek" (disabled, highlighted), ArrowDown to "Potato"; Home →
+   "Apple", End → "Potato".
+4. Enter on "Banana" (Home, ArrowDown, Enter): `value: banana`, the trigger shows "Banana".
+5. Closed, typing `p` opens the list on "Potato" (typeahead on the registered labels); Enter
+   chooses it.
+6. The separator has no role of its own (`role="presentation"`); the Value shows the chosen item's ItemText only
+   ("Potato", not the item's whole text with its indicator).
+7. Axe finds no violation, closed and open.
+
+### `/select/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a `<label for>`
+**"Fruit"** for the Trigger of a Select with the basic items and placeholder **"Choose a
+fruit"**; its Portal has `keepMounted` (the Positioner is the kept-mounted part). The checks open
+it with a click on the trigger.
+
+Checks: the common checks (no "Close with actions").
+
 ## Differences from Base UI
 
 Measured by the POC against Base UI 1.9 (`Select`, with `alignItemWithTrigger={false}`):
@@ -248,3 +307,8 @@ Measured by the POC against Base UI 1.9 (`Select`, with `alignItemWithTrigger={f
 | Base UI's Select is modal by default | **non-modal by default**, `modal` as an option (D4 §3) |
 | An outside press reports the reason `cancel-open` | `outside-press`, the reason vocabulary of spec/README.md |
 | A form reset does not return the Select to its default | **reset** (spec/README.md, "Forms") |
+
+Base UI's Select.Separator has the `separator` role, which a `listbox` may not own (axe's
+`aria-required-children`): it is `presentation` here, as Combobox's. Groups, GroupLabel, ItemText
+and the optional `items` (items registering themselves,
+the Value showing the raw value until the selected item renders) follow Base UI.

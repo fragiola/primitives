@@ -14,6 +14,8 @@ Every element carries `data-primitives-part="<component>-<part>"`:
 | --- | --- |
 | a dialog's trigger | `data-primitives-part="dialog-trigger"` |
 | a dialog's popup | `data-primitives-part="dialog-popup"` |
+| an alert dialog's popup (Dialog's part, named by its root) | `data-primitives-part="alert-dialog-popup"` |
+| a context menu's item (Menu's part, named by its root) | `data-primitives-part="context-menu-item"` |
 | a tab | `data-primitives-part="tabs-tab"` |
 | the tab indicator | `data-primitives-part="tabs-indicator"` |
 | a combobox's hidden inputs | `data-primitives-part="combobox-hidden-input"` |
@@ -29,14 +31,14 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 
 | attribute | on |
 | --- | --- |
-| `data-open` | an open overlay (a popup, its positioner, a dialog's backdrop); an open collapsible, accordion item and their parts |
-| `data-closed` | a closed collapsible, accordion item and their parts (with `data-open`: exactly one is present) |
+| `data-open` | an open overlay (a popup, its positioner, its arrow, a dialog's backdrop and viewport); an open collapsible, accordion item and their parts |
+| `data-closed` | a rendered overlay part that is not open (its exit runs, or the Portal's `keepMounted` keeps it, `hidden`); a closed collapsible, accordion item and their parts (with `data-open`: exactly one is present) |
 | `data-panel-open` | a collapsible's or an accordion's trigger while its panel is open |
-| `data-popup-open` | a trigger while its overlay is open (a Select's or a date picker's trigger, a Combobox's input, input group and trigger too) |
+| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's or a date picker's trigger, a Combobox's input, input group and trigger too, a context menu's area) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts (or is hidden) once its animations end: an overlay, a tabs panel, a collapsible or accordion panel |
 | `data-selected` | a selected tab and its panel, a selected select or combobox option, a chosen calendar date |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max` |
 | `data-placeholder` | a Select showing its placeholder |
 | `data-empty` | a combobox list with no item |
@@ -47,7 +49,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus |
 | `data-highlighted` | the menu item, select or combobox option the keyboard or the pointer points at |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group) |
-| `data-nested` | a submenu's positioner and popup |
+| `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport (a dialog or alert dialog inside another's popup) |
+| `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
@@ -57,6 +60,10 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |
 | `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` | a range calendar's cells: the range's ends, its dates, the dates of a range being chosen |
 | `data-readonly` | a read-only calendar, a read-only switch and its thumb |
+
+One CSS variable carries the depth of nested dialogs: a dialog's popup has the inline style
+`--nested-dialogs: <n>`, the number of open dialogs nested below it as a chain (`0` when none), to
+scale or offset the parent (`scale: calc(1 - 0.05 * var(--nested-dialogs))`).
 
 ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-checked`, `aria-invalid`,
 `aria-activedescendant`, `aria-modal`, `aria-controls`, `aria-current`, `aria-readonly`, `aria-valuenow`
@@ -75,4 +82,6 @@ and `aria-valuetext`.
 }
 ```
 
-The popup stays mounted while its exit transition runs, and unmounts when it ends.
+The popup stays mounted while its exit transition runs, and unmounts when it ends (or, with the
+Portal's `keepMounted`, is hidden with `data-closed`). `onOpenChangeComplete(open)` reports the end
+of each transition.

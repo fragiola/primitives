@@ -1,0 +1,202 @@
+---
+title: Detached triggers
+description: Open one Dialog, Popover, Menu or Tooltip from triggers anywhere in the page with a handle, give each a payload, and open it from code.
+---
+
+An overlay's Trigger usually sits inside its Root. A table with an "Edit" button on every row
+would then need one dialog per row. With a **handle**, the Triggers may sit anywhere, outside the
+Root, and one Root serves them all: each Trigger passes a `payload` (the row's data) that the
+Root's content reads. Dialog, AlertDialog, Popover, Menu and Tooltip take one; a ContextMenu has
+one Trigger area and none.
+
+## One Root, many Triggers
+
+Create the handle once, give it to the Root and to every Trigger, and read the active trigger's
+payload in the content.
+
+<Framework name="react">
+
+```tsx
+import { Dialog } from "@fragiola/primitives-react/dialog";
+
+const editUser = Dialog.createHandle<string>();
+
+function Users({ names }: { names: string[] }) {
+    return (
+        <>
+            <ul>
+                {names.map((name) => (
+                    <li key={name}>
+                        {name}
+                        <Dialog.Trigger handle={editUser} payload={name} id={`edit-${name}`}>
+                            Edit {name}
+                        </Dialog.Trigger>
+                    </li>
+                ))}
+            </ul>
+            <Dialog.Root handle={editUser}>
+                {({ payload }) => (
+                    <Dialog.Portal>
+                        <Dialog.Backdrop />
+                        <Dialog.Popup>
+                            <Dialog.Title>Edit {payload}</Dialog.Title>
+                            <Dialog.Close>Done</Dialog.Close>
+                        </Dialog.Popup>
+                    </Dialog.Portal>
+                )}
+            </Dialog.Root>
+        </>
+    );
+}
+```
+
+The Root's children may be a function of `{ payload }`. `createDialogHandle<string>()` is the
+same function, as a named export.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Dialog } from "@fragiola/primitives-vue/dialog";
+
+defineProps<{ names: string[] }>();
+const editUser = Dialog.createHandle<string>();
+</script>
+
+<template>
+    <ul>
+        <li v-for="name in names" :key="name">
+            {{ name }}
+            <Dialog.Trigger :handle="editUser" :payload="name" :id="`edit-${name}`">Edit {{ name }}</Dialog.Trigger>
+        </li>
+    </ul>
+    <Dialog.Root :handle="editUser" v-slot="{ payload }">
+        <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Popup>
+                <Dialog.Title>Edit {{ payload }}</Dialog.Title>
+                <Dialog.Close>Done</Dialog.Close>
+            </Dialog.Popup>
+        </Dialog.Portal>
+    </Dialog.Root>
+</template>
+```
+
+The Root's default scoped slot gives the payload.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+import { createDialogHandle, DialogBackdrop, DialogClose, DialogPopup, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from "@fragiola/primitives-angular/dialog";
+
+@Component({
+    imports: [DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogPopup, DialogTitle, DialogClose],
+    template: `
+        <ul>
+            @for (name of names(); track name) {
+                <li>
+                    {{ name }}
+                    <button dialogTrigger [handle]="editUser" [payload]="name" [id]="'edit-' + name">Edit {{ name }}</button>
+                </li>
+            }
+        </ul>
+        <ng-container dialogRoot #dialog="dialogRoot" [handle]="editUser">
+            <ng-container *dialogPortal>
+                <div dialogBackdrop></div>
+                <div dialogPopup>
+                    <h2 dialogTitle>Edit {{ dialog.payload() }}</h2>
+                    <button dialogClose>Done</button>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class Users {
+    readonly names = input.required<string[]>();
+    protected readonly editUser = createDialogHandle<string>();
+}
+```
+
+The root directive's `payload()` signal, through `exportAs`, gives the payload.
+
+</Framework>
+
+The same shape works for the others: `AlertDialog.createHandle()`, `Popover.createHandle()`,
+`Menu.createHandle()` and `Tooltip.createHandle()` (`createAlertDialogHandle`,
+`createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`). A handle belongs to one
+framework and connects one Root at a time; the open state and the payload stay in that Root.
+
+## The active trigger
+
+The Trigger that opened the overlay is the **active** one. Only it carries `data-popup-open`,
+`aria-expanded="true"` and `aria-controls`; the others have `aria-expanded="false"`. A positioned
+overlay (Popover, Menu, Tooltip) anchors to it, a Menu's popup is labelled by it, and focus
+returns to it on close.
+
+- A press on **another** Trigger while a Popover or a Menu is open moves it there: it stays open,
+  anchors to that Trigger and takes its payload, and `onOpenChange(true, details)` reports it
+  (reason `trigger-press`, `details.trigger` the new Trigger).
+- Hovering another Trigger of an open Tooltip moves it there at once.
+- A modal Dialog or AlertDialog makes the page inert, so its other Triggers cannot be pressed
+  while it is open.
+
+The active trigger can be controlled with `triggerId` (and seeded with `defaultTriggerId`), the
+id of a Trigger, together with `open`: set both from `onOpenChange`, whose `details.trigger` is
+the Trigger element. A Trigger's `id` is generated when you give none.
+
+## Opening from code
+
+The handle opens and closes its Root from anywhere, with the reason `imperative-action`:
+
+| member | what |
+| --- | --- |
+| `open(triggerId)` | opens it as if the Trigger with that id was pressed (it becomes the active one, its payload is the content's); `null` opens it with no trigger |
+| `openWithPayload(payload)` | opens it with that payload and no trigger |
+| `close()` | closes it |
+| `isOpen` | whether it is open |
+
+A call while no Root is attached to the handle does nothing. A close of `imperative-action`
+returns focus as a programmatic close does (reason `none`): to the active trigger only when focus
+was left inside the overlay.
+
+<Framework name="react">
+
+```tsx
+<button type="button" onClick={() => editUser.open("edit-Grace")}>
+    Open for Grace
+</button>
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <button type="button" @click="editUser.open('edit-Grace')">Open for Grace</button>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<button type="button" (click)="editUser.open('edit-Grace')">Open for Grace</button>
+```
+
+</Framework>
+
+The Root's own actions do the same without a handle: `close()` and `unmount()`, on React's
+`actionsRef`, the Vue Root's template ref and the Angular root directive
+([the primitive contract](/docs/concepts/primitive-contract)).
+
+## What stays yours
+
+The Triggers' text and their accessible names, the content the payload fills, and where every
+part sits in the page. Read the [Dialog](/docs/api/dialog), [Popover](/docs/api/popover),
+[Menu](/docs/api/menu) and [Tooltip](/docs/api/tooltip) pages for each Root's props.

@@ -4,7 +4,12 @@
 export type {
     ChangeDetails,
     ChangeReason,
+    FocusTarget,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayHandle,
+    OverlayPortalOptions,
 } from "@fragiola/primitives-angular/internal";
 export {
     DialogBackdrop,
@@ -17,13 +22,25 @@ export {
     type DialogPopupState,
 } from "./directives/dialog-popup.directive.ts";
 export { DialogPortal } from "./directives/dialog-portal.directive.ts";
+export { DialogRoot } from "./directives/dialog-root.directive.ts";
 export {
-    DialogRoot,
+    type DialogComponent,
+    DialogRootBase,
     type DialogState,
-} from "./directives/dialog-root.directive.ts";
+} from "./directives/dialog-root-base.ts";
 export { DialogTitle } from "./directives/dialog-title.directive.ts";
+export { DialogTrigger } from "./directives/dialog-trigger.directive.ts";
 export {
-    DialogTrigger,
+    DialogTriggerBase,
     type DialogTriggerState,
-} from "./directives/dialog-trigger.directive.ts";
+} from "./directives/dialog-trigger-base.ts";
+export {
+    DialogViewport,
+    type DialogViewportState,
+} from "./directives/dialog-viewport.directive.ts";
 export { injectDialog } from "./inject/inject-dialog.ts";
+export {
+    createDialogHandle,
+    type DialogHandle,
+} from "./utils/dialog-handle.ts";
+export { DIALOG_NESTING, type DialogNesting } from "./utils/dialog-nesting.ts";

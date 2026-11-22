@@ -19,11 +19,15 @@ export class SelectValue {
     private readonly root = inject(SelectRoot);
     /** Shown while nothing is selected. */
     readonly placeholder = input("");
+    // without `items`, the raw value until the selected Item has rendered (Base UI)
     private readonly label = computed(
         () =>
             this.root
-                .items()
-                .find((item) => item.value === this.root.selected())?.label,
+                .itemList()
+                .find((item) => item.value === this.root.selected())?.label ??
+            (this.root.items() === undefined
+                ? (this.root.selected() ?? undefined)
+                : undefined),
     );
     readonly state = computed(() => ({
         placeholder: this.label() === undefined,

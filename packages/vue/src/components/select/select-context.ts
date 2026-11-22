@@ -11,10 +11,20 @@ export interface SelectItemData {
     disabled?: boolean;
 }
 
+/** An Item that registered itself (a Select without `items`: spec/select.md, "API"). */
+export interface RegisteredItem extends SelectItemData {
+    element: HTMLElement;
+}
+
 export interface SelectContext extends OverlayRoot {
     /** The enclosing field's binding, for the trigger (spec/field.md). */
     field: FieldControlBinding;
+    /** The Root's `items`, else the registered Items, in DOM order. */
     items: () => readonly SelectItemData[];
+    /** Whether the Items register themselves (no `items` on the Root). */
+    registers: () => boolean;
+    /** Registers an Item (without `items`); returns its unregistration. */
+    registerItem: (item: RegisteredItem) => () => void;
     value: ComputedRef<string | null>;
     disabled: () => boolean;
     required: () => boolean;
@@ -22,9 +32,9 @@ export interface SelectContext extends OverlayRoot {
     modal: () => boolean;
     highlighted: Ref<string | null>;
     /** Opens the list with this item highlighted. */
-    openOn: (value: string | null, reason: ChangeReason) => void;
+    openOn: (value: string | null, reason: ChangeReason, event?: Event) => void;
     /** Chooses an enabled item and closes. */
-    choose: (value: string, reason: ChangeReason) => void;
+    choose: (value: string, reason: ChangeReason, event?: Event) => void;
     listId: string;
     /** The id of item `value`'s option element. */
     itemId: (value: string) => string;
@@ -38,6 +48,10 @@ export interface SelectItemState {
     highlighted: boolean;
     disabled: boolean;
 }
+
+/** What a Group gives its GroupLabel: where the label reports its id. */
+export const SelectGroupKey: InjectionKey<Ref<string | undefined>> =
+    Symbol("SelectGroup");
 
 export const SelectItemKey: InjectionKey<ComputedRef<SelectItemState>> =
     Symbol("SelectItem");

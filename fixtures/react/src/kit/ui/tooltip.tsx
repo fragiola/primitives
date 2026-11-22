@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 export const Tooltip = {
     Provider: Primitive.Provider,
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: (props: ComponentProps<typeof Primitive.Trigger>) => (
         <Primitive.Trigger className={tooltip.trigger} {...props} />

@@ -21,6 +21,22 @@ export const FRUIT_POPUP = `
     </ng-container>
 `;
 
+/** The fruits' popup in a Portal kept mounted (the lifecycle scenario). */
+export const FRUIT_POPUP_KEPT_MOUNTED = `
+    <ng-container *comboboxPortal="{ keepMounted: true }">
+        <div comboboxPositioner [sideOffset]="4" [class]="styles.positioner">
+            <div comboboxPopup [class]="styles.popup">
+                <div comboboxEmpty [class]="styles.empty">No fruit found.</div>
+                <div comboboxList #list="comboboxList" [class]="styles.list">
+                    @for (fruit of asFruits(list.entries()); track fruit.value) {
+                        <div comboboxItem [value]="fruit" [disabled]="fruit.disabled ?? false" [class]="styles.item">{{ fruit.label }}</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </ng-container>
+`;
+
 /** The same, each Item with its ItemIndicator. */
 export const FRUIT_POPUP_WITH_INDICATOR = `
     <ng-container *comboboxPortal>

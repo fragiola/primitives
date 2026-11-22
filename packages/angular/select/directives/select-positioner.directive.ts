@@ -34,7 +34,9 @@ const NEVER = new Set<string>();
         "data-primitives-part": "select-positioner",
         // a modal select blocks the pointer outside; its list takes it back (spec/select.md)
         "[style.pointer-events]": "root.modal() ? 'auto' : null",
+        "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
@@ -51,7 +53,9 @@ export class SelectPositioner {
         open: this.root.overlay.open(),
         ...this.root.placed(),
     }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() =>
+        dataValues({ ...this.state(), closed: !this.state().open }),
+    );
 
     constructor() {
         const overlay = this.root.overlay;
@@ -59,7 +63,11 @@ export class SelectPositioner {
         positionOverlay(
             this,
             { side: "bottom", align: "start" },
-            { anchor: overlay.trigger, positioner },
+            {
+                anchor: overlay.trigger,
+                positioner,
+                mounted: overlay.presence.mounted,
+            },
             this.root.placed,
         );
         afterRenderEffect((onCleanup) => {
@@ -72,7 +80,8 @@ export class SelectPositioner {
                 const session = openOverlaySession(positioner.ownerDocument, {
                     elements: () => [positioner],
                     ignore: () => [trigger],
-                    dismiss: (reason) => overlay.setOpen(false, reason),
+                    dismiss: (reason, event) =>
+                        overlay.setOpen(false, reason, event),
                     returnFocus: {
                         when: NEVER,
                         whenUnfocused: () =>

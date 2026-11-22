@@ -1,20 +1,48 @@
-// The entry of @fragiola/primitives-vue/menu: a menu of actions opened by a button, with submenus
-// (spec/menu.md, the APG's menu button).
+// The entry of @fragiola/primitives-vue/menu: a menu of actions opened by a button, with submenus,
+// checkbox items and radio items (spec/menu.md, the APG's menu button).
 
 export type {
     Align,
     Side,
 } from "@fragiola/primitives/positioning";
+export type {
+    OverlayRootEmits,
+    OverlayRootProps,
+    OverlayTriggerRootProps,
+} from "../../composables/use-overlay-root.ts";
+export type { OverlayTriggerProps } from "../../composables/use-overlay-trigger.ts";
 export type { PositionerProps } from "../../composables/use-positioner.ts";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
+    OverlayActions,
 } from "../../utils/change-details.ts";
+export type { OverlayHandle } from "../../utils/overlay-handle.ts";
+export type { OverlayPortalProps } from "../../utils/overlay-portal.ts";
+export type { OverlayRootSlots } from "../../utils/public-component.ts";
 export type { RenderSlotProps } from "../../utils/render-part.ts";
+export type {
+    MenuCheckboxItemEmits,
+    MenuCheckboxItemProps,
+    MenuCheckboxItemState,
+} from "./menu-checkbox-item.ts";
+export type { MenuCheckboxItemIndicatorProps } from "./menu-checkbox-item-indicator.ts";
+export type { MenuCheckableItemState } from "./menu-context.ts";
+export { createMenuHandle, type MenuHandle } from "./menu-handle.ts";
 export type { MenuItemProps, MenuItemState } from "./menu-item.ts";
 export type { MenuPopupState } from "./menu-popup.ts";
 export type { MenuPortalProps } from "./menu-portal.ts";
 export type { MenuPositionerState } from "./menu-positioner.ts";
+export type {
+    MenuRadioGroupEmits,
+    MenuRadioGroupProps,
+} from "./menu-radio-group.ts";
+export type {
+    MenuRadioItemProps,
+    MenuRadioItemState,
+} from "./menu-radio-item.ts";
+export type { MenuRadioItemIndicatorProps } from "./menu-radio-item-indicator.ts";
 export type {
     MenuRootEmits,
     MenuRootProps,

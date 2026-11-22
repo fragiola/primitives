@@ -215,6 +215,11 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES.radio).toEqual(["radio-group", "field"]);
         expect(ENTRY_DEPENDENCIES["radio-group"]).toEqual(["field"]);
         expect(ENTRY_DEPENDENCIES.switch).toEqual(["field"]);
+        // Epic #35: AlertDialog on Dialog's parts, ContextMenu on Menu's; neither base on them
+        expect(ENTRY_DEPENDENCIES["alert-dialog"]).toEqual(["dialog"]);
+        expect(ENTRY_DEPENDENCIES["context-menu"]).toEqual(["menu"]);
+        expect(ENTRY_DEPENDENCIES.dialog).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES.menu).toBeUndefined();
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [

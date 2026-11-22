@@ -5,6 +5,8 @@ export interface ScenarioQuery {
     /** The document's `lang`: the locale, none with `?locale=none`. */
     lang: string | undefined;
     dir: "ltr" | "rtl";
+    /** `?cancel`: a lifecycle scenario cancels every close (spec/README.md, "The lifecycle scenarios"). */
+    cancel: boolean;
 }
 
 export function readQuery(search: string): ScenarioQuery {
@@ -14,5 +16,6 @@ export function readQuery(search: string): ScenarioQuery {
         locale: locale === "none" ? undefined : locale,
         lang: locale === "none" ? undefined : locale,
         dir: params.get("dir") === "rtl" ? "rtl" : "ltr",
+        cancel: params.has("cancel"),
     };
 }

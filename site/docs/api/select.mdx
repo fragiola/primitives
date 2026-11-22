@@ -28,6 +28,14 @@ submits, resets and validates as a `<select>` would. A list the user filters by 
   (`outside-press`) close without choosing; focus stays on the trigger.
 - **`modal`** (off by default): while open, the page does not scroll and a press outside reaches
   no element: it only closes the list. Without it, the page keeps its pointer and its scroll.
+- **Items**: with the Root's `items`, every label is known while the list is closed. Without it,
+  the Items register while they are rendered, in DOM order, and an item's label is its `label`,
+  else its ItemText's text, else its text; the Value shows the selected item's label once that item
+  has rendered, else the raw value. Give such a Select the Portal's `keepMounted`, so the labels
+  are known while it is closed. Groups, their labels and separators are skipped by the keyboard.
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it as it
+  is), `onOpenChangeComplete(open)` reports the end of each transition, the actions `close()` and
+  `unmount()` act from code.
 - **Forms**: a visually hidden input carries `name` and the value (`""` with none). `required`
   blocks the submission and focuses the trigger; a form reset returns an uncontrolled Select to
   `defaultValue`. In a [Field](/docs/api/field), the trigger takes the field's ids and states.
@@ -44,7 +52,11 @@ submits, resets and validates as a `<select>` would. A list the user filters by 
 | Popup | `div` | `select-popup` | the floating container |
 | List | `div` | `select-list` | the `listbox` |
 | Item | `div` | `select-item` | an `option` |
+| ItemText | `span` | `select-item-text` | inside an Item: its label, without `items` |
 | ItemIndicator | `span` | `select-item-indicator` | rendered only while its item is selected |
+| Group | `div` | `select-group` | groups items under a label |
+| GroupLabel | `div` | `select-group-label` | names its group |
+| Separator | `div` | `select-separator` | separates items or groups |
 | (hidden input) | `input` | `select-input` | what the form submits and validates |
 
 ## Usage
@@ -84,8 +96,38 @@ const FRUITS = [
 </>;
 ```
 
-The Root needs `items` even while the list is closed: for the Value's label, the typeahead on
-the closed trigger and the hidden input.
+With `items`, the Root knows every label while the list is closed: for the Value, the typeahead
+on the closed trigger and the hidden input. Without it, keep the list mounted:
+
+```tsx
+<Select.Root defaultValue="carrot">
+    <Select.Trigger>
+        <Select.Value placeholder="Choose a food" />
+    </Select.Trigger>
+    <Select.Portal keepMounted>
+        <Select.Positioner>
+            <Select.Popup>
+                <Select.List>
+                    <Select.Group>
+                        <Select.GroupLabel>Fruits</Select.GroupLabel>
+                        <Select.Item value="apple">
+                            <Select.ItemText>Apple</Select.ItemText>
+                            <Select.ItemIndicator>✓</Select.ItemIndicator>
+                        </Select.Item>
+                    </Select.Group>
+                    <Select.Separator />
+                    <Select.Group>
+                        <Select.GroupLabel>Vegetables</Select.GroupLabel>
+                        <Select.Item value="carrot">
+                            <Select.ItemText>Carrot</Select.ItemText>
+                        </Select.Item>
+                    </Select.Group>
+                </Select.List>
+            </Select.Popup>
+        </Select.Positioner>
+    </Select.Portal>
+</Select.Root>;
+```
 
 </Framework>
 
@@ -107,6 +149,10 @@ the closed trigger and the hidden input.
     </Select.Root>
 </template>
 ```
+
+Without `items`: `<Select.Portal keep-mounted>`, and `Select.Group`, `Select.GroupLabel`,
+`Select.Separator` and `<Select.Item value="apple"><Select.ItemText>Apple</Select.ItemText></Select.Item>`
+as in React.
 
 </Framework>
 
@@ -138,6 +184,10 @@ export class FruitPicker {
 }
 ```
 
+Without `items`: `*selectPortal="{ keepMounted: true }"`, and `<div selectGroup>`,
+`<div selectGroupLabel>`, `<div selectSeparator>` and
+`<div selectItem value="apple"><span selectItemText>Apple</span></div>`.
+
 </Framework>
 
 ## Props
@@ -154,14 +204,16 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | `value` | `string \| null` | | the selected item's value, controlled |
 | `defaultValue` | `string \| null` | `null` | the initial value, uncontrolled |
 | `onValueChange` | `(value: string \| null, details: { reason }) => void` | | every change (`item-press`, `focus-out`, `none` on a form reset) |
-| `items` | `{ value, label, disabled? }[]` | | every item |
+| `items` | `{ value, label, disabled? }[]` | | every item (optional: without it, the rendered Items register themselves) |
 | `name` | `string` | | the hidden input's name (a field's wins) |
 | `required` | `boolean` | `false` | the form cannot submit with no value |
 | `disabled` | `boolean` | `false` | the trigger opens nothing |
 | `modal` | `boolean` | `false` | while open: scroll lock and a blocked outside pointer |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every open change, with its reason |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every open change, with its reason; called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
 
 ### Trigger
 
@@ -177,7 +229,9 @@ No props of its own.
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*selectPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*selectPortal="{ keepMounted: true }"`, or `*selectPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -205,7 +259,12 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `value` | `string` | | required: its `items` entry's value |
+| `label` | `string` | its ItemText's text, else its text | the label the Value shows and typeahead matches, without the Root's `items` |
 | `disabled` | `boolean` | its entry's | highlighted, never chosen |
+
+### ItemText
+
+No props of its own.
 
 ### ItemIndicator
 
@@ -213,17 +272,35 @@ No props of its own.
 | --- | --- | --- | --- |
 | `keepMounted` | `boolean` | `false` | rendered in every state |
 
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id its group's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Separator
+
+No props of its own.
+
 ## State and part attributes
 
 | part | attributes |
 | --- | --- |
 | Trigger | `role="combobox"`, `type="button"`, `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls` and `aria-activedescendant` (while open), `aria-required`, `disabled`, `data-popup-open`, `data-placeholder`, `data-disabled`; in a Field, the field's states |
 | Value | `data-placeholder` |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the CSS variables of the [Popover](/docs/api/popover)'s |
-| Popup | `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; the CSS variables of the [Popover](/docs/api/popover)'s; `hidden` while kept mounted and closed |
+| Popup | `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
 | List | `role="listbox"`, `aria-labelledby` |
 | Item | `role="option"`, `aria-selected`, `aria-disabled`, `data-highlighted`, `data-selected`, `data-disabled` |
+| ItemText | none beyond the part attribute |
 | ItemIndicator | `aria-hidden="true"` |
+| Group | `role="group"`, `aria-labelledby` (its GroupLabel) |
+| GroupLabel | an `id` |
+| Separator | `role="presentation"`, `data-orientation="horizontal"` (a `separator` role is not allowed inside a `listbox`) |
 
 ## Keyboard
 
@@ -239,6 +316,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/select` | `Align`, `ChangeDetails`, `ChangeReason`, `PositionerProps`, `RenderProp`, `Select`, `SelectItemData`, `SelectItemIndicatorProps`, `SelectItemProps`, `SelectItemState`, `SelectPortalProps`, `SelectPositionerProps`, `SelectPositionerState`, `SelectRootProps`, `SelectTriggerState`, `SelectValueProps`, `Side` |
-| `@fragiola/primitives-vue/select` | `Align`, `ChangeDetails`, `ChangeReason`, `PositionerProps`, `RenderSlotProps`, `Select`, `SelectItemData`, `SelectItemIndicatorProps`, `SelectItemIndicatorState`, `SelectItemProps`, `SelectItemState`, `SelectListState`, `SelectPopupState`, `SelectPortalProps`, `SelectPositionerState`, `SelectRootEmits`, `SelectRootProps`, `SelectTriggerState`, `SelectValueProps`, `SelectValueState`, `Side` |
-| `@fragiola/primitives-angular/select` | `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `SelectItem`, `SelectItemData`, `SelectItemIndicator`, `SelectItemState`, `SelectList`, `SelectPopup`, `SelectPortal`, `SelectPositioner`, `SelectRoot`, `SelectState`, `SelectTrigger`, `SelectTriggerState`, `SelectValue`, `Side`, `ValueChangeEvent` |
+| `@fragiola/primitives-react/select` | `Align`, `ChangeDetails`, `ChangeReason`, `PositionerProps`, `RenderProp`, `Select`, `SelectItemData`, `SelectItemIndicatorProps`, `SelectItemProps`, `SelectItemState`, `SelectPortalProps`, `SelectPositionerProps`, `SelectPositionerState`, `SelectRootProps`, `SelectTriggerState`, `SelectValueProps`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps` |
+| `@fragiola/primitives-vue/select` | `Align`, `ChangeDetails`, `ChangeReason`, `PositionerProps`, `RenderSlotProps`, `Select`, `SelectItemData`, `SelectItemIndicatorProps`, `SelectItemIndicatorState`, `SelectItemProps`, `SelectItemState`, `SelectListState`, `SelectPopupState`, `SelectPortalProps`, `SelectPositionerState`, `SelectRootEmits`, `SelectRootProps`, `SelectTriggerState`, `SelectValueProps`, `SelectValueState`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps` |
+| `@fragiola/primitives-angular/select` | `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `SelectItem`, `SelectItemData`, `SelectItemIndicator`, `SelectItemState`, `SelectList`, `SelectPopup`, `SelectPortal`, `SelectPositioner`, `SelectRoot`, `SelectState`, `SelectTrigger`, `SelectTriggerState`, `SelectValue`, `SelectItemText`, `SelectGroup`, `SelectGroupLabel`, `SelectSeparator`, `Side`, `ValueChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalOptions`, `RegisteredItem` |

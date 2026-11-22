@@ -1,0 +1,266 @@
+---
+title: AlertDialog
+description: A modal dialog the user must answer, never dismissed by a press outside, focused on its least destructive action (APG alert dialog), in each framework.
+---
+
+A dialog that interrupts the user with a message that needs an answer, usually the confirmation
+of a destructive action. It takes focus, traps it, makes the rest of the page inert and returns
+focus when it closes, as a [Dialog](/docs/api/dialog) does, but a press outside never closes it:
+the user answers (one of its buttons) or presses Escape. It follows the WAI-ARIA APG
+[alert dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/). A dialog the user
+may dismiss from outside is a Dialog.
+
+AlertDialog has its own entry and is built on Dialog's parts: the same Trigger, Portal, Backdrop,
+Viewport, Popup, Title, Description and Close, whose part attribute names the alert dialog
+(`alert-dialog-popup`). Only its Root is its own.
+
+<Example id="alert-dialog" />
+
+## Behaviour
+
+- **Open**: a press on the Trigger (Enter and Space, as any button). Focus moves to
+  `initialFocus`, else the **first Close part** of the popup (the APG's least destructive action,
+  which you render as the Close: "Cancel"), else the first tabbable element, else the popup.
+- **Inside**: Tab and Shift+Tab wrap inside the popup; everything outside the portal is inert,
+  and the page does not scroll.
+- **No outside dismissal**: a press outside the popup (on the backdrop, on the viewport around
+  the popup, or on the page) does nothing: the alert dialog stays open, `onOpenChange` is not
+  called, and focus stays where it was.
+- **Close**: Escape (reason `escape-key`), a Close part (`close-press`) or the Trigger again
+  (`trigger-press`). Your other actions ("Discard", "Delete") are your own buttons: they act, then
+  close it through the controlled `open`, the handle's `close()` or the actions' `close()` (reason
+  `imperative-action`). Focus moves to `finalFocus`, else the active trigger, else the element
+  focused before it opened.
+- **Layers and nesting**: as a Dialog's ([nested overlays](/docs/guides/nested-overlays)):
+  Escape closes the newest layer only; an AlertDialog inside a Dialog's popup (or a Dialog inside
+  an AlertDialog's) is a nested dialog, with the same `data-nested`, `data-nested-dialog-open`
+  and `--nested-dialogs`.
+- **Detached triggers**: as a Dialog's, with an AlertDialog handle
+  (`AlertDialog.createHandle()`, [detached triggers](/docs/guides/detached-triggers)).
+- **Lifecycle**: as a Dialog's: `onOpenChange` before the change (`details.cancel()` keeps it as
+  it is), `onOpenChangeComplete(open)`, the actions `close()` and `unmount()`, and the Portal's
+  `keepMounted`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state |
+| Trigger | `button` | `alert-dialog-trigger` | opens the alert dialog |
+| Portal | none | | moves the Backdrop, the Viewport and the Popup to the end of `body` |
+| Backdrop | `div` | `alert-dialog-backdrop` | covers the page (optional; a nested one renders nothing unless `forceRender`) |
+| Viewport | `div` | `alert-dialog-viewport` | a full-page container that positions the Popup (optional) |
+| Popup | `div` | `alert-dialog-popup` | the alert dialog |
+| Title | `h2` | `alert-dialog-title` | names it |
+| Description | `p` | `alert-dialog-description` | its message |
+| Close | `button` | `alert-dialog-close` | closes it: the least destructive answer |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import {
+    AlertDialog,
+    type OverlayActions,
+} from "@fragiola/primitives-react/alert-dialog";
+import { useRef } from "react";
+
+function DiscardDraft({ onDiscard }: { onDiscard: () => void }) {
+    const actions = useRef<OverlayActions | null>(null);
+    return (
+        <AlertDialog.Root actionsRef={actions}>
+            <AlertDialog.Trigger>Discard draft</AlertDialog.Trigger>
+            <AlertDialog.Portal>
+                <AlertDialog.Backdrop />
+                <AlertDialog.Popup>
+                    <AlertDialog.Title>Discard draft?</AlertDialog.Title>
+                    <AlertDialog.Description>
+                        Your unsaved changes will be lost.
+                    </AlertDialog.Description>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            onDiscard();
+                            actions.current?.close();
+                        }}
+                    >
+                        Discard
+                    </button>
+                    <AlertDialog.Close>Cancel</AlertDialog.Close>
+                </AlertDialog.Popup>
+            </AlertDialog.Portal>
+        </AlertDialog.Root>
+    );
+}
+```
+
+The "Discard" button is yours: it acts, then closes the alert dialog through the actions (reason
+`imperative-action`). A controlled `open` closes it as well.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { AlertDialog } from "@fragiola/primitives-vue/alert-dialog";
+import { ref } from "vue";
+
+const emit = defineEmits<{ discard: [] }>();
+const open = ref(false);
+
+function discard() {
+    emit("discard");
+    open.value = false;
+}
+</script>
+
+<template>
+    <AlertDialog.Root v-model:open="open">
+        <AlertDialog.Trigger>Discard draft</AlertDialog.Trigger>
+        <AlertDialog.Portal>
+            <AlertDialog.Backdrop />
+            <AlertDialog.Popup>
+                <AlertDialog.Title>Discard draft?</AlertDialog.Title>
+                <AlertDialog.Description>Your unsaved changes will be lost.</AlertDialog.Description>
+                <button type="button" @click="discard">Discard</button>
+                <AlertDialog.Close>Cancel</AlertDialog.Close>
+            </AlertDialog.Popup>
+        </AlertDialog.Portal>
+    </AlertDialog.Root>
+</template>
+```
+
+The Root's template ref exposes the actions (`close()`, `unmount()`).
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [AlertDialogRoot, AlertDialogTrigger, AlertDialogPortal, AlertDialogBackdrop, AlertDialogPopup, AlertDialogTitle, AlertDialogDescription, AlertDialogClose],
+    template: `
+        <ng-container alertDialogRoot #alert="alertDialogRoot">
+            <button alertDialogTrigger>Discard draft</button>
+            <ng-container *alertDialogPortal>
+                <div alertDialogBackdrop></div>
+                <div alertDialogPopup>
+                    <h2 alertDialogTitle>Discard draft?</h2>
+                    <p alertDialogDescription>Your unsaved changes will be lost.</p>
+                    <button type="button" (click)="discard.emit(); alert.close()">Discard</button>
+                    <button alertDialogClose>Cancel</button>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class DiscardDraft {
+    readonly discard = output<void>();
+}
+```
+
+The directives are Dialog's behaviour under the entry's own selectors (`[alertDialogRoot]`,
+`*alertDialogPortal`, `[alertDialogViewport]`, ...). `#alert="alertDialogRoot"` gives the actions
+and the active trigger's `alert.payload()`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:open`, `@open-change`), and Angular
+as inputs and outputs (`[(open)]`, `(openChangeDetails)`). There is no `modal` and no outside
+dismissal option: an alert dialog is always modal and never dismissed from outside.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `imperative-action`; never `outside-press`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `AlertDialogHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+| `handle` | `AlertDialogHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Backdrop, the Viewport and the Popup go |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed, `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*alertDialogPortal="{ keepMounted: true }"` |
+
+### Backdrop
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `forceRender` | `boolean` | `false` | render the Backdrop of a nested alert dialog too |
+
+### Viewport
+
+No props of its own.
+
+### Popup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `initialFocus` | an element, a ref, or `false` | the first Close, else the first tabbable element | focused on open (`false`: the popup itself); Vue and Angular also take a getter |
+| `finalFocus` | an element, a ref, or `false` | the trigger | focused on close (`false`: nothing moves) |
+
+### Title
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Description
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-describedby` points at; React and Vue take it as a plain attribute |
+
+### Close
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="dialog"` (ARIA has no `alertdialog` value), `aria-expanded`, `aria-controls` (the popup, on the active trigger while open), `data-popup-open` (the active trigger), `data-disabled`, an `id` |
+| Backdrop | `aria-hidden="true"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`; `hidden` while kept mounted and closed |
+| Viewport | `role="presentation"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`; `hidden` while kept mounted and closed |
+| Popup | `role="alertdialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`, the inline `--nested-dialogs: <n>`; `hidden` while kept mounted and closed |
+| Title, Description | an `id` (generated unless given) |
+
+The APG asks an alert dialog for a name and a description: render a Title and a Description.
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space on the Trigger | opens, focus on the first Close |
+| Tab, Shift+Tab | the next or previous tabbable element of the popup, wrapping |
+| Escape | closes (only the topmost layer, when one is open inside) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/alert-dialog` | `AlertDialog`, `AlertDialogRootProps`, `AlertDialogTriggerProps`, `AlertDialogTriggerState`, `AlertDialogPortalProps`, `AlertDialogBackdropProps`, `AlertDialogBackdropState`, `AlertDialogViewportState`, `AlertDialogPopupProps`, `AlertDialogPopupState`, `AlertDialogHandle`, `createAlertDialogHandle`, `OverlayRootProps`, `OverlayTriggerRootProps`, `OverlayTriggerProps`, `OverlayPortalProps`, `OverlayHandle`, `OverlayActions`, `OpenChangeDetails`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/alert-dialog` | `AlertDialog`, `AlertDialogRootProps`, `AlertDialogRootEmits`, `AlertDialogTriggerProps`, `AlertDialogTriggerState`, `AlertDialogPortalProps`, `AlertDialogBackdropProps`, `AlertDialogBackdropState`, `AlertDialogViewportState`, `AlertDialogPopupProps`, `AlertDialogPopupState`, `AlertDialogHandle`, `createAlertDialogHandle`, `OverlayRootProps`, `OverlayRootEmits`, `OverlayRootSlots`, `OverlayTriggerRootProps`, `OverlayTriggerProps`, `OverlayPortalProps`, `OverlayHandle`, `OverlayActions`, `OpenChangeDetails`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/alert-dialog` | `AlertDialogRoot`, `AlertDialogTrigger`, `AlertDialogPortal`, `AlertDialogBackdrop`, `AlertDialogViewport`, `AlertDialogPopup`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogClose`, `AlertDialogHandle`, `createAlertDialogHandle`, `OverlayHandle`, `OverlayActions`, `OverlayPortalOptions`, `OpenChangeDetails`, `OpenChangeEvent`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `AlertDialogBackdropState`, `AlertDialogPopupState`, `AlertDialogState`, `AlertDialogTriggerState`, `AlertDialogViewportState` |

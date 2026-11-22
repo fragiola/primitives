@@ -21,6 +21,7 @@ export interface TooltipPopupState {
         "data-primitives-part": "tooltip-popup",
         "[attr.id]": "root.overlay.popupId",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-instant]": "data().instant",
@@ -29,7 +30,7 @@ export interface TooltipPopupState {
     },
 })
 export class TooltipPopup {
-    protected readonly root = inject(TooltipRoot);
+    protected readonly root = inject<TooltipRoot>(TooltipRoot);
     readonly state = computed<TooltipPopupState>(() => ({
         open: this.root.overlay.open(),
         instant: this.root.instant(),
@@ -37,8 +38,10 @@ export class TooltipPopup {
     }));
     protected readonly data = computed(() => {
         const status = this.root.overlay.presence.status();
+        const state = this.state();
         return dataValues({
-            ...this.state(),
+            ...state,
+            closed: !state.open,
             "starting-style": status === "starting",
             "ending-style": status === "ending",
         });

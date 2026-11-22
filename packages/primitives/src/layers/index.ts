@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/layers: the stack of open overlays of a document (Escape, outside press), the focus-outside watch, and an Escape taken before the layers (a tooltip's).
+// The entry of @fragiola/primitives/layers: the tree of open overlays of a document (Escape, outside press), the focus-outside watch, and an Escape taken before the layers (a tooltip's).
 
 export { watchFocusOutside } from "./focus-outside.ts";
 export { interceptEscape } from "./intercept-escape.ts";

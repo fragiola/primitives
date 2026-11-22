@@ -6,7 +6,8 @@ description: A modal dialog that takes focus, traps it, makes the page inert and
 A window over the page: it takes focus, keeps it inside, makes the rest of the page inert and
 stops it scrolling, and gives focus back when it closes. It follows the WAI-ARIA APG
 [modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Non-modal floating
-content is a popover; alert dialogs are out of its scope.
+content is a [Popover](/docs/api/popover); a dialog the user must answer, never dismissed from
+outside, is an [AlertDialog](/docs/api/alert-dialog).
 
 <Example id="dialog" />
 
@@ -19,10 +20,27 @@ content is a popover; alert dialogs are out of its scope.
 - **Close**: Escape (reason `escape-key`), a press outside the popup (`outside-press`), a Close
   part (`close-press`) or the Trigger again (`trigger-press`). Focus moves to `finalFocus`, else
   the trigger, else the element focused before it opened.
-- **Layers**: the dialog is a layer. Escape and outside presses go to the topmost open layer, so a
-  popover opened inside the dialog closes first.
-- **Animation**: the Backdrop and the Popup carry `data-starting-style` on their first frame and
-  `data-ending-style` while closing, and unmount when their animations end.
+- **Change details**: `onOpenChange(open, details)` is called **before** the state changes, with
+  the `reason`, the DOM `event` and the `trigger`; `details.cancel()` keeps the dialog as it is (it
+  keeps working, focus and inertness included). A close of the handle or of the actions has the
+  reason `imperative-action` and returns focus as `none` does.
+- **Layers**: the dialog is a layer of the [nested overlay tree](/docs/guides/nested-overlays).
+  Escape closes the newest layer only; a press inside the dialog closes the overlays opened from
+  it, not the dialog; closing the dialog closes them all (reason `none`).
+- **Nested dialogs**: a Dialog whose Root is inside another dialog's Popup is nested: its parts
+  carry `data-nested`, the parent's `data-nested-dialog-open`, and the parent Popup's
+  `--nested-dialogs` counts the open dialogs below it (`2` for a child with its own child open,
+  `0` when none), so a recipe can scale or offset it. A nested Backdrop renders nothing unless
+  `forceRender`. A press on a nested dialog's Viewport outside its Popup closes that dialog only.
+- **Detached triggers**: Triggers anywhere in the page open the same Root through a `handle`, each
+  with a `payload` the content reads ([detached triggers](/docs/guides/detached-triggers)). Only
+  the active trigger reports the open state, and focus returns to it. The handle's
+  `open(triggerId)`, `openWithPayload(payload)` and `close()` act from code (reason
+  `imperative-action`), `isOpen` reads the state; a call with no Root attached does nothing.
+- **Animation and lifecycle**: the Backdrop, the Viewport and the Popup carry
+  `data-starting-style` on their first frame and `data-ending-style` while closing, and unmount
+  when their animations end; `onOpenChangeComplete(open)` reports the end of each transition. With
+  the Portal's `keepMounted`, they stay in the page while closed, `hidden` and `data-closed`.
 
 ## Anatomy
 
@@ -30,8 +48,9 @@ content is a popover; alert dialogs are out of its scope.
 | --- | --- | --- | --- |
 | Root | none | | holds the state |
 | Trigger | `button` | `dialog-trigger` | opens the dialog |
-| Portal | none | | moves the Backdrop and the Popup to the end of `body` |
-| Backdrop | `div` | `dialog-backdrop` | covers the page (optional) |
+| Portal | none | | moves the Backdrop, the Viewport and the Popup to the end of `body` |
+| Backdrop | `div` | `dialog-backdrop` | covers the page (optional; a nested dialog's renders nothing unless `forceRender`) |
+| Viewport | `div` | `dialog-viewport` | a full-page container that positions the Popup (optional, `role="presentation"`) |
 | Popup | `div` | `dialog-popup` | the dialog |
 | Title | `h2` | `dialog-title` | names the dialog |
 | Description | `p` | `dialog-description` | describes the dialog |
@@ -48,16 +67,21 @@ import { Dialog } from "@fragiola/primitives-react/dialog";
     <Dialog.Trigger>Edit profile</Dialog.Trigger>
     <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Popup>
-            <Dialog.Title>Edit profile</Dialog.Title>
-            <Dialog.Description>Change how others see you.</Dialog.Description>
-            <Dialog.Close>Close</Dialog.Close>
-        </Dialog.Popup>
+        <Dialog.Viewport>
+            <Dialog.Popup>
+                <Dialog.Title>Edit profile</Dialog.Title>
+                <Dialog.Description>Change how others see you.</Dialog.Description>
+                <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+        </Dialog.Viewport>
     </Dialog.Portal>
 </Dialog.Root>;
 ```
 
-Controlled: `open` and `onOpenChange`, with `useState`.
+Controlled: `open` and `onOpenChange`, with `useState`. The actions: `actionsRef={ref}`, then
+`ref.current?.close()`. Detached triggers: `const handle = Dialog.createHandle<User>()`,
+`<Dialog.Trigger handle={handle} payload={user}>` anywhere, and the Root's children as a function
+`{({ payload }) => ...}`.
 
 </Framework>
 
@@ -76,15 +100,21 @@ const open = ref(false);
         <Dialog.Trigger>Edit profile</Dialog.Trigger>
         <Dialog.Portal>
             <Dialog.Backdrop />
-            <Dialog.Popup>
-                <Dialog.Title>Edit profile</Dialog.Title>
-                <Dialog.Description>Change how others see you.</Dialog.Description>
-                <Dialog.Close>Close</Dialog.Close>
-            </Dialog.Popup>
+            <Dialog.Viewport>
+                <Dialog.Popup>
+                    <Dialog.Title>Edit profile</Dialog.Title>
+                    <Dialog.Description>Change how others see you.</Dialog.Description>
+                    <Dialog.Close>Close</Dialog.Close>
+                </Dialog.Popup>
+            </Dialog.Viewport>
         </Dialog.Portal>
     </Dialog.Root>
 </template>
 ```
+
+The Root's template ref exposes the actions (`close()`, `unmount()`); its default scoped slot gives
+the active trigger's payload (`v-slot="{ payload }"`); `@open-change-complete` reports the end of
+each transition.
 
 </Framework>
 
@@ -92,16 +122,18 @@ const open = ref(false);
 
 ```ts
 @Component({
-    imports: [DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogPopup, DialogTitle, DialogDescription, DialogClose],
+    imports: [DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogViewport, DialogPopup, DialogTitle, DialogDescription, DialogClose],
     template: `
-        <ng-container dialogRoot [(open)]="open" (openChangeDetails)="log($event.details.reason)">
+        <ng-container dialogRoot #dialog="dialogRoot" [(open)]="open" (openChangeDetails)="log($event.details.reason)">
             <button dialogTrigger>Edit profile</button>
             <ng-container *dialogPortal>
                 <div dialogBackdrop></div>
-                <div dialogPopup>
-                    <h2 dialogTitle>Edit profile</h2>
-                    <p dialogDescription>Change how others see you.</p>
-                    <button dialogClose>Close</button>
+                <div dialogViewport>
+                    <div dialogPopup>
+                        <h2 dialogTitle>Edit profile</h2>
+                        <p dialogDescription>Change how others see you.</p>
+                        <button dialogClose>Close</button>
+                    </div>
                 </div>
             </ng-container>
         </ng-container>
@@ -112,8 +144,12 @@ export class EditProfile {
 }
 ```
 
-`*dialogPortal="element"` portals into another container. `injectDialog()` gives a child
-component the dialog's state.
+`*dialogPortal="element"` portals into another container, `*dialogPortal="{ keepMounted: true }"`
+keeps the content while closed. `#dialog="dialogRoot"` gives the actions (`dialog.close()`,
+`dialog.unmount()`) and the active trigger's `dialog.payload()`; `(openChangeComplete)` reports
+the end of each transition. `injectDialog()` gives a child component the dialog's state. The entry also exports its lower
+layer, which AlertDialog's directives extend: `DialogRootBase`, `DialogTriggerBase`,
+`DialogComponent`, `DIALOG_NESTING` and `DialogNesting`.
 
 </Framework>
 
@@ -130,21 +166,37 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | --- | --- | --- | --- |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `DialogHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
 
 ### Trigger
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+| `handle` | `DialogHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
 
 ### Portal
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Backdrop and the Popup go (Angular: `*dialogPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Backdrop, the Viewport and the Popup go |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*dialogPortal="{ keepMounted: true }"`, or `*dialogPortal="element"` for a container alone |
 
 ### Backdrop
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `forceRender` | `boolean` | `false` | render the Backdrop of a nested dialog too (by default only the outermost dialog's covers the page) |
+
+### Viewport
 
 No props of its own.
 
@@ -175,9 +227,10 @@ No props of its own.
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
-| Backdrop | `aria-hidden="true"`, `data-open`, `data-starting-style`, `data-ending-style` |
-| Popup | `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded` (`"true"` on the active trigger while open), `aria-controls` (the popup, on the active trigger while open), `data-popup-open` (the active trigger), `data-disabled`, an `id` |
+| Backdrop | `aria-hidden="true"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`; `hidden` while kept mounted and closed |
+| Viewport | `role="presentation"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`; `hidden` while kept mounted and closed |
+| Popup | `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-dialog-open`, the inline `--nested-dialogs: <n>`; `hidden` while kept mounted and closed |
 | Title, Description | an `id` (generated unless given) |
 
 ## Keyboard
@@ -192,6 +245,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/dialog` | `Dialog`, `DialogRootProps`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/dialog` | `Dialog`, `DialogRootProps`, `DialogRootEmits`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/dialog` | `DialogRoot`, `DialogTrigger`, `DialogPortal`, `DialogBackdrop`, `DialogPopup`, `DialogTitle`, `DialogDescription`, `DialogClose`, `injectDialog`, `DialogState`, `DialogTriggerState`, `DialogBackdropState`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |
+| `@fragiola/primitives-react/dialog` | `Dialog`, `DialogRootProps`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `DialogBackdropProps`, `DialogHandle`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createDialogHandle` |
+| `@fragiola/primitives-vue/dialog` | `Dialog`, `DialogRootProps`, `DialogRootEmits`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `DialogBackdropProps`, `DialogHandle`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createDialogHandle` |
+| `@fragiola/primitives-angular/dialog` | `DialogRoot`, `DialogTrigger`, `DialogPortal`, `DialogBackdrop`, `DialogPopup`, `DialogTitle`, `DialogDescription`, `DialogClose`, `injectDialog`, `DialogState`, `DialogTriggerState`, `DialogBackdropState`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `DialogHandle`, `DialogViewport`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createDialogHandle`, `DIALOG_NESTING`, `DialogComponent`, `DialogNesting`, `DialogRootBase`, `DialogTriggerBase` |

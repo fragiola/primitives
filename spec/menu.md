@@ -2,9 +2,14 @@
 
 ## Purpose
 
-A menu of actions opened by a button (APG `menu-button` with a `menu`), with nested submenus.
-Checkbox and radio items, context menus and menubars are out of scope (later stages). A list for
-choosing a value is a Select or a Combobox (with their Epic).
+A menu of actions opened by a button (APG `menu-button` with a `menu`), with nested submenus,
+checkbox items and groups of radio items (APG `menuitemcheckbox`, `menuitemradio`, Issue #34). A
+menu opened from an area at the pointer is a [ContextMenu](context-menu.md), built on these parts.
+Menubars are out of scope. A list for choosing a form value is a Select or a Combobox.
+
+Every part's part attribute names the component it belongs to: `menu-*` inside a `Menu.Root`,
+`context-menu-*` inside a `ContextMenu.Root` (read from the Root, as the calendar family's shared
+parts are).
 
 ## Anatomy
 
@@ -19,6 +24,11 @@ choosing a value is a Select or a Combobox (with their Epic).
 | Separator | `div` | `menu-separator` | |
 | Group | `div` | `menu-group` | groups items under a label |
 | GroupLabel | `div` | `menu-group-label` | names its Group |
+| CheckboxItem | `div` | `menu-checkbox-item` | a `menuitemcheckbox` |
+| CheckboxItemIndicator | `span` | `menu-checkbox-item-indicator` | inside a CheckboxItem, rendered while it is checked |
+| RadioGroup | `div` | `menu-radio-group` | a `group` of radio items, holding their value |
+| RadioItem | `div` | `menu-radio-item` | a `menuitemradio` |
+| RadioItemIndicator | `span` | `menu-radio-item-indicator` | inside a RadioItem, rendered while it is checked |
 | SubmenuRoot | none | | a nested Root; its Trigger is a SubmenuTrigger |
 | SubmenuTrigger | `div` | `menu-submenu-trigger` | an item of the parent menu that opens the submenu |
 
@@ -27,13 +37,22 @@ Positioner and Popup carry `data-nested`.
 
 ## API
 
-**Root**: `open`, `defaultOpen`, `onOpenChange(open, details)`, `loopFocus` (`true`: arrow keys
-wrap; Base UI's name, D4 §3 "Naming", the POC's `loop`), `modal` (`false`; see "Modal").
+**Root**: `open`, `defaultOpen`, `onOpenChange(open, details)` (an `OpenChangeDetails`,
+[README](README.md#open-change-details)), `onOpenChangeComplete(open)`, the actions (`close()`,
+`unmount()`; React `actionsRef`), `loopFocus` (`true`: arrow keys wrap; Base UI's name, D4 §3
+"Naming", the POC's `loop`), `modal` (`false`; see "Modal"), `handle`, `triggerId` /
+`defaultTriggerId` (the active trigger, [README](README.md#detached-triggers)); its content may
+be a function of the active trigger's `payload`.
 
-**SubmenuRoot**: `open`, `defaultOpen`, `onOpenChange`, `loopFocus`. Its default positioning is
-`side="inline-end" align="start"`. It follows its root menu's `modal`.
+**SubmenuRoot**: `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete`, the actions,
+`loopFocus`. Its default positioning is `side="inline-end" align="start"`. It follows its root
+menu's `modal`. It takes no handle (its trigger is its SubmenuTrigger).
 
-**Trigger**: `disabled`.
+**Trigger**: `disabled`, `handle`, `payload`, `id` (as [Dialog's](dialog.md#api)).
+
+**createHandle**: `createMenuHandle<Payload>()` (React and Vue also `Menu.createHandle`).
+
+**Portal**: `container`, `keepMounted` (`false`; [README](README.md#lifecycle)).
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`.
 
@@ -46,18 +65,51 @@ opens it).
 
 **Group**, **GroupLabel**, **Separator**: nothing beyond the contract.
 
+**CheckboxItem**: `checked`, `defaultChecked` (`false`), `onCheckedChange(checked, details)`
+(`{ reason: "item-press", event }`), `disabled`, `label`, `closeOnClick` (`false`: a click toggles
+it and leaves the menu open, Base UI's default for checkable items).
+
+**CheckboxItemIndicator**: `keepMounted` (`false`: rendered only while the item is checked).
+
+**RadioGroup**: `value`, `defaultValue` (`null`), `onValueChange(value, details)` (`{ reason:
+"item-press", event }`; the value is a string, `null` for none), `disabled` (every RadioItem in it).
+
+**RadioItem**: `value` (string, required), `disabled`, `label`, `closeOnClick` (`false`).
+Checking the checked item changes nothing (no `onValueChange`).
+
+**RadioItemIndicator**: `keepMounted` (`false`).
+
+**Activating a checkable item** (CheckboxItem, RadioItem; APG menu):
+
+| how | effect |
+| --- | --- |
+| Space | toggles the CheckboxItem / checks the RadioItem, the menu **stays open** |
+| Enter | toggles / checks, then **closes every level** (reason `item-press`) and focuses the root Trigger (APG: Enter activates the item and closes the menu) |
+| a click | toggles / checks; closes every level only when `closeOnClick` |
+
+The keys fire the element's `click`, as Item's activation does; a disabled item (or one in a
+disabled RadioGroup) does nothing.
+
 ## State attributes and ARIA
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming"), `data-disabled` |
-| Positioner | as Popover's, plus `data-nested` for a submenu |
-| Popup | `role="menu"`, `aria-labelledby` (the Trigger's or SubmenuTrigger's id), `aria-orientation="vertical"`, `tabindex="-1"`, `data-open`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style`, `data-nested` |
+| Trigger | `aria-haspopup="menu"`, `aria-expanded` (`"true"` on the active trigger while open), `aria-controls` (on the active trigger while open), `data-popup-open` on the active trigger while open (Base UI's name, D4 §3 "Naming"), `data-disabled`, an `id` |
+| Positioner | as Popover's (`data-open` / `data-closed`; `hidden` while kept mounted and closed), plus `data-nested` for a submenu |
+| Popup | `role="menu"`, `aria-labelledby` (the active Trigger's or the SubmenuTrigger's id), `aria-orientation="vertical"`, `tabindex="-1"`, `data-open` / `data-closed`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style`, `data-nested` |
 | Item | `role="menuitem"`, `tabindex="-1"`, `aria-disabled="true"` and `data-disabled` when disabled, `data-highlighted` while highlighted |
 | SubmenuTrigger | `role="menuitem"`, `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while its submenu is open, `data-highlighted`, `data-disabled` |
 | Separator | `role="separator"`, `aria-orientation="horizontal"` |
 | Group | `role="group"`, `aria-labelledby` (its GroupLabel's id) |
 | GroupLabel | an `id` |
+| CheckboxItem | `role="menuitemcheckbox"`, `tabindex="-1"`, `aria-checked` (`"true"` / `"false"`), `data-checked` / `data-unchecked` (exactly one), `data-highlighted`, `aria-disabled="true"` and `data-disabled` when disabled |
+| CheckboxItemIndicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
+| RadioGroup | `role="group"`, `data-disabled`; named by the consumer (`aria-label`, or a Group's GroupLabel around it) |
+| RadioItem | `role="menuitemradio"`, `tabindex="-1"`, `aria-checked`, `data-checked` / `data-unchecked`, `data-highlighted`, `aria-disabled="true"` and `data-disabled` when disabled (itself or its group) |
+| RadioItemIndicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
+
+The items of a level are its `menuitem`, `menuitemcheckbox` and `menuitemradio` elements, in DOM
+order: the arrow keys, Home/End and typeahead move through all of them, across groups.
 
 **Highlight follows focus**: the highlighted item is the focused item (roving focus with
 `element.focus()`, not `aria-activedescendant`).
@@ -81,7 +133,7 @@ In the menu:
 | ArrowDown / ArrowUp | next / previous item; wraps when `loopFocus` |
 | Home / End | first / last item |
 | a printable character | typeahead: the next item whose label starts with the typed string (characters typed within 500 ms accumulate; repeating one character cycles through the items starting with it) |
-| Enter, Space | activates the highlighted item: fires its `click`, then closes every menu level (reason `item-press`) when `closeOnClick`, and focuses the root Trigger |
+| Enter, Space | activates the highlighted item: fires its `click`, then closes every menu level (reason `item-press`) when `closeOnClick`, and focuses the root Trigger; a checkable item follows "Activating a checkable item" (Space keeps the menu open, Enter closes it) |
 | ArrowRight (LTR) on a SubmenuTrigger, or Enter / Space on it | opens the submenu and highlights its first item |
 | ArrowLeft (LTR) in a submenu | closes it, highlights its SubmenuTrigger |
 | Escape | closes the current level only (reason `escape-key`): a submenu returns focus to its SubmenuTrigger, the root menu to the Trigger |
@@ -103,6 +155,10 @@ reaches the new level (AGENTS.md, "Porting a component", item 8).
   for a submenu's Escape).
 - An outside press on a non-modal menu moves no focus (the press puts it where the user pressed);
   on a modal menu, where the press reaches nothing, focus returns to the Trigger.
+- A close with the reason `imperative-action` (a handle, the actions) returns focus as `none`
+  does: a root menu's focus left inside it goes back to its Trigger.
+- **Moving to another trigger** (detached triggers): a press on another Trigger of the open menu
+  moves the menu there and focuses its popup with no highlight, as a pointer opening does.
 
 ## Pointer
 
@@ -134,8 +190,18 @@ Both end when the menu closes. A submenu follows its root: it adds no lock of it
 
 ## Dismissal and layering
 
-Each menu level is a layer; a submenu is a child layer of its parent menu. Escape closes one level;
-an outside press, Tab and item activation close them all.
+Each menu level is a layer of the nested overlay tree; a submenu is a child layer of its parent
+menu, and a menu opened from inside another overlay (a Popover's popup) is that overlay's child
+([`/dialog/nested-tree`](dialog.md#dialognested-tree)). Escape closes one level; an outside press,
+Tab and item activation close them all; a press inside a parent level closes the levels below it
+only.
+
+## Detached triggers
+
+As [Dialog's](dialog.md#detached-triggers) ([README](README.md#detached-triggers)): the menu
+anchors to its active trigger and is labelled by it; a press on another Trigger while open moves it
+there (it stays open, with that Trigger's payload, `onOpenChange(true, details)` with
+`trigger-press`); the keys of the Trigger table open it from any of its Triggers.
 
 ## Positioning
 
@@ -145,7 +211,8 @@ As [popover.md](popover.md#positioning), with the defaults above. A submenu flip
 
 ## Animation
 
-As [popover.md](popover.md#animation), for each level.
+As [popover.md](popover.md#animation), for each level; `keepMounted`, `onOpenChangeComplete` and the
+actions as [README](README.md#lifecycle).
 
 ## RTL
 
@@ -231,6 +298,40 @@ Content: Trigger **"View"**; a Group labelled by GroupLabel **"Sort by"** with i
 Checks: two `group` elements named "Sort by" and "Show"; arrow navigation crosses groups
 ("Date" → "Hidden files").
 
+### `/menu/checkbox-radio`
+
+A view-options menu. Content: a Trigger **"View"**; a Popup with a CheckboxItem **"Show
+toolbar"** (`defaultChecked`), a CheckboxItem **"Show status bar"**, a Separator, and a Group
+labelled by the GroupLabel **"Sort by"** holding a RadioGroup (`defaultValue` `"name"`) with the
+RadioItems **"Name"** (`name`), **"Date"** (`date`) and **"Size"** (`size`, disabled). Each
+checkable item renders its indicator (`✓` for the checkboxes, `•` for the radios) before its
+label. Output: `open: ...`, `reason: ...`, `toolbar: <true|false>`, `status bar: <true|false>`,
+`sort: <value>` (every state starts as its default: `toolbar: true`, `status bar: false`,
+`sort: name`).
+
+Checks:
+
+1. Open with ArrowDown: "Show toolbar" is a `menuitemcheckbox` with `aria-checked="true"`, "Show
+   status bar" one with `aria-checked="false"`; a `group` named "Sort by" holds three
+   `menuitemradio`s, "Name" `aria-checked="true"`, "Date" and "Size" `"false"`; "Size" has
+   `aria-disabled="true"`.
+2. ArrowDown to "Show status bar", Space: `status bar: true`, `aria-checked="true"`, the menu
+   stays open with "Show status bar" focused.
+3. Space again: `status bar: false`.
+4. ArrowDown to "Date" (the arrows cross the separator and the group), Space: `sort: date`, "Date"
+   `aria-checked="true"`, "Name" `"false"`; the menu stays open.
+5. ArrowDown to "Size" (disabled, still focusable), Space and Enter: nothing changes (`sort:
+   date`), the menu stays open.
+6. Home, Enter on "Show toolbar": `toolbar: false`, the menu closes (`reason: item-press`), focus
+   on "View".
+7. Click "View", click "Show status bar": `status bar: true` and the menu stays open
+   (`closeOnClick` is `false`); click "Name": `sort: name`, still open.
+8. Typeahead reaches the checkable items: open, type `d`: "Date" is focused.
+9. Contract layer: the checked items have `data-checked`, the others `data-unchecked`; an
+   indicator is rendered inside "Show toolbar" and "Name" only (with `data-checked`,
+   `aria-hidden="true"`).
+10. Axe finds no violation while open.
+
 ### `/menu/modal`
 
 Content: the page is taller than the viewport; a Trigger **"Options"** on a Root with `modal`;
@@ -248,6 +349,38 @@ Checks:
 4. Reopen; the pointer still works inside: clicking "Rename" prints `action: Rename`.
 5. Reopen; clicking "Options" closes the menu (`reason: trigger-press`).
 
+### `/menu/detached`
+
+One Menu opened from three rows. A list of three rows, each with the name **"Ada"**, **"Grace"**,
+**"Alan"** as text and a Trigger **"Actions for Ada"** (`id="actions-ada"`, `payload` `"Ada"`),
+**"Actions for Grace"** (`actions-grace`), **"Actions for Alan"** (`actions-alan`), with the
+`handle` of a Root after the list. The Root's content is a function of the payload: a Positioner
+and a Popup with the items **"Rename <name>"** and **"Delete <name>"** (one text node each);
+clicking an item prints it. Output: `open: ...`, `reason: ...`, `trigger: <id or none>`,
+`chosen: <the last item clicked, or none>`.
+
+Checks:
+
+1. Click "Actions for Grace": a `menu` named "Actions for Grace" with the items "Rename Grace" and
+   "Delete Grace", its top below the trigger's bottom and its start edge aligned with the
+   trigger's (±1 px); only "Actions for Grace" has `aria-expanded="true"`.
+2. Click "Actions for Alan" while it is open: the menu stays open (`open: true`, `reason:
+   trigger-press`, `trigger: actions-alan`), is named "Actions for Alan" with "Rename Alan", below
+   "Actions for Alan"; "Actions for Grace" has `aria-expanded="false"`.
+3. Click "Delete Alan": `chosen: Delete Alan`, the menu closes (`reason: item-press`), focus on
+   "Actions for Alan".
+4. Focus "Actions for Ada" and press ArrowDown: a `menu` named "Actions for Ada" opens with "Rename
+   Ada" focused (`reason: list-navigation`, `trigger: actions-ada`).
+5. Axe finds no violation while open.
+
+### `/menu/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a Trigger **"Actions"**;
+a Portal with `keepMounted` holding a Positioner (the kept-mounted part) and a Popup with the
+items **"Edit"** and **"Delete"**.
+
+Checks: the common checks (no "Close with actions").
+
 ## Differences from Base UI
 
 Measured by the POC against Base UI 1.9: no behaviour difference, but one default.
@@ -255,5 +388,6 @@ Measured by the POC against Base UI 1.9: no behaviour difference, but one defaul
 | difference | decision |
 | --- | --- |
 | Base UI's Menu is modal by default | **non-modal by default**, `modal` as an option (D4 §3): the APG menu button is non-modal |
+| Enter on a CheckboxItem or RadioItem follows `closeOnClick` (the menu stays open by default) | **Enter closes the menu**, Space keeps it open (the APG menu: Enter activates the item and closes the menu; Space on a `menuitemcheckbox` toggles it without closing); a click follows `closeOnClick` (Base UI) |
 
 Base UI reads the direction from its `DirectionProvider`, not from the document.

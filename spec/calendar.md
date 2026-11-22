@@ -104,10 +104,15 @@ are always rendered, so the grid never changes height).
 defaults to the full date (`Intl` `dateStyle: "full"`), and the consumer can replace it.
 
 **DatePicker.Root**: `value`, `defaultValue`, `onValueChange`, `open`, `defaultOpen`,
-`onOpenChange`, plus the calendar options (`min`, `max`, `isDateUnavailable`, `locale`,
+`onOpenChange` (an `OpenChangeDetails`, [README](README.md#open-change-details); `trigger` is
+the Trigger), `onOpenChangeComplete(open)`, the actions (`close()`, `unmount()`; React
+`actionsRef`), plus the calendar options (`min`, `max`, `isDateUnavailable`, `locale`,
 `firstDayOfWeek`, `visibleMonths`) passed to the bound calendar; and the form props
 ([Forms](#forms)): `name`, `required`, `disabled`, `readOnly`. **DateRangePicker.Root**: the same
 with a range.
+
+**Picker Portal**: `container`, `keepMounted` (`false`: the popup and its calendar stay rendered,
+hidden, while closed; [README](README.md#lifecycle)).
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`.
 
@@ -128,8 +133,8 @@ have no name of their own: the consumer labels them; the picker's popup likewise
 | Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused date unless the calendar is disabled, `-1` on the other dates of the shown months, absent on outside-month cells), `aria-selected="true"` when selected (absent otherwise), `aria-disabled="true"` when disabled, unavailable or outside the month, `aria-current="date"` on today; `data-today`, `data-selected`, `data-disabled`, `data-unavailable`, `data-outside-month`; in a RangeCalendar also `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` |
 | Picker Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup's id, while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming"); `disabled` and `data-disabled` while the picker is disabled, `data-readonly` while read-only, `data-required` while required; inside a Field, its ids, `aria-*` and state attributes ([field.md](field.md#integration-contract)) |
 | Picker hidden input | `name`, `value` (ISO), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, structural inline style (visually hidden) |
-| Picker Positioner | `role="presentation"`, `data-open`, `data-side`, `data-align` |
-| Picker Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-open`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style` |
+| Picker Positioner | `role="presentation"`, `data-open` / `data-closed`, `data-side`, `data-align`; `hidden` while kept mounted and closed |
+| Picker Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-open` / `data-closed`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style` |
 
 A date is **disabled** when it is before `min`, after `max`, or the calendar is disabled: it
 cannot be focused (by the keyboard, nor by a press) nor chosen. A date is **unavailable** when
@@ -232,7 +237,9 @@ Pickers: as Popover's, defaults `side="bottom" align="start"`.
 
 ## Animation
 
-Pickers' Popup as [popover.md](popover.md#animation). Calendars: none.
+Pickers' Popup as [popover.md](popover.md#animation); `keepMounted`, `onOpenChangeComplete` and the
+actions as [README](README.md#lifecycle): a kept-mounted picker's calendar stays mounted and takes
+the focus again when it reopens, as a picker reopened during its exit does. Calendars: none.
 
 ## RTL
 
@@ -406,6 +413,15 @@ Checks:
    `data-required`, the disabled one `data-disabled`.
 
 The pickers inside a [Field](field.md) are [`/field/more-controls`](field.md#fieldmore-controls).
+
+### `/date-picker/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)), en-US: a DatePicker whose
+Trigger reads **"Choose date: "** and the value (or "none"); its Portal has `keepMounted` (the
+Positioner is the kept-mounted part); the Popup (`aria-label` **"Choose date"**) holds a bound
+Calendar with PrevButton **"Previous month"** and NextButton **"Next month"**.
+
+Checks: the common checks (no "Close with actions"); reopened, focus is on November 20 (today).
 
 ## Differences from Base UI
 

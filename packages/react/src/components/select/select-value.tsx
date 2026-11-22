@@ -12,9 +12,12 @@ export interface SelectValueProps extends PartProps<{ placeholder: boolean }> {
 /** The selected item's label, or the placeholder (spec/select.md). */
 export function SelectValue({ placeholder, ...props }: SelectValueProps) {
     const context = useRequiredContext(SelectContext, "Select.Value");
-    const label = context.items.find(
-        (item) => item.value === context.value,
-    )?.label;
+    // without `items`, the raw value until the selected Item has rendered (Base UI)
+    const label =
+        context.items.find((item) => item.value === context.value)?.label ??
+        (context.registerItem !== null
+            ? (context.value ?? undefined)
+            : undefined);
     const isPlaceholder = label === undefined;
     return renderElement(
         "span",

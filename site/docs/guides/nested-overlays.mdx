@@ -1,0 +1,267 @@
+---
+title: Nested overlays
+description: Overlays opened from overlays form a tree - Escape one level at a time, presses that close the branch you left, and nested dialogs' attributes.
+---
+
+An overlay opened from inside another one is its **child**: a Popover opened from a Dialog, a
+Menu opened from that Popover, a submenu of that Menu. Together the open overlays of a page form a
+tree, whatever the DOM position of their portals (each one is portaled to the end of `body`).
+Every overlay follows it: Dialog, AlertDialog, Popover, Menu and its submenus, ContextMenu,
+Select, Combobox and the date pickers. Nothing needs configuring: put a Trigger inside a popup and
+its overlay is that popup's child.
+
+## How the tree behaves
+
+- **The parent** is decided when an overlay opens: the newest open overlay that contains one of
+  its Triggers, else the one that contains the focused element, else none.
+- **Escape** closes the newest overlay only. The next Escape closes the next one, and focus goes
+  back to each level's trigger.
+- **A press** keeps open the deepest overlay that contains it and its ancestors, and closes every
+  other open overlay, newest first (reason `outside-press`). In a Dialog → Popover → Menu chain, a
+  press inside the Popover (outside the Menu) closes the Menu and its submenus; a press on the
+  Dialog closes the Popover and the Menu; a press on the Dialog's backdrop closes everything.
+  A Dialog or AlertDialog makes the page under it inert, so a press outside it counts as a press
+  in the overlay it was opened from: a Dialog opened from a Menu that stays open closes alone, and
+  an AlertDialog opened from a Popover keeps both open.
+- **Focus**: a Dialog's focus trap and a Popover's focus-out watch accept focus inside their
+  descendants, so tabbing in a menu opened from a dialog never leaves the dialog.
+- **Closing an overlay closes the overlays opened from it** (reason `none`).
+- A Tooltip is no layer: Escape closes it first, and the overlay around it stays open.
+
+## A dialog, a popover, a menu
+
+<Framework name="react">
+
+```tsx
+<Dialog.Root>
+    <Dialog.Trigger>Settings</Dialog.Trigger>
+    <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup>
+            <Dialog.Title>Settings</Dialog.Title>
+            <Popover.Root>
+                <Popover.Trigger>Theme</Popover.Trigger>
+                <Popover.Portal>
+                    <Popover.Positioner>
+                        <Popover.Popup>
+                            <Menu.Root>
+                                <Menu.Trigger>Accent</Menu.Trigger>
+                                <Menu.Portal>
+                                    <Menu.Positioner>
+                                        <Menu.Popup>
+                                            <Menu.Item>Blue</Menu.Item>
+                                            <Menu.Item>Green</Menu.Item>
+                                        </Menu.Popup>
+                                    </Menu.Positioner>
+                                </Menu.Portal>
+                            </Menu.Root>
+                        </Popover.Popup>
+                    </Popover.Positioner>
+                </Popover.Portal>
+            </Popover.Root>
+        </Dialog.Popup>
+    </Dialog.Portal>
+</Dialog.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Dialog.Root>
+        <Dialog.Trigger>Settings</Dialog.Trigger>
+        <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Popup>
+                <Dialog.Title>Settings</Dialog.Title>
+                <Popover.Root>
+                    <Popover.Trigger>Theme</Popover.Trigger>
+                    <Popover.Portal>
+                        <Popover.Positioner>
+                            <Popover.Popup>
+                                <Menu.Root>
+                                    <Menu.Trigger>Accent</Menu.Trigger>
+                                    <Menu.Portal>
+                                        <Menu.Positioner>
+                                            <Menu.Popup>
+                                                <Menu.Item>Blue</Menu.Item>
+                                                <Menu.Item>Green</Menu.Item>
+                                            </Menu.Popup>
+                                        </Menu.Positioner>
+                                    </Menu.Portal>
+                                </Menu.Root>
+                            </Popover.Popup>
+                        </Popover.Positioner>
+                    </Popover.Portal>
+                </Popover.Root>
+            </Dialog.Popup>
+        </Dialog.Portal>
+    </Dialog.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<ng-container dialogRoot>
+    <button dialogTrigger>Settings</button>
+    <ng-container *dialogPortal>
+        <div dialogBackdrop></div>
+        <div dialogPopup>
+            <h2 dialogTitle>Settings</h2>
+            <ng-container popoverRoot>
+                <button popoverTrigger>Theme</button>
+                <ng-container *popoverPortal>
+                    <div popoverPositioner>
+                        <div popoverPopup>
+                            <ng-container menuRoot>
+                                <button menuTrigger>Accent</button>
+                                <ng-container *menuPortal>
+                                    <div menuPositioner>
+                                        <div menuPopup>
+                                            <div menuItem>Blue</div>
+                                            <div menuItem>Green</div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    </ng-container>
+</ng-container>
+```
+
+</Framework>
+
+## Nested dialogs
+
+A Dialog (or an AlertDialog) whose Root is inside another dialog's Popup is **nested** in it. The
+parts say so, for your styles:
+
+| attribute | on | while |
+| --- | --- | --- |
+| `data-nested` | the nested dialog's Popup, Backdrop and Viewport | always |
+| `data-nested-dialog-open` | the parent's Popup, Backdrop and Viewport | a dialog nested in it is open |
+| `--nested-dialogs: <n>` | the parent's Popup (inline style) | the number of open dialogs nested below it, as a chain: `2` for a child open with its own child open, `0` when none |
+
+A nested dialog's Backdrop renders nothing unless `forceRender`: the outermost backdrop already
+covers the page. A press on a nested dialog's Viewport (or Backdrop) outside its Popup closes that
+dialog only, since the press is inside its parent. Escape closes one level at a time.
+
+```css
+[data-primitives-part="dialog-popup"] {
+    scale: calc(1 - 0.05 * var(--nested-dialogs));
+    translate: 0 calc(-1rem * var(--nested-dialogs));
+    transition: scale 150ms, translate 150ms;
+}
+[data-primitives-part="dialog-popup"][data-nested-dialog-open]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.1);
+    border-radius: inherit;
+}
+```
+
+<Framework name="react">
+
+```tsx
+<Dialog.Root>
+    <Dialog.Trigger>Account</Dialog.Trigger>
+    <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+            <Dialog.Popup>
+                <Dialog.Title>Account</Dialog.Title>
+                <Dialog.Root>
+                    <Dialog.Trigger>Change email</Dialog.Trigger>
+                    <Dialog.Portal>
+                        <Dialog.Viewport>
+                            <Dialog.Popup>
+                                <Dialog.Title>Change email</Dialog.Title>
+                                <Dialog.Close>Done</Dialog.Close>
+                            </Dialog.Popup>
+                        </Dialog.Viewport>
+                    </Dialog.Portal>
+                </Dialog.Root>
+            </Dialog.Popup>
+        </Dialog.Viewport>
+    </Dialog.Portal>
+</Dialog.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Dialog.Root>
+        <Dialog.Trigger>Account</Dialog.Trigger>
+        <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Viewport>
+                <Dialog.Popup>
+                    <Dialog.Title>Account</Dialog.Title>
+                    <Dialog.Root>
+                        <Dialog.Trigger>Change email</Dialog.Trigger>
+                        <Dialog.Portal>
+                            <Dialog.Viewport>
+                                <Dialog.Popup>
+                                    <Dialog.Title>Change email</Dialog.Title>
+                                    <Dialog.Close>Done</Dialog.Close>
+                                </Dialog.Popup>
+                            </Dialog.Viewport>
+                        </Dialog.Portal>
+                    </Dialog.Root>
+                </Dialog.Popup>
+            </Dialog.Viewport>
+        </Dialog.Portal>
+    </Dialog.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<ng-container dialogRoot>
+    <button dialogTrigger>Account</button>
+    <ng-container *dialogPortal>
+        <div dialogBackdrop></div>
+        <div dialogViewport>
+            <div dialogPopup>
+                <h2 dialogTitle>Account</h2>
+                <ng-container dialogRoot>
+                    <button dialogTrigger>Change email</button>
+                    <ng-container *dialogPortal>
+                        <div dialogViewport>
+                            <div dialogPopup>
+                                <h2 dialogTitle>Change email</h2>
+                                <button dialogClose>Done</button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-container>
+```
+
+</Framework>
+
+## Building your own
+
+The tree is the toolkit's `/layers` entry, used through `/overlay`
+([the DOM toolkit](/docs/api/toolkit)): `pushLayer(doc, { owner, backdrops, onParentClose, ... })`
+resolves a layer's parent from its `owner()` elements, and `openOverlaySession` dismisses with
+`dismiss(reason, event)`, `reason` `none` and no event when the parent closed.

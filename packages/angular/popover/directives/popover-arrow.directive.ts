@@ -12,14 +12,19 @@ import { PopoverRoot } from "./popover-root.directive.ts";
     host: {
         "aria-hidden": "true",
         "data-primitives-part": "popover-arrow",
+        "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
 })
 export class PopoverArrow {
-    private readonly root = inject(PopoverRoot);
+    private readonly root = inject<PopoverRoot>(PopoverRoot);
     readonly state = this.root.placed.asReadonly();
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() => {
+        const open = this.root.overlay.open();
+        return dataValues({ ...this.state(), open, closed: !open });
+    });
 
     constructor() {
         registerHost(this.root.arrow);

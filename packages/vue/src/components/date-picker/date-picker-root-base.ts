@@ -95,8 +95,10 @@ export function defineDatePickerRoot(
         name,
         props: datePickerRootProps,
         emits: datePickerRootEmits,
-        setup(props, { emit, slots }) {
+        setup(props, { emit, slots, expose }) {
             const root = useOverlayRoot(props, emit);
+            // a template ref on the Root: `close()` and `unmount()` (spec/README.md, "Lifecycle")
+            expose(root.actions);
             const value = useControllable<CalendarValue, ChangeDetails>(
                 () => props.value,
                 props.defaultValue ?? null,

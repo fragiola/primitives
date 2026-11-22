@@ -17,6 +17,7 @@ export function ComboboxPopup(
             "data-primitives-part": "combobox-popup",
             ...stateAttributes({
                 open: context.open,
+                closed: !context.open,
                 side: context.placed.side,
                 align: context.placed.align,
                 "starting-style": status === "starting",

@@ -355,3 +355,96 @@ test.describe("select / modal", () => {
         await expectOutput(page, "reason", "trigger-press");
     });
 });
+
+test.describe("select / groups", () => {
+    const food = (page: Page) => page.getByRole("combobox", { name: "Food" });
+
+    async function expectFoodHighlighted(page: Page, name: string) {
+        const id = await option(page, name).getAttribute("id");
+        expect(id).not.toBeNull();
+        await expect(food(page)).toHaveAttribute(
+            "aria-activedescendant",
+            id as string,
+        );
+    }
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/select/groups");
+    });
+
+    test("closed, it shows the selected item's label from the kept-mounted list", async ({
+        page,
+    }) => {
+        await expect(food(page)).toHaveText("Carrot");
+        await expectOutput(page, "value", "carrot");
+    });
+
+    test("two named groups of options; the selected one is highlighted", async ({
+        page,
+    }) => {
+        await food(page).click();
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await expect(page.getByRole("group", { name: "Fruits" })).toBeVisible();
+        await expect(
+            page.getByRole("group", { name: "Vegetables" }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole("group", { name: "Fruits" }).getByRole("option"),
+        ).toHaveText(["Apple", "Banana"]);
+        await expect(page.getByRole("option")).toHaveCount(5);
+        await expectFoodHighlighted(page, "Carrot");
+        await expect(option(page, "Carrot")).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+    });
+
+    test("the keys move across groups, skipping labels and the separator", async ({
+        page,
+    }) => {
+        await food(page).click();
+        await expectFoodHighlighted(page, "Carrot");
+        await page.keyboard.press("ArrowUp");
+        await expectFoodHighlighted(page, "Banana");
+        await page.keyboard.press("ArrowDown");
+        await expectFoodHighlighted(page, "Carrot");
+        await page.keyboard.press("ArrowDown");
+        await expectFoodHighlighted(page, "Leek");
+        await page.keyboard.press("ArrowDown");
+        await expectFoodHighlighted(page, "Potato");
+        await page.keyboard.press("Home");
+        await expectFoodHighlighted(page, "Apple");
+        await page.keyboard.press("End");
+        await expectFoodHighlighted(page, "Potato");
+    });
+
+    test("Enter chooses; the Value shows the item's text", async ({ page }) => {
+        await food(page).click();
+        await page.keyboard.press("Home");
+        await page.keyboard.press("ArrowDown");
+        await expectFoodHighlighted(page, "Banana");
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "value", "banana");
+        await expect(food(page)).toHaveText("Banana");
+    });
+
+    test("typing while closed matches the registered labels", async ({
+        page,
+    }) => {
+        await food(page).focus();
+        await page.keyboard.press("p");
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await expectFoodHighlighted(page, "Potato");
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "value", "potato");
+        // the ItemText only, not the indicator after it
+        await expect(food(page)).toHaveText("Potato");
+    });
+
+    test("has no axe violation, closed and open", async ({ page }) => {
+        await expectNoAxeViolations(page);
+        await food(page).click();
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await expectNoAxeViolations(page);
+    });
+});

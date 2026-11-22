@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import {
+    expectNoFalseStates,
+    expectOpenState,
+    part,
+    parts,
+} from "../../src/contract.ts";
+import { settleAnimations, slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/menu.md: anatomy, state attributes
@@ -77,5 +83,93 @@ test("menu / modal: the trigger and the positioner take the pointer back", async
     await page.keyboard.press("Escape");
     await expect(part(page, "menu", "popup")).toHaveCount(0);
     await expect(page.locator("body")).toHaveCSS("pointer-events", "auto");
+    await expectNoFalseStates(parts(page, "menu"));
+});
+
+// spec/README.md, "State attributes": exactly one of data-open and data-closed, data-closed while
+// the exit runs; the trigger keeps data-popup-open only
+test("menu / basic: data-open, then data-closed while the exit runs", async ({
+    page,
+}) => {
+    await openScenario(page, "/menu/basic");
+    await slowMotion(page, 600);
+    await page.getByRole("button", { name: "Actions" }).click();
+    await expectOpenState(part(page, "menu", "positioner"), true);
+    await expectOpenState(part(page, "menu", "popup"), true);
+    await settleAnimations(page);
+    await page.keyboard.press("Escape");
+    await expect(part(page, "menu", "popup")).toHaveAttribute(
+        "data-ending-style",
+        "",
+    );
+    await expectOpenState(part(page, "menu", "positioner"), false);
+    await expectOpenState(part(page, "menu", "popup"), false);
+    await expect(part(page, "menu", "trigger").first()).not.toHaveAttribute(
+        "data-closed",
+    );
+    await expect(part(page, "menu", "popup")).toHaveCount(0);
+});
+
+// spec/README.md, "Detached triggers": only the active trigger says its popup is open
+test("menu / detached: data-popup-open on the active trigger only", async ({
+    page,
+}) => {
+    await openScenario(page, "/menu/detached");
+    await page.getByRole("button", { name: "Actions for Alan" }).click();
+    await expect(
+        page.getByRole("menu", { name: "Actions for Alan" }),
+    ).toBeVisible();
+    await expect(part(page, "menu", "trigger")).toHaveCount(3);
+    await expect(page.locator("#actions-alan")).toHaveAttribute(
+        "data-popup-open",
+        "",
+    );
+    await expect(page.locator("#actions-ada")).not.toHaveAttribute(
+        "data-popup-open",
+    );
+    await expect(page.locator("#actions-grace")).not.toHaveAttribute(
+        "data-popup-open",
+    );
+    await expectOpenState(part(page, "menu", "popup"), true);
+    await expectNoFalseStates(parts(page, "menu"));
+});
+
+test("menu / checkbox-radio: checked states and indicators", async ({
+    page,
+}) => {
+    await openScenario(page, "/menu/checkbox-radio");
+    await part(page, "menu", "trigger").focus();
+    await page.keyboard.press("ArrowDown");
+    const checkboxes = part(page, "menu", "checkbox-item");
+    await expect(checkboxes).toHaveCount(2);
+    await expect(checkboxes.nth(0)).toHaveAttribute("data-checked", "");
+    await expect(checkboxes.nth(0)).not.toHaveAttribute("data-unchecked");
+    await expect(checkboxes.nth(0)).toHaveAttribute("data-highlighted", "");
+    await expect(checkboxes.nth(1)).toHaveAttribute("data-unchecked", "");
+    await expect(checkboxes.nth(1)).not.toHaveAttribute("data-checked");
+    const radios = part(page, "menu", "radio-item");
+    await expect(radios).toHaveCount(3);
+    await expect(radios.nth(0)).toHaveAttribute("data-checked", "");
+    await expect(radios.nth(1)).toHaveAttribute("data-unchecked", "");
+    await expect(radios.nth(2)).toHaveAttribute("data-disabled", "");
+    await expect(part(page, "menu", "radio-group")).toHaveAttribute(
+        "role",
+        "group",
+    );
+    // the indicators are rendered while checked only
+    const checkIndicators = part(page, "menu", "checkbox-item-indicator");
+    await expect(checkIndicators).toHaveCount(1);
+    await expect(checkboxes.nth(0).locator(checkIndicators)).toHaveCount(1);
+    await expect(checkIndicators).toHaveAttribute("data-checked", "");
+    await expect(checkIndicators).toHaveAttribute("aria-hidden", "true");
+    const radioIndicators = part(page, "menu", "radio-item-indicator");
+    await expect(radioIndicators).toHaveCount(1);
+    await expect(radios.nth(0).locator(radioIndicators)).toHaveCount(1);
+    await expect(radioIndicators).toHaveAttribute("data-checked", "");
+    await expect(radioIndicators).toHaveAttribute("aria-hidden", "true");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press(" ");
+    await expect(checkboxes.nth(1)).toHaveAttribute("data-checked", "");
+    await expect(checkIndicators).toHaveCount(2);
     await expectNoFalseStates(parts(page, "menu"));
 });

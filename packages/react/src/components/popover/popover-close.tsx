@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { PopoverContext } from "./popover-context.ts";
@@ -11,7 +12,8 @@ export function PopoverClose(props: PartProps<Record<string, never>>) {
         {
             type: "button",
             "data-primitives-part": "popover-close",
-            onClick: () => context.setOpen(false, "close-press"),
+            onClick: (event: MouseEvent) =>
+                context.setOpen(false, "close-press", event.nativeEvent),
         },
     );
 }

@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import {
+    expectNoFalseStates,
+    expectOpenState,
+    part,
+    parts,
+} from "../../src/contract.ts";
+import { settleAnimations, slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/combobox.md: anatomy, state attributes
@@ -158,4 +164,28 @@ test("combobox / field: the field's states on the input", async ({ page }) => {
         "data-invalid",
         "",
     );
+});
+
+// spec/README.md, "State attributes": exactly one of data-open and data-closed, data-closed while
+// the exit runs; the trigger keeps data-popup-open only
+test("combobox / basic: data-open, then data-closed while the exit runs", async ({
+    page,
+}) => {
+    await openScenario(page, "/combobox/basic");
+    await slowMotion(page, 600);
+    await page.getByRole("button", { name: "Show fruits" }).click();
+    await expectOpenState(part(page, "combobox", "positioner"), true);
+    await expectOpenState(part(page, "combobox", "popup"), true);
+    await settleAnimations(page);
+    await page.keyboard.press("Escape");
+    await expect(part(page, "combobox", "popup")).toHaveAttribute(
+        "data-ending-style",
+        "",
+    );
+    await expectOpenState(part(page, "combobox", "positioner"), false);
+    await expectOpenState(part(page, "combobox", "popup"), false);
+    await expect(part(page, "combobox", "trigger").first()).not.toHaveAttribute(
+        "data-closed",
+    );
+    await expect(part(page, "combobox", "popup")).toHaveCount(0);
 });

@@ -232,3 +232,73 @@ test("tooltip / in-dialog: Escape closes the tooltip, not the dialog around it",
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
 });
+
+// spec/tooltip.md, `/tooltip/detached`
+test.describe("tooltip / detached", () => {
+    const call = (page: Page, name: string) =>
+        page.getByRole("button", { name: `Call ${name}` });
+
+    async function expectAbove(page: Page, name: string): Promise<void> {
+        const trigger = await call(page, name).boundingBox();
+        const tooltip = await page.getByRole("tooltip").boundingBox();
+        expect(trigger).not.toBeNull();
+        expect(tooltip).not.toBeNull();
+        if (trigger === null || tooltip === null) {
+            return;
+        }
+        expect(tooltip.y + tooltip.height).toBeLessThanOrEqual(trigger.y + 1);
+        const centre = tooltip.x + tooltip.width / 2;
+        expect(centre).toBeGreaterThan(trigger.x);
+        expect(centre).toBeLessThan(trigger.x + trigger.width);
+    }
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/tooltip/detached");
+        await page.mouse.move(0, 0);
+    });
+
+    test("hovering a trigger opens it with that trigger's payload", async ({
+        page,
+    }) => {
+        await call(page, "Ada").hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Opens a call with Ada",
+        );
+        await expect(call(page, "Ada")).toHaveAccessibleDescription(
+            "Opens a call with Ada",
+        );
+        await expectOutput(page, "trigger", "call-ada");
+        await expectOutput(page, "reason", "trigger-hover");
+        await expectAbove(page, "Ada");
+    });
+
+    test("hovering another trigger moves it there at once", async ({
+        page,
+    }) => {
+        await call(page, "Ada").hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Opens a call with Ada",
+        );
+        await call(page, "Grace").hover();
+        await expect(page.getByRole("tooltip")).toHaveText(
+            "Opens a call with Grace",
+            { timeout: 200 },
+        );
+        await expect(page.getByRole("tooltip")).toHaveCount(1);
+        await expectOutput(page, "open", "true");
+        await expectOutput(page, "trigger", "call-grace");
+        await expect(call(page, "Grace")).toHaveAccessibleDescription(
+            "Opens a call with Grace",
+        );
+        await expect(call(page, "Ada")).toHaveAccessibleDescription("");
+        await expectAbove(page, "Grace");
+    });
+
+    test("moving the pointer away closes it", async ({ page }) => {
+        await call(page, "Ada").hover();
+        await expect(page.getByRole("tooltip")).toBeVisible();
+        await page.mouse.move(600, 500);
+        await expectOutput(page, "open", "false");
+        await expect(page.getByRole("tooltip")).toHaveCount(0);
+    });
+});

@@ -1,4 +1,5 @@
-import { Directive } from "@angular/core";
+import { Directive, inject } from "@angular/core";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 /** Separates items: `<div menuSeparator>`. */
 @Directive({
@@ -6,7 +7,11 @@ import { Directive } from "@angular/core";
     host: {
         role: "separator",
         "aria-orientation": "horizontal",
-        "data-primitives-part": "menu-separator",
+        "[attr.data-primitives-part]": "part",
     },
 })
-export class MenuSeparator {}
+export class MenuSeparator {
+    protected readonly part =
+        inject(MenuRootBase, { optional: true })?.part("separator") ??
+        "menu-separator";
+}

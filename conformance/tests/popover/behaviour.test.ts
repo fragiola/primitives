@@ -260,3 +260,85 @@ test.describe("popover / controlled", () => {
         await expect(trigger(page)).toBeFocused();
     });
 });
+
+// spec/popover.md, `/popover/detached`
+test.describe("popover / detached", () => {
+    const info = (page: Page, name: string) =>
+        page.getByRole("button", { name: `Info for ${name}` });
+
+    async function expectBelow(page: Page, name: string): Promise<void> {
+        const trigger = await info(page, name).boundingBox();
+        const popup = await page
+            .getByRole("dialog", { name: `About ${name}` })
+            .boundingBox();
+        expect(trigger).not.toBeNull();
+        expect(popup).not.toBeNull();
+        if (trigger === null || popup === null) {
+            return;
+        }
+        expect(popup.y).toBeGreaterThanOrEqual(trigger.y + trigger.height - 1);
+        expect(popup.x).toBeLessThan(trigger.x + trigger.width);
+        expect(popup.x + popup.width).toBeGreaterThan(trigger.x);
+    }
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/popover/detached");
+    });
+
+    test("a trigger opens it with its payload, anchored below it", async ({
+        page,
+    }) => {
+        await info(page, "Ada").click();
+        await expect(
+            page.getByRole("dialog", { name: "About Ada" }),
+        ).toBeVisible();
+        await expectOutput(page, "trigger", "info-ada");
+        await expectBelow(page, "Ada");
+    });
+
+    test("a press on another trigger while open moves it there", async ({
+        page,
+    }) => {
+        await info(page, "Ada").click();
+        await expect(
+            page.getByRole("dialog", { name: "About Ada" }),
+        ).toBeVisible();
+        await info(page, "Grace").click();
+        await expect(
+            page.getByRole("dialog", { name: "About Grace" }),
+        ).toBeVisible();
+        await expectOutput(page, "open", "true");
+        await expectOutput(page, "reason", "trigger-press");
+        await expectOutput(page, "trigger", "info-grace");
+        await expect(page.getByRole("dialog")).toHaveCount(1);
+        await expectBelow(page, "Grace");
+        await expect(info(page, "Grace")).toHaveAttribute(
+            "aria-expanded",
+            "true",
+        );
+        await expect(info(page, "Ada")).toHaveAttribute(
+            "aria-expanded",
+            "false",
+        );
+    });
+
+    test("Escape returns focus to the active trigger", async ({ page }) => {
+        await info(page, "Ada").click();
+        await info(page, "Grace").click();
+        await expect(
+            page.getByRole("dialog", { name: "About Grace" }),
+        ).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+        await expectOutput(page, "reason", "escape-key");
+        await expect(info(page, "Grace")).toBeFocused();
+    });
+
+    test("has no axe violation while open", async ({ page }) => {
+        await info(page, "Ada").click();
+        await expect(
+            page.getByRole("dialog", { name: "About Ada" }),
+        ).toBeVisible();
+        await expectNoAxeViolations(page);
+    });
+});

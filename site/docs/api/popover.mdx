@@ -22,11 +22,20 @@ the modal parts). A menu of actions is a [Menu](/docs/api/menu); a description s
   (`trigger-press`) return focus to `finalFocus`, else the trigger. A press outside
   (`outside-press`) returns it to the trigger **unless the press landed on a focusable element**,
   which keeps the focus it got (Base UI's rule).
-- **Layers**: the popover is a layer. Opened inside a dialog, it closes first on Escape and on a
-  press inside the dialog.
+- **Layers**: the popover is a layer of the [nested overlay tree](/docs/guides/nested-overlays).
+  Opened inside a dialog, it is the dialog's child: it closes first on Escape and on a press
+  inside the dialog, and a menu opened from it is its own child. Closing it closes them.
+- **Detached triggers**: Triggers anywhere in the page open the same Root through a `handle`,
+  each with a `payload` ([detached triggers](/docs/guides/detached-triggers)). The popup anchors to
+  the active trigger and focus returns to it; a press on another trigger while open moves the
+  popover there, with that trigger's payload.
 - **Positioning**: `side` of the anchor, flipped to the other side when there is no room, shifted
   along it to stay in the viewport, following scroll and resize. `inline-start` and `inline-end`
   follow the direction; `left` and `right` do not. `data-side` says where it ended up.
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it as it
+  is, [change details](/docs/concepts/primitive-contract)), `onOpenChangeComplete(open)` reports
+  the end of each transition, the actions `close()` and `unmount()` act from code, and the
+  Portal's `keepMounted` keeps the Positioner in the page while closed (`hidden`, `data-closed`).
 
 ## Anatomy
 
@@ -139,19 +148,29 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | --- | --- | --- | --- |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `close-press`, `escape-key`, `outside-press`, `focus-out`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `PopoverHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
 
 ### Trigger
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+| `handle` | `PopoverHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
 
 ### Portal
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*popoverPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*popoverPortal="{ keepMounted: true }"`, or `*popoverPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -196,8 +215,8 @@ No props of its own.
 | part | attributes |
 | --- | --- |
 | Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin` |
-| Popup | `role="dialog"` (no `aria-modal`), `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin`; `hidden` while kept mounted and closed |
+| Popup | `role="dialog"` (no `aria-modal`), `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
 | Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
 | Title, Description | an `id` (generated unless given) |
 
@@ -214,6 +233,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/popover` | `Popover`, `PopoverRootProps`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/popover` | `Popover`, `PopoverRootProps`, `PopoverRootEmits`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PopoverArrowState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/popover` | `PopoverRoot`, `PopoverTrigger`, `PopoverPortal`, `PopoverPositioner`, `PopoverPopup`, `PopoverArrow`, `PopoverTitle`, `PopoverDescription`, `PopoverClose`, `injectPopover`, `PopoverState`, `PopoverTriggerState`, `PopoverPositionerState`, `PopoverPopupState`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |
+| `@fragiola/primitives-react/popover` | `Popover`, `PopoverRootProps`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `PopoverHandle`, `createPopoverHandle` |
+| `@fragiola/primitives-vue/popover` | `Popover`, `PopoverRootProps`, `PopoverRootEmits`, `PopoverTriggerProps`, `PopoverTriggerState`, `PopoverPortalProps`, `PopoverPositionerState`, `PopoverPopupProps`, `PopoverPopupState`, `PopoverArrowState`, `PositionerProps`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `PopoverHandle`, `createPopoverHandle` |
+| `@fragiola/primitives-angular/popover` | `PopoverRoot`, `PopoverTrigger`, `PopoverPortal`, `PopoverPositioner`, `PopoverPopup`, `PopoverArrow`, `PopoverTitle`, `PopoverDescription`, `PopoverClose`, `injectPopover`, `PopoverState`, `PopoverTriggerState`, `PopoverPositionerState`, `PopoverPopupState`, `Side`, `Align`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `PopoverHandle`, `createPopoverHandle` |

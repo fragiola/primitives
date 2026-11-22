@@ -4,6 +4,7 @@ import { styled } from "../styled.ts";
 
 export const Popover = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: styled(Primitive.Trigger, popover.trigger),
     Positioner: styled(Primitive.Positioner, popover.positioner),

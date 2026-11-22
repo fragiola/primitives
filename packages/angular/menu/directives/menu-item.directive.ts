@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
 import { menuItemBehaviour } from "./menu-item-behaviour.ts";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuItemState {
     highlighted: boolean;
@@ -26,7 +26,7 @@ export interface MenuItemState {
     host: {
         role: "menuitem",
         tabindex: "-1",
-        "data-primitives-part": "menu-item",
+        "[attr.data-primitives-part]": "level.part('item')",
         "[attr.aria-disabled]": "state().disabled ? 'true' : null",
         "[attr.data-highlighted]": "data().highlighted",
         "[attr.data-disabled]": "data().disabled",
@@ -34,11 +34,11 @@ export interface MenuItemState {
         "(blur)": "item.onBlur()",
         "(pointermove)": "item.onPointerMove($event)",
         "(pointerleave)": "item.onPointerLeave()",
-        "(click)": "onClick()",
+        "(click)": "onClick($event)",
     },
 })
 export class MenuItem {
-    private readonly level = inject(MenuRoot);
+    protected readonly level = inject(MenuRootBase);
     readonly disabled = input(false, { transform: booleanAttribute });
     /** The text typeahead matches (default: the item's text). */
     readonly label = input<string | undefined>(undefined);
@@ -70,9 +70,9 @@ export class MenuItem {
         );
     }
 
-    protected onClick(): void {
+    protected onClick(event: MouseEvent): void {
         if (!this.disabled() && this.closeOnClick()) {
-            this.level.closeAll("item-press");
+            this.level.closeAll("item-press", event);
         }
     }
 }

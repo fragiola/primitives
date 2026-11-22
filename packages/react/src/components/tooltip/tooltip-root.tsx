@@ -16,28 +16,39 @@ import {
 } from "react";
 import {
     type OverlayRootProps,
+    type OverlayTriggerRootProps,
     useOverlayRoot,
 } from "../../hooks/use-overlay-root.ts";
+import { useAttachHandle } from "../../hooks/use-overlay-trigger.ts";
 import type { ChangeReason } from "../../utils/change-details.ts";
 import { TooltipContext, TooltipProviderContext } from "./tooltip-context.ts";
+import type { TooltipHandle } from "./tooltip-handle.ts";
 
-export interface TooltipRootProps extends OverlayRootProps {
+export interface TooltipRootProps<Payload = unknown>
+    extends OverlayRootProps,
+        OverlayTriggerRootProps {
     /** ms before a hovered trigger opens (default: the Provider's, else 600). */
     delay?: number;
     /** ms before it closes once the pointer left (default: the Provider's, else 0). */
     closeDelay?: number;
     disabled?: boolean;
-    children?: ReactNode;
+    /** Connects Triggers rendered outside the Root (spec/tooltip.md, "Detached triggers"). */
+    handle?: TooltipHandle<Payload>;
+    /** The content, or a function of the active trigger's payload. */
+    children?:
+        | ReactNode
+        | ((state: { payload: Payload | undefined }) => ReactNode);
 }
 
 /** Holds the tooltip's state and its hover intent; renders no element (spec/tooltip.md). */
-export function TooltipRoot({
+export function TooltipRoot<Payload = unknown>({
     delay: delayProp,
     closeDelay: closeDelayProp,
     disabled = false,
+    handle,
     children,
     ...overlayProps
-}: TooltipRootProps) {
+}: TooltipRootProps<Payload>) {
     const root = useOverlayRoot(overlayProps);
     const provider = useContext(TooltipProviderContext);
     // a Root outside any Provider is alone in its own group
@@ -54,55 +65,94 @@ export function TooltipRoot({
     const { open, setOpen, trigger, popup } = root;
     const blocked = useRef(false);
     const openedByHover = useRef(false);
+    // the trigger the pointer is over, and the one a pending hover delay opens from
+    const hovered = useRef<HTMLElement | null>(null);
+    const pendingTrigger = useRef<HTMLElement | null>(null);
+    const pendingEvent = useRef<Event | undefined>(undefined);
+    const triggers = useRef(root.triggers);
+    triggers.current = root.triggers;
 
     const show = useCallback(
-        (reason: ChangeReason, isInstant: boolean) => {
-            openedByHover.current = reason === "trigger-hover";
-            setInstant(isInstant);
-            setOpen(true, reason);
+        (
+            reason: ChangeReason,
+            isInstant: boolean,
+            event?: Event,
+            from?: HTMLElement | null,
+        ) => {
+            if (setOpen(true, reason, event, from)) {
+                openedByHover.current = reason === "trigger-hover";
+                setInstant(isInstant);
+            }
         },
         [setOpen],
     );
     const hide = useCallback(
-        (reason: ChangeReason) => setOpen(false, reason),
+        (reason: ChangeReason, event?: Event) => {
+            setOpen(false, reason, event);
+        },
         [setOpen],
     );
     const intent = useMemo(
         () =>
             createHoverIntent({
-                open: () => show("trigger-hover", false),
+                open: () =>
+                    show(
+                        "trigger-hover",
+                        false,
+                        pendingEvent.current,
+                        pendingTrigger.current,
+                    ),
                 close: () => hide("trigger-hover"),
             }),
         [show, hide],
     );
     useEffect(() => intent.cancel, [intent]);
 
-    const hoverStart = useCallback(() => {
-        if (disabled || blocked.current) {
-            return;
-        }
-        if (open) {
+    const hoverStart = useCallback(
+        (from: HTMLElement, event: Event) => {
+            hovered.current = from;
+            if (disabled || blocked.current) {
+                return;
+            }
+            if (open) {
+                intent.cancel();
+                // another trigger of the open tooltip: it moves there at once (spec/tooltip.md)
+                if (from !== trigger) {
+                    show("trigger-hover", true, event, from);
+                }
+            } else if (group.isInstant()) {
+                intent.cancel();
+                show("trigger-hover", true, event, from);
+            } else {
+                pendingTrigger.current = from;
+                pendingEvent.current = event;
+                intent.enter(delay);
+            }
+        },
+        [disabled, open, trigger, group, intent, show, delay],
+    );
+    const hoverEnd = useCallback(
+        (from: HTMLElement) => {
+            if (hovered.current === from) {
+                hovered.current = null;
+            }
+            blocked.current = false;
+            if (!open) {
+                intent.cancel();
+            }
+        },
+        [open, intent],
+    );
+    const press = useCallback(
+        (event: Event) => {
+            blocked.current = true;
             intent.cancel();
-        } else if (group.isInstant()) {
-            intent.cancel();
-            show("trigger-hover", true);
-        } else {
-            intent.enter(delay);
-        }
-    }, [disabled, open, group, intent, show, delay]);
-    const hoverEnd = useCallback(() => {
-        blocked.current = false;
-        if (!open) {
-            intent.cancel();
-        }
-    }, [open, intent]);
-    const press = useCallback(() => {
-        blocked.current = true;
-        intent.cancel();
-        if (open) {
-            hide("trigger-press");
-        }
-    }, [open, intent, hide]);
+            if (open) {
+                hide("trigger-press", event);
+            }
+        },
+        [open, intent, hide],
+    );
 
     // one open tooltip per group: the previous one closes when this one opens
     const closeForGroup = useRef(() => hide("trigger-hover"));
@@ -124,7 +174,21 @@ export function TooltipRoot({
         }
         return trackHoverBridge(trigger, popup, {
             inside: () => intent.cancel(),
-            outside: () => intent.leave(closeDelay),
+            outside: () => {
+                // over another of its triggers: the tooltip is moving there (a trigger removed
+                // while hovered is none: it never reports the pointer leaving)
+                const other = hovered.current;
+                if (
+                    other !== null &&
+                    other !== trigger &&
+                    other.isConnected &&
+                    triggers.current.includes(other)
+                ) {
+                    intent.cancel();
+                    return;
+                }
+                intent.leave(closeDelay);
+            },
         });
     }, [open, trigger, popup, intent, closeDelay]);
 
@@ -133,9 +197,9 @@ export function TooltipRoot({
         if (!open || trigger === null) {
             return undefined;
         }
-        return interceptEscape(trigger.ownerDocument, () => {
+        return interceptEscape(trigger.ownerDocument, (event) => {
             intent.cancel();
-            hide("escape-key");
+            hide("escape-key", event);
         });
     }, [open, trigger, intent, hide]);
 
@@ -167,9 +231,12 @@ export function TooltipRoot({
             placed,
         ],
     );
+    useAttachHandle(handle, value);
     return (
         <TooltipContext.Provider value={value}>
-            {children}
+            {typeof children === "function"
+                ? children({ payload: root.payload as Payload | undefined })
+                : children}
         </TooltipContext.Provider>
     );
 }

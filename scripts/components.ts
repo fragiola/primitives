@@ -6,6 +6,7 @@
 // order Biome sorts the root entries' re-exports in).
 export const COMPONENTS = [
     "accordion",
+    "alert-dialog",
     "avatar",
     "button",
     "calendar",
@@ -13,6 +14,7 @@ export const COMPONENTS = [
     "checkbox-group",
     "collapsible",
     "combobox",
+    "context-menu",
     "date-picker",
     "date-range-picker",
     "dialog",

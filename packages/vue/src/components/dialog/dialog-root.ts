@@ -1,46 +1,48 @@
-import { defineComponent, provide, ref, shallowRef } from "vue";
+import { defineComponent, type PropType } from "vue";
 import {
+    type OverlayRootEmits,
+    type OverlayRootProps,
+    type OverlayTriggerRootProps,
     overlayRootEmits,
-    overlayRootProps,
-    useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
-import type { ChangeDetails } from "../../utils/change-details.ts";
 import {
-    type ContentSlots,
+    type OverlayRootSlots,
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { DialogKey } from "./dialog-context.ts";
+import type { DialogHandle } from "./dialog-handle.ts";
+import { dialogRootProps, setupDialogRoot } from "./dialog-root-base.ts";
 
-/** Holds the dialog's state (`v-model:open`); renders no element (spec/dialog.md). */
-export interface DialogRootProps {
-    open?: boolean;
-    defaultOpen?: boolean;
+/**
+ * Holds the dialog's state (`v-model:open`); renders no element (spec/dialog.md). A template ref
+ * on it exposes the actions, `close()` and `unmount()`.
+ */
+export interface DialogRootProps
+    extends OverlayRootProps,
+        OverlayTriggerRootProps {
+    /** Connects Triggers rendered outside the Root (spec/dialog.md, "Detached triggers"). */
+    handle?: DialogHandle;
 }
 
-export type DialogRootEmits = {
-    "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
-};
+export type DialogRootEmits = OverlayRootEmits;
 
 export const DialogRoot: PublicComponent<
     DialogRootProps,
-    ContentSlots,
+    OverlayRootSlots,
     DialogRootEmits
 > = publicComponent(
     defineComponent({
         name: "DialogRoot",
-        props: overlayRootProps,
+        props: {
+            ...dialogRootProps,
+            handle: {
+                type: Object as PropType<DialogHandle>,
+                default: undefined,
+            },
+        },
         emits: overlayRootEmits,
-        setup(props, { emit, slots }) {
-            const root = useOverlayRoot(props, emit);
-            provide(DialogKey, {
-                ...root,
-                backdrop: shallowRef(null),
-                titleId: ref(),
-                descriptionId: ref(),
-            });
-            return () => slots.default?.();
+        setup(props, context) {
+            return setupDialogRoot("dialog", props, context);
         },
     }),
 );

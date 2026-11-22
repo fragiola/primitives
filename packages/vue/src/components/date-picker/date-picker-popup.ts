@@ -24,7 +24,12 @@ export type DatePickerPopupProps = Record<never, never>;
 const RETURNS_FOCUS = new Set(["escape-key", "item-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (as Popover, D4 §3)
 // and a close made through the controlled `open` (reason `none`), as Popover's
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// (and the actions' `imperative-action`, whose focus return is `none`'s)
+const RETURNS_FOCUS_UNFOCUSED = new Set([
+    "outside-press",
+    "none",
+    "imperative-action",
+]);
 
 /** The non-modal dialog holding the bound calendar (spec/calendar.md, pickers). */
 export const DatePickerPopup: PartComponent<
@@ -59,7 +64,7 @@ export const DatePickerPopup: PartComponent<
                 const trigger = context.trigger.value;
                 if (event.shiftKey && (active === first || active === popup)) {
                     event.preventDefault();
-                    context.setOpen(false, "focus-out");
+                    context.setOpen(false, "focus-out", event);
                     trigger?.focus();
                 } else if (!event.shiftKey && active === last) {
                     event.preventDefault();
@@ -69,7 +74,7 @@ export const DatePickerPopup: PartComponent<
                               popup,
                           ])
                         : null;
-                    context.setOpen(false, "focus-out");
+                    context.setOpen(false, "focus-out", event);
                     next?.focus();
                 }
             };
@@ -89,7 +94,8 @@ export const DatePickerPopup: PartComponent<
                     const session = openOverlaySession(popup.ownerDocument, {
                         elements: () => [positioner ?? popup],
                         ignore: () => [trigger],
-                        dismiss: (reason) => context.setOpen(false, reason),
+                        dismiss: (reason, event) =>
+                            context.setOpen(false, reason, event),
                         focusOut: () => [trigger],
                         returnFocus: {
                             when: RETURNS_FOCUS,
@@ -124,6 +130,7 @@ export const DatePickerPopup: PartComponent<
                         "data-primitives-part": `${context.component}-popup`,
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.side,
                             align: placed.align,
                             "starting-style": status === "starting",

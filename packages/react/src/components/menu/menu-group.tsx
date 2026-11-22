@@ -1,5 +1,6 @@
-import { createContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
+import { MenuContext } from "./menu-context.ts";
 
 export const MenuGroupContext = createContext<
     ((id: string | undefined) => void) | null
@@ -7,6 +8,7 @@ export const MenuGroupContext = createContext<
 
 /** Groups items under its GroupLabel. */
 export function MenuGroup(props: PartProps<Record<string, never>>) {
+    const component = useContext(MenuContext)?.component ?? "menu";
     const [labelId, setLabelId] = useState<string>();
     const register = useMemo(() => setLabelId, []);
     return (
@@ -18,7 +20,7 @@ export function MenuGroup(props: PartProps<Record<string, never>>) {
                 {
                     role: "group",
                     "aria-labelledby": labelId,
-                    "data-primitives-part": "menu-group",
+                    "data-primitives-part": `${component}-group`,
                 },
             )}
         </MenuGroupContext.Provider>

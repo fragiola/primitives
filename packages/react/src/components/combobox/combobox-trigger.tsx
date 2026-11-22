@@ -1,3 +1,4 @@
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -22,9 +23,9 @@ export function ComboboxTrigger(
             "data-primitives-part": "combobox-trigger",
             ...stateAttributes({ "popup-open": open, disabled }),
             onPointerDown: (event: PointerEvent) => event.preventDefault(),
-            onClick: () => {
+            onClick: (event: ReactMouseEvent) => {
                 context.pendingHighlight.current = null;
-                context.setOpen(!open, "trigger-press");
+                context.setOpen(!open, "trigger-press", event.nativeEvent);
                 context.trigger?.focus();
             },
         },

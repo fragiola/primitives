@@ -67,16 +67,18 @@ top-left corner.
 | file | what |
 | --- | --- |
 | `implementations.ts` | the registered frameworks, and the `--project` parsing |
-| `scenario.ts` | `openScenario(page, path, { locale, dir, today })` |
+| `scenario.ts` | `openScenario(page, path, { locale, dir, today, cancel })` |
 | `output.ts` | `expectOutput(page, key, value)` reads the fixture's `key: value` lines |
 | `focus.ts` | `expectFocusWithin`, `isInertOrHidden` |
 | `axe.ts` | `expectNoAxeViolations` |
-| `contract.ts` | `part(page, component, name)`, `parts(page, component)`, `expectNoFalseStates` |
+| `contract.ts` | `part(page, component, name)`, `parts(page, component)`, `expectNoFalseStates`, `expectOpenState` (exactly one of `data-open` and `data-closed`) |
 | `visual.ts` | `visualOnlyInCi`, `expectScreen` |
+| `lifecycle.ts` | `LIFECYCLE_OVERLAYS`: the overlays of the lifecycle scenarios (`tests/lifecycle`) |
 | `presence.ts` | `settleAnimations`, `slowMotion`, `recordExit`, `markElement`, `isSameElement`: the exit transitions (`tests/presence`) |
 | `ssr.ts` | `scenarioPaths` (every spec scenario), `snapshotRoot` (the comparable `#root`) |
 | `ssr-server.ts` | the ssr layer's server: `node conformance/src/ssr-server.ts <fixture dir> <port>` |
 | `form.ts` | `expectSubmitted(page, entries)`: the form scenarios' `form: ...` line |
 | `pointer.ts` | `pointAlong`, `pressAlong`, `dragFrom`: whole-pixel presses and drags along a box |
+| `touch.ts` | `holdTouch`: a touch held at a point for a time (a long press), through Chromium's input pipeline (CDP), in a `hasTouch` context |
 | `slider.ts` | `sliderState`, `expectSliderValue` |
 | `dates.ts` | `fullDate`, `monthHeading`, `shortWeekday`: the calendar's expected names, computed with `Intl` |

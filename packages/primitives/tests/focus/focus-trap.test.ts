@@ -70,6 +70,35 @@ describe("focus", () => {
         release();
     });
 
+    it("holds the focus on an outside press with holdOutsidePress", () => {
+        const box = setup();
+        const press = (target: Element) => {
+            const event = new MouseEvent("mousedown", {
+                bubbles: true,
+                cancelable: true,
+            });
+            target.dispatchEvent(event);
+            return event.defaultPrevented;
+        };
+        const after = document.getElementById("after") as HTMLElement;
+        const save = document.getElementById("save") as HTMLElement;
+        const child = document.createElement("div");
+        document.body.append(child);
+        const plain = trapFocus(box);
+        expect(press(after)).toBe(false);
+        plain();
+        const release = trapFocus(box, () => [child], {
+            holdOutsidePress: true,
+        });
+        expect(press(after)).toBe(true);
+        expect(press(document.body)).toBe(true);
+        // inside the container and its child layers, a press gives focus as usual
+        expect(press(save)).toBe(false);
+        expect(press(child)).toBe(false);
+        release();
+        expect(press(after)).toBe(false);
+    });
+
     it("pulls focus back when it escapes", () => {
         const box = setup();
         const release = trapFocus(box);

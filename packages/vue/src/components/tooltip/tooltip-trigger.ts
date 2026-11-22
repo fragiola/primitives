@@ -1,6 +1,10 @@
-import { defineComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
-import { useRequiredContext } from "../../composables/use-required-context.ts";
+import {
+    type OverlayTriggerProps,
+    overlayTriggerProps,
+    useOverlayTrigger,
+} from "../../composables/use-overlay-trigger.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -8,6 +12,7 @@ import {
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { TooltipKey } from "./tooltip-context.ts";
+import type { TooltipHandle } from "./tooltip-handle.ts";
 
 function isFocusVisible(element: Element): boolean {
     try {
@@ -17,69 +22,91 @@ function isFocusVisible(element: Element): boolean {
     }
 }
 
-/** The described control and the anchor (spec/tooltip.md). */
+/** A described control and the anchor; with a `handle`, anywhere in the page (spec/tooltip.md). */
 export interface TooltipTriggerState {
     open: boolean;
 }
 
+export interface TooltipTriggerProps
+    extends OverlayTriggerProps<TooltipHandle, unknown> {}
+
 export const TooltipTrigger: PartComponent<
-    Record<never, never>,
+    TooltipTriggerProps,
     TooltipTriggerState
 > = publicComponent(
     defineComponent({
         name: "TooltipTrigger",
         inheritAttrs: false,
-        props: asProp,
+        props: {
+            ...asProp,
+            ...overlayTriggerProps,
+            handle: {
+                type: Object as PropType<TooltipHandle>,
+                default: undefined,
+            },
+        },
         setup(props, { attrs, slots }) {
-            const context = useRequiredContext(TooltipKey, "Tooltip.Trigger");
-            const setTrigger = elementSetter(context.trigger);
+            const trigger = useOverlayTrigger(
+                TooltipKey,
+                "Tooltip.Trigger",
+                props,
+            );
+            const setTrigger = elementSetter(trigger.element);
             return () => {
-                const open = context.open.value;
+                const root = trigger.root.value;
+                const active = trigger.active.value;
                 const { "aria-describedby": describedBy, ...rest } = attrs;
                 const description =
-                    [describedBy, open ? context.popupId : undefined]
+                    [describedBy, active ? root?.popupId : undefined]
                         .filter(Boolean)
                         .join(" ") || undefined;
                 return renderPart(
                     "button",
                     { attrs: rest, slots },
                     props.as,
-                    { open },
+                    { open: active },
                     {
                         type: "button",
-                        id: context.triggerId,
+                        id: trigger.id.value,
                         "aria-describedby": description,
                         "data-primitives-part": "tooltip-trigger",
-                        ...stateAttributes({ "popup-open": open }),
+                        ...stateAttributes({ "popup-open": active }),
                         onPointerenter: (event: PointerEvent) => {
                             // a tap never opens a tooltip
                             if (event.pointerType !== "touch") {
-                                context.hoverStart();
+                                root?.hoverStart(
+                                    event.currentTarget as HTMLElement,
+                                    event,
+                                );
                             }
                         },
                         onPointerleave: (event: PointerEvent) => {
                             if (event.pointerType !== "touch") {
-                                context.hoverEnd();
+                                root?.hoverEnd(
+                                    event.currentTarget as HTMLElement,
+                                );
                             }
                         },
                         onPointerdown: (event: PointerEvent) => {
                             // a tap neither opens nor blocks it (the block ends on a pointer leave
                             // touch has not)
                             if (event.pointerType !== "touch") {
-                                context.press();
+                                root?.press(event);
                             }
                         },
                         onFocus: (event: FocusEvent) => {
+                            const target = event.currentTarget as HTMLElement;
                             if (
-                                !context.disabled() &&
-                                isFocusVisible(event.currentTarget as Element)
+                                root !== null &&
+                                !root.disabled() &&
+                                isFocusVisible(target)
                             ) {
-                                context.show("trigger-focus", true);
+                                root.show("trigger-focus", true, event, target);
                             }
                         },
-                        onBlur: () => {
-                            if (context.open.value) {
-                                context.hide("trigger-focus");
+                        onBlur: (event: FocusEvent) => {
+                            if (trigger.active.value) {
+                                root?.hide("trigger-focus", event);
                             }
                         },
                         ref: setTrigger,

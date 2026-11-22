@@ -1,49 +1,22 @@
-import {
-    booleanAttribute,
-    computed,
-    Directive,
-    inject,
-    input,
-} from "@angular/core";
-import {
-    dataValues,
-    registerHost,
-} from "@fragiola/primitives-angular/internal";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { booleanAttribute, Directive, input } from "@angular/core";
+import type { DialogHandle } from "../utils/dialog-handle.ts";
+import { DialogTriggerBase } from "./dialog-trigger-base.ts";
 
-export interface DialogTriggerState {
-    open: boolean;
-    disabled: boolean;
-}
-
-/** Opens and closes the dialog (reason `trigger-press`): `<button dialogTrigger>`. */
-@Directive({
-    selector: "[dialogTrigger]",
-    exportAs: "dialogTrigger",
-    host: {
-        type: "button",
-        "aria-haspopup": "dialog",
-        "data-primitives-part": "dialog-trigger",
-        "[attr.id]": "root.overlay.triggerId",
-        "[attr.disabled]": "data().disabled",
-        "[attr.aria-expanded]": "String(state().open)",
-        "[attr.aria-controls]": "state().open ? root.overlay.popupId : null",
-        "[attr.data-popup-open]": "data().open",
-        "[attr.data-disabled]": "data().disabled",
-        "(click)": "root.overlay.setOpen(!state().open, 'trigger-press')",
-    },
-})
-export class DialogTrigger {
-    protected readonly root = inject(DialogRoot);
+/**
+ * Opens and closes the dialog (reason `trigger-press`): `<button dialogTrigger>` inside the
+ * `[dialogRoot]`, or anywhere with a handle (`<button dialogTrigger [handle]="handle"
+ * [payload]="row" id="edit-ada">`, spec/dialog.md, "Detached triggers").
+ */
+@Directive({ selector: "[dialogTrigger]", exportAs: "dialogTrigger" })
+export class DialogTrigger<Payload = unknown> extends DialogTriggerBase<
+    Payload,
+    DialogHandle<Payload>
+> {
     readonly disabled = input(false, { transform: booleanAttribute });
-    readonly state = computed<DialogTriggerState>(() => ({
-        open: this.root.overlay.open(),
-        disabled: this.disabled(),
-    }));
-    protected readonly data = computed(() => dataValues(this.state()));
-    protected readonly String = String;
-
-    constructor() {
-        registerHost(this.root.overlay.trigger);
-    }
+    /** The handle of a `[dialogRoot]` this trigger opens from anywhere. */
+    readonly handle = input<DialogHandle<Payload> | undefined>(undefined);
+    /** What the root's `payload()` gives while this trigger is the active one. */
+    readonly payload = input<Payload | undefined>(undefined);
+    /** The trigger's id (generated when not given). */
+    readonly id = input<string | undefined>(undefined);
 }

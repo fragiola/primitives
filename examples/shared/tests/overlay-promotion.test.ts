@@ -20,8 +20,14 @@ const geometry = {
 
 describe("overlay promotion", () => {
     it("knows the modal parts by their part attribute", () => {
-        expect(MODAL_TRIGGER_PARTS).toEqual(["dialog-trigger"]);
-        expect(MODAL_POPUP_PARTS).toEqual(["dialog-popup"]);
+        expect(MODAL_TRIGGER_PARTS).toEqual([
+            "dialog-trigger",
+            "alert-dialog-trigger",
+        ]);
+        expect(MODAL_POPUP_PARTS).toEqual([
+            "dialog-popup",
+            "alert-dialog-popup",
+        ]);
         document.body.innerHTML =
             '<button data-primitives-part="dialog-trigger"><span id="label">Open</span></button><button id="other">Other</button>';
         expect(modalTriggerOf(document.getElementById("label"))).toBe(

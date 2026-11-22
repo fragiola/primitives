@@ -1,35 +1,16 @@
-import { type ReactNode, useMemo, useState } from "react";
+import type { DialogHandle } from "./dialog-handle.ts";
 import {
-    type OverlayRootProps,
-    useOverlayRoot,
-} from "../../hooks/use-overlay-root.ts";
-import { DialogContext } from "./dialog-context.ts";
+    DialogRootBase,
+    type DialogRootSharedProps,
+} from "./dialog-root-base.tsx";
 
-export interface DialogRootProps extends OverlayRootProps {
-    children?: ReactNode;
+export interface DialogRootProps<Payload = unknown>
+    extends DialogRootSharedProps<Payload> {
+    /** Connects Triggers rendered outside the Root (spec/dialog.md, "Detached triggers"). */
+    handle?: DialogHandle<Payload>;
 }
 
 /** Holds the dialog's state; renders no element (spec/dialog.md). */
-export function DialogRoot({ children, ...props }: DialogRootProps) {
-    const root = useOverlayRoot(props);
-    const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
-    const [titleId, setTitleId] = useState<string>();
-    const [descriptionId, setDescriptionId] = useState<string>();
-    const value = useMemo(
-        () => ({
-            ...root,
-            backdrop,
-            setBackdrop,
-            titleId,
-            setTitleId,
-            descriptionId,
-            setDescriptionId,
-        }),
-        [root, backdrop, titleId, descriptionId],
-    );
-    return (
-        <DialogContext.Provider value={value}>
-            {children}
-        </DialogContext.Provider>
-    );
+export function DialogRoot<Payload = unknown>(props: DialogRootProps<Payload>) {
+    return <DialogRootBase {...props} component="dialog" />;
 }

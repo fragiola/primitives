@@ -1,6 +1,7 @@
 import {
     defineComponent,
     type InjectionKey,
+    inject,
     provide,
     type Ref,
     ref,
@@ -10,6 +11,7 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
+import { MenuKey } from "./menu-context.ts";
 
 export const MenuGroupKey: InjectionKey<Ref<string | undefined>> =
     Symbol("MenuGroup");
@@ -24,6 +26,7 @@ export const MenuGroup: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const component = inject(MenuKey, null)?.component ?? "menu";
             const labelId = ref<string>();
             provide(MenuGroupKey, labelId);
             return () =>
@@ -35,7 +38,7 @@ export const MenuGroup: PartComponent<
                     {
                         role: "group",
                         "aria-labelledby": labelId.value,
-                        "data-primitives-part": "menu-group",
+                        "data-primitives-part": `${component}-group`,
                     },
                 );
         },

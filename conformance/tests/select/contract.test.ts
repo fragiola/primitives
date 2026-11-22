@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import {
+    expectNoFalseStates,
+    expectOpenState,
+    part,
+    parts,
+} from "../../src/contract.ts";
+import { settleAnimations, slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/select.md: anatomy, state attributes, the hidden input
@@ -62,5 +68,58 @@ test("select / basic: parts, placeholder, hidden input, open states", async ({
         "true",
     );
     await expect(part(page, "select", "item-indicator")).toHaveCount(1);
+    await expectNoFalseStates(parts(page, "select"));
+});
+
+// spec/README.md, "State attributes": exactly one of data-open and data-closed, data-closed while
+// the exit runs; the trigger keeps data-popup-open only
+test("select / basic: data-open, then data-closed while the exit runs", async ({
+    page,
+}) => {
+    await openScenario(page, "/select/basic");
+    await slowMotion(page, 600);
+    await page.getByRole("combobox", { name: "Fruit" }).click();
+    await expectOpenState(part(page, "select", "positioner"), true);
+    await expectOpenState(part(page, "select", "popup"), true);
+    await settleAnimations(page);
+    await page.keyboard.press("Escape");
+    await expect(part(page, "select", "popup")).toHaveAttribute(
+        "data-ending-style",
+        "",
+    );
+    await expectOpenState(part(page, "select", "positioner"), false);
+    await expectOpenState(part(page, "select", "popup"), false);
+    await expect(part(page, "select", "trigger").first()).not.toHaveAttribute(
+        "data-closed",
+    );
+    await expect(part(page, "select", "popup")).toHaveCount(0);
+});
+
+test("select / groups: groups, labels, the separator and item texts", async ({
+    page,
+}) => {
+    await openScenario(page, "/select/groups");
+    await page.getByRole("combobox", { name: "Food" }).click();
+    const groups = part(page, "select", "group");
+    await expect(groups).toHaveCount(2);
+    await expect(groups.nth(0)).toHaveAttribute("role", "group");
+    const labels = part(page, "select", "group-label");
+    await expect(labels).toHaveCount(2);
+    const labelId = await labels.nth(0).getAttribute("id");
+    expect(labelId).toBeTruthy();
+    await expect(groups.nth(0)).toHaveAttribute(
+        "aria-labelledby",
+        labelId as string,
+    );
+    const separator = part(page, "select", "separator");
+    await expect(separator).toHaveCount(1);
+    await expect(separator).toHaveAttribute("role", "presentation");
+    await expect(separator).toHaveAttribute("data-orientation", "horizontal");
+    await expect(part(page, "select", "item-text")).toHaveCount(5);
+    await expect(
+        part(page, "select", "item")
+            .nth(2)
+            .locator(part(page, "select", "item-text")),
+    ).toHaveText("Carrot");
     await expectNoFalseStates(parts(page, "select"));
 });

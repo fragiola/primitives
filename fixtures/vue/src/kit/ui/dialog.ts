@@ -4,9 +4,11 @@ import { styled } from "../styled.ts";
 
 export const Dialog = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: styled(Primitive.Trigger, dialog.trigger),
     Backdrop: styled(Primitive.Backdrop, dialog.backdrop),
+    Viewport: styled(Primitive.Viewport, dialog.viewport),
     Popup: styled(Primitive.Popup, dialog.popup),
     Title: styled(Primitive.Title, dialog.title),
     Description: styled(Primitive.Description, dialog.description),

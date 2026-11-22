@@ -2,7 +2,7 @@ import {
     createTypeahead,
     menuKeyTarget,
 } from "@fragiola/primitives/collection";
-import { type KeyboardEvent, useRef } from "react";
+import { type KeyboardEvent, type MouseEvent, useRef } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -28,7 +28,7 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
     const { open, items, value, highlighted, disabled } = context;
     const index = items.findIndex((item) => item.value === highlighted);
 
-    const typeTo = (key: string) => {
+    const typeTo = (key: string, event: Event) => {
         const from = items.findIndex(
             (item) => item.value === (open ? highlighted : value),
         );
@@ -45,7 +45,7 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
         if (open) {
             context.setHighlighted(target);
         } else {
-            context.openOn(target, "list-navigation");
+            context.openOn(target, "list-navigation", event);
         }
     };
 
@@ -64,7 +64,7 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
                 return;
             }
             event.preventDefault();
-            typeTo(event.key);
+            typeTo(event.key, event.nativeEvent);
             return;
         }
         if (!open) {
@@ -77,6 +77,7 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
                     context.openOn(
                         initialHighlight(items, value),
                         "list-navigation",
+                        event.nativeEvent,
                     );
                     return;
                 case "Home":
@@ -86,6 +87,7 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
                         (event.key === "Home" ? items[0] : items.at(-1))
                             ?.value ?? null,
                         "list-navigation",
+                        event.nativeEvent,
                     );
                     return;
                 default:
@@ -111,16 +113,20 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
             case " ":
                 event.preventDefault();
                 if (highlighted !== null) {
-                    context.choose(highlighted, "item-press");
+                    context.choose(
+                        highlighted,
+                        "item-press",
+                        event.nativeEvent,
+                    );
                 }
                 return;
             case "Tab": {
                 // APG: Tab chooses the highlighted option, then focus moves on
                 const item = items[index];
                 if (item !== undefined && !item.disabled) {
-                    context.choose(item.value, "focus-out");
+                    context.choose(item.value, "focus-out", event.nativeEvent);
                 } else {
-                    context.setOpen(false, "focus-out");
+                    context.setOpen(false, "focus-out", event.nativeEvent);
                 }
                 return;
             }
@@ -158,13 +164,14 @@ export function SelectTrigger(props: PartProps<SelectTriggerState>) {
                 disabled,
                 placeholder,
             }),
-            onClick: () => {
+            onClick: (event: MouseEvent) => {
                 if (open) {
-                    context.setOpen(false, "trigger-press");
+                    context.setOpen(false, "trigger-press", event.nativeEvent);
                 } else {
                     context.openOn(
                         initialHighlight(items, value),
                         "trigger-press",
+                        event.nativeEvent,
                     );
                 }
             },

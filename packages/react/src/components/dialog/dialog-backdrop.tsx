@@ -5,20 +5,39 @@ import { DialogContext } from "./dialog-context.ts";
 
 export interface DialogBackdropState {
     open: boolean;
+    nested: boolean;
+    nestedDialogOpen: boolean;
 }
 
-export function DialogBackdrop(props: PartProps<DialogBackdropState>) {
+export interface DialogBackdropProps extends PartProps<DialogBackdropState> {
+    /** A nested dialog's Backdrop renders only with it (default `false`; spec/dialog.md). */
+    forceRender?: boolean;
+}
+
+export function DialogBackdrop({
+    forceRender = false,
+    ...props
+}: DialogBackdropProps) {
     const context = useRequiredContext(DialogContext, "Dialog.Backdrop");
-    const status = context.presence.status;
+    if (context.nested && !forceRender) {
+        return null;
+    }
+    const { open, nested, nestedDialogs, presence } = context;
+    const status = presence.status;
+    const nestedDialogOpen = nestedDialogs > 0;
     return renderElement(
         "div",
         props,
-        { open: context.open },
+        { open, nested, nestedDialogOpen },
         {
             "aria-hidden": "true",
-            "data-primitives-part": "dialog-backdrop",
+            hidden: presence.mounted ? undefined : true,
+            "data-primitives-part": `${context.component}-backdrop`,
             ...stateAttributes({
-                open: context.open,
+                open,
+                closed: !open,
+                nested,
+                "nested-dialog-open": nestedDialogOpen,
                 "starting-style": status === "starting",
                 "ending-style": status === "ending",
             }),

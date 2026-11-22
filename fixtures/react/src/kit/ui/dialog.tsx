@@ -5,12 +5,16 @@ import type { ComponentProps } from "react";
 // The styled layer: each part gets its recipe (a per-framework Fragiola UI in miniature).
 export const Dialog = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: (props: ComponentProps<typeof Primitive.Trigger>) => (
         <Primitive.Trigger className={dialog.trigger} {...props} />
     ),
     Backdrop: (props: ComponentProps<typeof Primitive.Backdrop>) => (
         <Primitive.Backdrop className={dialog.backdrop} {...props} />
+    ),
+    Viewport: (props: ComponentProps<typeof Primitive.Viewport>) => (
+        <Primitive.Viewport className={dialog.viewport} {...props} />
     ),
     Popup: (props: ComponentProps<typeof Primitive.Popup>) => (
         <Primitive.Popup className={dialog.popup} {...props} />

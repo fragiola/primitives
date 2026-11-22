@@ -104,6 +104,8 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         open: openProp,
         defaultOpen,
         onOpenChange,
+        onOpenChangeComplete,
+        actionsRef,
     } = props;
     const defaultValue: unknown =
         props.defaultValue ?? (multiple ? NONE : null);
@@ -111,6 +113,8 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         open: openProp,
         defaultOpen,
         onOpenChange,
+        onOpenChangeComplete,
+        actionsRef,
     });
     const [value, setValue] = useControllableState<unknown, ChangeDetails>(
         props.value,
@@ -186,19 +190,22 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
 
     const { setOpen: setOpenState } = root;
     const setOpen = useCallback(
-        (next: boolean, reason: ChangeReason) => {
+        (next: boolean, reason: ChangeReason, event?: Event): boolean => {
+            // a close the consumer cancels leaves the list, its text and highlight as they are
+            const changed = setOpenState(next, reason, event);
             if (!next || reason !== "input-change") {
-                setTyped(false);
+                if (changed || next) {
+                    setTyped(false);
+                }
             }
-            setOpenState(next, reason);
-            if (next) {
-                return;
+            if (next || !changed) {
+                return changed;
             }
             // a list reopened during its exit animation starts with no highlight
             setHighlighted(null);
             pendingHighlight.current = null;
             if (reason === "item-press") {
-                return;
+                return changed;
             }
             // closing without a choice resets the text (spec/combobox.md, "Choosing an item")
             const current = latest.current;
@@ -208,6 +215,7 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
                     reason: text === "" ? "input-clear" : "none",
                 });
             }
+            return changed;
         },
         [setOpenState, setInputValueState],
     );

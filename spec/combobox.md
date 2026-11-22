@@ -83,7 +83,9 @@ form controls (spec/README.md, "Forms"): `combobox-input` is the Input's.
   `[]`).
 - `inputValue`, `defaultInputValue`, `onInputValueChange(inputValue, details)`: the text in the
   input. Its default is the label of `defaultValue` (single), else `""`.
-- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)`.
+- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)` (an `OpenChangeDetails`,
+  [README](README.md#open-change-details); `trigger` is the Input), `onOpenChangeComplete(open)`,
+  the actions (`close()`, `unmount()`; React `actionsRef`).
 - `isItemEqualToValue(item, value)`: whether an item is a value (default `Object.is`).
 - `itemToStringLabel(item)`: an item's text, for the input and the filter. Default: an object's
   `label`, else its `value`, else the item itself as a string.
@@ -116,6 +118,9 @@ the value's label, or the labels joined with `", "` (`multiple`).
 
 **ItemIndicator**: `keepMounted` (`false`).
 
+**Portal**: `container`, `keepMounted` (`false`: the list stays rendered, hidden, while closed;
+[README](README.md#lifecycle)).
+
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`, and `--anchor-width` lets
 the consumer match the anchor's width.
 
@@ -130,7 +135,8 @@ the consumer match the anchor's width.
 **Closing the list without a choice** (Escape, an outside press, Tab, the Trigger, Alt+ArrowUp)
 resets the input's text: to the selected item's label in single mode, to `""` with `multiple`.
 The reason is `input-clear` when the text becomes empty, else `none`. Every close also drops the highlight:
-a list reopened while its exit animation still runs starts as a fresh open.
+a list reopened while its exit animation still runs starts as a fresh open. A close the consumer
+cancels (`details.cancel()`) does none of this: the list stays open with its text and highlight.
 
 ## State attributes and ARIA
 
@@ -147,7 +153,7 @@ stays the Positioner's and the Popup's.
 | Chip | `tabindex="-1"`, `aria-disabled="true"` and `data-disabled` when the Root is disabled |
 | ChipRemove | `type="button"`, `tabindex="-1"`, `data-disabled` |
 | Status | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
-| Positioner, Popup | as Popover's (Popup has no role) |
+| Positioner, Popup | as Popover's (Popup has no role): `data-open` / `data-closed`; the Positioner `hidden` while kept mounted and closed |
 | Empty | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
 | List | `role="listbox"`, an `id`, `aria-multiselectable="true"` with `multiple`, `data-empty` when it holds no item |
 | Group | `role="group"`, `aria-labelledby` (its GroupLabel) |
@@ -247,7 +253,8 @@ Input.
 
 ## Animation
 
-As [popover.md](popover.md#animation).
+As [popover.md](popover.md#animation); `keepMounted`, `onOpenChangeComplete` and the actions as
+[README](README.md#lifecycle).
 
 ## RTL
 
@@ -452,6 +459,16 @@ Checks:
 5. A form reset (`form.reset()`) empties the input and the value; "Submit" then submits nothing
    again.
 6. Axe finds no violation, before and after the failed submission.
+
+### `/combobox/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a `<label>` **"Fruit"** for
+the Input of basic's combobox (an InputGroup with the Input and a Trigger **"Show fruits"**,
+`items` the fruits, an Empty "No fruit found." and the List); its Portal has `keepMounted` (the
+Positioner is the kept-mounted part). The checks open it with a click on "Show fruits".
+
+Checks: the common checks (no "Close with actions"); the Input names the List in
+`aria-controls` while closed too (the kept-mounted List exists).
 
 ## Differences from Base UI
 

@@ -8,9 +8,9 @@ import { PopoverRoot } from "./popover-root.directive.ts";
     host: {
         type: "button",
         "data-primitives-part": "popover-close",
-        "(click)": "root.overlay.setOpen(false, 'close-press')",
+        "(click)": "root.overlay.setOpen(false, 'close-press', $event)",
     },
 })
 export class PopoverClose {
-    protected readonly root = inject(PopoverRoot);
+    protected readonly root = inject<PopoverRoot>(PopoverRoot);
 }

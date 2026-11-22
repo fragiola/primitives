@@ -2,6 +2,9 @@ import type { ComponentType } from "react";
 import { AccordionBasic } from "../scenarios/accordion/accordion-basic.tsx";
 import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.tsx";
 import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx";
+import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.tsx";
+import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.tsx";
+import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
@@ -20,16 +23,24 @@ import { ComboboxField } from "../scenarios/combobox/combobox-field.tsx";
 import { ComboboxFiltered } from "../scenarios/combobox/combobox-filtered.tsx";
 import { ComboboxForm } from "../scenarios/combobox/combobox-form.tsx";
 import { ComboboxGroups } from "../scenarios/combobox/combobox-groups.tsx";
+import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.tsx";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
+import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.tsx";
+import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
+import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
+import { DialogDetached } from "../scenarios/dialog/dialog-detached.tsx";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.tsx";
+import { DialogLifecycle } from "../scenarios/dialog/dialog-lifecycle.tsx";
+import { DialogNestedDialogs } from "../scenarios/dialog/dialog-nested-dialogs.tsx";
 import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.tsx";
+import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.tsx";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.tsx";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.tsx";
 import { FieldAsync } from "../scenarios/field/field-async.tsx";
@@ -42,14 +53,19 @@ import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
+import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
+import { MenuDetached } from "../scenarios/menu/menu-detached.tsx";
 import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
+import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
+import { PopoverDetached } from "../scenarios/popover/popover-detached.tsx";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.tsx";
+import { PopoverLifecycle } from "../scenarios/popover/popover-lifecycle.tsx";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.tsx";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.tsx";
@@ -57,6 +73,8 @@ import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx"
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
+import { SelectGroups } from "../scenarios/select/select-groups.tsx";
+import { SelectLifecycle } from "../scenarios/select/select-lifecycle.tsx";
 import { SelectModal } from "../scenarios/select/select-modal.tsx";
 import { SeparatorBasic } from "../scenarios/separator/separator-basic.tsx";
 import { SliderBasic } from "../scenarios/slider/slider-basic.tsx";
@@ -72,16 +90,28 @@ import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.tsx";
+import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.tsx";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.tsx";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.tsx";
+import { TooltipLifecycle } from "../scenarios/tooltip/tooltip-lifecycle.tsx";
 
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
-export const routes: Record<string, ComponentType<{ locale?: string }>> = {
+export const routes: Record<
+    string,
+    ComponentType<{ locale?: string; cancel?: boolean }>
+> = {
     "/dialog/basic": DialogBasic,
     "/dialog/initial-focus": DialogInitialFocus,
     "/dialog/nested-popover": DialogNestedPopover,
     "/dialog/controlled": DialogControlled,
     "/dialog/rejected-close": DialogRejectedClose,
+    "/dialog/nested-tree": DialogNestedTree,
+    "/dialog/nested-dialogs": DialogNestedDialogs,
+    "/dialog/detached": DialogDetached,
+    "/dialog/lifecycle": DialogLifecycle,
+    "/alert-dialog/basic": AlertDialogBasic,
+    "/alert-dialog/detached": AlertDialogDetached,
+    "/alert-dialog/lifecycle": AlertDialogLifecycle,
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
@@ -98,14 +128,24 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/popover/rtl": PopoverRtl,
     "/popover/arrow": PopoverArrow,
     "/popover/controlled": PopoverControlled,
+    "/popover/detached": PopoverDetached,
+    "/popover/lifecycle": PopoverLifecycle,
     "/tooltip/basic": TooltipBasic,
     "/tooltip/group": TooltipGroup,
     "/tooltip/in-dialog": TooltipInDialog,
+    "/tooltip/detached": TooltipDetached,
+    "/tooltip/lifecycle": TooltipLifecycle,
     "/menu/basic": MenuBasic,
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,
     "/menu/modal": MenuModal,
     "/menu/controlled": MenuControlled,
+    "/menu/detached": MenuDetached,
+    "/menu/lifecycle": MenuLifecycle,
+    "/menu/checkbox-radio": MenuCheckboxRadio,
+    "/context-menu/basic": ContextMenuBasic,
+    "/context-menu/rtl": ContextMenuBasic,
+    "/context-menu/lifecycle": ContextMenuLifecycle,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,
@@ -115,9 +155,12 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/combobox/groups": ComboboxGroups,
     "/combobox/form": ComboboxForm,
     "/combobox/field": ComboboxField,
+    "/combobox/lifecycle": ComboboxLifecycle,
     "/select/basic": SelectBasic,
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
+    "/select/lifecycle": SelectLifecycle,
+    "/select/groups": SelectGroups,
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
@@ -151,6 +194,7 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
+    "/date-picker/lifecycle": DatePickerLifecycle,
     "/progress/basic": ProgressBasic,
     "/avatar/basic": AvatarBasic,
     "/separator/basic": SeparatorBasic,

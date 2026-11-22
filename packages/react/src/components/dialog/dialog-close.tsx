@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { DialogContext } from "./dialog-context.ts";
@@ -11,8 +12,9 @@ export function DialogClose(props: PartProps<Record<string, never>>) {
         {},
         {
             type: "button",
-            "data-primitives-part": "dialog-close",
-            onClick: () => context.setOpen(false, "close-press"),
+            "data-primitives-part": `${context.component}-close`,
+            onClick: (event: MouseEvent) =>
+                context.setOpen(false, "close-press", event.nativeEvent),
         },
     );
 }

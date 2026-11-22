@@ -5,7 +5,7 @@ import {
     positionOverlay,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuPositionerState {
     open: boolean;
@@ -22,8 +22,10 @@ export interface MenuPositionerState {
     exportAs: "menuPositioner",
     host: {
         role: "presentation",
-        "data-primitives-part": "menu-positioner",
+        "[attr.data-primitives-part]": "level.part('positioner')",
+        "[attr.hidden]": "level.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-nested]": "data().nested",
@@ -32,7 +34,7 @@ export interface MenuPositionerState {
     },
 })
 export class MenuPositioner {
-    protected readonly level = inject(MenuRoot);
+    protected readonly level = inject(MenuRootBase);
     readonly side = input<Side | undefined>(undefined);
     readonly align = input<Align | undefined>(undefined);
     readonly sideOffset = input<number | undefined>(undefined);
@@ -44,7 +46,11 @@ export class MenuPositioner {
         ...this.level.placed(),
     }));
     protected readonly data = computed(() =>
-        dataValues({ ...this.state(), nested: this.level.nested }),
+        dataValues({
+            ...this.state(),
+            closed: !this.state().open,
+            nested: this.level.nested,
+        }),
     );
 
     constructor() {
@@ -55,7 +61,14 @@ export class MenuPositioner {
             this.level.nested
                 ? { side: "inline-end", align: "start" }
                 : { side: "bottom", align: "start" },
-            { anchor: overlay.trigger, positioner },
+            {
+                // a context menu's point, else the trigger
+                anchor: computed(
+                    () => this.level.anchor() ?? overlay.trigger(),
+                ),
+                positioner,
+                mounted: overlay.presence.mounted,
+            },
             this.level.placed,
         );
     }

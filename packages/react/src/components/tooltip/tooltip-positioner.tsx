@@ -35,6 +35,7 @@ export function TooltipPositioner({
         context.trigger,
         context.positioner,
         context.arrow,
+        context.presence.mounted,
     );
     const { setPlaced } = context;
     useLayoutEffect(() => setPlaced(placed), [placed, setPlaced]);
@@ -45,9 +46,11 @@ export function TooltipPositioner({
         state,
         {
             role: "presentation",
+            hidden: context.presence.mounted ? undefined : true,
             "data-primitives-part": "tooltip-positioner",
             ...stateAttributes({
                 open: context.open,
+                closed: !context.open,
                 side: placed.side,
                 align: placed.align,
             }),

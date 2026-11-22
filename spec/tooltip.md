@@ -26,10 +26,17 @@ scope.
 ms before a tooltip closes after the pointer leaves), `timeout` (`400`, ms after a tooltip of the
 group closed during which another one opens with no delay).
 
-**Root**: `open`, `defaultOpen` (`false`), `onOpenChange(open, details)`, `delay`, `closeDelay`
-(each defaults to the Provider's, else the Provider defaults), `disabled`.
+**Root**: `open`, `defaultOpen` (`false`), `onOpenChange(open, details)` (an
+`OpenChangeDetails`, [README](README.md#open-change-details)), `onOpenChangeComplete(open)`, the
+actions (`close()`, `unmount()`; React `actionsRef`), `delay`, `closeDelay` (each defaults to the
+Provider's, else the Provider defaults), `disabled`, `handle`, `triggerId` / `defaultTriggerId`;
+its content may be a function of the active trigger's `payload`.
 
-**Trigger**: no props of its own.
+**Trigger**: `handle`, `payload`, `id` (as [Dialog's](dialog.md#api)).
+
+**createHandle**: `createTooltipHandle<Payload>()` (React and Vue also `Tooltip.createHandle`).
+
+**Portal**: `container`, `keepMounted` (`false`; [README](README.md#lifecycle)).
 
 **Positioner**: as [Popover's](popover.md#api) (the same sides: `top`, `bottom`, `inline-start`,
 `inline-end`, `left`, `right`); defaults `side="top" align="center"`, `sideOffset` `0`.
@@ -44,10 +51,10 @@ the trigger closes it), `escape-key`.
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-describedby` (the popup's id, while open; added to the consumer's own), `data-popup-open` while open (Base UI's name, D4 §3 "Naming") |
-| Positioner | as Popover's (`role="presentation"`, `data-side`, `data-align`, `data-open`, CSS variables) |
-| Popup | `role="tooltip"`, an `id`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style`, `data-instant` when it opened with no delay (focus, or the group's hand-off) |
-| Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
+| Trigger | `aria-describedby` (the popup's id, on the active trigger while open; added to the consumer's own), `data-popup-open` on the active trigger while open (Base UI's name, D4 §3 "Naming"), an `id` |
+| Positioner | as Popover's (`role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`, CSS variables; `hidden` while kept mounted and closed) |
+| Popup | `role="tooltip"`, an `id`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-instant` when it opened with no delay (focus, the group's hand-off, or a move to another trigger) |
+| Arrow | `aria-hidden="true"`, `data-side`, `data-align`, `data-open` / `data-closed` |
 
 **The tooltip wires itself** (D4 §3 "Tooltip", keep): the Popup sets `role="tooltip"` and the
 Trigger's `aria-describedby` points at it while open. Reason: the APG tooltip pattern; Base UI
@@ -87,6 +94,15 @@ The Provider's props may change at runtime (Epic #22): it keeps **one** group fo
 reads the current `timeout` at each check, so the open tooltip stays its member and the next
 hand-off uses the new value.
 
+## Detached triggers
+
+One Tooltip may describe several Triggers ([README](README.md#detached-triggers)): each Trigger
+with the Root's `handle` (or inside the Root) opens it on hover and focus, with its `payload`.
+While it is open, hovering (or focusing) **another** of its Triggers moves it there **at once**,
+with no delay (`data-instant`, `onOpenChange(true, details)` with that reason and the new
+`trigger`): the popup anchors to the new trigger and describes it, and the previous one loses its
+`aria-describedby`.
+
 ## Dismissal and layering
 
 The open tooltip is not a layer: it takes no outside press and never closes an enclosing overlay.
@@ -101,7 +117,8 @@ As [popover.md](popover.md#positioning), from the Trigger. It flips and shifts t
 ## Animation
 
 As [popover.md](popover.md#animation). `data-instant` lets a stylesheet skip the enter transition
-for a hand-off.
+for a hand-off. `keepMounted`, `onOpenChangeComplete` and the actions as
+[README](README.md#lifecycle).
 
 ## RTL
 
@@ -158,6 +175,31 @@ Checks (the tooltip is not a layer, and its Escape stops there):
 1. Open the dialog, Tab to "Close", Shift+Tab back to "Bold": the tooltip "Bold (Ctrl+B)" opens.
 2. Escape closes the tooltip only: the dialog stays open, focus on "Bold".
 3. Escape again closes the dialog.
+
+### `/tooltip/detached`
+
+Two Triggers with the `handle` of one Root (`delay` `300`), which sits after them: **"Call Ada"**
+(`id="call-ada"`, `payload` `"Ada"`) and **"Call Grace"** (`call-grace`, `"Grace"`), in a row with
+a gap. The Root's content is a function of the payload: a Positioner and a Popup saying **"Opens a
+call with <name>"** (one text node). Output: `open: ...`, `reason: ...`, `trigger: <id or none>`.
+
+Checks:
+
+1. Hovering "Call Ada" opens, after the delay, a `tooltip` "Opens a call with Ada" above it;
+   "Call Ada" is described by it; output `trigger: call-ada`, `reason: trigger-hover`.
+2. Moving the pointer straight to "Call Grace": within 200 ms (less than the delay) the `tooltip`
+   says "Opens a call with Grace" and sits above "Call Grace"; "Call Grace" is described by it,
+   "Call Ada" by nothing; output `open: true`, `trigger: call-grace`; only one `tooltip` exists.
+3. Moving the pointer away closes it (`open: false`).
+
+### `/tooltip/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a Tooltip (`delay` `0`)
+whose Trigger is **"Save"** and whose popup says **"Save the document"**, its Portal with
+`keepMounted` (the Positioner is the kept-mounted part). The checks open it by hovering "Save"
+and press Escape with the pointer still on it; the outside press of check 4 is left out (a
+tooltip is not a layer), and with `?cancel` the pointer leaving reports
+`canceled: trigger-hover` and leaves it open.
 
 ## Differences from Base UI
 

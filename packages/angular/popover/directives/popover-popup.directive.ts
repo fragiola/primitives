@@ -30,7 +30,12 @@ export interface PopoverPopupState {
 const RETURNS_FOCUS = new Set(["escape-key", "close-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (D4 §3, Base UI); so does a
 // close made through the controlled `open` (reason `none`): focus left inside the popup goes back
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// (and a handle's or the actions' `imperative-action`, whose focus return is `none`'s)
+const RETURNS_FOCUS_UNFOCUSED = new Set([
+    "outside-press",
+    "none",
+    "imperative-action",
+]);
 
 /**
  * The non-modal popover (spec/popover.md): `<div popoverPopup>`. Not trapped: it closes when focus
@@ -47,6 +52,7 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
         "[attr.aria-labelledby]": "root.titleId() ?? null",
         "[attr.aria-describedby]": "root.descriptionId() ?? null",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-starting-style]": "data()['starting-style']",
@@ -55,7 +61,7 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
     },
 })
 export class PopoverPopup {
-    protected readonly root = inject(PopoverRoot);
+    protected readonly root = inject<PopoverRoot>(PopoverRoot);
     /** Focused on open (default: the first tabbable element, else the popup; `false`: none). */
     readonly initialFocus = input<FocusTarget>(undefined);
     /** Focused when focus returns on close (default: the trigger). */
@@ -66,8 +72,10 @@ export class PopoverPopup {
     }));
     protected readonly data = computed(() => {
         const status = this.root.overlay.presence.status();
+        const state = this.state();
         return dataValues({
-            ...this.state(),
+            ...state,
+            closed: !state.open,
             "starting-style": status === "starting",
             "ending-style": status === "ending",
         });
@@ -80,32 +88,48 @@ export class PopoverPopup {
         afterRenderEffect((onCleanup) => {
             const open = overlay.open();
             const positioner = overlay.positioner();
-            const trigger = overlay.trigger();
             if (!open) {
                 return;
             }
             untracked(() => {
+                // the triggers are read when the session needs them: the active trigger may move
+                // while it is open
                 const session = openOverlaySession(popup.ownerDocument, {
                     elements: () => [positioner ?? popup],
-                    ignore: () => [trigger],
-                    dismiss: (reason) => overlay.setOpen(false, reason),
-                    focusOut: () => [trigger],
+                    ignore: () => untracked(overlay.triggers),
+                    dismiss: (reason, event) =>
+                        overlay.setOpen(false, reason, event),
+                    focusOut: () => untracked(overlay.triggers),
                     returnFocus: {
                         when: RETURNS_FOCUS,
                         whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
                         reason: () => overlay.lastReason.current ?? "none",
                         to: () => {
-                            const final = resolveFocusTarget(this.finalFocus());
-                            return final === false ? false : (final ?? trigger);
+                            const final = resolveFocusTarget(
+                                untracked(this.finalFocus),
+                            );
+                            return final === false
+                                ? false
+                                : (final ?? untracked(overlay.trigger));
                         },
                     },
                 });
+                onCleanup(session.end);
+            });
+        });
+        // on open, and when it moves to another trigger: the first tabbable element, else the
+        // popup (D4 §3 "Popover focus on open")
+        afterRenderEffect(() => {
+            const open = overlay.open();
+            overlay.trigger();
+            if (!open) {
+                return;
+            }
+            untracked(() => {
                 const initial = resolveFocusTarget(this.initialFocus());
                 if (initial !== false) {
-                    // the first tabbable element, else the popup (D4 §3 "Popover focus on open")
                     focusInitial(popup, initial);
                 }
-                onCleanup(session.end);
             });
         });
     }
@@ -124,14 +148,14 @@ export class PopoverPopup {
         const last = tabbables.at(-1) ?? popup;
         if (event.shiftKey && (active === first || active === popup)) {
             event.preventDefault();
-            overlay.setOpen(false, "focus-out");
+            overlay.setOpen(false, "focus-out", event);
             trigger?.focus();
         } else if (!event.shiftKey && active === last) {
             event.preventDefault();
             const next = trigger
                 ? nextTabbableAfter(trigger, [overlay.positioner(), popup])
                 : null;
-            overlay.setOpen(false, "focus-out");
+            overlay.setOpen(false, "focus-out", event);
             next?.focus();
         }
     }

@@ -143,12 +143,33 @@ function objectKeys(source: string): { keys: string[]; spreads: string[] } {
 const capitalize = (name: string) =>
     name.charAt(0).toUpperCase() + name.slice(1);
 
-/** A component's namespace: part → the component (or directive) that implements it. */
+/**
+ * A component's namespace: part → the component (or directive) that implements it. A function on
+ * the namespace (`createHandle: createDialogHandle`) is no part: it is checked as an export.
+ */
 function namespaceOf(source: string): Map<string, string> {
     const open = source.indexOf("{", source.search(/export const \w+ = \{/));
+    const body = withoutComments(braced(source, open));
+    // the namespace's own entries only, not the names inside an entry's type
+    // (`Trigger: DialogTrigger as <Payload>(props: AlertDialogTriggerProps<Payload>) => ReactNode`)
+    const entries: string[] = [];
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i <= body.length; i++) {
+        const char = body[i];
+        if (char === "{" || char === "(" || char === "[") depth++;
+        else if (char === "}" || char === ")" || char === "]") depth--;
+        else if (i === body.length || (char === "," && depth === 0)) {
+            entries.push(body.slice(start, i));
+            start = i + 1;
+        }
+    }
     const parts = new Map<string, string>();
-    for (const match of braced(source, open).matchAll(/(\w+):\s*(\w+)/g)) {
-        if (match[1] && match[2]) parts.set(match[1], match[2]);
+    for (const entry of entries) {
+        const match = /^\s*(\w+):\s*(\w+)/.exec(entry);
+        if (match?.[1] && match[2] && /^[A-Z]/.test(match[2])) {
+            parts.set(match[1], match[2]);
+        }
     }
     return parts;
 }
@@ -174,7 +195,10 @@ function partsOf(dir: string, component: string, sources: Sources) {
 
 /** The React props of each part (interfaces, the contract's `PartProps` left out). */
 function reactProps(component: string, sources: Sources) {
-    const interfaces = new Map<string, { fields: string[]; bases: string[] }>();
+    const interfaces = new Map<
+        string,
+        { fields: string[]; bases: string[]; omitted?: string[] }
+    >();
     for (const file of sources.files("packages/react/src")) {
         if (!/\.tsx?$/.test(file)) continue;
         const text = sources.read(file);
@@ -208,17 +232,33 @@ function reactProps(component: string, sources: Sources) {
             const fields = [...body.matchAll(/^ {4}(\w+)\??[:(<]/gm)].map(
                 (field) => field[1] ?? "",
             );
+            // a base may be an `Omit<Base, "a" | "b">`: Base's props but those keys
+            const omitted: string[] = [];
             const bases = (/extends\s+([\s\S]*)$/.exec(heritage)?.[1] ?? "")
                 .split(/,(?![^<]*>)/)
-                .map((base) => base.trim().replace(/<[\s\S]*$/, ""))
+                .map((base) => {
+                    const omit = /^Omit<\s*(\w+)[^,]*,([^>]*)>/.exec(
+                        base.trim(),
+                    );
+                    if (!omit) return base.trim().replace(/<[\s\S]*$/, "");
+                    for (const key of (omit[2] ?? "").matchAll(/"(\w+)"/g))
+                        omitted.push(key[1] ?? "");
+                    return omit[1] ?? "";
+                })
                 .filter((base) => base && base !== "PartProps");
-            interfaces.set(match[1] ?? "", { fields, bases });
+            interfaces.set(match[1] ?? "", { fields, bases, omitted });
         }
     }
     const propsOf = (name: string): string[] => {
         const found = interfaces.get(name);
         if (!found) return [];
-        return [...found.fields, ...found.bases.flatMap(propsOf)];
+        const omitted = found.omitted ?? [];
+        return [
+            ...found.fields,
+            ...found.bases
+                .flatMap(propsOf)
+                .filter((prop) => !omitted.includes(prop)),
+        ];
     };
     const parts = partsOf("packages/react/src", component, sources);
     return new Map(
@@ -284,7 +324,17 @@ function vueProps(component: string, sources: Sources) {
                             folders.some((each) =>
                                 sources.files(each).includes(path),
                             ) && sources.read(path).includes(declaration),
-                    ) ?? `${folder}/${kebab(implementation)}.ts`;
+                    ) ??
+                // else the part's own file, in the first folder that has it (an AlertDialog's
+                // Title is Dialog's `dialog-title.ts`)
+                folders
+                    .map((each) => `${each}/${kebab(implementation)}.ts`)
+                    .find((path) =>
+                        folders.some((each) =>
+                            sources.files(each).includes(path),
+                        ),
+                    ) ??
+                `${folder}/${kebab(implementation)}.ts`;
             const whole = sources.read(file);
             let text = whole.slice(Math.max(0, whole.indexOf(declaration)));
             // a part made by a factory its roots share (`defineCalendarRoot(...)`): the factory's
@@ -325,6 +375,10 @@ function vueProps(component: string, sources: Sources) {
 const SHARED_PARTS: Record<string, string> = {
     "range-calendar": "calendar",
     "date-range-picker": "date-picker",
+    // spec/alert-dialog.md, spec/context-menu.md: built on Dialog's and Menu's parts (Angular
+    // gives them their own selectors, as subclasses of Dialog's and Menu's directives)
+    "alert-dialog": "dialog",
+    "context-menu": "menu",
 };
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
@@ -341,10 +395,17 @@ function angularProps(
     return new Map(
         parts.map((part) => {
             // a component that is no namespace is its one part (CheckboxGroup); a shared part is
-            // its base component's directive (RangeCalendar's Cell is `[calendarCell]`)
+            // its own directive when its entry has one (`[alertDialogPopup]`, a subclass of
+            // `DialogPopup`), else its base component's (RangeCalendar's Cell is `[calendarCell]`)
+            const shared = SHARED_PARTS[component];
+            const ownFile = `packages/angular/${component}/directives/${kebab(`${pascal(component)}${part}`)}.directive.ts`;
             const owner =
-                part !== "Root" && SHARED_PARTS[component]
-                    ? SHARED_PARTS[component]
+                part !== "Root" &&
+                shared &&
+                !sources
+                    .files(`packages/angular/${component}/directives`)
+                    .includes(ownFile)
+                    ? shared
                     : component;
             const directive =
                 part === pascal(component) ? part : `${pascal(owner)}${part}`;
@@ -402,15 +463,26 @@ function angularProps(
             }
             // an input bound under an alias (`boundValue = input(…, { alias: "value" })`) is its
             // alias, but a structural directive's microsyntax inputs (`alias: "dialogPortal"`,
-            // `"tabsPanelKeepMounted"`) keep their property's name
-            const prefix = selector.slice(1, -1);
+            // `"tabsPanelKeepMounted"`) keep their property's name, also when the input is its
+            // base directive's (`ContextMenuCheckboxItemIndicator extends MenuCheckboxItemIndicator`,
+            // `alias: "menuCheckboxItemIndicator"`)
+            const prefixes = [
+                selector.slice(1, -1),
+                ...[...text.matchAll(/selector:\s*"([^"]*)"/g)].flatMap(
+                    (match) =>
+                        [...(match[1] ?? "").matchAll(/\[(\w+)\]/g)].map(
+                            (each) => each[1] ?? "",
+                        ),
+                ),
+            ];
             const inputs = [
                 ...text.matchAll(
                     /readonly (\w+) =\s*input(?:\.required)?[<(]([^;]*);/g,
                 ),
             ].map((match) => {
                 const alias = /alias:\s*"(\w+)"/.exec(match[2] ?? "")?.[1];
-                return alias !== undefined && !alias.startsWith(prefix)
+                return alias !== undefined &&
+                    !prefixes.some((prefix) => alias.startsWith(prefix))
                     ? alias
                     : (match[1] ?? "");
             });
@@ -652,6 +724,11 @@ describe("the API pages", () => {
             { name: "open" },
             { name: "defaultOpen" },
             { name: "onOpenChange" },
+            { name: "onOpenChangeComplete" },
+            { name: "actionsRef", frameworks: ["react"] },
+            { name: "handle" },
+            { name: "triggerId" },
+            { name: "defaultTriggerId" },
         ]);
         expect(
             documentedProps(PAGES.get("api/dialog") ?? "").get("Title"),
@@ -665,14 +742,22 @@ describe("the API pages", () => {
             "loopFocus",
         ]);
         expect(vueProps("dialog", disk).get("Root")).toEqual([
+            "handle",
             "open",
             "defaultOpen",
+            "triggerId",
+            "defaultTriggerId",
             "onOpenChange",
+            "onOpenChangeComplete",
         ]);
         expect(angularProps("dialog", ["Root"], disk).get("Root")).toEqual([
             "open",
             "defaultOpen",
+            "handle",
+            "triggerId",
+            "defaultTriggerId",
             "onOpenChange",
+            "onOpenChangeComplete",
         ]);
         expect(
             exportedNames(
@@ -765,6 +850,40 @@ describe("the docs reference check", () => {
         expect(docsReferenceProblems(pages)).toContain(
             'api/render: no "## Exports" row for @fragiola/primitives-angular/render',
         );
+    });
+
+    it("reads the props of an Omit<…> base, and a namespace's entries only", () => {
+        // `MenuRootProps extends Omit<MenuSubmenuRootProps, "children">, …`
+        expect(reactProps("menu", disk).get("Root")).toEqual(
+            expect.arrayContaining(["open", "loopFocus", "modal", "handle"]),
+        );
+        // `Trigger: DialogTrigger as <Payload>(props: AlertDialogTriggerProps<Payload>) => …`
+        expect([...reactProps("alert-dialog", disk).keys()]).toEqual([
+            "Root",
+            "Trigger",
+            "Portal",
+            "Backdrop",
+            "Viewport",
+            "Popup",
+            "Title",
+            "Description",
+            "Close",
+        ]);
+    });
+
+    it("reads a part built on another component's: its own subclass, or the base's file", () => {
+        // `AlertDialogBackdrop extends DialogBackdrop`, in the dialog entry
+        expect(
+            angularProps("alert-dialog", ["Backdrop"], disk).get("Backdrop"),
+        ).toEqual(["forceRender"]);
+        // the base's structural input keeps its name (`alias: "menuCheckboxItemIndicator"`)
+        expect(
+            angularProps("context-menu", ["CheckboxItemIndicator"], disk).get(
+                "CheckboxItemIndicator",
+            ),
+        ).toContain("options");
+        // Vue's AlertDialog.Title is Dialog's `dialog-title.ts`
+        expect(vueProps("alert-dialog", disk).has("Title")).toBe(true);
     });
 
     it("reads a method of a props interface as a prop", () => {

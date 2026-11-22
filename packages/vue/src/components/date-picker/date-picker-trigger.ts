@@ -63,9 +63,9 @@ export const DatePickerTrigger: PartComponent<
                             readonly: readOnly,
                             required,
                         }),
-                        onClick: () => {
+                        onClick: (event: MouseEvent) => {
                             if (!context.disabled()) {
-                                context.setOpen(!open, "trigger-press");
+                                context.setOpen(!open, "trigger-press", event);
                             }
                         },
                         onFocus: field.onFocus,

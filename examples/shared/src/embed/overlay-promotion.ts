@@ -4,7 +4,7 @@
 // runs the same module (guidelines decisions.md#np-modal-overlays).
 //
 // Overlay promotion, the embed's half (site export contract v1.7, §5.4). A modal overlay (a
-// dialog today; an alert dialog or a drawer later) belongs over the site's whole page, so the site
+// dialog or an alert dialog today; a drawer later) belongs over the site's whole page, so the site
 // promotes the frame over its viewport while one is open, and the stage is pinned where it was:
 // the reader sees nothing move but the overlay. The copyable example files never know about it.
 //
@@ -39,9 +39,15 @@ import {
 } from "./messages.ts";
 
 /** The parts that open a modal overlay (`data-primitives-part`). */
-export const MODAL_TRIGGER_PARTS = ["dialog-trigger"] as const;
+export const MODAL_TRIGGER_PARTS = [
+    "dialog-trigger",
+    "alert-dialog-trigger",
+] as const;
 /** The parts that exist while a modal overlay is open or closing. */
-export const MODAL_POPUP_PARTS = ["dialog-popup"] as const;
+export const MODAL_POPUP_PARTS = [
+    "dialog-popup",
+    "alert-dialog-popup",
+] as const;
 /** The embed's stage, which the armed rule pins in place. */
 export const STAGE_SELECTOR = "[data-embed-stage]";
 

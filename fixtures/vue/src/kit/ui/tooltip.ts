@@ -5,6 +5,7 @@ import { styled } from "../styled.ts";
 export const Tooltip = {
     Provider: Primitive.Provider,
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     Portal: Primitive.Portal,
     Trigger: styled(Primitive.Trigger, tooltip.trigger),
     Positioner: styled(Primitive.Positioner, tooltip.positioner),

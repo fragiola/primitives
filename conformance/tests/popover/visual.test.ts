@@ -19,3 +19,13 @@ test("popover / arrow: open", async ({ page }) => {
     await expect(page.getByRole("dialog", { name: "Arrow" })).toBeVisible();
     await expectScreen(page, "popover-arrow-open");
 });
+
+test("popover / detached: moved to the second trigger", async ({ page }) => {
+    await openScenario(page, "/popover/detached");
+    await page.getByRole("button", { name: "Info for Ada" }).click();
+    await page.getByRole("button", { name: "Info for Grace" }).click();
+    await expect(
+        page.getByRole("dialog", { name: "About Grace" }),
+    ).toBeVisible();
+    await expectScreen(page, "popover-detached-moved");
+});

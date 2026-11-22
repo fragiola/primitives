@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useElement } from "../../hooks/use-element.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -42,12 +43,12 @@ export function MenuItem({
             role: "menuitem",
             tabIndex: -1,
             "aria-disabled": disabled ? "true" : undefined,
-            "data-primitives-part": "menu-item",
+            "data-primitives-part": `${context.component}-item`,
             ...stateAttributes({ highlighted: item.highlighted, disabled }),
             ...item.handlers,
-            onClick: () => {
+            onClick: (event: MouseEvent) => {
                 if (!disabled && closeOnClick) {
-                    context.closeAll("item-press");
+                    context.closeAll("item-press", event.nativeEvent);
                 }
             },
         },

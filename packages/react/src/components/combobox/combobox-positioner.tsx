@@ -50,6 +50,7 @@ export function ComboboxPositioner({
         inputGroup ?? chips ?? trigger,
         positioner,
         null,
+        context.presence.mounted,
     );
     useLayoutEffect(() => setPlaced(placed), [placed, setPlaced]);
     useEffect(() => {
@@ -59,7 +60,7 @@ export function ComboboxPositioner({
         const session = openOverlaySession(positioner.ownerDocument, {
             elements: () => [positioner],
             ignore: () => [trigger, button, inputGroup, chips, clearButton],
-            dismiss: (reason) => setOpen(false, reason),
+            dismiss: (reason, event) => setOpen(false, reason, event),
         });
         return session.end;
     }, [
@@ -78,9 +79,11 @@ export function ComboboxPositioner({
         { open, ...placed },
         {
             role: "presentation",
+            hidden: context.presence.mounted ? undefined : true,
             "data-primitives-part": "combobox-positioner",
             ...stateAttributes({
                 open,
+                closed: !open,
                 side: placed.side,
                 align: placed.align,
             }),

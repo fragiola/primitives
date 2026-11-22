@@ -22,21 +22,31 @@ import {
     overlayRootProps,
     useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
-import type { ChangeDetails } from "../../utils/change-details.ts";
+import type {
+    ChangeDetails,
+    OpenChangeDetails,
+} from "../../utils/change-details.ts";
 import {
     type ContentSlots,
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { type SelectItemData, SelectKey } from "./select-context.ts";
+import {
+    type RegisteredItem,
+    type SelectItemData,
+    SelectKey,
+} from "./select-context.ts";
 
 export interface SelectRootProps {
     open?: boolean;
     defaultOpen?: boolean;
     value?: string | null;
     defaultValue?: string | null;
-    /** Every item: the Root needs their labels while the list is closed. */
-    items: readonly SelectItemData[];
+    /**
+     * Every item: the labels known while the list is closed. Without it, the Items register
+     * themselves while mounted (keep the list mounted: `Portal keep-mounted`).
+     */
+    items?: readonly SelectItemData[];
     name?: string;
     required?: boolean;
     disabled?: boolean;
@@ -46,7 +56,8 @@ export interface SelectRootProps {
 
 export type SelectRootEmits = {
     "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
+    openChange: (open: boolean, details: OpenChangeDetails) => true;
+    openChangeComplete: (open: boolean) => true;
     "update:value": (value: string | null) => true;
     valueChange: (value: string | null, details: ChangeDetails) => true;
 };
@@ -69,10 +80,10 @@ export const SelectRoot: PublicComponent<
                 type: String as PropType<string | null>,
                 default: null,
             },
-            /** Every item: the Root needs their labels while the list is closed. */
+            /** Every item; without it, the Items register themselves while mounted. */
             items: {
                 type: Array as PropType<readonly SelectItemData[]>,
-                required: true,
+                default: undefined,
             },
             name: { type: String, default: undefined },
             required: { type: Boolean, default: false },
@@ -89,8 +100,32 @@ export const SelectRoot: PublicComponent<
             valueChange: (_value: string | null, _details: ChangeDetails) =>
                 true,
         },
-        setup(props, { emit, slots }) {
+        setup(props, { emit, slots, expose }) {
             const root = useOverlayRoot(props, emit);
+            // without `items`, the Items register themselves (Base UI), in DOM order
+            const registered = shallowRef<readonly RegisteredItem[]>([]);
+            const registerItem = (item: RegisteredItem) => {
+                registered.value = [
+                    ...registered.value.filter(
+                        (entry) => entry.element !== item.element,
+                    ),
+                    item,
+                ].sort((a, b) =>
+                    a.element.compareDocumentPosition(b.element) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+                        ? -1
+                        : 1,
+                );
+                return () => {
+                    registered.value = registered.value.filter(
+                        (entry) => entry !== item,
+                    );
+                };
+            };
+            const items = (): readonly SelectItemData[] =>
+                props.items ?? registered.value;
+            // a template ref on the Root: `close()` and `unmount()` (spec/README.md, "Lifecycle")
+            expose(root.actions);
             const state = useControllable<string | null, ChangeDetails>(
                 () => props.value,
                 props.defaultValue,
@@ -117,29 +152,33 @@ export const SelectRoot: PublicComponent<
             provide(SelectKey, {
                 ...root,
                 field,
-                items: () => props.items,
+                items,
+                registers: () => props.items === undefined,
+                registerItem,
                 value,
                 disabled,
                 required: () => props.required,
                 modal: () => props.modal,
                 highlighted,
-                openOn(entry, reason) {
-                    highlighted.value = entry;
-                    root.setOpen(true, reason);
+                openOn(entry, reason, event) {
+                    // highlighted only when the opening happened (a canceled one did not)
+                    if (root.setOpen(true, reason, event)) {
+                        highlighted.value = entry;
+                    }
                 },
-                choose(entry, reason) {
-                    const item = props.items.find(
+                choose(entry, reason, event) {
+                    const item = items().find(
                         (candidate) => candidate.value === entry,
                     );
                     if (item === undefined || item.disabled) {
                         return;
                     }
-                    state.set(entry, { reason });
-                    root.setOpen(false, reason);
+                    state.set(entry, { reason, event });
+                    root.setOpen(false, reason, event);
                 },
                 listId,
                 itemId: (entry) =>
-                    `${baseId}-item-${props.items.findIndex((item) => item.value === entry)}`,
+                    `${baseId}-item-${items().findIndex((item) => item.value === entry)}`,
                 placed: ref<{ side: Side; align: Align }>({
                     side: "bottom",
                     align: "start",

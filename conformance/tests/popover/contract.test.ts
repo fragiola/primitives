@@ -1,5 +1,11 @@
 import { expect, type Page, test } from "@playwright/test";
-import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import {
+    expectNoFalseStates,
+    expectOpenState,
+    part,
+    parts,
+} from "../../src/contract.ts";
+import { settleAnimations, slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/popover.md: anatomy, state attributes, positioning attributes
@@ -84,4 +90,52 @@ test("popover / arrow: hidden and sided", async ({ page }) => {
     await expect(arrow).toHaveAttribute("aria-hidden", "true");
     await expect(arrow).toHaveAttribute("data-side", "bottom");
     await expect(arrow).toHaveAttribute("data-align", "center");
+});
+
+// spec/README.md, "State attributes": exactly one of data-open and data-closed, data-closed while
+// the exit runs; the trigger keeps data-popup-open only
+test("popover / arrow: data-open, then data-closed while the exit runs", async ({
+    page,
+}) => {
+    await openScenario(page, "/popover/arrow");
+    await slowMotion(page, 600);
+    await page.getByRole("button", { name: "With arrow" }).click();
+    await expectOpenState(part(page, "popover", "positioner"), true);
+    await expectOpenState(part(page, "popover", "popup"), true);
+    await expectOpenState(part(page, "popover", "arrow"), true);
+    await settleAnimations(page);
+    await page.keyboard.press("Escape");
+    await expect(part(page, "popover", "popup")).toHaveAttribute(
+        "data-ending-style",
+        "",
+    );
+    await expectOpenState(part(page, "popover", "positioner"), false);
+    await expectOpenState(part(page, "popover", "popup"), false);
+    await expectOpenState(part(page, "popover", "arrow"), false);
+    await expect(part(page, "popover", "trigger").first()).not.toHaveAttribute(
+        "data-closed",
+    );
+    await expect(part(page, "popover", "popup")).toHaveCount(0);
+});
+
+// spec/README.md, "Detached triggers": only the active trigger says its popup is open
+test("popover / detached: data-popup-open on the active trigger only", async ({
+    page,
+}) => {
+    await openScenario(page, "/popover/detached");
+    await page.getByRole("button", { name: "Info for Ada" }).click();
+    await page.getByRole("button", { name: "Info for Grace" }).click();
+    await expect(
+        page.getByRole("dialog", { name: "About Grace" }),
+    ).toBeVisible();
+    await expect(part(page, "popover", "trigger")).toHaveCount(2);
+    await expect(page.locator("#info-grace")).toHaveAttribute(
+        "data-popup-open",
+        "",
+    );
+    await expect(page.locator("#info-ada")).not.toHaveAttribute(
+        "data-popup-open",
+    );
+    await expectOpenState(part(page, "popover", "popup"), true);
+    await expectNoFalseStates(parts(page, "popover"));
 });

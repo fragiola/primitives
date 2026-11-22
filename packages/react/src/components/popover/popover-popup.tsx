@@ -31,7 +31,12 @@ export interface PopoverPopupProps extends PartProps<PopoverPopupState> {
 const RETURNS_FOCUS = new Set(["escape-key", "close-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (D4 §3, Base UI); so does a
 // close made through the controlled `open` (reason `none`): focus left inside the popup goes back
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// (and a handle's or the actions' `imperative-action`, whose focus return is `none`'s)
+const RETURNS_FOCUS_UNFOCUSED = new Set([
+    "outside-press",
+    "none",
+    "imperative-action",
+]);
 
 /** The non-modal popover (spec/popover.md): not trapped, it closes when focus leaves it. */
 export function PopoverPopup({
@@ -43,6 +48,9 @@ export function PopoverPopup({
     const { open, popup, positioner, trigger, setOpen, lastReason } = context;
     const focusTargets = useRef({ initialFocus, finalFocus });
     focusTargets.current = { initialFocus, finalFocus };
+    // read when the session needs them: the active trigger may move while it is open
+    const triggers = useRef(context);
+    triggers.current = context;
 
     useEffect(() => {
         if (!open || popup === null) {
@@ -50,9 +58,9 @@ export function PopoverPopup({
         }
         const session = openOverlaySession(popup.ownerDocument, {
             elements: () => [positioner ?? popup],
-            ignore: () => [trigger],
-            dismiss: (reason) => setOpen(false, reason),
-            focusOut: () => [trigger],
+            ignore: () => triggers.current.triggers,
+            dismiss: (reason, event) => setOpen(false, reason, event),
+            focusOut: () => triggers.current.triggers,
             returnFocus: {
                 when: RETURNS_FOCUS,
                 whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
@@ -61,17 +69,27 @@ export function PopoverPopup({
                     const final = resolveFocusTarget(
                         focusTargets.current.finalFocus,
                     );
-                    return final === false ? false : (final ?? trigger);
+                    return final === false
+                        ? false
+                        : (final ?? triggers.current.trigger);
                 },
             },
         });
+        return session.end;
+    }, [open, popup, positioner, setOpen, lastReason]);
+
+    // on open, and when it moves to another trigger: the first tabbable element, else the popup
+    // (D4 §3 "Popover focus on open")
+    // biome-ignore lint/correctness/useExhaustiveDependencies: a new active trigger focuses again
+    useEffect(() => {
+        if (!open || popup === null) {
+            return;
+        }
         const initial = resolveFocusTarget(focusTargets.current.initialFocus);
         if (initial !== false) {
-            // the first tabbable element, else the popup (D4 §3 "Popover focus on open")
             focusInitial(popup, initial);
         }
-        return session.end;
-    }, [open, popup, positioner, trigger, setOpen, lastReason]);
+    }, [open, popup, trigger]);
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key !== "Tab" || popup === null || event.defaultPrevented) {
@@ -84,14 +102,14 @@ export function PopoverPopup({
         const last = tabbables.at(-1) ?? popup;
         if (event.shiftKey && (active === first || active === popup)) {
             event.preventDefault();
-            setOpen(false, "focus-out");
+            setOpen(false, "focus-out", event.nativeEvent);
             trigger?.focus();
         } else if (!event.shiftKey && active === last) {
             event.preventDefault();
             const next = trigger
                 ? nextTabbableAfter(trigger, [positioner, popup])
                 : null;
-            setOpen(false, "focus-out");
+            setOpen(false, "focus-out", event.nativeEvent);
             next?.focus();
         }
     };
@@ -111,6 +129,7 @@ export function PopoverPopup({
             "data-primitives-part": "popover-popup",
             ...stateAttributes({
                 open,
+                closed: !open,
                 side: context.placed.side,
                 align: context.placed.align,
                 "starting-style": status === "starting",

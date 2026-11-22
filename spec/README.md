@@ -9,12 +9,14 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | spec | components |
 | --- | --- |
 | [dialog.md](dialog.md) | Dialog |
+| [alert-dialog.md](alert-dialog.md) | AlertDialog (on Dialog's parts) |
 | [tabs.md](tabs.md) | Tabs |
 | [collapsible.md](collapsible.md) | Collapsible |
 | [accordion.md](accordion.md) | Accordion |
 | [popover.md](popover.md) | Popover |
 | [tooltip.md](tooltip.md) | Tooltip |
-| [menu.md](menu.md) | Menu (with submenus) |
+| [menu.md](menu.md) | Menu (with submenus, checkbox and radio items) |
+| [context-menu.md](context-menu.md) | ContextMenu (on Menu's parts) |
 | [field.md](field.md) | Field |
 | [fieldset.md](fieldset.md) | Fieldset |
 | [form.md](form.md) | Form |
@@ -40,7 +42,11 @@ Stage 1 adds the Field layer (Epic #26: Field to production, Fieldset, Form, eve
 a Field, Slider's Label and Value, the pickers' form support) and the direction provider; then
 the controls and display components (Epic #29: Button, RadioGroup and Radio, Switch, Progress,
 Avatar, Separator); then disclosure (Epic #32: Collapsible, Accordion, and Tabs' activation
-direction, panel enter and exit states and physical Indicator variables).
+direction, panel enter and exit states and physical Indicator variables); then the overlay
+mechanisms (Epic #35, Issue #33: the nested overlay tree, detached triggers, the open change
+details, the lifecycle controls and Dialog's Viewport and nested dialogs, [below](#overlays);
+Issue #34: AlertDialog, ContextMenu, Menu's checkbox and radio items, and Select's groups,
+separators, item text and optional `items`).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -85,13 +91,13 @@ The vocabulary is shared by every component:
 | attribute | meaning |
 | --- | --- |
 | `data-open` | an overlay while open; an open Collapsible, Accordion item and their panels |
-| `data-closed` | a closed Collapsible, Accordion item and their panels (with `data-open`: exactly one is present) |
+| `data-closed` | a closed Collapsible, Accordion item and their panels; an overlay part that carries `data-open` (popup, positioner, backdrop, viewport, arrow) while it is rendered and not open: its exit animation runs, or it is kept mounted (with `data-open`: exactly one is present; Base UI). Triggers keep `data-popup-open` only |
 | `data-panel-open` | a Collapsible's or an Accordion's Trigger while its panel is open (Base UI's name) |
 | `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover, Select or picker trigger, a Combobox's Input, InputGroup and Trigger |
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
-| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, combobox item) |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox item, select item) |
 | `data-selected` | a selected tab, combobox item or calendar date |
 | `data-pressed` | not used in these specs |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
@@ -106,8 +112,9 @@ The vocabulary is shared by every component:
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
 | `data-empty` | a combobox list with no item |
-| `data-nested` | a submenu's positioner and popup |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's and a radio's `data-checked` / `data-unchecked`; an indeterminate Progress |
+| `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
+| `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; an indeterminate Progress |
 | `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present) |
 | `data-required` | a required form control |
 | `data-placeholder` | a Select showing its placeholder |
@@ -127,18 +134,20 @@ them cell by cell; the consumer can still replace each one ([calendar.md](calend
 
 ### Change details
 
-Every `on<Value>Change` receives the new value and a details object: `{ reason }`. The reasons are
-shared:
+Every `on<Value>Change` receives the new value and a details object: `{ reason, event }`, the
+reason below and the DOM event that caused the change (`undefined` when it was programmatic or is
+not known). An overlay's `onOpenChange` receives richer details ([Overlays](#open-change-details)).
+The reasons are shared:
 
 | reason | when |
 | --- | --- |
-| `trigger-press` | the trigger toggled the overlay |
+| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area) |
 | `close-press` | a `Close` part was pressed |
 | `escape-key` | Escape dismissed the overlay |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu or combobox item was chosen |
-| `list-navigation` | the keyboard opened a menu or combobox |
+| `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
+| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10) |
 | `input-change` | typing opened or changed a combobox |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
@@ -149,7 +158,8 @@ shared:
 | `keyboard` | a key changed a slider's value |
 | `track-press` | a press on a slider's control moved a thumb |
 | `drag` | a pointer drag moved a slider's thumb |
-| `none` | anything else (a programmatic change) |
+| `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
+| `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed) |
 
 ### Normalized API names
 
@@ -207,6 +217,131 @@ Each control follows the spec's integration contract: it takes the field's ids, 
 [Fieldset](fieldset.md) groups fields under a legend and disables them; [Form](form.md) validates
 every field on submission, focuses the first invalid one, and shows server errors.
 
+## Overlays
+
+Every overlay (Dialog, AlertDialog, Popover, Tooltip, Menu and its submenus, ContextMenu, Select,
+Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35, Issues #33
+and #34). Each spec says what it adds.
+
+### The nested overlay tree
+
+The open overlays of a document form a **tree** of layers (`@fragiola/primitives/layers`, used
+through `@fragiola/primitives/overlay`), not a stack. An overlay's **parent** is decided when it
+opens: the newest open overlay that contains one of its triggers (its owner elements), else the
+newest open overlay that contains the focused element, else none. A trigger inside a portaled
+popup therefore makes its overlay a child of that popup's overlay, wherever the child's own portal
+sits in the DOM: a Popover in a Dialog, a Menu in that Popover, a submenu of that Menu are a
+chain of four ([`/dialog/nested-tree`](dialog.md#dialognested-tree)).
+
+- **Escape** closes the newest open overlay only (the deepest of its branch); the next Escape the
+  next one.
+- **An outside press**: the deepest overlay that contains the press (its own elements, or its
+  triggers, which toggle it themselves) stays open with its ancestors; every other open overlay is
+  dismissed (reason `outside-press`), newest first. A press outside every overlay dismisses all of
+  them. A press on a dialog's Backdrop or Viewport is outside that dialog and inside its parent.
+  A Dialog or AlertDialog is a **modal** overlay (the page under it is inert): while one is open, a
+  press outside the newest one and its descendants counts as a press inside the overlay it was
+  opened from, which stays open with its ancestors ([dialog.md](dialog.md#dismissal-and-layering)).
+- **Focus**: a modal Dialog's focus trap and a non-modal overlay's focus-out watch accept focus
+  in their **descendants** only (the overlays opened from them).
+- **Closing an overlay closes the overlays opened from it** (reason `none`), newest first.
+
+### Open change details
+
+`onOpenChange(open, details)`: `details` is an `OpenChangeDetails` (Base UI's):
+
+| member | what |
+| --- | --- |
+| `reason` | the reason (table above) |
+| `event` | the DOM event that caused the change (a `KeyboardEvent`, `PointerEvent`, `MouseEvent`, `FocusEvent`), `undefined` when programmatic |
+| `trigger` | the trigger element the change is associated with: the pressed one for `trigger-press`, else the active trigger; `undefined` when there is none |
+| `cancel()` | called inside `onOpenChange`: the change does not happen |
+| `isCanceled` | whether `cancel()` was called |
+| `preventUnmountOnClose()` | called on a close: the popup stays mounted, with `data-ending-style`, until the actions' `unmount()` is called |
+
+The root calls `onOpenChange` **before** it changes its own state. A canceled change leaves `open`
+as it was, controlled or not, and the overlay keeps working exactly as a controlled `open` the
+consumer kept (`/dialog/rejected-close`): focus stays, the layer works, a modal's outside stays
+inert. Value changes (`onValueChange`) keep `{ reason, event }`: they cannot be canceled (out of
+scope).
+
+### Lifecycle
+
+- **`onOpenChangeComplete(open)`**: `true` once an opening's `data-starting-style` frame has
+  ended and every animation on the popup has finished; `false` once the exit's animations have
+  finished (the popup is unmounted, or hidden when kept mounted). It is not called on the first
+  render, nor for an exit a reopening interrupted.
+- **Actions** (Base UI's `actionsRef`): `close()` closes the overlay (reason `imperative-action`);
+  `unmount()` ends a running exit at once, or the exit held by `preventUnmountOnClose()`.
+- **`keepMounted`** on every overlay's **Portal** (Base UI's place): the portal's content stays
+  rendered while the overlay is closed, before its first opening and after an exit ends. A kept
+  mounted, closed overlay carries `hidden` on its outermost portaled parts (the Positioner, or a
+  Dialog's Backdrop, Viewport and Popup) and `data-closed`; it has no layer, no positioning
+  updates and no focus effects; reopening shows **the same element**. A server render renders no
+  portal content: it appears once the page is hydrated.
+
+### Detached triggers
+
+Dialog, AlertDialog, Popover, Menu and Tooltip (Base UI's detached triggers; a ContextMenu has
+one Trigger area and no handle):
+
+- A **handle** connects a Root and its Triggers: `createDialogHandle<Payload>()` (and
+  `createAlertDialogHandle`, `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
+  `openWithPayload(payload)`, `close()` (reason `imperative-action`) and the getter `isOpen`. A
+  call while no Root is attached does nothing (no console output). The Roots attached to one
+  handle form a stack: the newest mounted serves it, and when it unmounts the previous one serves
+  it again. The handle belongs to one framework: the open state and the payload stay in its Root.
+- **Trigger**: `handle`, `payload`, `id` (generated when not given). A Trigger with a `handle` may
+  sit anywhere, outside the Root; a Trigger inside the Root needs none; a Root may have several
+  Triggers. **Root**: `handle`, `triggerId` / `defaultTriggerId` (the active trigger's id,
+  controlled together with `open`: the consumer sets it from `details.trigger`). The active
+  trigger's `payload` reaches the Root's content (mapping below).
+- **The active trigger** is the one that opened the overlay (or `triggerId`; else the first
+  Trigger). Only it carries `data-popup-open`, `aria-expanded="true"` and `aria-controls`; the
+  others have `aria-expanded="false"`. A positioned overlay anchors to it, focus returns to it,
+  a Menu's popup is labelled by it. A press on **another** Trigger of the same open overlay moves
+  the overlay to it: it stays open, takes that Trigger's payload, and `onOpenChange(true,
+  details)` is called with `reason: "trigger-press"` and the new `trigger` (not deduplicated).
+  The handle's `open(id)` moves it the same way (`imperative-action`); for a Trigger not rendered
+  yet, `details.trigger` is `undefined` and the overlay moves to it once it renders. A new
+  `payload` of the active Trigger reaches the content at once.
+  Hovering another Trigger of an open Tooltip moves it there at once (a Trigger removed while
+  hovered no longer counts: the tooltip closes as the pointer left). Every Trigger of an
+  overlay is part of its layer (a press on one is not an outside press).
+
+### The lifecycle scenarios
+
+Every overlay has a `/<component>/lifecycle` scenario of one shape (its spec gives the content):
+
+- the overlay's Portal has `keepMounted`; its popup has the recipes' enter and exit transition
+  (opacity and scale over `--pr-motion`, which the tests lengthen with `slowMotion`);
+- the fixture prints `open: <true|false>` (the open state it was told about and that happened),
+  `reason: <the last reason>`, `complete: <true|false|none>` (the last value
+  `onOpenChangeComplete` received, `none` before any) and `canceled: <reason|none>` (the reason of
+  the last change it canceled);
+- with `?cancel` in the URL, its `onOpenChange` calls `details.cancel()` for every close, and
+  prints its reason as `canceled`; the overlay is uncontrolled (no `open` prop), so the cancel
+  alone keeps it open;
+- Dialog, AlertDialog and Popover also render a button **"Close with actions"** inside the popup,
+  which calls the actions' `close()`.
+
+The common checks (`conformance/tests/lifecycle`), for each overlay:
+
+1. Before the first opening, the kept-mounted part is in the document with `hidden` and
+   `data-closed` and without `data-open`; the accessibility tree has no popup of its role.
+2. Opening shows that very element (the same node); `complete` stays `none` while the enter
+   transition runs, then becomes `true`.
+3. Escape closes it (`open: false`, `reason: escape-key`); `complete` stays `true` while the exit
+   transition runs (`data-ending-style`), then becomes `false`; the element is still in the
+   document, `hidden`, `data-closed`, the same node.
+4. With `?cancel`: Escape and an outside press each report `canceled: <reason>` and leave it open
+   and working (`open: true`, still visible, the next Escape canceled again). A Tooltip, which is
+   no layer, reports the pointer leaving instead of the outside press; an AlertDialog, which an
+   outside press never dismisses, reports nothing for it.
+5. Dialog, AlertDialog and Popover: "Close with actions" closes it with `reason:
+   imperative-action`.
+6. Axe finds no violation, closed (kept mounted) and open.
+
 ## API mapping by framework
 
 The specs describe one API. Each framework expresses it with its own means, never as a foreign API:
@@ -218,7 +353,14 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | portal | `<Dialog.Portal>` (`createPortal` into `body`) | `<Dialog.Portal>` (`Teleport`) | the structural `*dialogPortal` on an `<ng-container>`: its view moves to `body`, in the declaration's injectors and change detection |
 | controlled state | `open` + `onOpenChange` | `v-model:open` (`open` prop + `update:open` emit) | `open = input<boolean>()` + `openChange = output<boolean>()` (two-way `[(open)]` or one-way `[open]`; not `model()`, which writes its own value) |
 | uncontrolled seed | `defaultOpen` | `default-open` | `defaultOpen = input()` |
-| change details | `onOpenChange(open, details)` | `@open-change="(open, details) => ..."` (besides `update:open`) | `openChangeDetails = output<{ open, details }>()` (`(openChange)` emits the value alone) |
+| change details | `onOpenChange(open, details)` (called before the state changes; `details.cancel()` stops it) | `@open-change="(open, details) => ..."`, emitted first; `update:open` follows only when not canceled | `openChangeDetails = output<{ open, details }>()`, emitted first; `(openChange)` (the value alone) follows only when not canceled |
+| open change complete | `onOpenChangeComplete={(open) => ...}` | `@open-change-complete="(open) => ..."` | `(openChangeComplete)="..."` (an output of the root directive) |
+| actions (`close`, `unmount`) | `actionsRef={ref}` on the Root (`ref.current = { close, unmount }`) | the Root component exposes `close()` and `unmount()` (a template ref, `expose`) | public `close()` and `unmount()` methods of the root directive (`#menu="menuRoot"`, `menu.close()`) |
+| keep the portal's content mounted | `<Dialog.Portal keepMounted>` | `<Dialog.Portal keep-mounted>` | `*dialogPortal="{ keepMounted: true }"` (the option object of the structural portal; `*dialogPortal` alone still works) |
+| a handle (detached triggers) | `Dialog.createHandle<Payload>()` (on the namespace object; also exported as `createDialogHandle`) | `Dialog.createHandle<Payload>()` (also `createDialogHandle`) | `createDialogHandle<Payload>()` |
+| a detached Trigger | `<Dialog.Trigger handle={handle} payload={row} id="edit-ada">` | `<Dialog.Trigger :handle="handle" :payload="row" id="edit-ada">` | `<button dialogTrigger [handle]="handle" [payload]="row" id="edit-ada">` |
+| the Root's handle and active trigger | `<Dialog.Root handle={handle} triggerId={id}>` (`defaultTriggerId`) | `<Dialog.Root :handle="handle" :trigger-id="id">` (`default-trigger-id`) | `[dialogRoot] [handle]="handle" [triggerId]="id"` (`defaultTriggerId`) |
+| the active trigger's payload in the content | the Root's `children` as a function, `({ payload }) => ReactNode` | the Root's default scoped slot, `v-slot="{ payload }"` | the root directive's `payload()` signal, through `exportAs` (`#dialog="dialogRoot"`, `dialog.payload()`) |
 | class and style from state | `className` / `style` as a value or `(state) => value` | `class` / `style` values; state through `data-*` or the `render` slot | the consumer's own `class`; state through `data-*` or the directive's `state()` signal (`exportAs`) |
 | element reference | `ref` prop | template ref (the component instance, element as `$el`) | the host element: a template reference variable (`#cancel`); `#cancel="dialogClose"` gives the directive |
 | children function (collections, calendar weeks, a combobox's List and Value) | `children={(item) => ...}` | default scoped slot (`v-slot="{ week }"`) | `@for` over the directive's signal, read through `exportAs` (`@for (week of body.weeks(); ...)`, `{{ cell.dayNumber() }}`); a part rendered only in some states is structural (`*tabsPanel="'account'"`) |
@@ -229,7 +371,13 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | direction | `<DirectionProvider direction="rtl">`, `useDirection()` | `<DirectionProvider direction="rtl">`, `useDirection()` (a computed ref) | `[directionProvider]="'rtl'"` or `provideDirection('rtl')`, `injectDirection()` (a signal) |
 | render utilities | `useRender({ render, props, state, ref })`, `mergeProps(a, b, ...)` (`/render`) | `renderPart(tag, context, as, state, props)`, `asProp` (`/render`; Vue's own `mergeProps` merges attributes) | `dataValue`, `dataValues` (`/render`: the directive sits on the consumer's own element, Angular's `render`) |
 | part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()`, `injectCombobox()` → `{ state, ... }` of the enclosing root; `injectField()` → the enclosing `[fieldRoot]` or `null` (the parts are the directives themselves) |
+| a handle of a component built on another's parts | `AlertDialog.createHandle<Payload>()` (also `createAlertDialogHandle`) | the same | `createAlertDialogHandle<Payload>()` |
 | a menu item's activation | `onClick` on `Menu.Item` | `@click` on `Menu.Item` | `(click)` on the `[menuItem]` element |
+| a menu checkbox item's state | `checked` + `onCheckedChange(checked, details)` (`defaultChecked`) on `Menu.CheckboxItem` | `v-model:checked` (`default-checked`, `@checked-change="(checked, details) => ..."`) | `[(checked)]` on `[menuCheckboxItem]` (`defaultChecked`; `checkedChangeDetails` output `{ value, details }`, as Checkbox and Switch) |
+| a menu radio group's value | `value` + `onValueChange(value, details)` (`defaultValue`) on `Menu.RadioGroup` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[menuRadioGroup]` (`defaultValue`; `valueChangeDetails` output) |
+| a part rendered only while checked (menu indicators) | rendered by the part (`keepMounted` keeps it) | rendered by the part (`keep-mounted`) | structural: `*menuCheckboxItemIndicator`, `*menuRadioItemIndicator` (`*menuCheckboxItemIndicator="{ keepMounted: true }"`) |
+| parts shared by two entries (AlertDialog on Dialog's, ContextMenu on Menu's) | `AlertDialog.Popup` is Dialog's Popup, its part attribute named by the enclosing `AlertDialog.Root` | the same (`AlertDialog.Popup`) | the entry's own selectors on the same directives' behaviour: `[alertDialogRoot]`, `[alertDialogTrigger]`, `*alertDialogPortal`, `[alertDialogBackdrop]`, `[alertDialogViewport]`, `[alertDialogPopup]`, `[alertDialogTitle]`, `[alertDialogDescription]`, `[alertDialogClose]`; `[contextMenuRoot]`, `[contextMenuTrigger]`, `*contextMenuPortal`, `[contextMenuPositioner]`, `[contextMenuPopup]`, `[contextMenuItem]`, `[contextMenuCheckboxItem]`, `[contextMenuRadioGroup]`, `[contextMenuRadioItem]`, `[contextMenuSeparator]`, `[contextMenuGroup]`, `[contextMenuGroupLabel]`, `[contextMenuSubmenuRoot]`, `[contextMenuSubmenuTrigger]`, `*contextMenuCheckboxItemIndicator`, `*contextMenuRadioItemIndicator` (each the same behaviour as Menu's directive, its part attribute `context-menu-*`) |
+| Select's new parts | `Select.Group`, `Select.GroupLabel`, `Select.Separator`, `Select.ItemText` | the same | `[selectGroup]`, `[selectGroupLabel]`, `[selectSeparator]`, `[selectItemText]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
@@ -283,7 +431,8 @@ The specs fix:
 - a `data-testid` on an element the behaviour layer must find but that has no role (a popover's
   Arrow), named in the scenario;
 - query parameters: `?locale=<tag>` and `?dir=rtl` where a scenario says so; `?locale=none`
-  passes no `locale` and leaves the document with no `lang`.
+  passes no `locale` and leaves the document with no `lang`; `?cancel` in the lifecycle
+  scenarios ([above](#the-lifecycle-scenarios)).
 
 The conformance suite fixes "today" with Playwright's clock: **2026-11-20** (a Friday) in every
 calendar scenario.

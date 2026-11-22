@@ -52,6 +52,7 @@ export const ComboboxPositioner: PartComponent<
                 anchor,
                 context.positioner,
                 null,
+                context.presence.mounted,
             );
             watch(placed, (value) => (context.placed.value = value), {
                 immediate: true,
@@ -73,7 +74,8 @@ export const ComboboxPositioner: PartComponent<
                                 context.chips.value,
                                 context.clearButton.value,
                             ],
-                            dismiss: (reason) => context.setOpen(false, reason),
+                            dismiss: (reason, event) =>
+                                context.setOpen(false, reason, event),
                         },
                     );
                     onCleanup(session.end);
@@ -89,9 +91,13 @@ export const ComboboxPositioner: PartComponent<
                     { open, ...placed.value },
                     {
                         role: "presentation",
+                        hidden: context.presence.mounted.value
+                            ? undefined
+                            : true,
                         "data-primitives-part": "combobox-positioner",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.value.side,
                             align: placed.value.align,
                         }),

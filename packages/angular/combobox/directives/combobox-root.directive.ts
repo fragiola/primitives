@@ -35,6 +35,7 @@ import {
     injectFlush,
     injectId,
     type OpenChangeEvent,
+    type OverlayActions,
     placementSignal,
     setInputAttribute,
     type ValueChangeEvent,
@@ -83,7 +84,7 @@ const NONE: readonly ComboboxItemValue[] = [];
  * overlay's `trigger` is the input, the Trigger button is `button`.
  */
 @Directive({ selector: "[comboboxRoot]", exportAs: "comboboxRoot" })
-export class ComboboxRoot {
+export class ComboboxRoot implements OverlayActions {
     /** The items, or groups of items: the combobox filters them, the List renders the matches. */
     readonly items = input<readonly ComboboxItemValue[] | undefined>(undefined);
     /** Whether an item matches the query; `null` turns filtering off. */
@@ -98,7 +99,10 @@ export class ComboboxRoot {
     readonly open = input<boolean | undefined>(undefined);
     readonly openChange = output<boolean>();
     readonly defaultOpen = input(false);
+    /** Every requested change with its details, before it happens (`details.cancel()` keeps it). */
     readonly openChangeDetails = output<OpenChangeEvent>();
+    /** An opening's or a closing's transition has finished (spec/README.md, "Lifecycle"). */
+    readonly openChangeComplete = output<boolean>();
     /** The bound value (`[(value)]`); `value()` is the current one. */
     readonly boundValue = input<ComboboxItemValue>(undefined, {
         alias: "value",
@@ -350,14 +354,20 @@ export class ComboboxRoot {
     }
 
     /**
-     * Opens or closes the list, and renders it at once. Closing without a choice resets the text
-     * (spec/combobox.md, "Choosing an item").
+     * Opens or closes the list, and renders it at once; returns whether it changed. Closing
+     * without a choice resets the text (spec/combobox.md, "Choosing an item"); a close the
+     * consumer cancels leaves the list, its text and highlight as they are.
      */
-    setOpen(next: boolean, reason: ChangeReason): void {
-        if (!next || reason !== "input-change") {
+    setOpen(next: boolean, reason: ChangeReason, event?: Event): boolean {
+        if (next && reason !== "input-change") {
             this.typed.set(false);
         }
-        if (!next && reason !== "item-press") {
+        const changed = this.overlay.setOpen(next, reason, event);
+        if (next || !changed) {
+            return changed;
+        }
+        this.typed.set(false);
+        if (reason !== "item-press") {
             const text = this.multiple() ? "" : this.label(this.value());
             if (untracked(this.inputValue) !== text) {
                 this.text.set(text, {
@@ -365,12 +375,11 @@ export class ComboboxRoot {
                 });
             }
         }
-        this.overlay.setOpen(next, reason);
-        if (!next) {
-            // a list reopened during its exit animation starts with no highlight
-            this.highlighted.set(null);
-            this.pendingHighlight.set(null);
-        }
+        // a list reopened during its exit animation starts with no highlight
+        this.highlighted.set(null);
+        this.pendingHighlight.set(null);
+        this.flush();
+        return changed;
     }
 
     /** Chooses an item (spec/combobox.md, "Choosing an item"). */
@@ -508,5 +517,15 @@ export class ComboboxRoot {
             input.value = this.inputValue();
         }
         this.hidden.value = this.multiple() ? "" : this.formValue(this.value());
+    }
+
+    /** Closes the list (reason `imperative-action`). */
+    close(): void {
+        this.setOpen(false, "imperative-action");
+    }
+
+    /** Ends a running exit now, or the exit held by `preventUnmountOnClose()`. */
+    unmount(): void {
+        this.overlay.unmount();
     }
 }

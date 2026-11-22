@@ -58,15 +58,18 @@ export const GUARD = {
  * Fieldset and Form, whose contexts Field reads, Epic #26), a Checkbox on its group's context and
  * a Radio on its RadioGroup's (Epic #29), the pickers on the calendars. Collapsible and Accordion
  * share their panel mechanics through each framework's hooks and the toolkit, not each other's
- * code (Epic #32). Any other component's code
+ * code (Epic #32). AlertDialog is built on Dialog's parts and ContextMenu on Menu's (Epic #35),
+ * never the other way. Any other component's code
  * in an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
 > = {
+    "alert-dialog": ["dialog"],
     checkbox: ["checkbox-group", "field"],
     "checkbox-group": ["field"],
     combobox: ["field"],
+    "context-menu": ["menu"],
     "date-picker": ["calendar", "field"],
     "date-range-picker": ["calendar", "date-picker", "field"],
     fieldset: ["field"],

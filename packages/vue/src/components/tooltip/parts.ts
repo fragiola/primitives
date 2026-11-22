@@ -1,4 +1,5 @@
 import { TooltipArrow } from "./tooltip-arrow.ts";
+import { createTooltipHandle } from "./tooltip-handle.ts";
 import { TooltipPopup } from "./tooltip-popup.ts";
 import { TooltipPortal } from "./tooltip-portal.ts";
 import { TooltipPositioner } from "./tooltip-positioner.ts";
@@ -15,4 +16,5 @@ export const Tooltip = {
     Positioner: TooltipPositioner,
     Popup: TooltipPopup,
     Arrow: TooltipArrow,
+    createHandle: createTooltipHandle,
 };

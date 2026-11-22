@@ -8,6 +8,8 @@ export interface ScenarioOptions {
     dir?: "rtl";
     /** Fixes the clock at {@link TODAY} before the page loads. */
     today?: boolean;
+    /** `?cancel`: a lifecycle scenario cancels every close (spec/README.md). */
+    cancel?: boolean;
 }
 
 /** Opens `/<component>/<scenario>` with the spec's query parameters. */
@@ -25,6 +27,9 @@ export async function openScenario(
     }
     if (options.dir !== undefined) {
         query.set("dir", options.dir);
+    }
+    if (options.cancel) {
+        query.set("cancel", "");
     }
     const search = query.size > 0 ? `?${query}` : "";
     await page.goto(`${path}${search}`);

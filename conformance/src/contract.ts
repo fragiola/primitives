@@ -32,3 +32,21 @@ export async function expectNoFalseStates(locator: Locator): Promise<void> {
     );
     expect(falseStates).toEqual([]);
 }
+
+/**
+ * An overlay part's open state (spec/README.md, "State attributes"): exactly one of `data-open`
+ * and `data-closed` is present, `data-open` while open, `data-closed` while it is rendered and not
+ * open (its exit running, or kept mounted).
+ */
+export async function expectOpenState(
+    locator: Locator,
+    open: boolean,
+): Promise<void> {
+    if (open) {
+        await expect(locator).toHaveAttribute("data-open", "");
+        await expect(locator).not.toHaveAttribute("data-closed");
+    } else {
+        await expect(locator).toHaveAttribute("data-closed", "");
+        await expect(locator).not.toHaveAttribute("data-open");
+    }
+}

@@ -18,12 +18,14 @@ windows. Its only runtime dependency is `@floating-ui/dom`, in the positioning e
 ## One entry per mechanism
 
 Each mechanism is its own entry, so a component pulls in only the ones it uses: Dialog uses
-`/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and
+`/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence` (AlertDialog, built on Dialog's
+parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collection` and
 `/direction` (and `/presence` for its panels' enter and exit); Collapsible uses `/presence` alone
 (its panel size and find-in-page match), Accordion `/presence`, `/collection` and `/direction`;
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
-`/scroll-lock`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+`/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them). The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -39,16 +41,16 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 | `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
-| `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality` |
+| `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |
 | `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/image` | `watchImageStatus`, `ImageLoadingStatus`, `ImageSourceOptions` |
 | `@fragiola/primitives/inert` | `inertOutside`, `blockOutsidePointer` |
 | `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
-| `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason` |
-| `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks` |
-| `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement` |
+| `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason`, `DismissEvent` |
+| `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `LongPressOptions`, `watchLongPress` |
+| `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement`, `AnchorRect`, `VirtualAnchor`, `virtualAnchor` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `isAnimating`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
@@ -58,12 +60,31 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 - **Overlay**: an overlay session ties a layer, the focus-out watch and the focus return of one
   open overlay together, and ends them with one call. After an outside press, a popover's focus
   returns only once the press has ended, and only when the press focused nothing
-  (`returnFocus.whenUnfocused`).
-- **Layers**: the stack of a document's open overlays. Escape and an outside press go to the
-  topmost layer only; a layer opened inside another is its child. A tooltip, which is no layer,
+  (`returnFocus.whenUnfocused`). `openOverlaySession` takes the layer's `owner` (default: its
+  `ignore` elements, the triggers), `backdrops` and `modal`, and calls `dismiss(reason, event)` with the DOM
+  event that caused it (`DismissEvent`: a keyboard, pointer or focus event; `undefined`, with the
+  reason `none`, when a parent overlay closed).
+- **Layers**: the **tree** of a document's open overlays
+  ([nested overlays](/docs/guides/nested-overlays)). `pushLayer(doc, options)` resolves the
+  layer's parent when it opens: the newest open layer whose elements contain one of its `owner()`
+  elements (its triggers), else the newest one containing the focused element, else none.
+  `backdrops` are the elements that cover the page under the layer (a dialog's backdrop and
+  viewport): a press on them is outside the layer and inside its parent. Escape goes to the newest
+  layer only. An outside press keeps the deepest layer containing the press (its elements, or its
+  `ignore` list) and its ancestors, and dismisses every other open layer, newest first.
+  `modal: true` marks a layer that makes the page under it inert (a dialog): while it is the
+  newest modal layer open, a press that is neither in it nor in one of its descendants counts as
+  a press in its parent, so the layers it was opened from stay open and it, with the layers above
+  them that are not its ancestors, gets `onOutsidePress` (a press on the inert page reaches no
+  layer, and would otherwise dismiss them all).
+  `Layer.elementsAbove()` gives the elements of the layer's descendants only (what a focus trap
+  and a focus-out watch accept). When a layer is removed, its children move to its parent and
+  each descendant still open gets `onParentClose()`, newest first. A tooltip, which is no layer,
   takes Escape before them (`interceptEscape`), so an enclosing dialog stays open.
 - **Focus**: the tabbable elements of a container, the focus trap, the initial focus, and whether
-  the last interaction was the keyboard.
+  the last interaction was the keyboard. `trapFocus(container, allow, { holdOutsidePress })`
+  (`FocusTrapOptions`): with `holdOutsidePress`, a press outside the trap and its child layers
+  keeps focus where it is (its default focus change is prevented): an alert dialog's.
 - **Inert and scroll lock**: everything outside some elements made inert, the pointer blocked
   outside a modal menu (the body stops taking pointer events), and the document's scroll locked
   (counted, so nested locks release in order), keeping the scrollbar gutter.
@@ -75,13 +96,19 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
   ArrowUp and ArrowLeft the previous, whatever the orientation, ArrowLeft and ArrowRight swapped
   with `rtl`; it passes over the radios `skip` returns `true` for (the disabled ones), wraps at
   the ends with `loop`, and returns `null` for another key or an end without `loop`.
-- **Positioning**: a floating element anchored to its trigger (Floating UI), on Base UI's sides:
+- **Positioning**: a floating element anchored to its trigger, or to a point
+  (`virtualAnchor({ x, y, width?, height? }, contextElement?)`, a `VirtualAnchor` whose
+  `AnchorRect` is in client coordinates: a context menu's pointer; its direction is read from
+  `contextElement`) (Floating UI), on Base UI's sides:
   `top`, `bottom`, the logical `inline-start` and `inline-end`, and the physical `left` and
   `right`; a flipped side keeps the kind it was asked with. Its `direction` option (a direction,
   or a getter read at every placement) is a [DirectionProvider](/docs/api/direction)'s: the
   logical sides follow it. Without it, the anchor's computed direction, read at every placement.
 - **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
-  delay groups.
+  delay groups. `watchLongPress(element, { delay, moveTolerance, pointerTypes, onLongPress })`
+  (`LongPressOptions`; defaults 500 ms, 10 px, touch only) calls `onLongPress(point, event)` once a
+  press is held still that long; a move beyond the tolerance, a release or a cancel stops it, and
+  the click and `contextmenu` that follow a long press are swallowed. It returns the cleanup.
 - **Form**: the hidden inputs' form bridge (a reset, and focus on the primitive when its input is
   the form's first invalid control), the field's validity and its rules (the required rule, the
   modes), `createFieldValidator` for async `validate` (the latest run wins, a value already

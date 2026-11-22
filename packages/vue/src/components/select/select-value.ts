@@ -31,11 +31,15 @@ export const SelectValue: PartComponent<SelectValueProps, SelectValueState> =
             setup(props, { attrs, slots }) {
                 const context = useRequiredContext(SelectKey, "Select.Value");
                 return () => {
-                    const label = context
-                        .items()
-                        .find(
-                            (item) => item.value === context.value.value,
-                        )?.label;
+                    // without `items`, the raw value until the selected Item has rendered (Base UI)
+                    const label =
+                        context
+                            .items()
+                            .find((item) => item.value === context.value.value)
+                            ?.label ??
+                        (context.registers()
+                            ? (context.value.value ?? undefined)
+                            : undefined);
                     const placeholder = label === undefined;
                     return renderPart(
                         "span",

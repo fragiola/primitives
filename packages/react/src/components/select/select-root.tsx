@@ -22,14 +22,21 @@ import type {
     ChangeDetails,
     ChangeReason,
 } from "../../utils/change-details.ts";
-import { SelectContext, type SelectItemData } from "./select-context.ts";
+import {
+    type RegisteredItem,
+    SelectContext,
+    type SelectItemData,
+} from "./select-context.ts";
 
 export interface SelectRootProps extends OverlayRootProps {
     value?: string | null;
     defaultValue?: string | null;
     onValueChange?: (value: string | null, details: ChangeDetails) => void;
-    /** Every item: the Root needs their labels while the list is closed. */
-    items: readonly SelectItemData[];
+    /**
+     * Every item: the labels known while the list is closed. Without it, the Items register
+     * themselves while mounted (keep the list mounted: `Portal keepMounted`).
+     */
+    items?: readonly SelectItemData[];
     name?: string;
     required?: boolean;
     disabled?: boolean;
@@ -48,7 +55,7 @@ export function SelectRoot({
     value: valueProp,
     defaultValue = null,
     onValueChange,
-    items,
+    items: itemsProp,
     name,
     required = false,
     disabled: disabledProp = false,
@@ -57,6 +64,26 @@ export function SelectRoot({
     ...overlayProps
 }: SelectRootProps) {
     const root = useOverlayRoot(overlayProps);
+    // without `items`, the Items register themselves (Base UI), in DOM order
+    const [registered, setRegistered] = useState<readonly RegisteredItem[]>([]);
+    const registerItem = useCallback((item: RegisteredItem) => {
+        setRegistered((previous) =>
+            [
+                ...previous.filter((entry) => entry.element !== item.element),
+                item,
+            ].sort((a, b) =>
+                a.element.compareDocumentPosition(b.element) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+                    ? -1
+                    : 1,
+            ),
+        );
+        return () =>
+            setRegistered((previous) =>
+                previous.filter((entry) => entry !== item),
+            );
+    }, []);
+    const items = itemsProp ?? registered;
     const [value, setValue] = useControllableState(
         valueProp,
         defaultValue,
@@ -87,20 +114,21 @@ export function SelectRoot({
     );
     const { setOpen } = root;
     const openOn = useCallback(
-        (entry: string | null, reason: ChangeReason) => {
-            setHighlighted(entry);
-            setOpen(true, reason);
+        (entry: string | null, reason: ChangeReason, event?: Event) => {
+            if (setOpen(true, reason, event)) {
+                setHighlighted(entry);
+            }
         },
         [setOpen],
     );
     const choose = useCallback(
-        (entry: string, reason: ChangeReason) => {
+        (entry: string, reason: ChangeReason, event?: Event) => {
             const item = items.find((candidate) => candidate.value === entry);
             if (item === undefined || item.disabled) {
                 return;
             }
-            setValue(entry, { reason });
-            setOpen(false, reason);
+            setValue(entry, { reason, event });
+            setOpen(false, reason, event);
         },
         [items, setValue, setOpen],
     );
@@ -138,6 +166,7 @@ export function SelectRoot({
             ...root,
             field,
             items,
+            registerItem: itemsProp === undefined ? registerItem : null,
             value,
             disabled,
             required,
@@ -155,6 +184,8 @@ export function SelectRoot({
             root,
             field,
             items,
+            itemsProp,
+            registerItem,
             value,
             disabled,
             required,

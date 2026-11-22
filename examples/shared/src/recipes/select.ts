@@ -11,6 +11,10 @@ export const select: Recipe<
     | "list"
     | "item"
     | "item-indicator"
+    | "item-text"
+    | "group"
+    | "group-label"
+    | "separator"
 > = {
     trigger: `${BUTTON.replace("justify-center", "justify-between")} min-w-48 data-popup-open:bg-palette-soft data-invalid:border-2 data-invalid:border-palette-contrast`,
     value: "truncate data-placeholder:text-palette-accent/85",
@@ -20,4 +24,8 @@ export const select: Recipe<
     list: "flex flex-col p-1 outline-none",
     item: `${LIST_ITEM} justify-between data-selected:font-semibold`,
     "item-indicator": "text-xs",
+    "item-text": "truncate",
+    group: "flex flex-col",
+    "group-label": "px-2 pt-2 pb-1 text-xs font-medium text-palette-accent",
+    separator: "-mx-1 my-1 h-px bg-palette-line",
 };

@@ -2,6 +2,7 @@ import { submenuKeys } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import {
     type KeyboardEvent,
+    type MouseEvent,
     type PointerEvent,
     useContext,
     useEffect,
@@ -56,12 +57,13 @@ export function MenuSubmenuTrigger({
     const open = (
         highlight: "first" | null,
         reason: "trigger-press" | "list-navigation",
+        event?: Event,
     ) => {
         if (disabled) {
             return;
         }
         submenu.pendingHighlight.current = highlight;
-        submenu.setOpen(true, reason);
+        submenu.setOpen(true, reason, event);
     };
     const state = {
         open: submenu.open,
@@ -80,14 +82,15 @@ export function MenuSubmenuTrigger({
             "aria-expanded": submenu.open,
             "aria-controls": submenu.open ? submenu.popupId : undefined,
             "aria-disabled": disabled ? "true" : undefined,
-            "data-primitives-part": "menu-submenu-trigger",
+            "data-primitives-part": `${parent.component}-submenu-trigger`,
             ...stateAttributes({
                 "popup-open": submenu.open,
                 highlighted: item.highlighted,
                 disabled,
             }),
             ...item.handlers,
-            onClick: () => open(null, "trigger-press"),
+            onClick: (event: MouseEvent) =>
+                open(null, "trigger-press", event.nativeEvent),
             onKeyDown: (event: KeyboardEvent) => {
                 const { open: openKey } = submenuKeys(
                     element !== null &&
@@ -105,6 +108,7 @@ export function MenuSubmenuTrigger({
                         event.key === openKey
                             ? "list-navigation"
                             : "trigger-press",
+                        event.nativeEvent,
                     );
                 }
             },
