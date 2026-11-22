@@ -3,6 +3,8 @@ import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { DirectionProvider } from "@fragiola/primitives-angular/direction";
 import { readQuery } from "../kit/query.ts";
+import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
+import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
 import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts";
 import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
@@ -32,6 +34,7 @@ import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
 import { FieldMatch } from "../scenarios/field/field-match.ts";
 import { FieldMoreControls } from "../scenarios/field/field-more-controls.ts";
+import { FieldSettings } from "../scenarios/field/field-settings.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
@@ -46,14 +49,20 @@ import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.ts";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.ts";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
+import { ProgressBasic } from "../scenarios/progress/progress-basic.ts";
+import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.ts";
+import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.ts";
 import { SelectBasic } from "../scenarios/select/select-basic.ts";
 import { SelectControlled } from "../scenarios/select/select-controlled.ts";
 import { SelectModal } from "../scenarios/select/select-modal.ts";
+import { SeparatorBasic } from "../scenarios/separator/separator-basic.ts";
 import { SliderBasic } from "../scenarios/slider/slider-basic.ts";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.ts";
 import { SliderLabelValue } from "../scenarios/slider/slider-label-value.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
+import { SwitchBasic } from "../scenarios/switch/switch-basic.ts";
+import { SwitchControlled } from "../scenarios/switch/switch-controlled.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
@@ -126,6 +135,15 @@ import { ROUTES } from "./routes.ts";
         FormBasic,
         DirectionProvider,
         DirectionProviderScenario,
+        AvatarBasic,
+        ButtonBasic,
+        FieldSettings,
+        ProgressBasic,
+        RadioGroupBasic,
+        RadioGroupControlled,
+        SeparatorBasic,
+        SwitchBasic,
+        SwitchControlled,
     ],
     template: `
         @switch (path) {
@@ -167,6 +185,11 @@ import { ROUTES } from "./routes.ts";
             @case ("/checkbox/basic") { <main class="p-6" scenario-checkbox-basic></main> }
             @case ("/checkbox/group") { <main class="p-6" scenario-checkbox-group></main> }
             @case ("/checkbox/controlled") { <main class="p-6" scenario-checkbox-controlled></main> }
+            @case ("/radio-group/basic") { <main class="p-6" scenario-radio-group-basic></main> }
+            @case ("/radio-group/controlled") { <main class="p-6" scenario-radio-group-controlled></main> }
+            @case ("/switch/basic") { <main class="p-6" scenario-switch-basic></main> }
+            @case ("/switch/controlled") { <main class="p-6" scenario-switch-controlled></main> }
+            @case ("/button/basic") { <main class="p-6" scenario-button-basic></main> }
             @case ("/slider/basic") { <main class="p-6" scenario-slider-basic></main> }
             @case ("/slider/range") { <main class="p-6" scenario-slider-range></main> }
             @case ("/slider/vertical") { <main class="p-6" scenario-slider-vertical></main> }
@@ -179,6 +202,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/field/async") { <main class="p-6" scenario-field-async></main> }
             @case ("/field/match") { <main class="p-6" scenario-field-match></main> }
             @case ("/field/more-controls") { <main class="p-6" scenario-field-more-controls></main> }
+            @case ("/field/settings") { <main class="p-6" scenario-field-settings></main> }
             @case ("/fieldset/basic") { <main class="p-6" scenario-fieldset-basic></main> }
             @case ("/form/basic") { <main class="p-6" scenario-form-basic></main> }
             @case ("/calendar/single") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
@@ -191,6 +215,9 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
+            @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }
+            @case ("/avatar/basic") { <main class="p-6" scenario-avatar-basic></main> }
+            @case ("/separator/basic") { <main class="p-6" scenario-separator-basic></main> }
             @case ("/direction/provider") { <main class="p-6" scenario-direction-provider [directionProvider]="'rtl'"></main> }
             @default {
                 <main class="p-6">
