@@ -12,6 +12,12 @@
         "menu",
         "popover",
         "tooltip",
+        "select",
+        "combobox",
+        "checkbox",
+        "slider",
+        "field",
+        "forms",
         "primitives",
         "ui"
     ],
@@ -43,10 +49,30 @@
             "types": "./dist/types/fragiola-primitives-angular-internal.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-internal.mjs"
         },
+        "./checkbox": {
+            "@fragiola/source": "./checkbox/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-checkbox.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-checkbox.mjs"
+        },
+        "./checkbox-group": {
+            "@fragiola/source": "./checkbox-group/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-checkbox-group.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-checkbox-group.mjs"
+        },
+        "./combobox": {
+            "@fragiola/source": "./combobox/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-combobox.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-combobox.mjs"
+        },
         "./dialog": {
             "@fragiola/source": "./dialog/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-dialog.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-dialog.mjs"
+        },
+        "./field": {
+            "@fragiola/source": "./field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-field.mjs"
         },
         "./menu": {
             "@fragiola/source": "./menu/public-api.ts",
@@ -57,6 +83,16 @@
             "@fragiola/source": "./popover/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-popover.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-popover.mjs"
+        },
+        "./select": {
+            "@fragiola/source": "./select/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-select.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-select.mjs"
+        },
+        "./slider": {
+            "@fragiola/source": "./slider/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-slider.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-slider.mjs"
         },
         "./tabs": {
             "@fragiola/source": "./tabs/public-api.ts",
