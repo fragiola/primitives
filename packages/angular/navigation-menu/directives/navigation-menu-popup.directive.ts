@@ -136,6 +136,8 @@ export class NavigationMenuPopup {
                 onCleanup(() => {
                     root.layered.set(false);
                     doc.removeEventListener("pointermove", onMove);
+                    // a close delay still pending would close a later opening
+                    root.hover.cancel();
                     session.end();
                 });
             });

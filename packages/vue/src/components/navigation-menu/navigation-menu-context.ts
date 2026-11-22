@@ -25,7 +25,7 @@ export interface NavigationMenuContext {
      * How the open Content was opened, and when the pointer last opened one (a hover opening or
      * switch): a press within 500 ms of it keeps the Content open.
      */
-    openedBy: { by: OpenedBy; hoveredAt: number };
+    openedBy: { by: OpenedBy; at: number };
     lastReason: { current: ChangeReason | null };
     orientation: () => NavigationMenuOrientation;
     loopFocus: () => boolean;

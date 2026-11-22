@@ -3,6 +3,7 @@ import {
     computed,
     DestroyRef,
     Directive,
+    effect,
     InjectionToken,
     inject,
     input,
@@ -140,8 +141,28 @@ export class NavigationMenuRoot {
     }));
     protected readonly data = computed(() => dataValues(this.state()));
 
+    /**
+     * The value the last setValue asked for: a controlled value that changed without one is a
+     * programmatic change.
+     */
+    private requested: string | null | undefined = undefined;
+
     constructor() {
         inject(DestroyRef).onDestroy(() => this.hover.cancel());
+        let previous = untracked(this.current);
+        effect(() => {
+            const value = this.current();
+            untracked(() => {
+                if (value !== previous && value !== this.requested) {
+                    this.pendingFocus = null;
+                    if (value !== null) {
+                        this.openedBy = { by: "press", at: performance.now() };
+                    }
+                }
+                previous = value;
+                this.requested = undefined;
+            });
+        });
     }
 
     setValue(
@@ -154,9 +175,15 @@ export class NavigationMenuRoot {
         if (previous === next) {
             return;
         }
-        if (next !== null && by !== undefined) {
-            this.openedBy = { by, at: performance.now() };
+        if (next !== null) {
+            // a programmatic opening (no `by`) is a deliberate one, as a press
+            this.openedBy = { by: by ?? "press", at: performance.now() };
         }
+        // the open key's pending focus belongs to its own change only
+        if (reason !== "list-navigation") {
+            this.pendingFocus = null;
+        }
+        this.requested = next;
         // the direction from the Trigger open before (none from closed)
         this.activationDirection.set(
             previous !== null && next !== null

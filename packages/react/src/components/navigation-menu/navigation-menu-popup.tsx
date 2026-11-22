@@ -65,9 +65,11 @@ export function NavigationMenuPopup({
         session.current = layer;
         return () => {
             session.current = null;
+            // a close delay still pending would close a later opening
+            hover.cancel();
             layer.end();
         };
-    }, [open, popup, positioner, setValue, lastReason]);
+    }, [open, popup, positioner, setValue, lastReason, hover]);
 
     // a hover-opened Content: the pointer leaving the Trigger and the popup (and the levels
     // opened from it) closes it after the close delay

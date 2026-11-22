@@ -5,6 +5,7 @@ import {
     useCallback,
     useContext,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useReducer,
     useRef,
@@ -98,6 +99,20 @@ export function NavigationMenuRoot({
     const lastReason = useRef<ChangeReason | null>(null);
     const pendingHover = useRef<string | null>(null);
     const pendingFocus = useRef<string | null>(null);
+    // the value the last setValue asked for: a controlled value that changed without one is a
+    // programmatic change
+    const requested = useRef<string | null | undefined>(undefined);
+    const previousValue = useRef(value);
+    useLayoutEffect(() => {
+        if (previousValue.current !== value && requested.current !== value) {
+            pendingFocus.current = null;
+            if (value !== null) {
+                openedBy.current = { by: "press", at: performance.now() };
+            }
+        }
+        previousValue.current = value;
+        requested.current = undefined;
+    }, [value]);
     const latest = useRef({ value, orientation });
     latest.current = { value, orientation };
 
@@ -112,9 +127,15 @@ export function NavigationMenuRoot({
             if (previous === next) {
                 return;
             }
-            if (next !== null && by !== undefined) {
-                openedBy.current = { by, at: performance.now() };
+            if (next !== null) {
+                // a programmatic opening (no `by`) is a deliberate one, as a press
+                openedBy.current = { by: by ?? "press", at: performance.now() };
             }
+            // the open key's pending focus belongs to its own change only
+            if (reason !== "list-navigation") {
+                pendingFocus.current = null;
+            }
+            requested.current = next;
             // the direction from the Trigger open before (none from closed)
             setDirection(
                 previous !== null && next !== null

@@ -131,15 +131,34 @@ export const NavigationMenuRoot: PartComponent<
                 ref<NavigationMenuContext["activationDirection"]["value"]>(
                     "none",
                 );
-            const openedBy: { by: OpenedBy; hoveredAt: number } = {
+            const openedBy: { by: OpenedBy; at: number } = {
                 by: "press",
-                hoveredAt: Number.NEGATIVE_INFINITY,
+                at: Number.NEGATIVE_INFINITY,
             };
             const lastReason: { current: ChangeReason | null } = {
                 current: null,
             };
             const pendingHover = { current: null as string | null };
             const pendingFocus = { current: null as string | null };
+            // the value the last setValue asked for: a controlled value that changed without
+            // one is a programmatic change
+            const requested = {
+                current: undefined as string | null | undefined,
+            };
+            watch(
+                value,
+                (next) => {
+                    if (requested.current !== next) {
+                        pendingFocus.current = null;
+                        if (next !== null) {
+                            openedBy.by = "press";
+                            openedBy.at = performance.now();
+                        }
+                    }
+                    requested.current = undefined;
+                },
+                { flush: "sync" },
+            );
 
             const setValue = (
                 next: string | null,
@@ -151,12 +170,16 @@ export const NavigationMenuRoot: PartComponent<
                 if (previous === next) {
                     return;
                 }
-                if (next !== null && by !== undefined) {
-                    openedBy.by = by;
+                if (next !== null) {
+                    // a programmatic opening (no `by`) is a deliberate one, as a press
+                    openedBy.by = by ?? "press";
+                    openedBy.at = performance.now();
                 }
-                if (next !== null && reason === "trigger-hover") {
-                    openedBy.hoveredAt = performance.now();
+                // the open key's pending focus belongs to its own change only
+                if (reason !== "list-navigation") {
+                    pendingFocus.current = null;
                 }
+                requested.current = next;
                 // the direction from the Trigger open before (none from closed)
                 direction.value =
                     previous !== null && next !== null

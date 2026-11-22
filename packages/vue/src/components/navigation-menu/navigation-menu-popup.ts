@@ -107,6 +107,8 @@ export const NavigationMenuPopup: PartComponent<
                     onCleanup(() => {
                         doc.removeEventListener("pointermove", onMove);
                         context.layered.value = false;
+                        // a close delay still pending would close a later opening
+                        context.hover.cancel();
                         layer.end();
                     });
                 },

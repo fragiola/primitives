@@ -104,7 +104,10 @@ export const NavigationMenuTrigger: PartComponent<
                 context.hover.cancel();
                 const opened = context.openedBy;
                 if (isOpen()) {
-                    if (performance.now() - opened.hoveredAt < PATIENT_CLICK) {
+                    if (
+                        opened.by === "hover" &&
+                        performance.now() - opened.at < PATIENT_CLICK
+                    ) {
                         // the user aimed for it: it stays open, and the pointer leaving keeps it
                         opened.by = "press";
                         return;

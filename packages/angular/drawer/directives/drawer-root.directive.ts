@@ -96,8 +96,9 @@ export class DrawerRoot<Payload = unknown> extends DialogRootBase<Payload> {
     constructor() {
         super();
         attachHandle(this.handle, this);
-        // an opening starts on the default snap point again, and every open change at rest
-        // (spec/drawer.md, "API")
+        // an opening (the change of `open` to true, a controlled one included) starts at rest, on
+        // the default snap point again (spec/drawer.md, "API"); a swipe's dismissal keeps its
+        // progress while it exits
         let wasOpen = untracked(this.overlay.open);
         effect(() => {
             const open = this.overlay.open();
@@ -106,9 +107,12 @@ export class DrawerRoot<Payload = unknown> extends DialogRootBase<Payload> {
                     return;
                 }
                 wasOpen = open;
+                if (!open) {
+                    return;
+                }
                 this.swipe.set(AT_REST);
                 const start = this.initialSnapPoint();
-                if (open && !Object.is(start, this.snapping.value())) {
+                if (!Object.is(start, this.snapping.value())) {
                     this.snapping.set(start, { reason: "none" });
                 }
             });

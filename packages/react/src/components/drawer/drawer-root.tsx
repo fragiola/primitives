@@ -1,10 +1,16 @@
 import type { SnapPoint, SwipeDirection } from "@fragiola/primitives/swipe";
-import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import {
+    type ReactNode,
+    useCallback,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
-import type {
-    ChangeDetails,
-    OpenChangeDetails,
-} from "../../utils/change-details.ts";
+import { useRequiredContext } from "../../hooks/use-required-context.ts";
+import type { ChangeDetails } from "../../utils/change-details.ts";
+import { DialogContext } from "../dialog/dialog-context.ts";
 import {
     DialogRootBase,
     type DialogRootSharedProps,
@@ -46,7 +52,6 @@ export function DrawerRoot<Payload = unknown>({
     snapPoint: snapPointProp,
     defaultSnapPoint,
     onSnapPointChange,
-    onOpenChange,
     children,
     ...props
 }: DrawerRootProps<Payload>) {
@@ -56,23 +61,17 @@ export function DrawerRoot<Payload = unknown>({
         ChangeDetails
     >(snapPointProp, initial, onSnapPointChange);
     const [swipe, setSwipe] = useState<DrawerSwipeState>(AT_REST);
-    const latest = useRef({ initial, snapPoint, onOpenChange });
-    latest.current = { initial, snapPoint, onOpenChange };
-    // an opening starts on the default snap point again (spec/drawer.md, "API")
-    const handleOpenChange = useCallback(
-        (next: boolean, details: OpenChangeDetails) => {
-            latest.current.onOpenChange?.(next, details);
-            if (details.isCanceled) {
-                return;
-            }
-            setSwipe(AT_REST);
-            const { initial: start, snapPoint: current } = latest.current;
-            if (next && !Object.is(start, current)) {
-                setSnapPoint(start, { reason: "none" });
-            }
-        },
-        [setSnapPoint],
-    );
+    const latest = useRef({ initial, snapPoint });
+    latest.current = { initial, snapPoint };
+    // an opening (the change of `open` to true, a controlled one included) starts at rest, on the
+    // default snap point again (spec/drawer.md, "API")
+    const onOpening = useCallback(() => {
+        setSwipe(AT_REST);
+        const { initial: start, snapPoint: current } = latest.current;
+        if (!Object.is(start, current)) {
+            setSnapPoint(start, { reason: "none" });
+        }
+    }, [setSnapPoint]);
     const drawer: DrawerContextValue = useMemo(
         () => ({
             swipeDirection,
@@ -85,13 +84,10 @@ export function DrawerRoot<Payload = unknown>({
         [swipeDirection, snapPoints, snapPoint, setSnapPoint, swipe],
     );
     return (
-        <DialogRootBase
-            {...props}
-            onOpenChange={handleOpenChange}
-            component="drawer"
-        >
+        <DialogRootBase {...props} component="drawer">
             {(state: { payload: Payload | undefined }): ReactNode => (
                 <DrawerContext.Provider value={drawer}>
+                    <DrawerOpening onOpening={onOpening} />
                     {typeof children === "function"
                         ? children(state)
                         : children}
@@ -99,4 +95,17 @@ export function DrawerRoot<Payload = unknown>({
             )}
         </DialogRootBase>
     );
+}
+
+/** Calls `onOpening` when the dialog's `open` changes to true (not on the first render). */
+function DrawerOpening({ onOpening }: { onOpening: () => void }) {
+    const { open } = useRequiredContext(DialogContext, "Drawer.Root");
+    const previous = useRef(open);
+    useLayoutEffect(() => {
+        if (open && !previous.current) {
+            onOpening();
+        }
+        previous.current = open;
+    }, [open, onOpening]);
+    return null;
 }

@@ -5,6 +5,7 @@ import {
     type PropType,
     provide,
     shallowRef,
+    watch,
 } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import {
@@ -13,10 +14,7 @@ import {
     type OverlayTriggerRootProps,
     overlayRootEmits,
 } from "../../composables/use-overlay-root.ts";
-import type {
-    ChangeDetails,
-    OpenChangeDetails,
-} from "../../utils/change-details.ts";
+import type { ChangeDetails } from "../../utils/change-details.ts";
 import {
     type OverlayRootSlots,
     type PublicComponent,
@@ -118,30 +116,34 @@ export const DrawerRoot: PublicComponent<
                 swipe,
             };
             provide(DrawerKey, context);
-            // an opening starts on the default snap point again (spec/drawer.md, "API")
-            const overlayEmit = ((event: string, ...args: unknown[]) => {
-                (emit as (event: string, ...args: unknown[]) => void)(
-                    event,
-                    ...args,
-                );
-                if (event !== "openChange") {
-                    return;
-                }
-                const [next, details] = args as [boolean, OpenChangeDetails];
-                if (details.isCanceled) {
-                    return;
-                }
+            // an opening (the change of `open` to true, a controlled one included) starts at
+            // rest, on the default snap point again (spec/drawer.md, "API")
+            const onOpening = () => {
                 swipe.value = { swiping: false, progress: 0 };
                 const start = initial();
-                if (next && !Object.is(start, state.value.value)) {
+                if (!Object.is(start, state.value.value)) {
                     state.set(start, { reason: "none" });
                 }
-            }) as Parameters<typeof setupDialogRoot>[2]["emit"];
-            return setupDialogRoot("drawer", props, {
-                emit: overlayEmit,
-                slots,
-                expose,
-            });
+            };
+            return setupDialogRoot(
+                "drawer",
+                props,
+                {
+                    emit: emit as Parameters<typeof setupDialogRoot>[2]["emit"],
+                    slots,
+                    expose,
+                },
+                (open) =>
+                    watch(
+                        open,
+                        (next, previous) => {
+                            if (next && !previous) {
+                                onOpening();
+                            }
+                        },
+                        { flush: "sync" },
+                    ),
+            );
         },
     }),
 );
