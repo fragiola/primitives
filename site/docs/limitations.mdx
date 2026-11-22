@@ -3,13 +3,21 @@ title: Known limitations
 description: What the first release does not do yet - the rest of the catalog, other frameworks, npm packages - and what stays yours by design.
 ---
 
-The first release covers the overlays and the tabs. Here is what it leaves out, on purpose or for
+The first release covers the overlays, the tabs and the form controls. Here is what it leaves out, on purpose or for
 a later release.
 
 ## Not in this release
 
-- **Five components.** Dialog, Popover, Tooltip, Menu and Tabs ship today. The form controls
-  (Field, Checkbox, Slider, Select, Combobox) come next, then the date pickers.
+- **Eleven components.** Dialog, Popover, Tooltip, Menu, Tabs, Field, Checkbox, CheckboxGroup,
+  Slider, Select and Combobox ship today. The date pickers come next.
+- **Field is the first version's.** It labels, describes and validates one control, with
+  synchronous `validate` and three validation modes. Fieldset, Form (a form-level errors object),
+  async validation, a debounce, and Field in the date pickers come with stage 1.
+- **No RadioGroup, Switch, NumberField, Listbox or Autocomplete** yet: they come with later
+  stages.
+- **Combobox and Select**: no virtualization or async lists, no `readOnly` or `autoHighlight`, no
+  input inside the popup; a Select chooses one value (no `multiple`, groups or scroll arrows), and
+  a Combobox has no `modal` option.
 - **No menu checkbox or radio items, context menu, menubar or hover card** yet: they come with
   later stages.
 - **Not on npm yet.** The packages are published once the maintainer validates the library.

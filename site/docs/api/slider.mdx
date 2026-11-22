@@ -1,0 +1,164 @@
+---
+title: Slider
+description: A number, or a range of numbers, chosen by dragging a thumb, pressing the track or with the keyboard, following the APG's slider patterns, in each framework.
+---
+
+Choose a number within bounds, or a range with several thumbs (WAI-ARIA APG
+[slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) and
+[multi-thumb slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/)). It works in a
+native `<form>`: each thumb submits its value.
+
+<Example id="slider" />
+
+## Behaviour
+
+- **Value**: a number, or an array of numbers for several thumbs (sorted); the type of
+  `defaultValue` (or `value`) decides. Values snap to `min + n × step` and stay in `[min, max]`;
+  thumbs never cross, and stay `minStepsBetweenValues × step` apart.
+- **Pointer**: a press on the Control moves the nearest thumb there (reason `track-press`),
+  focuses it and starts a drag; the drag follows the pointer outside the Control until it is
+  released (reason `drag`, `data-dragging` meanwhile). `touch-action: none` keeps a touch drag
+  from scrolling.
+- **Commit**: `onValueCommit` once a drag ends, or after a key changed the value.
+- **RTL**: horizontal sliders run right to left (`min` at the right, the arrows swap).
+- **Forms**: one hidden input per thumb submits `name=value`, in order.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `slider-root` | the `group`; holds the state |
+| Control | `div` | `slider-control` | the interactive area |
+| Track | `div` | `slider-track` | the rail |
+| Indicator | `div` | `slider-indicator` | the filled part: from `min` to the value, or between two thumbs |
+| Thumb | `div` | `slider-thumb` | a `slider`; one per value |
+| (hidden input) | `input type="hidden"` | `slider-input` | one per value: what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Slider } from "@fragiola/primitives-react/slider";
+
+<Slider.Root defaultValue={[20, 80]} minStepsBetweenValues={10} name="price">
+    <Slider.Control>
+        <Slider.Track>
+            <Slider.Indicator />
+        </Slider.Track>
+        <Slider.Thumb aria-label="Minimum price" getAriaValueText={(value) => `$${value}`} />
+        <Slider.Thumb aria-label="Maximum price" getAriaValueText={(value) => `$${value}`} />
+    </Slider.Control>
+</Slider.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Slider.Root v-model:value="volume">
+        <Slider.Control>
+            <Slider.Track><Slider.Indicator /></Slider.Track>
+            <Slider.Thumb aria-label="Volume" />
+        </Slider.Control>
+    </Slider.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [SliderRoot, SliderControl, SliderTrack, SliderIndicator, SliderThumb],
+    template: `
+        <div sliderRoot [(value)]="volume">
+            <div sliderControl>
+                <div sliderTrack><div sliderIndicator></div></div>
+                <div sliderThumb aria-label="Volume"></div>
+            </div>
+        </div>
+    `,
+})
+export class Volume {
+    protected readonly volume = signal(50);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-commit`), and Angular as inputs and outputs (`[(value)]`, `(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `number \| number[]` | | the value, controlled |
+| `defaultValue` | `number \| number[]` | `min` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason }) => void` | | every change (`keyboard`, `track-press`, `drag`) |
+| `onValueCommit` | `(value, details: { reason }) => void` | | once a drag ends, or after a key |
+| `min` | `number` | `0` | the lower bound |
+| `max` | `number` | `100` | the upper bound |
+| `step` | `number` | `1` | the step of the arrows and the snapping |
+| `largeStep` | `number` | `10` | the step of Page Up, Page Down and Shift+Arrow |
+| `minStepsBetweenValues` | `number` | `0` | the smallest distance between two thumbs, in steps |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the axis |
+| `disabled` | `boolean` | `false` | ignores the pointer and the keys |
+| `name` | `string` | | the form name of the hidden inputs |
+
+### Control
+
+No props of its own.
+
+### Track
+
+No props of its own.
+
+### Indicator
+
+No props of its own.
+
+### Thumb
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | its order | the index of its value |
+| `getAriaValueText` | `(value: number, index: number) => string` | | the `aria-valuetext` |
+| `disabled` | `boolean` | `false` | this thumb only |
+
+A thumb's accessible name comes from the consumer (`aria-label`, `aria-labelledby`).
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`, `data-orientation`, `data-disabled`, `data-dragging`; in a Field, the field's states |
+| Control, Track | `data-orientation`, `data-disabled`, `data-dragging` |
+| Indicator | `data-orientation`; structural inline style (`inset-inline-start` and `inline-size` in %, or the block ones) |
+| Thumb | `role="slider"`, `tabindex="0"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` (the bounds it can reach), `aria-valuetext`, `aria-orientation`, `aria-disabled`, `data-orientation`, `data-index`, `data-dragging`, `data-disabled`; structural inline style placing it |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowRight, ArrowUp | + `step` (ArrowLeft in RTL) |
+| ArrowLeft, ArrowDown | − `step` (ArrowRight in RTL) |
+| Page Up / Page Down, Shift+Arrow | ± `largeStep` |
+| Home / End | the lowest / highest value the thumb can reach |
+| Tab | the next thumb, in value order |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/slider` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `Slider`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState` |
+| `@fragiola/primitives-vue/slider` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `Slider`, `SliderRootEmits`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState` |
+| `@fragiola/primitives-angular/slider` | `ChangeDetails`, `ChangeReason`, `SliderControl`, `SliderIndicator`, `SliderRoot`, `SliderState`, `SliderThumb`, `SliderThumbState`, `SliderTrack`, `SliderValue`, `ValueChangeEvent` |

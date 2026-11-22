@@ -1,0 +1,326 @@
+---
+title: Combobox
+description: A text input that filters a popup list, for one value or several with chips, with native form support, following the APG's combobox pattern, in each framework.
+---
+
+A text input that filters a popup list, for choosing **one** value or **several** (WAI-ARIA APG
+[combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with a `listbox` popup:
+list autocomplete without automatic selection). It has the parts of Fragiola UI's combobox, on
+Base UI's behaviour. A list chosen from a button, with no text, is a [Select](/docs/api/select).
+
+<Example id="combobox" />
+
+## Behaviour
+
+These are decided (D10): the APG allows them or says nothing about them.
+
+- **It filters**: given `items`, the combobox filters them with the input's text and gives the
+  List the matching ones, through a render function. The default filter is a locale-aware
+  "contains" that ignores case and accents (`sao` finds "São Paulo"); `filter` replaces it, `null`
+  turns it off, `limit` caps the list. Without `items`, the consumer filters and renders the Items.
+- **Values are items**: a string or any object, compared with `isItemEqualToValue` and turned into
+  text with `itemToStringLabel` (the input's text, the filter) and `itemToStringValue` (the form).
+- **`multiple`** keeps a list of values, shown as chips: choosing an item adds it, or removes it
+  when it is already chosen.
+- **Escape resets the text**: closing the list without a choice resets the input's text to the
+  selected item's label (`""` with none, or with `multiple`); Escape on the closed list clears the
+  text and the value.
+- **A press on the input opens the list** (reason `input-press`), on the selected item.
+- **Focus**: DOM focus stays on the input; the highlighted item is announced with
+  `aria-activedescendant`. Typing highlights nothing until the user navigates; ArrowDown past the
+  last item returns to the input.
+- **Forms**: hidden inputs carry `name` and `itemToStringValue(value)` (one per value with
+  `multiple`), and a visually hidden input carries `required`. A form reset returns an
+  uncontrolled combobox to `defaultValue`. In a [Field](/docs/api/field), the Input takes the
+  field's ids and states.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state; renders the hidden inputs |
+| InputGroup | `div` | `combobox-input-group` | holds the Input and its buttons, and anchors the list |
+| Input | `input` | `combobox-input` | the `combobox`; keeps DOM focus |
+| Trigger | `button` | `combobox-trigger` | toggles the list; not in the tab order |
+| Clear | `button` | `combobox-clear` | clears the value and the text; rendered only while there is a value |
+| Chips | `div` | `combobox-chips` | `multiple`: holds the chips and the Input; anchors the list |
+| Chip | `div` | `combobox-chip` | one per value |
+| ChipRemove | `button` | `combobox-chip-remove` | removes its chip's value |
+| Value | none | | renders the value: its label, or a render function of it |
+| Status | `div` | `combobox-status` | a polite live region for the consumer's text |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `combobox-positioner` | places the popup under the anchor |
+| Popup | `div` | `combobox-popup` | the floating container |
+| Empty | `div` | `combobox-empty` | a polite live region; its children show only while the list is empty |
+| List | `div` | `combobox-list` | the `listbox` |
+| Group | `div` | `combobox-group` | a `group` of items |
+| GroupLabel | `div` | `combobox-group-label` | names its Group |
+| Separator | `div` | `combobox-separator` | between groups |
+| Item | `div` | `combobox-item` | an `option` |
+| ItemIndicator | `span` | `combobox-item-indicator` | rendered only while its item is selected |
+| (hidden inputs) | `input` | `combobox-hidden-input` | what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Combobox } from "@fragiola/primitives-react/combobox";
+
+const FRUITS = [
+    { value: "apple", label: "Apple" },
+    { value: "banana", label: "Banana" },
+];
+
+<Combobox.Root items={FRUITS} name="fruit">
+    <label htmlFor="fruit">Fruit</label>
+    <Combobox.InputGroup>
+        <Combobox.Input id="fruit" />
+        <Combobox.Clear aria-label="Clear fruit">×</Combobox.Clear>
+        <Combobox.Trigger aria-label="Show fruits">▾</Combobox.Trigger>
+    </Combobox.InputGroup>
+    <Combobox.Portal>
+        <Combobox.Positioner sideOffset={4}>
+            <Combobox.Popup>
+                <Combobox.Empty>No fruit found.</Combobox.Empty>
+                <Combobox.List>
+                    {(fruit: (typeof FRUITS)[number]) => (
+                        <Combobox.Item key={fruit.value} value={fruit}>
+                            {fruit.label}
+                        </Combobox.Item>
+                    )}
+                </Combobox.List>
+            </Combobox.Popup>
+        </Combobox.Positioner>
+    </Combobox.Portal>
+</Combobox.Root>;
+```
+
+With `multiple`, the Chips hold a `Combobox.Value` whose render function gets the values and
+renders a Chip per value, then the Input.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Combobox.Root v-model:value="fruit" :items="FRUITS" name="fruit">
+        <Combobox.InputGroup>
+            <Combobox.Input id="fruit" />
+        </Combobox.InputGroup>
+        <Combobox.Portal>
+            <Combobox.Positioner :side-offset="4">
+                <Combobox.Popup>
+                    <Combobox.Empty>No fruit found.</Combobox.Empty>
+                    <Combobox.List v-slot="{ entry }">
+                        <Combobox.Item :key="entry.value" :value="entry">{{ entry.label }}</Combobox.Item>
+                    </Combobox.List>
+                </Combobox.Popup>
+            </Combobox.Positioner>
+        </Combobox.Portal>
+    </Combobox.Root>
+</template>
+```
+
+The List's default scoped slot gets `{ entry, index }`; the Value's, `{ value }`.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ComboboxRoot, ComboboxInputGroup, ComboboxInput, ComboboxPortal, ComboboxPositioner, ComboboxPopup, ComboboxEmpty, ComboboxList, ComboboxItem],
+    template: `
+        <ng-container comboboxRoot [items]="fruits" name="fruit">
+            <div comboboxInputGroup><input comboboxInput id="fruit" /></div>
+            <ng-container *comboboxPortal>
+                <div comboboxPositioner [sideOffset]="4">
+                    <div comboboxPopup>
+                        <div comboboxEmpty>No fruit found.</div>
+                        <div comboboxList #list="comboboxList">
+                            @for (fruit of list.entries(); track fruit.value) {
+                                <div comboboxItem [value]="fruit">{{ fruit.label }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class FruitSearch {
+    protected readonly fruits = FRUITS;
+}
+```
+
+There is no Value directive: the Root's `value()` signal, read through `exportAs`
+(`#combobox="comboboxRoot"`), gives the chips. `injectCombobox()` gives a child component the
+state, `choose` and `clear`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`v-model:input-value`, `v-model:open`), and Angular as inputs and outputs (`[(value)]`,
+`[(inputValue)]`, `[(open)]`, `(valueChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `items` | `(Item \| { items: Item[] })[]` | | the items, or groups of items: the combobox filters them |
+| `filter` | `(item, query, itemToString) => boolean \| null` | locale-aware "contains" | whether an item matches; `null`: no filtering |
+| `limit` | `number` | `-1` | the most items the List renders |
+| `locale` | `string` | the document's | the collator's locale |
+| `multiple` | `boolean` | `false` | a list of values, with chips |
+| `value` | `Item \| null`, or `Item[]` | | the value, controlled |
+| `defaultValue` | `Item \| null`, or `Item[]` | `null`, or `[]` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason }) => void` | | every change (`item-press`, `clear-press`, `chip-remove-press`, `escape-key`, `none`) |
+| `inputValue` | `string` | | the input's text, controlled |
+| `defaultInputValue` | `string` | the default value's label | the initial text |
+| `onInputValueChange` | `(text: string, details: { reason }) => void` | | every text change (`input-change`, `input-clear`, `item-press`, `none`) |
+| `isItemEqualToValue` | `(item, value) => boolean` | `Object.is` | whether an item is a value |
+| `itemToStringLabel` | `(item) => string` | an object's `label`, else its `value`, else the item | an item's text |
+| `itemToStringValue` | `(item) => string` | an object's `value`, else the item | an item's form value |
+| `name` | `string` | | the hidden inputs' name (a field's wins) |
+| `required` | `boolean` | `false` | the form cannot submit with no value |
+| `disabled` | `boolean` | `false` | disables the input and its buttons |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every open change (`input-press`, `input-change`, `list-navigation`, `trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`) |
+
+### InputGroup
+
+No props of its own.
+
+### Input
+
+No props of its own.
+
+### Trigger
+
+No props of its own.
+
+### Clear
+
+No props of its own.
+
+### Chips
+
+No props of its own.
+
+### Chip
+
+No props of its own.
+
+### ChipRemove
+
+No props of its own.
+
+### Value
+
+No props of its own: its children are the value's label, or a render function of the value
+(not in Angular).
+
+### Status
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*comboboxPortal="element"`) |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the anchor |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the anchor, in px |
+| `alignOffset` | `number` | `0` | the shift along the anchor's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the InputGroup, else the Chips, else the Input | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+### Empty
+
+No props of its own.
+
+### List
+
+No props of its own: its children are nodes, or, with `items`, a render function of each
+matching entry (an item, or a group with its matching items).
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+No props of its own.
+
+### Separator
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Item` | | required: the item it chooses |
+| `disabled` | `boolean` | `false` | highlighted, never chosen |
+
+### ItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` | `boolean` | `false` | rendered in every state |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| InputGroup | `role="group"`, `data-popup-open`, `data-disabled` |
+| Input | `role="combobox"`, `aria-autocomplete="list"`, `aria-expanded`, `aria-controls`, `aria-activedescendant` (while an item is highlighted), `autocomplete="off"`, `data-popup-open`, `data-disabled`; in a Field, the field's states |
+| Trigger | `tabindex="-1"`, `aria-expanded`, `aria-controls`, `data-popup-open`, `data-disabled` |
+| Clear, ChipRemove | `type="button"`, `tabindex="-1"`, `data-disabled` |
+| Chips | `role="toolbar"` while it holds a chip |
+| Chip | `tabindex="-1"`, `aria-disabled`, `data-disabled` |
+| Status, Empty | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
+| Positioner, Popup | as the [Select](/docs/api/select)'s |
+| List | `role="listbox"`, `aria-multiselectable` with `multiple`, `data-empty` |
+| Group | `role="group"`, `aria-labelledby` |
+| Separator | `role="presentation"`, `data-orientation="horizontal"` |
+| Item | `role="option"`, `aria-selected`, `aria-disabled`, `data-highlighted`, `data-selected`, `data-disabled` |
+| ItemIndicator | `aria-hidden="true"` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| typing | filters and opens; nothing is highlighted yet |
+| ArrowDown / ArrowUp | closed: opens on the selected item, else the first (last); open: the next (previous) item, then back to the input |
+| Alt+ArrowDown / Alt+ArrowUp | opens without highlighting / closes |
+| Enter | chooses the highlighted item; never submits a form while the list is open |
+| Escape | open: closes and resets the text; closed: clears the text and the value |
+| Tab | closes without choosing and moves on |
+| Backspace | `multiple`, empty input: removes the last value |
+| ArrowLeft (ArrowRight in RTL) | `multiple`, caret at the start: focuses the last chip; on a chip, the arrows move between chips and back to the input, Backspace and Delete remove it |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxItemIndicatorProps`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxListProps`, `ComboboxPortalProps`, `ComboboxPositionerProps`, `ComboboxPositionerState`, `ComboboxRootMultipleProps`, `ComboboxRootProps`, `ComboboxRootSingleProps`, `ComboboxValueProps`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderProp`, `Side` |
+| `@fragiola/primitives-vue/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxDisabledState`, `ComboboxItemIndicatorProps`, `ComboboxItemIndicatorState`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxListSlots`, `ComboboxListState`, `ComboboxOpenState`, `ComboboxPopupState`, `ComboboxPortalProps`, `ComboboxPositionerState`, `ComboboxRootEmits`, `ComboboxRootProps`, `ComboboxValueSlots`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderSlotProps`, `Side` |
+| `@fragiola/primitives-angular/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `ComboboxChip`, `ComboboxChipRemove`, `ComboboxChips`, `ComboboxClear`, `ComboboxEmpty`, `ComboboxGroup`, `ComboboxGroupLabel`, `ComboboxInput`, `ComboboxInputGroup`, `ComboboxItem`, `ComboboxItemIndicator`, `ComboboxItemInfo`, `ComboboxItemState`, `ComboboxItemValue`, `ComboboxList`, `ComboboxPopup`, `ComboboxPortal`, `ComboboxPositioner`, `ComboboxRoot`, `ComboboxSeparator`, `ComboboxState`, `ComboboxStatus`, `ComboboxTrigger`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `OpenChangeEvent`, `PendingHighlight`, `Side`, `ValueChangeEvent`, `injectCombobox` |

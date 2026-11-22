@@ -66,6 +66,30 @@
                 {
                     "label": "Tabs",
                     "path": "api/tabs"
+                },
+                {
+                    "label": "Field",
+                    "path": "api/field"
+                },
+                {
+                    "label": "Checkbox",
+                    "path": "api/checkbox"
+                },
+                {
+                    "label": "CheckboxGroup",
+                    "path": "api/checkbox-group"
+                },
+                {
+                    "label": "Slider",
+                    "path": "api/slider"
+                },
+                {
+                    "label": "Select",
+                    "path": "api/select"
+                },
+                {
+                    "label": "Combobox",
+                    "path": "api/combobox"
                 }
             ]
         },

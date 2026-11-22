@@ -34,4 +34,5 @@ export {
     stepIndex,
     stepThroughNone,
 } from "./list-navigation.ts";
+export { scrollIntoViewWithin } from "./scroll-into-view.ts";
 export { createTypeahead } from "./typeahead.ts";

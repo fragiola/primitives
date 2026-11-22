@@ -187,6 +187,12 @@ describe("the sidebar", () => {
             "api/tooltip",
             "api/menu",
             "api/tabs",
+            "api/field",
+            "api/checkbox",
+            "api/checkbox-group",
+            "api/slider",
+            "api/select",
+            "api/combobox",
             "api/toolkit",
             "limitations",
             "https://github.com/fragiola/primitives/issues",
@@ -200,6 +206,12 @@ describe("the sidebar", () => {
             "api/tooltip",
             "api/menu",
             "api/tabs",
+            "api/field",
+            "api/checkbox",
+            "api/checkbox-group",
+            "api/slider",
+            "api/select",
+            "api/combobox",
         ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
@@ -212,9 +224,12 @@ describe("the sidebar", () => {
                 "Keyboard",
                 "Exports",
             ]);
-            expect(page, path).toMatch(
-                /https:\/\/www\.w3\.org\/WAI\/ARIA\/apg\/patterns\//,
-            );
+            // every component follows an APG pattern but Field, which has none (Base UI's Field)
+            if (path !== "api/field") {
+                expect(page, path).toMatch(
+                    /https:\/\/www\.w3\.org\/WAI\/ARIA\/apg\/patterns\//,
+                );
+            }
             for (const framework of site.project.frameworks) {
                 expect(page, path).toContain(`<Framework name="${framework}">`);
             }

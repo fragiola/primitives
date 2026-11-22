@@ -24,6 +24,12 @@
         "popover",
         "tooltip",
         "menu",
+        "checkbox",
+        "checkbox-group",
+        "combobox",
+        "field",
+        "select",
+        "slider",
         "tests",
         "*.config.ts"
     ]

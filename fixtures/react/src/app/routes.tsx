@@ -1,9 +1,24 @@
 import type { ComponentType } from "react";
+import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
+import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
+import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
+import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
+import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.tsx";
+import { ComboboxField } from "../scenarios/combobox/combobox-field.tsx";
+import { ComboboxFiltered } from "../scenarios/combobox/combobox-filtered.tsx";
+import { ComboboxForm } from "../scenarios/combobox/combobox-form.tsx";
+import { ComboboxGroups } from "../scenarios/combobox/combobox-groups.tsx";
+import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
+import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
+import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.tsx";
 import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.tsx";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.tsx";
+import { FieldBasic } from "../scenarios/field/field-basic.tsx";
+import { FieldControls } from "../scenarios/field/field-controls.tsx";
+import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
 import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
@@ -13,6 +28,13 @@ import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.tsx";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.tsx";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
+import { SelectBasic } from "../scenarios/select/select-basic.tsx";
+import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
+import { SelectModal } from "../scenarios/select/select-modal.tsx";
+import { SliderBasic } from "../scenarios/slider/slider-basic.tsx";
+import { SliderControlled } from "../scenarios/slider/slider-controlled.tsx";
+import { SliderRange } from "../scenarios/slider/slider-range.tsx";
+import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
 import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
@@ -42,4 +64,27 @@ export const routes: Record<string, ComponentType<{ locale: string }>> = {
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,
     "/menu/modal": MenuModal,
+    "/combobox/basic": ComboboxBasic,
+    "/combobox/controlled": ComboboxControlled,
+    "/combobox/rejected-input": ComboboxRejectedInput,
+    "/combobox/filtered": ComboboxFiltered,
+    "/combobox/objects": ComboboxObjects,
+    "/combobox/multiple": ComboboxMultiple,
+    "/combobox/groups": ComboboxGroups,
+    "/combobox/form": ComboboxForm,
+    "/combobox/field": ComboboxField,
+    "/select/basic": SelectBasic,
+    "/select/controlled": SelectControlled,
+    "/select/modal": SelectModal,
+    "/checkbox/basic": CheckboxBasic,
+    "/checkbox/group": CheckboxGroupScenario,
+    "/checkbox/controlled": CheckboxControlled,
+    "/slider/basic": SliderBasic,
+    "/slider/range": SliderRange,
+    "/slider/vertical": SliderVertical,
+    "/slider/rtl": SliderBasic,
+    "/slider/controlled": SliderControlled,
+    "/field/basic": FieldBasic,
+    "/field/validation": FieldValidation,
+    "/field/controls": FieldControls,
 };

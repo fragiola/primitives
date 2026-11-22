@@ -1,0 +1,140 @@
+---
+title: Checkbox
+description: A two-state or mixed choice the user toggles, with native form support, following the APG's checkbox pattern, in each framework.
+---
+
+A choice the user checks or clears (WAI-ARIA APG
+[checkbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/), the mixed state
+included). It works in a native `<form>`: it submits, resets and validates as an
+`<input type="checkbox">` would. Several checkboxes sharing one array value, with a parent that
+checks or clears them all, are a [CheckboxGroup](/docs/api/checkbox-group), shown in the example.
+
+<Example id="checkbox" />
+
+## Behaviour
+
+- **Toggle**: a click on the Root or on its `<label>`, or Space; Enter does nothing (the APG, and
+  a native checkbox).
+- **Mixed**: `indeterminate` shows the mixed state (`aria-checked="mixed"`); a toggle from it
+  checks. The app sets it, or the group sets it on its parent checkbox.
+- **Forms**: a visually hidden `checkbox` input right after the Root submits `name=value` while
+  checked (`value` defaults to `"on"`), nothing while not. It is never in the accessibility tree
+  nor the tab order. `required` blocks the submission while unchecked and focuses the Root; a form
+  reset returns an uncontrolled checkbox to its default.
+- **In a [Field](/docs/api/field)**: the Root takes the field's ids, `name`, `disabled` and
+  states.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `button` | `checkbox-root` | the `checkbox`; holds its state |
+| Indicator | `span` | `checkbox-indicator` | the check or the dash; rendered only while checked or mixed |
+| (hidden input) | `input type="checkbox"` | `checkbox-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Checkbox } from "@fragiola/primitives-react/checkbox";
+
+<label>
+    <Checkbox.Root name="terms" required onCheckedChange={(checked) => console.log(checked)}>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+    </Checkbox.Root>
+    Accept terms
+</label>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label>
+        <Checkbox.Root v-model:checked="accepted" name="terms" required>
+            <Checkbox.Indicator>✓</Checkbox.Indicator>
+        </Checkbox.Root>
+        Accept terms
+    </label>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CheckboxRoot, CheckboxIndicator],
+    template: `
+        <label>
+            <button checkboxRoot [(checked)]="accepted" name="terms" required>
+                <span *checkboxIndicator>✓</span>
+            </button>
+            Accept terms
+        </label>
+    `,
+})
+export class Terms {
+    protected readonly accepted = signal(false);
+}
+```
+
+The Indicator is structural (`*checkboxIndicator`): it is rendered only while checked or mixed.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:checked`,
+`@checked-change`), and Angular as inputs and outputs (`[(checked)]`, `(checkedChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` | | the checked state, controlled |
+| `defaultChecked` | `boolean` | `false` | the initial state, uncontrolled |
+| `onCheckedChange` | `(checked: boolean, details: { reason }) => void` | | every change (reason `none`) |
+| `indeterminate` | `boolean` | `false` | shows the mixed state |
+| `disabled` | `boolean` | `false` | ignores clicks and keys |
+| `required` | `boolean` | `false` | the form cannot submit while unchecked |
+| `name` | `string` | | the form name (a field's wins) |
+| `value` | `string` | `"on"` | the submitted value; in a CheckboxGroup, the checkbox's value in the group's array |
+| `parent` | `boolean` | `false` | in a CheckboxGroup, the parent checkbox that checks or clears every value |
+| `id` (react, vue) | `string` | generated | the button's id; Angular takes it as a plain attribute |
+
+### Indicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` | `boolean` | `false` | rendered in every state (Angular: `*checkboxIndicator="true"`) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="checkbox"`, `type="button"`, `aria-checked` (`"true"`, `"false"`, `"mixed"`), `aria-required`, `disabled`, `data-checked` / `data-unchecked` / `data-indeterminate` (exactly one), `data-disabled`, `data-required`; a parent checkbox has `aria-controls` (its children's ids); in a Field, the field's states |
+| Indicator | `aria-hidden="true"`, `data-checked` / `data-unchecked` / `data-indeterminate`, `data-disabled` |
+| hidden input | `type="checkbox"`, `name`, `value`, `checked`, `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, visually hidden |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Space | toggles |
+| Enter | nothing |
+| Tab | moves on; every checkbox is a tab stop |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/checkbox` | `ChangeDetails`, `ChangeReason`, `Checkbox`, `CheckboxIndicatorProps`, `CheckboxRootProps`, `CheckboxState`, `RenderProp` |
+| `@fragiola/primitives-vue/checkbox` | `ChangeDetails`, `ChangeReason`, `Checkbox`, `CheckboxIndicatorProps`, `CheckboxRootEmits`, `CheckboxRootProps`, `CheckboxState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/checkbox` | `ChangeDetails`, `ChangeReason`, `CheckboxIndicator`, `CheckboxRoot`, `CheckboxState` |

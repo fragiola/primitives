@@ -5,9 +5,15 @@
 // Angular folders against it. A new component is added here first, in alphabetical order (the
 // order Biome sorts the root entries' re-exports in).
 export const COMPONENTS = [
+    "checkbox",
+    "checkbox-group",
+    "combobox",
     "dialog",
+    "field",
     "menu",
     "popover",
+    "select",
+    "slider",
     "tabs",
     "tooltip",
 ] as const;
