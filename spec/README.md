@@ -13,10 +13,14 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [popover.md](popover.md) | Popover |
 | [tooltip.md](tooltip.md) | Tooltip |
 | [menu.md](menu.md) | Menu (with submenus) |
+| [field.md](field.md) | Field (the POC's, ported as it is; production scope in stage 1) |
+| [checkbox.md](checkbox.md) | Checkbox and CheckboxGroup |
+| [slider.md](slider.md) | Slider |
+| [select.md](select.md) | Select |
+| [combobox.md](combobox.md) | Combobox (D10) |
 
-The POC's other specs (Field, Checkbox, CheckboxGroup, Slider, Select, Combobox; Calendar,
-RangeCalendar, DatePicker, DateRangePicker) move here with the Epic that ports their component
-(`docs/handoff.md` §5, stage 0), with §3's changes applied.
+The POC's other specs (Calendar, RangeCalendar, DatePicker, DateRangePicker) move here with the
+Epic that ports their component (`docs/handoff.md` §5, stage 0), with §3's changes applied.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -61,7 +65,7 @@ The vocabulary is shared by every component:
 | attribute | meaning |
 | --- | --- |
 | `data-open` | an overlay while open |
-| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming") |
+| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover or Select trigger, a Combobox's Input, InputGroup and Trigger |
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
@@ -133,7 +137,7 @@ shared:
 | arrow keys wrap around | `loopFocus` (Base UI's name, D4 §3 "Naming") |
 | an element to focus | `initialFocus`, `finalFocus` (an element, a ref, or `false` for none; Vue and Angular also take a getter, read when the focus moves; Angular also an `ElementRef`) |
 | positioning | `side` (`top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`), `align` (`start`, `center`, `end`), `sideOffset`, `alignOffset`, `collisionPadding` |
-| a modal overlay that is non-modal by default | `modal` (Menu; scroll lock and a blocked outside pointer, [menu.md](menu.md#modal)) |
+| a modal overlay that is non-modal by default | `modal` (Menu and Select; scroll lock and a blocked outside pointer, [menu.md](menu.md#modal), [select.md](select.md#modal)) |
 | locale | `locale` (a BCP 47 tag; defaults to the document's `lang`, then the browser's) |
 
 Controlled and uncontrolled: when `value` (or `open`) is given, the component is controlled and
@@ -146,8 +150,9 @@ component shows the consumer's value, not the user's input: the input's text goe
 kept value within the same event, and a kept `open` leaves the overlay open and working (focus
 inside, the outside inert). Frameworks that write a native element before the consumer answers
 (an `<input>`'s text) must re-assert the kept value after the consumer's update has rendered.
-Scenarios: [`/dialog/rejected-close`](dialog.md#dialogrejected-close) (and Combobox's
-`/combobox/rejected-input`, with its Epic).
+Scenarios: [`/dialog/rejected-close`](dialog.md#dialogrejected-close),
+[`/combobox/rejected-input`](combobox.md#comboboxrejected-input), and the `controlled` scenarios of
+Checkbox, Slider and Select.
 
 ### Forms
 
@@ -159,7 +164,7 @@ native control would. A hidden input is never in the accessibility tree nor in t
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
 `hidden-input`, since its `input` is the visible Input).
 
-**The Field layer** (`field.md`, with its Epic) sits above the controls. A `Field.Root` around a
+**The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a Select, a Slider or a Combobox gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
@@ -190,7 +195,7 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | children function (collections, calendar weeks, a combobox's List and Value) | `children={(item) => ...}` | default scoped slot (`v-slot="{ week }"`) | `@for` over the directive's signal, read through `exportAs` (`@for (week of body.weeks(); ...)`, `{{ cell.dayNumber() }}`); a part rendered only in some states is structural (`*tabsPanel="'account'"`) |
 | field context (a control inside `Field.Root`) | `useContext` of the field's context | `inject` of the field's provided state | `injectField()` (optional injection of the enclosing `[fieldRoot]`) |
 | field validation (`validate`, `validationMode`) | `validate={(value) => ...}` `validationMode="onBlur"` | `:validate="(value) => ..."` `validation-mode="onBlur"` | `[validate]="fn"` `validationMode="onBlur"` (inputs of `[fieldRoot]`) |
-| part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()` → `{ state, ... }` of the enclosing root (the parts are the directives themselves) |
+| part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()`, `injectCombobox()` → `{ state, ... }` of the enclosing root; `injectField()` → the enclosing `[fieldRoot]` or `null` (the parts are the directives themselves) |
 | a menu item's activation | `onClick` on `Menu.Item` | `@click` on `Menu.Item` | `(click)` on the `[menuItem]` element |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
