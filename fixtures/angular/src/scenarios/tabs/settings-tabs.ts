@@ -30,7 +30,7 @@ const TABS = [
                 @for (tab of tabs; track tab.value) {
                     <button tabsTab [value]="tab.value" [disabled]="tab.disabled" [class]="styles.tab">{{ tab.label }}</button>
                 }
-                <span *tabsIndicator [class]="styles.indicator"></span>
+                <span *tabsIndicator="true" [class]="styles.indicator"></span>
             </div>
             @for (tab of tabs; track tab.value) {
                 <div *tabsPanel="tab.value" [class]="styles.panel"><p>@for (run of [tab.label, " settings"]; track $index) {<ng-container>{{ run }}</ng-container>}</p></div>

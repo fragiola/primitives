@@ -119,10 +119,13 @@ No props of its own. Give it an accessible name (`aria-label` or `aria-labelledb
 
 ### Indicator
 
-No props of its own. It sets `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
+It sets `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
 `--tabs-indicator-inline-size` and `--tabs-indicator-block-size`, and is not rendered while no tab
-is selected. In Angular the directive's element stays in the DOM, without the variables, until a
-tab is selected.
+is selected (Angular's `*tabsIndicator` is structural).
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `renderBeforeHydration` | `boolean` | `false` | in a server render, places it before hydration: a small inline script inside it measures the selected tab as the page parses, then removes itself ([Server rendering](/docs/server-rendering)) (Angular: `*tabsIndicator="true"`) |
 
 ### Panel
 
@@ -155,6 +158,6 @@ tab is selected.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsPanelProps`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/tabs` | `Tabs`, `TabsRootProps`, `TabsRootEmits`, `TabsRootState`, `TabsListState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelProps`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsPanelProps`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/tabs` | `Tabs`, `TabsRootProps`, `TabsRootEmits`, `TabsRootState`, `TabsListState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsIndicatorState`, `TabsPanelProps`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
 | `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |

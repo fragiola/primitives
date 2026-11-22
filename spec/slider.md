@@ -86,6 +86,12 @@ Every thumb is a tab stop, in value order. A press on the Control focuses the th
 Horizontal sliders run right to left: `min` at the right, the arrows swap. Vertical sliders do not
 change.
 
+## Server rendering
+
+A Thumb's position is a percentage of its value (`inset-inline-start`, or `inset-block-end` when vertical),
+written as inline style on the server too: it is in place before hydration with no script (Base
+UI needs one for its `thumbAlignment="edge"`, which this library does not offer).
+
 ## Scenarios
 
 The form scenarios print `form: <key=value&...>` as [checkbox.md](checkbox.md#scenarios) does.

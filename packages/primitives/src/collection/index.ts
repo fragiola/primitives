@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs and menus, typeahead, the combobox's item helpers and chip keys.
+// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs and menus, typeahead, the combobox's item helpers and chip keys, the Tabs Indicator's placement before hydration.
 
 export {
     type ChipKeyAction,
@@ -35,4 +35,5 @@ export {
     stepThroughNone,
 } from "./list-navigation.ts";
 export { scrollIntoViewWithin } from "./scroll-into-view.ts";
+export { placeTabsIndicator } from "./tabs-indicator.ts";
 export { createTypeahead } from "./typeahead.ts";

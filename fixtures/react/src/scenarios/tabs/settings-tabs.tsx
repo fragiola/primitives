@@ -36,7 +36,7 @@ export function SettingsTabs({
                             {tab.label}
                         </Tabs.Tab>
                     ))}
-                    <Tabs.Indicator />
+                    <Tabs.Indicator renderBeforeHydration />
                 </Tabs.List>
                 {TABS.map((tab) => (
                     <Tabs.Panel key={tab.value} value={tab.value}>

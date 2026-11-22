@@ -1,5 +1,6 @@
+import { placeTabsIndicator } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, h, ref, watch } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
     type PartComponent,
@@ -14,14 +15,32 @@ export interface TabsIndicatorState {
     orientation: "horizontal" | "vertical";
 }
 
+export interface TabsIndicatorProps {
+    /**
+     * Places it before hydration in a server render (Base UI's name): the server writes a small
+     * inline script inside it that measures the selected tab as the page parses, then removes
+     * itself (spec/tabs.md, "Server rendering"). Default `false`.
+     */
+    renderBeforeHydration?: boolean;
+}
+
+/** The inline script of a server-rendered Indicator (`renderBeforeHydration`). */
+const BEFORE_HYDRATION = `(${placeTabsIndicator.toString()})(document.currentScript)`;
+
+/**
+ * It is rendered once the selected tab is measured (at once with `renderBeforeHydration`).
+ */
 export const TabsIndicator: PartComponent<
-    Record<never, never>,
+    TabsIndicatorProps,
     TabsIndicatorState
 > = publicComponent(
     defineComponent({
         name: "TabsIndicator",
         inheritAttrs: false,
-        props: asProp,
+        props: {
+            ...asProp,
+            renderBeforeHydration: { type: Boolean, default: false },
+        },
         setup(props, { attrs, slots }) {
             const context = useRequiredContext(TabsKey, "Tabs.Indicator");
             const box = ref<Record<string, string> | null>(null);
@@ -69,10 +88,21 @@ export const TabsIndicator: PartComponent<
                 { flush: "post", immediate: true },
             );
             return () => {
-                if (box.value === null) {
+                // rendered once measured, so it first appears in place; with
+                // `renderBeforeHydration` at once (a server measures nothing: its script does)
+                if (
+                    context.value.value === undefined ||
+                    (box.value === null && !props.renderBeforeHydration)
+                ) {
                     return null;
                 }
                 const orientation = context.orientation();
+                // only a server writes the script, which removes itself before the browser
+                // hydrates
+                const script =
+                    props.renderBeforeHydration && typeof window === "undefined"
+                        ? h("script", { innerHTML: BEFORE_HYDRATION })
+                        : null;
                 return renderPart(
                     "span",
                     { attrs, slots },
@@ -82,8 +112,17 @@ export const TabsIndicator: PartComponent<
                         "aria-hidden": "true",
                         "data-primitives-part": "tabs-indicator",
                         ...stateAttributes({ orientation }),
-                        style: box.value,
+                        // no style until measured: a server's script may have set one, which the
+                        // hydration must not read as a mismatch
+                        ...(box.value === null ? {} : { style: box.value }),
                     },
+                    script === null
+                        ? undefined
+                        : () => [
+                              ...(slots.default?.({ state: { orientation } }) ??
+                                  []),
+                              script,
+                          ],
                 );
             };
         },
