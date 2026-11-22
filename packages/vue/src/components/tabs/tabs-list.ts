@@ -3,6 +3,7 @@ import { getDirection } from "@fragiola/primitives/direction";
 import { defineComponent } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -25,6 +26,7 @@ export const TabsList: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(TabsKey, "Tabs.List");
             const setList = elementSetter(context.list);
             const onKeydown = (event: KeyboardEvent) => {
@@ -51,7 +53,7 @@ export const TabsList: PartComponent<
                 }
                 const index = tabsKeyTarget(event.key, current, tabs.length, {
                     orientation: context.orientation(),
-                    rtl: getDirection(list) === "rtl",
+                    rtl: getDirection(list, direction()) === "rtl",
                     loop: context.loopFocus(),
                 });
                 if (index === null) {

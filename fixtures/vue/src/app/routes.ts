@@ -17,15 +17,22 @@ import ComboboxMultiple from "../scenarios/combobox/combobox-multiple.vue";
 import ComboboxObjects from "../scenarios/combobox/combobox-objects.vue";
 import ComboboxRejectedInput from "../scenarios/combobox/combobox-rejected-input.vue";
 import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
+import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
 import DatePickerRange from "../scenarios/date-picker/date-picker-range.vue";
 import DialogBasic from "../scenarios/dialog/dialog-basic.vue";
 import DialogControlled from "../scenarios/dialog/dialog-controlled.vue";
 import DialogInitialFocus from "../scenarios/dialog/dialog-initial-focus.vue";
 import DialogNestedPopover from "../scenarios/dialog/dialog-nested-popover.vue";
 import DialogRejectedClose from "../scenarios/dialog/dialog-rejected-close.vue";
+import DirectionProviderScenario from "../scenarios/direction/direction-provider.vue";
+import FieldAsync from "../scenarios/field/field-async.vue";
 import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
+import FieldMatch from "../scenarios/field/field-match.vue";
+import FieldMoreControls from "../scenarios/field/field-more-controls.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
+import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
+import FormBasic from "../scenarios/form/form-basic.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
 import MenuControlled from "../scenarios/menu/menu-controlled.vue";
 import MenuGroups from "../scenarios/menu/menu-groups.vue";
@@ -42,6 +49,7 @@ import SelectControlled from "../scenarios/select/select-controlled.vue";
 import SelectModal from "../scenarios/select/select-modal.vue";
 import SliderBasic from "../scenarios/slider/slider-basic.vue";
 import SliderControlled from "../scenarios/slider/slider-controlled.vue";
+import SliderLabelValue from "../scenarios/slider/slider-label-value.vue";
 import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
@@ -97,9 +105,15 @@ export const routes: Record<string, Component> = {
     "/slider/vertical": SliderVertical,
     "/slider/rtl": SliderBasic,
     "/slider/controlled": SliderControlled,
+    "/slider/label-value": SliderLabelValue,
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
+    "/field/async": FieldAsync,
+    "/field/match": FieldMatch,
+    "/field/more-controls": FieldMoreControls,
+    "/fieldset/basic": FieldsetBasic,
+    "/form/basic": FormBasic,
     "/calendar/single": CalendarSingle,
     "/calendar/min-max": CalendarMinMax,
     "/calendar/unavailable": CalendarUnavailable,
@@ -109,4 +123,6 @@ export const routes: Record<string, Component> = {
     "/calendar/range": CalendarRange,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
+    "/date-picker/form": DatePickerForm,
+    "/direction/provider": DirectionProviderScenario,
 };

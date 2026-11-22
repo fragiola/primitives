@@ -9,7 +9,13 @@ if (root === null) {
 }
 const { pathname, search } = window.location;
 const query = readQuery(search);
-document.documentElement.dir = query.dir;
+// a `dir` only for an RTL page: a page with none reads left to right (spec/direction.md's
+// scenario checks the document has no `dir`)
+if (query.dir === "rtl") {
+    document.documentElement.dir = "rtl";
+} else {
+    document.documentElement.removeAttribute("dir");
+}
 if (query.lang === undefined) {
     document.documentElement.removeAttribute("lang");
 } else {

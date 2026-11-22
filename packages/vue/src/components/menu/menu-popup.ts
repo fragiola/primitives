@@ -11,6 +11,7 @@ import { lockScroll } from "@fragiola/primitives/scroll-lock";
 import { defineComponent, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -57,6 +58,7 @@ export const MenuPopup: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(MenuKey, "Menu.Popup");
             const nested = context.parent !== null;
             const setPopup = elementSetter(context.popup);
@@ -145,7 +147,7 @@ export const MenuPopup: PartComponent<
                 const focusAt = (index: number) =>
                     items[index]?.focus({ preventScroll: true });
                 const { close: closeKey } = submenuKeys(
-                    getDirection(popup) === "rtl",
+                    getDirection(popup, direction()) === "rtl",
                 );
                 switch (event.key) {
                     case "ArrowDown":

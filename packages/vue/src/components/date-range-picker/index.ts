@@ -20,7 +20,10 @@ export type {
 } from "../date-picker/date-picker-popup.ts";
 export type { DatePickerPortalProps } from "../date-picker/date-picker-portal.ts";
 export type { DatePickerPositionerState } from "../date-picker/date-picker-positioner.ts";
-export type { DatePickerRootSharedProps } from "../date-picker/date-picker-root-base.ts";
+export type {
+    DatePickerFormProps,
+    DatePickerRootSharedProps,
+} from "../date-picker/date-picker-root-base.ts";
 export type {
     DatePickerTriggerProps,
     DatePickerTriggerState,

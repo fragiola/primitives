@@ -1,4 +1,5 @@
 import type { ComputedRef, InjectionKey, Ref } from "vue";
+import type { FieldControlBinding } from "../../composables/use-field-control.ts";
 
 export interface CheckboxGroupContext {
     value: ComputedRef<readonly string[]>;
@@ -12,6 +13,12 @@ export interface CheckboxGroupContext {
     reset: () => void;
     /** The children's element ids, for the parent's `aria-controls`. */
     ids: Ref<Readonly<Record<string, string>>>;
+    /**
+     * Inside a Field, the group is the field's control: its checkboxes take the field's `name`
+     * and `disabled` from this binding, and do not register as the control themselves
+     * (spec/checkbox.md). `null` outside a Field.
+     */
+    field: FieldControlBinding | null;
 }
 
 export const CheckboxGroupKey: InjectionKey<CheckboxGroupContext> =

@@ -2,6 +2,7 @@ import { submenuKeys } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import { defineComponent, onBeforeUnmount, shallowRef } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -42,6 +43,7 @@ export const MenuSubmenuTrigger: PartComponent<
             delay: { type: Number, default: 100 },
         },
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const submenu = useRequiredContext(MenuKey, "Menu.SubmenuTrigger");
             const parent = submenu.parent;
             if (parent === null) {
@@ -96,7 +98,8 @@ export const MenuSubmenuTrigger: PartComponent<
                         onKeydown: (event: KeyboardEvent) => {
                             const node = element.value;
                             const { open: openKey } = submenuKeys(
-                                node !== null && getDirection(node) === "rtl",
+                                node !== null &&
+                                    getDirection(node, direction()) === "rtl",
                             );
                             if (
                                 event.key === openKey ||

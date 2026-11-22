@@ -18,6 +18,8 @@ export interface PickerBinding {
     /** Sets the picker's value and closes its popup (reason `item-press`). */
     choose: (value: CalendarValue) => void;
     options: () => CalendarOptions;
+    /** A read-only picker's calendar is read-only: it can be browsed, no date chosen. */
+    readOnly?: () => boolean;
 }
 
 export const PickerBindingKey: InjectionKey<PickerBinding> =

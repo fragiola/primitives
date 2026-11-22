@@ -1,6 +1,7 @@
 import type { FieldState } from "@fragiola/primitives/form";
 import {
     type FieldErrorMatch,
+    fieldErrorMessages,
     fieldErrorShown,
     fieldStateAttributes,
 } from "@fragiola/primitives/form";
@@ -24,14 +25,17 @@ import { stateAttributes } from "../../utils/state-attributes.ts";
 import { FieldKey } from "./field-context.ts";
 
 export interface FieldErrorProps {
-    /** A `ValidityState` key (`"customError"` for `validate`'s messages), or `true` for always. */
+    /**
+     * A `ValidityState` key (`"customError"` for `validate`'s messages), a function of the
+     * field's validity, or `true` for always.
+     */
     match?: FieldErrorMatch;
     id?: string;
 }
 
 /**
- * An error message, rendered only while shown: its slot, or the field's messages (one as text,
- * several as a list) (spec/field.md).
+ * An error message, rendered only while shown: its slot, or the field's messages (the Form's errors
+ * for it, else `validate`'s or the browser's; one as text, several as a list) (spec/field.md).
  */
 export const FieldError: PartComponent<FieldErrorProps, FieldState> =
     publicComponent(
@@ -40,9 +44,16 @@ export const FieldError: PartComponent<FieldErrorProps, FieldState> =
             inheritAttrs: false,
             props: {
                 ...asProp,
-                /** A `ValidityState` key (`"customError"` for `validate`'s messages), or `true` for always. */
+                /**
+                 * A `ValidityState` key (`"customError"` for `validate`'s messages), a function of
+                 * the field's validity, or `true` for always.
+                 */
                 match: {
-                    type: [Boolean, String] as PropType<FieldErrorMatch>,
+                    type: [
+                        Boolean,
+                        String,
+                        Function,
+                    ] as PropType<FieldErrorMatch>,
                     default: undefined,
                 },
                 id: { type: String, default: undefined },
@@ -72,7 +83,12 @@ export const FieldError: PartComponent<FieldErrorProps, FieldState> =
                         return null;
                     }
                     const state = field.state.value;
-                    const errors = field.shown.value.errors;
+                    // the Form's errors for the field first, else the field's own messages
+                    const errors = fieldErrorMessages(
+                        props.match,
+                        field.shown.value,
+                        field.formErrors.value,
+                    );
                     const content = slots.default
                         ? () => slots.default?.({ state })
                         : () =>

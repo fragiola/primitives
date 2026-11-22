@@ -4,11 +4,12 @@ import {
     DatePicker,
     type PlainDate,
 } from "@fragiola/primitives-vue/date-picker";
+import { Field } from "@fragiola/primitives-vue/field";
 import { ref } from "vue";
 import { styles } from "./styles.ts";
 
 const pad = (value: number) => String(value).padStart(2, "0");
-/** `2026-11-24`: what the form submits. */
+/** `2026-11-24`: a row's key. */
 const iso = (date: PlainDate) =>
     `${date.year}-${pad(date.month)}-${pad(date.day)}`;
 /** `Nov 24, 2026`: what the trigger shows. */
@@ -27,43 +28,48 @@ const checkIn = ref<PlainDate | null>(null);
 const booked = ref<string | null>(null);
 const onSubmit = (event: Event) => {
     const data = new FormData(event.currentTarget as HTMLFormElement);
-    booked.value = String(data.get("check-in") || "no date");
+    booked.value = String(data.get("check-in"));
 };
 
-// A booking form: the trigger opens a calendar on today, past days are disabled, choosing a day
-// closes it and returns focus to the trigger, and a hidden input carries the day into the form
-// (spec/calendar.md).
+// A booking form: the picker sits in a required field; the trigger opens a calendar on today,
+// past days are disabled, choosing a day closes it and returns focus to the trigger, and the
+// picker submits the day (`2026-11-24`). "Book" with no day shows the error and focuses the
+// trigger (spec/calendar.md, "Forms").
 </script>
 
 <template>
     <form :class="styles.form" @submit.prevent="onSubmit">
-        <DatePicker.Root v-model:value="checkIn" :min="today" locale="en-US">
-            <DatePicker.Trigger :class="styles.picker.trigger">Check-in: {{ checkIn ? format(checkIn) : "choose a date" }}</DatePicker.Trigger>
-            <DatePicker.Portal>
-                <DatePicker.Positioner :side-offset="4" :class="styles.picker.positioner">
-                    <DatePicker.Popup aria-label="Check-in date" :class="styles.picker.popup">
-                        <Calendar.Root :class="styles.calendar.root">
-                            <div :class="styles.header">
-                                <Calendar.PrevButton aria-label="Previous month" :class="styles.calendar.prevButton">‹</Calendar.PrevButton>
-                                <Calendar.Heading :class="styles.calendar.heading" />
-                                <Calendar.NextButton aria-label="Next month" :class="styles.calendar.nextButton">›</Calendar.NextButton>
-                            </div>
-                            <Calendar.Grid :class="styles.calendar.grid">
-                                <Calendar.GridHeader v-slot="{ weekday }">
-                                    <Calendar.HeaderCell :key="weekday.index" :weekday="weekday" :class="styles.calendar.headerCell" />
-                                </Calendar.GridHeader>
-                                <Calendar.GridBody v-slot="{ week }">
-                                    <Calendar.Row :key="iso(week[0] ?? today)" :week="week" v-slot="{ date }">
-                                        <Calendar.Cell :key="iso(date)" :date="date" :class="styles.calendar.cell" />
-                                    </Calendar.Row>
-                                </Calendar.GridBody>
-                            </Calendar.Grid>
-                        </Calendar.Root>
-                    </DatePicker.Popup>
-                </DatePicker.Positioner>
-            </DatePicker.Portal>
-        </DatePicker.Root>
-        <input type="hidden" name="check-in" :value="checkIn ? iso(checkIn) : ''" />
+        <Field.Root name="check-in" :class="styles.field.root">
+            <Field.Label :class="styles.field.label">Check-in</Field.Label>
+            <DatePicker.Root v-model:value="checkIn" :min="today" required locale="en-US">
+                <DatePicker.Trigger :class="styles.picker.trigger">{{ checkIn ? format(checkIn) : "Choose a date" }}</DatePicker.Trigger>
+                <DatePicker.Portal>
+                    <DatePicker.Positioner :side-offset="4" :class="styles.picker.positioner">
+                        <DatePicker.Popup aria-label="Check-in date" :class="styles.picker.popup">
+                            <Calendar.Root :class="styles.calendar.root">
+                                <div :class="styles.header">
+                                    <Calendar.PrevButton aria-label="Previous month" :class="styles.calendar.prevButton">‹</Calendar.PrevButton>
+                                    <Calendar.Heading :class="styles.calendar.heading" />
+                                    <Calendar.NextButton aria-label="Next month" :class="styles.calendar.nextButton">›</Calendar.NextButton>
+                                </div>
+                                <Calendar.Grid :class="styles.calendar.grid">
+                                    <Calendar.GridHeader v-slot="{ weekday }">
+                                        <Calendar.HeaderCell :key="weekday.index" :weekday="weekday" :class="styles.calendar.headerCell" />
+                                    </Calendar.GridHeader>
+                                    <Calendar.GridBody v-slot="{ week }">
+                                        <Calendar.Row :key="iso(week[0] ?? today)" :week="week" v-slot="{ date }">
+                                            <Calendar.Cell :key="iso(date)" :date="date" :class="styles.calendar.cell" />
+                                        </Calendar.Row>
+                                    </Calendar.GridBody>
+                                </Calendar.Grid>
+                            </Calendar.Root>
+                        </DatePicker.Popup>
+                    </DatePicker.Positioner>
+                </DatePicker.Portal>
+            </DatePicker.Root>
+            <Field.Description :class="styles.field.description">We hold the room until noon.</Field.Description>
+            <Field.Error :class="styles.field.error">Choose a check-in date.</Field.Error>
+        </Field.Root>
         <button type="submit" :class="styles.submit">Book</button>
         <p role="status" :class="styles.status">{{ booked === null ? "" : `Booked: ${booked}` }}</p>
     </form>

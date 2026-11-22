@@ -108,6 +108,7 @@ export const SelectRoot: PublicComponent<
                 value: () => value.value,
                 filled: () => value.value !== null,
                 input: () => input.value,
+                focusTarget: () => root.trigger.value,
             });
             const disabled = () => props.disabled || field.disabled();
             const highlighted = ref<string | null>(null);

@@ -84,6 +84,7 @@ export const FieldControl: PartComponent<
                 value: () => own.value.value,
                 filled: () => own.value.value !== "",
                 input: () => input.value,
+                focusTarget: () => input.value,
             });
             const onInput = (event: Event) => {
                 const target = event.currentTarget as HTMLInputElement;

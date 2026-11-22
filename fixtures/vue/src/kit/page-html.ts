@@ -11,7 +11,8 @@ export function pageHtml(
 ): string {
     const query = readQuery(search);
     const lang = query.lang === undefined ? "" : ` lang="${query.lang}"`;
+    const dir = query.dir === "rtl" ? ' dir="rtl"' : "";
     return template
-        .replace(/<html[^>]*>/, `<html${lang} dir="${query.dir}">`)
+        .replace(/<html[^>]*>/, `<html${lang}${dir}>`)
         .replace(/<div id="root"><\/div>/, root);
 }

@@ -23,7 +23,10 @@ export type {
     DatePickerRootEmits,
     DatePickerRootProps,
 } from "./date-picker-root.ts";
-export type { DatePickerRootSharedProps } from "./date-picker-root-base.ts";
+export type {
+    DatePickerFormProps,
+    DatePickerRootSharedProps,
+} from "./date-picker-root-base.ts";
 export type {
     DatePickerTriggerProps,
     DatePickerTriggerState,

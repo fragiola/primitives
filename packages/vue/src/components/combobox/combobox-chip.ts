@@ -3,6 +3,7 @@ import { getDirection } from "@fragiola/primitives/direction";
 import { defineComponent, nextTick, provide, shallowRef } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -26,6 +27,7 @@ export const ComboboxChip: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(ComboboxKey, "Combobox.Chip");
             const element = shallowRef<HTMLElement | null>(null);
             const setElement = elementSetter(element);
@@ -47,7 +49,7 @@ export const ComboboxChip: PartComponent<
                     event.key,
                     index,
                     chips.length,
-                    getDirection(current) === "rtl",
+                    getDirection(current, direction()) === "rtl",
                 );
                 if (action === null) {
                     return;

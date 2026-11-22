@@ -4,6 +4,7 @@ import {
     type Side,
 } from "@fragiola/primitives/positioning";
 import { type Ref, ref, watch } from "vue";
+import { useProvidedDirection } from "../direction/direction-context.ts";
 
 export interface PositionerProps {
     side?: Side;
@@ -32,6 +33,7 @@ export function usePositioner(
     positioner: Ref<HTMLElement | null>,
     arrow: Ref<HTMLElement | null> | null,
 ) {
+    const direction = useProvidedDirection();
     const placed = ref<{ side: Side; align: Align }>({
         side: props.side ?? defaults.side,
         align: props.align ?? defaults.align,
@@ -73,6 +75,7 @@ export function usePositioner(
                     alignOffset,
                     collisionPadding,
                     arrow: arrowElement,
+                    direction,
                     onPlaced: (next) => {
                         if (
                             placed.value.side !== next.side ||

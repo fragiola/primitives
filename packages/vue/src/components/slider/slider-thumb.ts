@@ -4,9 +4,17 @@ import {
     thumbBounds,
     valueToPercent,
 } from "@fragiola/primitives/range";
-import { defineComponent, type PropType, shallowRef, watch } from "vue";
+import {
+    defineComponent,
+    onBeforeUnmount,
+    type PropType,
+    shallowRef,
+    useId,
+    watch,
+} from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -26,9 +34,11 @@ export interface SliderThumbState {
 export interface SliderThumbProps {
     /** Its value's index (default: its order among the thumbs). */
     index?: number;
-    /** The text for `aria-valuetext`. */
+    /** The text for `aria-valuetext` (it wins over the Root's `format`). */
     getAriaValueText?: (value: number, index: number) => string;
     disabled?: boolean;
+    /** Generated unless given: the Value's `for` lists it. */
+    id?: string;
 }
 
 /** A `slider`: one value of the slider (spec/slider.md). */
@@ -41,7 +51,7 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                 ...asProp,
                 /** Its value's index (default: its order among the thumbs). */
                 index: { type: Number, default: undefined },
-                /** The text for `aria-valuetext`. */
+                /** The text for `aria-valuetext` (it wins over the Root's `format`). */
                 getAriaValueText: {
                     type: Function as PropType<
                         (value: number, index: number) => string
@@ -49,9 +59,17 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                     default: undefined,
                 },
                 disabled: { type: Boolean, default: false },
+                /** Generated unless given: the Value's `for` lists it. */
+                id: { type: String, default: undefined },
             },
             setup(props, { attrs, slots }) {
                 const context = useRequiredContext(SliderKey, "Slider.Thumb");
+                const generated = useId();
+                const id = () => props.id ?? generated;
+                // in setup, so a Value after the thumbs reads every id, on a server too
+                onBeforeUnmount(
+                    context.registerThumbId({ id, index: () => props.index }),
+                );
                 const element = shallowRef<HTMLElement | null>(null);
                 const setElement = elementSetter(element);
                 watch(
@@ -78,9 +96,15 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                         step: context.step(),
                         minStepsBetweenValues: context.minStepsBetweenValues(),
                     });
-                const rtl = () =>
+                const direction = useProvidedDirection();
+                // the keys follow a provider's direction; the thumb's placement follows the
+                // layout's (its `inset-inline-start`), so the computed one
+                const rtl = (provided: boolean) =>
                     element.value !== null &&
-                    getDirection(element.value) === "rtl";
+                    getDirection(
+                        element.value,
+                        provided ? direction() : null,
+                    ) === "rtl";
 
                 const onKeydown = (event: KeyboardEvent) => {
                     if (props.disabled || context.disabled()) {
@@ -100,7 +124,7 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                             min,
                             max,
                             orientation: context.orientation(),
-                            rtl: rtl(),
+                            rtl: rtl(true),
                         },
                     );
                     if (target === null) {
@@ -114,7 +138,7 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
 
                 return () => {
                     const { field } = context;
-                    // the field's label names a thumb that has no name of its own
+                    // the field's label, else the slider's, names a thumb with no name of its own
                     const named =
                         attrs["aria-label"] !== undefined ||
                         attrs["aria-labelledby"] !== undefined;
@@ -145,7 +169,9 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                                   position: "absolute",
                                   insetInlineStart: `${percent}%`,
                                   top: "50%",
-                                  translate: rtl() ? "50% -50%" : "-50% -50%",
+                                  translate: rtl(false)
+                                      ? "50% -50%"
+                                      : "-50% -50%",
                               };
                     return renderPart(
                         "div",
@@ -160,20 +186,23 @@ export const SliderThumb: PartComponent<SliderThumbProps, SliderThumbState> =
                         },
                         {
                             role: "slider",
+                            id: id(),
                             tabindex: disabled ? undefined : 0,
                             "aria-valuenow": value,
                             "aria-valuemin": min,
                             "aria-valuemax": max,
-                            "aria-valuetext": props.getAriaValueText?.(
-                                value,
-                                position,
-                            ),
+                            "aria-valuetext":
+                                props.getAriaValueText?.(value, position) ??
+                                (context.formatted()
+                                    ? context.formatValue(value)
+                                    : undefined),
                             "aria-orientation": orientation,
                             "aria-disabled": disabled ? "true" : undefined,
                             ...field.aria(),
                             "aria-labelledby": named
                                 ? undefined
-                                : field.aria()["aria-labelledby"],
+                                : (field.aria()["aria-labelledby"] ??
+                                  context.labelId.value),
                             "data-primitives-part": "slider-thumb",
                             ...stateAttributes({
                                 orientation,
