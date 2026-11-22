@@ -92,8 +92,12 @@ Title and a Description.
 The alert dialog is a layer of the nested overlay tree ([README](README.md#the-nested-overlay-tree)),
 as a Dialog: Escape closes the newest layer only; a press outside the alert dialog closes the
 layers opened from it that the press is outside of (the tree's rule for its descendants), never
-the alert dialog itself; closing it closes the overlays opened from it (reason `none`). The page
-does not scroll while it is open (scroll lock).
+the alert dialog itself; closing it closes the overlays opened from it (reason `none`). It is a
+**modal** layer, as a Dialog ([dialog.md](dialog.md#dismissal-and-layering)): a press outside it
+and its descendants counts as a press inside the layer it was opened from, so an alert dialog
+opened from a Popover or a Menu that stays open keeps both open (the press would otherwise close
+the Popover, whose close would close the alert dialog with `none`). The page does not scroll
+while it is open (scroll lock).
 
 An AlertDialog inside a Dialog's popup (or a Dialog inside an AlertDialog's popup) is a **nested
 dialog** ([dialog.md](dialog.md#nested-dialogs)): the same `data-nested`,

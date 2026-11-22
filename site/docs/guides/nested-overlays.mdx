@@ -20,6 +20,9 @@ its overlay is that popup's child.
   other open overlay, newest first (reason `outside-press`). In a Dialog → Popover → Menu chain, a
   press inside the Popover (outside the Menu) closes the Menu and its submenus; a press on the
   Dialog closes the Popover and the Menu; a press on the Dialog's backdrop closes everything.
+  A Dialog or AlertDialog makes the page under it inert, so a press outside it counts as a press
+  in the overlay it was opened from: a Dialog opened from a Menu that stays open closes alone, and
+  an AlertDialog opened from a Popover keeps both open.
 - **Focus**: a Dialog's focus trap and a Popover's focus-out watch accept focus inside their
   descendants, so tabbing in a menu opened from a dialog never leaves the dialog.
 - **Closing an overlay closes the overlays opened from it** (reason `none`).

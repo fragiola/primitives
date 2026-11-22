@@ -61,7 +61,7 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
   open overlay together, and ends them with one call. After an outside press, a popover's focus
   returns only once the press has ended, and only when the press focused nothing
   (`returnFocus.whenUnfocused`). `openOverlaySession` takes the layer's `owner` (default: its
-  `ignore` elements, the triggers) and `backdrops`, and calls `dismiss(reason, event)` with the DOM
+  `ignore` elements, the triggers), `backdrops` and `modal`, and calls `dismiss(reason, event)` with the DOM
   event that caused it (`DismissEvent`: a keyboard, pointer or focus event; `undefined`, with the
   reason `none`, when a parent overlay closed).
 - **Layers**: the **tree** of a document's open overlays
@@ -72,6 +72,11 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
   viewport): a press on them is outside the layer and inside its parent. Escape goes to the newest
   layer only. An outside press keeps the deepest layer containing the press (its elements, or its
   `ignore` list) and its ancestors, and dismisses every other open layer, newest first.
+  `modal: true` marks a layer that makes the page under it inert (a dialog): while it is the
+  newest modal layer open, a press that is neither in it nor in one of its descendants counts as
+  a press in its parent, so the layers it was opened from stay open and it, with the layers above
+  them that are not its ancestors, gets `onOutsidePress` (a press on the inert page reaches no
+  layer, and would otherwise dismiss them all).
   `Layer.elementsAbove()` gives the elements of the layer's descendants only (what a focus trap
   and a focus-out watch accept). When a layer is removed, its children move to its parent and
   each descendant still open gets `onParentClose()`, newest first. A tooltip, which is no layer,

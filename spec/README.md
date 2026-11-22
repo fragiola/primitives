@@ -239,6 +239,9 @@ chain of four ([`/dialog/nested-tree`](dialog.md#dialognested-tree)).
   triggers, which toggle it themselves) stays open with its ancestors; every other open overlay is
   dismissed (reason `outside-press`), newest first. A press outside every overlay dismisses all of
   them. A press on a dialog's Backdrop or Viewport is outside that dialog and inside its parent.
+  A Dialog or AlertDialog is a **modal** overlay (the page under it is inert): while one is open, a
+  press outside the newest one and its descendants counts as a press inside the overlay it was
+  opened from, which stays open with its ancestors ([dialog.md](dialog.md#dismissal-and-layering)).
 - **Focus**: a modal Dialog's focus trap and a non-modal overlay's focus-out watch accept focus
   in their **descendants** only (the overlays opened from them).
 - **Closing an overlay closes the overlays opened from it** (reason `none`), newest first.

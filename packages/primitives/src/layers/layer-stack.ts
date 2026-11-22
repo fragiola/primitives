@@ -9,6 +9,9 @@
  * - an outside press keeps the deepest layer that contains the press (its elements, or its
  *   `ignore` list: a press on an overlay's own trigger toggles it itself) and its ancestors, and
  *   dismisses every other open layer, newest first; a press outside every layer dismisses all;
+ * - but while a `modal` layer is open (a dialog, which makes the page inert), a press outside the
+ *   newest modal layer and its descendants lands in that layer's parent: the layers it was opened
+ *   from stay open, the modal layer and the other layers above them are dismissed;
  * - removing a layer re-parents its children to its parent, and tells each descendant still open
  *   that an ancestor closed (`onParentClose`), newest first.
  */
@@ -26,6 +29,12 @@ export interface LayerOptions {
     backdrops?: Elements;
     /** The elements the overlay was opened from (its triggers), which decide its parent. */
     owner?: Elements;
+    /**
+     * A modal layer (a dialog: the page under it is inert, so a press outside it reaches no
+     * layer): while it is the newest modal layer open, a press outside it and its descendants
+     * counts as a press inside its parent, which keeps the layers it was opened from.
+     */
+    modal?: boolean;
     onEscape?: (event: KeyboardEvent) => void;
     onOutsidePress?: (event: PointerEvent) => void;
     /** An ancestor layer was removed while this one is still open. */
@@ -127,7 +136,13 @@ function createTree(doc: Document): Tree {
         }
     };
     const onPointerDown = (event: PointerEvent) => {
-        const inside = layerOfPress(tree, event.target);
+        let inside = layerOfPress(tree, event.target);
+        const modal = [...tree.nodes]
+            .reverse()
+            .find((node) => node.options.modal === true);
+        if (modal !== undefined && !isAncestorOrSelf(modal, inside)) {
+            inside = modal.parent;
+        }
         for (const node of [...tree.nodes].reverse()) {
             if (!isAncestorOrSelf(node, inside)) {
                 node.options.onOutsidePress?.(event);

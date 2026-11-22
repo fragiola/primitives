@@ -106,6 +106,12 @@ element that had focus before opening when it was opened programmatically).
   a press inside a descendant is not an outside press for the dialog, Escape closes the deepest
   first, and the focus trap accepts focus in every descendant. A press inside the dialog closes
   its descendants only ([`/dialog/nested-tree`](#dialognested-tree)).
+- The dialog is a **modal** layer (`modal: true`): the page under it is inert, so a press outside it
+  reaches no layer. While it is the newest open modal layer, a press that is neither inside it nor
+  inside one of its descendants counts as a press inside the layer it was opened from: a Dialog
+  opened from a Popover or a Menu that stays open closes (`outside-press`), the Popover or Menu
+  stays open. Without the rule, the press would dismiss every layer, and the parent's close would
+  close the dialog with `none`.
 - Closing the dialog closes the overlays opened from it (reason `none`).
 - While open, the page does not scroll (scroll lock on the document element, keeping the
   scrollbar gutter so the layout does not shift).

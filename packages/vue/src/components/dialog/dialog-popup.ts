@@ -95,6 +95,9 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                             // a press on the backdrop or the viewport is outside this dialog,
                             // inside its parent
                             backdrops: () => [backdrop, viewport],
+                            // the page under it is inert: a press outside it lands in the overlay it was opened
+                            // from, which stays open (spec/dialog.md, "Dismissal and layering")
+                            modal: true,
                             dismiss: (reason, event) => {
                                 if (alert && reason === "outside-press") {
                                     return;

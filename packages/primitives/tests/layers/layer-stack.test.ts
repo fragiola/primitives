@@ -267,4 +267,89 @@ describe("the layer tree", () => {
         c.remove();
         b.remove();
     });
+
+    it("keeps the layers a modal layer was opened from when a press lands outside every layer", () => {
+        const popover = element();
+        const popoverButton = button(popover);
+        const alert = element();
+        const alertButton = button(alert);
+        const pressed: string[] = [];
+        const a = pushLayer(document, {
+            elements: () => [popover],
+            onOutsidePress: () => pressed.push("popover"),
+        });
+        const b = pushLayer(document, {
+            elements: () => [alert],
+            owner: () => [popoverButton],
+            modal: true,
+            onOutsidePress: () => pressed.push("alert"),
+        });
+        // a child of the modal layer (a menu opened from the dialog)
+        const menu = element();
+        const c = pushLayer(document, {
+            elements: () => [menu],
+            owner: () => [alertButton],
+            onOutsidePress: () => pressed.push("menu"),
+        });
+        // the page is inert under the modal layer: the press lands on the body
+        press(document.body);
+        expect(pressed).toEqual(["menu", "alert"]);
+        // a press on the layer it was opened from counts the same
+        pressed.length = 0;
+        press(popover);
+        expect(pressed).toEqual(["menu", "alert"]);
+        // a press inside the modal layer or its descendants follows the tree as usual
+        pressed.length = 0;
+        press(alert);
+        expect(pressed).toEqual(["menu"]);
+        pressed.length = 0;
+        press(menu);
+        expect(pressed).toEqual([]);
+        c.remove();
+        b.remove();
+        // without the modal layer, a press outside every layer dismisses them all again
+        press(document.body);
+        expect(pressed).toEqual(["popover"]);
+        a.remove();
+    });
+
+    it("follows the newest modal layer, and dismisses a non-descendant layer above it", () => {
+        const outer = element();
+        const outerButton = button(outer);
+        const inner = element();
+        const pressed: string[] = [];
+        const a = pushLayer(document, {
+            elements: () => [outer],
+            modal: true,
+            onOutsidePress: () => pressed.push("outer"),
+        });
+        const b = pushLayer(document, {
+            elements: () => [inner],
+            owner: () => [outerButton],
+            modal: true,
+            onOutsidePress: () => pressed.push("inner"),
+        });
+        // a root layer opened above the modal layers, from nowhere in them
+        const toast = element();
+        const c = pushLayer(document, {
+            elements: () => [toast],
+            onOutsidePress: () => pressed.push("toast"),
+        });
+        press(document.body);
+        expect(pressed).toEqual(["toast", "inner"]);
+        pressed.length = 0;
+        press(toast);
+        expect(pressed).toEqual(["toast", "inner"]);
+        pressed.length = 0;
+        // a press on the outer dialog closes the nested one only
+        press(outer);
+        expect(pressed).toEqual(["toast", "inner"]);
+        c.remove();
+        b.remove();
+        pressed.length = 0;
+        // the outer modal layer is a root: a press outside it dismisses it alone
+        press(document.body);
+        expect(pressed).toEqual(["outer"]);
+        a.remove();
+    });
 });

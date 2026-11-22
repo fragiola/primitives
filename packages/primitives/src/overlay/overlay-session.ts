@@ -36,6 +36,11 @@ export interface OverlaySessionOptions {
      */
     backdrops?: Elements;
     /**
+     * A modal overlay (a dialog): a press outside it and its descendants is outside it but inside
+     * its parent, so the overlays it was opened from stay open (`pushLayer`'s `modal`).
+     */
+    modal?: boolean;
+    /**
      * Called when Escape, an outside press, (with `focusOut`) focus leaving, or the close of the
      * overlay it was opened from (`none`) dismisses it, with the event that did.
      */
@@ -102,6 +107,7 @@ export function openOverlaySession(
         elements: options.elements,
         ignore: options.ignore,
         backdrops: options.backdrops,
+        modal: options.modal,
         owner: options.owner ?? options.ignore,
         onEscape: (event) => options.dismiss("escape-key", event),
         onOutsidePress: (event) => {

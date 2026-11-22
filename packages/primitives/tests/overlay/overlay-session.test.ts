@@ -106,6 +106,37 @@ describe("openOverlaySession", () => {
         parent.end();
     });
 
+    it("keeps the overlay a modal one was opened from on a press outside both", () => {
+        const { trigger, popup, outside } = setup();
+        const parentPopup = document.createElement("div");
+        document.body.append(parentPopup);
+        parentPopup.append(trigger);
+        const closeParent = vi.fn();
+        const dismiss = vi.fn();
+        const parent = openOverlaySession(document, {
+            elements: () => [parentPopup],
+            dismiss: closeParent,
+        });
+        const child = openOverlaySession(document, {
+            elements: () => [popup],
+            owner: () => [trigger],
+            modal: true,
+            dismiss,
+        });
+        outside.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        expect(dismiss).toHaveBeenCalledWith(
+            "outside-press",
+            expect.any(PointerEvent),
+        );
+        expect(closeParent).not.toHaveBeenCalled();
+        // an alert dialog ignores the press: it stays open, and so does its parent
+        child.end();
+        expect(closeParent).not.toHaveBeenCalled();
+        parent.end();
+    });
+
     it("dismisses when focus leaves, if asked", () => {
         const { trigger, popup, inside, outside } = setup();
         const dismiss = vi.fn();
