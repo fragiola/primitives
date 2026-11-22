@@ -36,19 +36,28 @@
 #   Site export       fragiola.com builds /primitives from `pnpm site:export` (contract v1.7,
 #                     fragiola/www CONTRACT.md), validated the way www's deploy runs it: it fails on
 #                     anything www would reject.
+#   Trigger www build on a push to main, asks fragiola/www to rebuild fragiola.com (a
+#                     repository_dispatch of type "project-updated"). From Tree (fragiola/tree,
+#                     .github/workflows/ci.yml). It needs the WWW_DISPATCH_TOKEN secret: a
+#                     fine-grained token with Contents: read & write on fragiola/www, created by
+#                     the maintainer (an organization secret shared with this repository). Without
+#                     the secret the step is skipped, not failed.
 #
 # Every Playwright job runs in Playwright's image (mcr.microsoft.com/playwright, the tag of the
 # pinned @playwright/test: no browser install; site/tests/ci-workflow.test.ts checks both). No
 # shards: add `--shard` only for a suite whose tests take more than ~3 min.
 #
-# Tests run only on pull requests (and on a manual run): main is what its PR tested. Nothing is
-# released or published, and fragiola.com is not told about this project yet: release.yml, npm
-# publishing and the www trigger come after the maintainer validates the library (AGENTS.md, "CI").
+# Tests run only on pull requests (and on a manual run). A push to main runs nothing but the www
+# trigger: with one coordinator merging one PR at a time, main is what its PR tested. Nothing is
+# released or published: release.yml and the npm releases come after the maintainer validates the
+# library (AGENTS.md, "CI").
 
 name: CI
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -61,6 +70,7 @@ concurrency:
 jobs:
   checks:
     name: Checks
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,6 +97,7 @@ jobs:
 
   package:
     name: Package
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -132,6 +143,7 @@ jobs:
   # jobs run only what it selects. An empty selection runs no job.
   changes:
     name: Changes
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     outputs:
       conformance: ${{ steps.suites.outputs.conformance }}
@@ -247,6 +259,7 @@ jobs:
 
   site-export:
     name: Site export
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -261,3 +274,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm site:export --base /primitives --out "$RUNNER_TEMP/site-export"
+
+  trigger-www-build:
+    name: Trigger www build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      WWW_DISPATCH_TOKEN: ${{ secrets.WWW_DISPATCH_TOKEN }}
+    steps:
+      - name: Dispatch project-updated to fragiola/www
+        if: env.WWW_DISPATCH_TOKEN != ''
+        env:
+          GH_TOKEN: ${{ env.WWW_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/fragiola/www/dispatches \
+            -f event_type=project-updated \
+            -f "client_payload[slug]=primitives" \
+            -f "client_payload[sha]=$GITHUB_SHA"

@@ -102,9 +102,10 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
    part's `state()` (`exportAs`).
 9. **Dates** are a plain `{ year, month, day }` value with no time zone; no external date library:
    the date math is the toolkit's `/date` entry, the locale comes from `Intl`.
-10. **Nothing is released yet.** No `release.yml`, no npm publishing, no `npm trust`, no `0.0.0`
-    stubs, no registration in `../www/projects.json` and no www trigger, until the maintainer
-    validates the library (`site/tests/ci-workflow.test.ts` checks the workflow).
+10. **Nothing is released yet.** No `release.yml`, no npm publishing, no `npm trust` and no `0.0.0`
+    stubs, until the maintainer validates the library (`site/tests/ci-workflow.test.ts` checks the
+    workflow). fragiola.com is told about every push to `main` (the www trigger, Epic #17); the
+    registration in `../www/projects.json` is fragiola/www's own Epic.
 
 ## Decisions
 
@@ -216,11 +217,14 @@ Pin dependencies to exact versions published at least 7 days ago (`npm view <pkg
 
 ## CI
 
-`.github/workflows/ci.yml` (its comment header describes every job) runs on pull requests and on
-a manual run: **Checks** (`pnpm check`, `typecheck`, `test`, `build`, `size --check`), **Package**
+`.github/workflows/ci.yml` (its comment header describes every job) runs its tests on pull requests
+and on a manual run: **Checks** (`pnpm check`, `typecheck`, `test`, `build`, `size --check`), **Package**
 (`pnpm check:package`), **Changesets** (a PR that changes what a package ships needs a changeset;
 skipped for `changeset-release/*`), **Changes**, **Conformance** (one job per framework),
-**E2E** (one job per examples app) and **Site export** (`--base /primitives`).
+**E2E** (one job per examples app) and **Site export** (`--base /primitives`). A push to `main`
+runs only **Trigger www build**: a `repository_dispatch` `project-updated` (slug `primitives`) to
+`fragiola/www`, with the `WWW_DISPATCH_TOKEN` secret (an organization secret the maintainer shares
+with this repository); without the secret the step is skipped, not failed.
 
 - A `Changes` job picks the suites a pull request can affect (`scripts/e2e-suites.ts`, a `git diff`
   against the base, tested by `site/tests/e2e-suites.test.ts`): none for docs only
@@ -234,7 +238,7 @@ skipped for `changeset-release/*`), **Changes**, **Conformance** (one job per fr
 - The golden screenshots are written by React's conformance job when missing and uploaded as the
   `conformance-snapshots` artifact; they are reviewed and committed from it
   (`conformance/README.md`). Vue and Angular run with `--update-snapshots none`.
-- No release workflow, no publish step and no www trigger (rule 10). Pushing a change under
+- No release workflow and no publish step (rule 10). Pushing a change under
   `.github/workflows/` needs the `workflow` scope, or a push over SSH (this repository's `origin`).
 
 ## Provenance
