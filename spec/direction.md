@@ -90,7 +90,8 @@ scenario's output and four components. Output: `direction: rtl` (`useDirection()
   disabled, "Team"; the Indicator; the panels);
 - a Slider **"Volume"** (`aria-label`), `defaultValue` `50`, its Control 200 px wide;
 - a Menu, Trigger **"File"**, items **"New file"**, a SubmenuTrigger **"Share"** whose submenu has
-  **"Email"** and **"Link"**;
+  **"Email"** and **"Link"**, its Trigger 24 rem from the page's left edge (`ms-96`), so a submenu
+  opening to the left has room and does not flip;
 - a Calendar (en-US, "today" 2026-11-20) with **"Previous month"** / **"Next month"**.
 
 Checks:

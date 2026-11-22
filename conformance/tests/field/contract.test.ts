@@ -292,9 +292,10 @@ test("field / more-controls: the group and the pickers take the field's ids, nam
             "for",
             (await trigger.getAttribute("id")) as string,
         );
+        // the label, then the trigger's own content (WCAG 2.5.3: its text stays in its name)
         await expect(trigger).toHaveAttribute(
             "aria-labelledby",
-            (await label.getAttribute("id")) as string,
+            `${await label.getAttribute("id")} ${await trigger.getAttribute("id")}`,
         );
         const input = part(field, component, "input");
         await expect(input).toHaveAttribute(

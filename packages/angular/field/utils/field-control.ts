@@ -174,7 +174,17 @@ export function fieldControl(
         inField: true,
         name: field.name,
         disabled: field.isDisabled,
-        labelledBy: computed(() => field.labelId() ?? null),
+        // a control named by its own content too (a picker's Trigger) adds itself, so its visible
+        // text stays in its name (WCAG 2.5.3, spec/field.md)
+        labelledBy: computed(() => {
+            const label = field.labelId();
+            const id = options.id();
+            return options.focusOnLabel &&
+                label !== undefined &&
+                id !== undefined
+                ? `${label} ${id}`
+                : (label ?? null);
+        }),
         describedBy: computed(() => field.describedBy() ?? null),
         ariaInvalid: computed(() => (field.showsInvalid() ? "true" : null)),
         data: field.data,

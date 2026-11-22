@@ -376,10 +376,10 @@ test.describe("field / more-controls", () => {
 
     const toppings = (page: Page) =>
         page.getByRole("group", { name: "Toppings", exact: true });
+    // named by the field's label, then by its own content (the value): "Arrival none"
     const arrival = (page: Page) =>
-        page.getByRole("button", { name: "Arrival", exact: true });
-    const stay = (page: Page) =>
-        page.getByRole("button", { name: "Stay", exact: true });
+        page.getByRole("button", { name: /^Arrival / });
+    const stay = (page: Page) => page.getByRole("button", { name: /^Stay / });
     const day = (page: Page, value: number) =>
         page.getByRole("gridcell", {
             name: fullDate("en-US", 2026, 11, value),
@@ -431,13 +431,14 @@ test.describe("field / more-controls", () => {
         await expect(toppings(page)).not.toHaveAttribute("aria-invalid");
         await arrival(page).click();
         await day(page, 24).click();
-        await expect(arrival(page)).toHaveText("Arrival: 2026-11-24");
+        await expect(arrival(page)).toHaveText("2026-11-24");
+        await expect(arrival(page)).toHaveAccessibleName("Arrival 2026-11-24");
         await hidden(page, "Choose a date.");
         await expect(arrival(page)).not.toHaveAttribute("aria-invalid");
         await stay(page).click();
         await day(page, 25).click();
         await day(page, 27).click();
-        await expect(stay(page)).toHaveText("Stay: 2026-11-25..2026-11-27");
+        await expect(stay(page)).toHaveText("2026-11-25..2026-11-27");
         await hidden(page, "Choose your dates.");
         await submit(page).click();
         await expectSubmitted(
@@ -452,13 +453,13 @@ test.describe("field / more-controls", () => {
         await page.getByRole("checkbox", { name: "Ham", exact: true }).click();
         await arrival(page).click();
         await day(page, 24).click();
-        await expect(arrival(page)).toHaveText("Arrival: 2026-11-24");
+        await expect(arrival(page)).toHaveText("2026-11-24");
         await resetForm(page);
         await expect(
             page.getByRole("checkbox", { name: "Ham", exact: true }),
         ).toHaveAttribute("aria-checked", "false");
-        await expect(arrival(page)).toHaveText("Arrival: none");
-        await expect(stay(page)).toHaveText("Stay: none");
+        await expect(arrival(page)).toHaveText("none");
+        await expect(stay(page)).toHaveText("none");
         await submit(page).click();
         await expectSubmitted(page, "none");
     });

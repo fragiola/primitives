@@ -206,8 +206,13 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | Combobox | Combobox.Input (`input`) | Combobox.Input | the value: an item or `null`, or the list of items with `multiple` | Combobox.Input | its visually hidden input (combobox.md, "Forms") |
 | Slider | none (a `group`) | Slider.Root gets `aria-labelledby`. Each Thumb gets `aria-describedby` and `aria-invalid`, and `aria-labelledby` when it has no `aria-label` or `aria-labelledby` of its own | the value (a number, or numbers) | its Thumbs | none: its inputs are `type="hidden"`, which the browser never validates. `validate` still runs and shows its messages, but it cannot block a native submission (a [Form](form.md) blocks it) |
 | CheckboxGroup | none (a `group`) | the CheckboxGroup | the array of checked values | its Checkboxes (focus within the group; `touched` once focus leaves it) | none: `validate` decides, as for the Slider. Its Checkboxes take the field's `name` (each still submits its own `value`; a parent checkbox submits nothing) and `disabled`, and do not register as the field's control themselves |
-| DatePicker | DatePicker.Trigger (`button`) | DatePicker.Trigger | the date, or `null` | DatePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
-| DateRangePicker | DateRangePicker.Trigger (`button`) | DateRangePicker.Trigger | the range `{ start, end }`, or `null` | DateRangePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
+| DatePicker | DatePicker.Trigger (`button`) | DatePicker.Trigger; its `aria-labelledby` lists the label's `id` **then its own** (see below) | the date, or `null` | DatePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
+| DateRangePicker | DateRangePicker.Trigger (`button`) | DateRangePicker.Trigger, as DatePicker's | the range `{ start, end }`, or `null` | DateRangePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
+
+**A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
+date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival
+2026-11-24", and the visible text stays in it (WCAG 2.5.3, axe `label-content-name-mismatch`). A
+Select's Trigger needs no such thing: it is a `combobox`, named by its label alone.
 
 Select's and the pickers' popups are portalled. Their parts never need the field: the trigger and
 the hidden input carry everything, and both stay inside the Root.
@@ -219,7 +224,8 @@ Nothing of its own: the control's keyboard applies.
 ## Focus
 
 Nothing of its own. A click on the Label focuses the Control, or clicks a labelable control (it
-toggles a Checkbox, as a native `<label for>` does).
+toggles a Checkbox, as a native `<label for>` does). A picker's Trigger is only focused: a click
+would open its popup, which takes the focus away from the field the label names.
 
 ## Pointer
 
@@ -377,11 +383,11 @@ A [Form](form.md) with three fields around the controls added in stage 1; the co
   Description **"Pick at least one."**; an Error with no children. Its `validate` returns
   **"Choose a topping."** for an empty array.
 - `name="arrival"`: Label **"Arrival"**; a DatePicker `required` (en-US) whose Trigger reads
-  **"Arrival: "** and the value (or "none"), its Popup (`aria-label` **"Choose date"**) holding a
+  the value (or "none"), its Popup (`aria-label` **"Choose date"**) holding a
   bound Calendar with **"Previous month"** / **"Next month"**; Description
   **"The day you arrive."**; an Error **"Choose a date."**.
 - `name="stay"`: Label **"Stay"**; a DateRangePicker `required` (en-US) whose Trigger reads
-  **"Stay: "** and the range (or "none"), its Popup (`aria-label` **"Choose dates"**) holding a
+  the range (or "none"), its Popup (`aria-label` **"Choose dates"**) holding a
   bound RangeCalendar; Description **"From check-in to check-out."**; an Error
   **"Choose your dates."**.
 - a **"Submit"** button.
@@ -390,18 +396,19 @@ A [Form](form.md) with three fields around the controls added in stage 1; the co
 
 Checks:
 
-1. A `group` named "Toppings", described by "Pick at least one."; a `button` named "Arrival",
-   described by "The day you arrive."; a `button` named "Stay", described by "From check-in to
-   check-out.". A click on the label "Arrival" focuses its trigger.
+1. A `group` named "Toppings", described by "Pick at least one."; a `button` named "Arrival none"
+   (the label, then its content), described by "The day you arrive."; a `button` named
+   "Stay none", described by "From check-in to check-out.". A click on the label "Arrival"
+   focuses its trigger (and opens nothing).
 2. "Submit" submits nothing and focuses "Cheese" (the first invalid field's focus target). The
    group and both triggers are `aria-invalid="true"`, and "Choose a topping.", "Choose a date."
    and "Choose your dates." are shown; the group's description is "Pick at least one. Choose a
    topping.".
 3. Checking "Ham" hides the group's error. Choosing November 24 in "Arrival" hides its error (the
-   trigger reads "Arrival: 2026-11-24"); choosing November 25 then 27 in "Stay" hides its own.
+   trigger reads "2026-11-24", named "Arrival 2026-11-24"); choosing November 25 then 27 in "Stay" hides its own.
 4. "Submit" gives `form: toppings=ham&arrival=2026-11-24&stay=2026-11-25/2026-11-27`.
 5. A form reset (`form.reset()`) returns every control to its default (no topping, both triggers
-   "none"); "Submit" then submits nothing again.
+   read "none"); "Submit" then submits nothing again.
 6. Axe finds no violation, before and after the failed submission.
 
 ## Differences from Base UI

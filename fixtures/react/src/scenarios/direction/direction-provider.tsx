@@ -51,29 +51,31 @@ export function DirectionProviderScenario() {
                         </Slider.Track>
                     </Slider.Control>
                 </Slider.Root>
-                <Menu.Root>
-                    <Menu.Trigger>File</Menu.Trigger>
-                    <Menu.Portal>
-                        <Menu.Positioner sideOffset={4}>
-                            <Menu.Popup>
-                                <Menu.Item>New file</Menu.Item>
-                                <Menu.SubmenuRoot>
-                                    <Menu.SubmenuTrigger>
-                                        Share
-                                    </Menu.SubmenuTrigger>
-                                    <Menu.Portal>
-                                        <Menu.Positioner>
-                                            <Menu.Popup>
-                                                <Menu.Item>Email</Menu.Item>
-                                                <Menu.Item>Link</Menu.Item>
-                                            </Menu.Popup>
-                                        </Menu.Positioner>
-                                    </Menu.Portal>
-                                </Menu.SubmenuRoot>
-                            </Menu.Popup>
-                        </Menu.Positioner>
-                    </Menu.Portal>
-                </Menu.Root>
+                <div className="ms-96">
+                    <Menu.Root>
+                        <Menu.Trigger>File</Menu.Trigger>
+                        <Menu.Portal>
+                            <Menu.Positioner sideOffset={4}>
+                                <Menu.Popup>
+                                    <Menu.Item>New file</Menu.Item>
+                                    <Menu.SubmenuRoot>
+                                        <Menu.SubmenuTrigger>
+                                            Share
+                                        </Menu.SubmenuTrigger>
+                                        <Menu.Portal>
+                                            <Menu.Positioner>
+                                                <Menu.Popup>
+                                                    <Menu.Item>Email</Menu.Item>
+                                                    <Menu.Item>Link</Menu.Item>
+                                                </Menu.Popup>
+                                            </Menu.Positioner>
+                                        </Menu.Portal>
+                                    </Menu.SubmenuRoot>
+                                </Menu.Popup>
+                            </Menu.Positioner>
+                        </Menu.Portal>
+                    </Menu.Root>
+                </div>
                 <Calendar.Root locale="en-US">
                     <MonthView />
                 </Calendar.Root>

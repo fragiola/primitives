@@ -13,8 +13,9 @@ const cell = (page: Page, day: number) =>
         name: fullDate("en-US", 2026, 11, day),
         exact: true,
     });
+// a submenu trigger's name ends with the recipe's chevron ("Share ›")
 const item = (page: Page, name: string) =>
-    page.getByRole("menuitem", { name, exact: true });
+    page.getByRole("menuitem", { name: new RegExp(`^${name}\\b`) });
 
 test.describe("direction / provider", () => {
     test.beforeEach(async ({ page }) => {

@@ -58,7 +58,7 @@ export function FieldMoreControls() {
                         locale="en-US"
                     >
                         <DatePicker.Trigger>
-                            Arrival: {iso(arrival) ?? "none"}
+                            {iso(arrival) ?? "none"}
                         </DatePicker.Trigger>
                         <DatePicker.Portal>
                             <DatePicker.Positioner sideOffset={4}>
@@ -82,7 +82,7 @@ export function FieldMoreControls() {
                         locale="en-US"
                     >
                         <DatePicker.Trigger>
-                            Stay: {isoRange(stay) ?? "none"}
+                            {isoRange(stay) ?? "none"}
                         </DatePicker.Trigger>
                         <DatePicker.Portal>
                             <DatePicker.Positioner sideOffset={4}>

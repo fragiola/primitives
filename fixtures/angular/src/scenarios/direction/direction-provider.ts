@@ -71,6 +71,7 @@ const TABS = [
             <div sliderRoot [defaultValue]="50" [class]="sliderStyles.root">
                 <div sliderControl [class]="sliderStyles.control"><div sliderTrack [class]="sliderStyles.track"><div sliderIndicator [class]="sliderStyles.indicator"></div><div sliderThumb aria-label="Volume" [class]="sliderStyles.thumb"></div></div></div>
             </div>
+            <div class="ms-96">
             <ng-container menuRoot>
                 <button menuTrigger [class]="menuStyles.trigger">File</button>
                 <ng-container *menuPortal>
@@ -92,6 +93,7 @@ const TABS = [
                     </div>
                 </ng-container>
             </ng-container>
+            </div>
             <div calendarRoot locale="en-US" [class]="calendarStyles.root">
                 <div monthView></div>
             </div>

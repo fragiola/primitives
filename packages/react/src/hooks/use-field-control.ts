@@ -147,7 +147,14 @@ export function useFieldControl(
             name: field.name,
             disabled: field.disabled,
             aria: {
-                "aria-labelledby": field.labelId,
+                // a control named by its own content too (a picker's Trigger) adds itself, so its
+                // visible text stays in its name (WCAG 2.5.3, spec/field.md)
+                "aria-labelledby":
+                    labelFocuses &&
+                    field.labelId !== undefined &&
+                    id !== undefined
+                        ? `${field.labelId} ${id}`
+                        : field.labelId,
                 "aria-describedby": field.describedBy,
                 "aria-invalid": field.invalid ? "true" : undefined,
             },
@@ -155,5 +162,5 @@ export function useFieldControl(
             onFocus: events.focused,
             onBlur,
         };
-    }, [field, events, onBlur]);
+    }, [field, events, onBlur, labelFocuses, id]);
 }

@@ -39,7 +39,7 @@ const TOPPINGS = [
 
 /**
  * A CheckboxGroup, a DatePicker and a DateRangePicker inside fields, in a Form (spec/field.md).
- * The triggers' text is two text nodes, as JSX makes `Arrival: {iso(arrival) ?? "none"}`.
+ * The triggers' text is the value alone: one text node, as JSX makes `{iso(arrival) ?? "none"}`.
  */
 @Component({
     selector: "[scenario-field-more-controls]",
@@ -76,7 +76,7 @@ const TOPPINGS = [
             <div fieldRoot [name]="'arrival'" [class]="styles.root">
                 <label fieldLabel [class]="styles.label">Arrival</label>
                 <ng-container datePickerRoot [(value)]="arrival" required locale="en-US">
-                    <button datePickerTrigger [class]="pickerStyles.trigger">@for (run of ["Arrival: ", iso(arrival()) ?? "none"]; track $index) {<ng-container>{{ run }}</ng-container>}</button>
+                    <button datePickerTrigger [class]="pickerStyles.trigger">{{ iso(arrival()) ?? "none" }}</button>
                     <ng-container *datePickerPortal>
                         <div datePickerPositioner [sideOffset]="4" [class]="pickerStyles.positioner">
                             <div datePickerPopup aria-label="Choose date" [class]="pickerStyles.popup">
@@ -93,7 +93,7 @@ const TOPPINGS = [
             <div fieldRoot [name]="'stay'" [class]="styles.root">
                 <label fieldLabel [class]="styles.label">Stay</label>
                 <ng-container dateRangePickerRoot [(value)]="stay" required locale="en-US">
-                    <button datePickerTrigger [class]="pickerStyles.trigger">@for (run of ["Stay: ", isoRange(stay()) ?? "none"]; track $index) {<ng-container>{{ run }}</ng-container>}</button>
+                    <button datePickerTrigger [class]="pickerStyles.trigger">{{ isoRange(stay()) ?? "none" }}</button>
                     <ng-container *datePickerPortal>
                         <div datePickerPositioner [sideOffset]="4" [class]="pickerStyles.positioner">
                             <div datePickerPopup aria-label="Choose dates" [class]="pickerStyles.popup">

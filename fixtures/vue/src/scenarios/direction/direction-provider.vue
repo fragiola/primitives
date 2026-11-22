@@ -38,6 +38,7 @@ const TABS = [
                     </Slider.Track>
                 </Slider.Control>
             </Slider.Root>
+            <div class="ms-96">
             <Menu.Root>
                 <Menu.Trigger>File</Menu.Trigger>
                 <Menu.Portal>
@@ -59,6 +60,7 @@ const TABS = [
                     </Menu.Positioner>
                 </Menu.Portal>
             </Menu.Root>
+            </div>
             <Calendar.Root locale="en-US">
                 <MonthView />
             </Calendar.Root>

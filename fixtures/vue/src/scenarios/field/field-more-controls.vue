@@ -9,7 +9,6 @@ import { ref } from "vue";
 import { formEntries } from "../../kit/form-entries.ts";
 import { iso, isoRange } from "../../kit/iso.ts";
 import Output from "../../kit/output.vue";
-import { TextRuns } from "../../kit/text-runs.ts";
 import { Calendar, RangeCalendar } from "../../kit/ui/calendar.ts";
 import { Checkbox, CheckboxGroup } from "../../kit/ui/checkbox.ts";
 import { DatePicker } from "../../kit/ui/date-picker.ts";
@@ -45,7 +44,7 @@ const onSubmit = (event: Event) => {
         <Field.Root name="arrival">
             <Field.Label>Arrival</Field.Label>
             <Picker.Root v-model:value="arrival" required locale="en-US">
-                <DatePicker.Trigger><TextRuns :runs="['Arrival: ', iso(arrival) ?? 'none']" /></DatePicker.Trigger>
+                <DatePicker.Trigger>{{ iso(arrival) ?? "none" }}</DatePicker.Trigger>
                 <DatePicker.Portal>
                     <DatePicker.Positioner :side-offset="4">
                         <DatePicker.Popup aria-label="Choose date">
@@ -62,7 +61,7 @@ const onSubmit = (event: Event) => {
         <Field.Root name="stay">
             <Field.Label>Stay</Field.Label>
             <RangePicker.Root v-model:value="stay" required locale="en-US">
-                <DatePicker.Trigger><TextRuns :runs="['Stay: ', isoRange(stay) ?? 'none']" /></DatePicker.Trigger>
+                <DatePicker.Trigger>{{ isoRange(stay) ?? "none" }}</DatePicker.Trigger>
                 <DatePicker.Portal>
                     <DatePicker.Positioner :side-offset="4">
                         <DatePicker.Popup aria-label="Choose dates">
