@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
-import { defineComponent, h, nextTick } from "vue";
+import { describe, expect, it, vi } from "vitest";
+import { defineComponent, h, nextTick, ref } from "vue";
 import { Dialog } from "../src/components/dialog/parts.ts";
 import {
     type OverlayRoot,
@@ -133,6 +133,114 @@ describe("a dialog handle", () => {
         handle.close();
         await nextTick();
         expect(handle.isOpen).toBe(false);
+        wrapper.unmount();
+    });
+
+    it("moves to a trigger not rendered yet when opened on another one", async () => {
+        const handle = Dialog.createHandle<string>();
+        const seen: { open: boolean; details: OpenChangeDetails }[] = [];
+        const second = ref(false);
+        const wrapper = mount(
+            defineComponent({
+                setup: () => () => [
+                    h(
+                        Dialog.Trigger,
+                        { handle, payload: "Ada", id: "edit-ada" },
+                        { default: () => "Edit Ada" },
+                    ),
+                    second.value
+                        ? h(
+                              Dialog.Trigger,
+                              { handle, payload: "Grace", id: "edit-grace" },
+                              { default: () => "Edit Grace" },
+                          )
+                        : null,
+                    h(
+                        Dialog.Root,
+                        {
+                            handle,
+                            onOpenChange: (
+                                open: boolean,
+                                details: OpenChangeDetails,
+                            ) => seen.push({ open, details }),
+                        },
+                        {
+                            default: ({ payload }: { payload: unknown }) => [
+                                h("output", `payload: ${payload}`),
+                            ],
+                        },
+                    ),
+                ],
+            }),
+            { attachTo: document.body },
+        );
+        await nextTick();
+        handle.open("edit-ada");
+        await nextTick();
+        expect(wrapper.get("output").text()).toBe("payload: Ada");
+        handle.open("edit-grace");
+        await nextTick();
+        expect(seen).toHaveLength(2);
+        expect(seen[1]?.open).toBe(true);
+        expect(seen[1]?.details.reason).toBe("imperative-action");
+        expect(seen[1]?.details.trigger).toBeUndefined();
+        // the same id again is no move
+        handle.open("edit-grace");
+        expect(seen).toHaveLength(2);
+        second.value = true;
+        await nextTick();
+        await nextTick();
+        expect(wrapper.get("output").text()).toBe("payload: Grace");
+        const [ada, grace] = wrapper.findAll("button");
+        expect(grace?.attributes("aria-expanded")).toBe("true");
+        expect(ada?.attributes("aria-expanded")).toBe("false");
+        wrapper.unmount();
+    });
+
+    it("serves the newest attached Root, and gives the handle back on detach", async () => {
+        const handle = Dialog.createHandle<string>();
+        const calls: string[] = [];
+        const withSecond = ref(true);
+        const firstOpen = ref(false);
+        const warn = vi.spyOn(console, "warn");
+        const error = vi.spyOn(console, "error");
+        const wrapper = mount(
+            defineComponent({
+                setup: () => () => [
+                    h(Dialog.Root, {
+                        handle,
+                        open: firstOpen.value,
+                        onOpenChange: (open: boolean) =>
+                            calls.push(`first ${open}`),
+                    }),
+                    withSecond.value
+                        ? h(Dialog.Root, {
+                              handle,
+                              onOpenChange: (open: boolean) =>
+                                  calls.push(`second ${open}`),
+                          })
+                        : null,
+                ],
+            }),
+        );
+        await nextTick();
+        handle.open(null);
+        await nextTick();
+        expect(calls).toEqual(["second true"]);
+        handle.close();
+        await nextTick();
+        firstOpen.value = true;
+        await nextTick();
+        expect(handle.isOpen).toBe(false);
+        withSecond.value = false;
+        await nextTick();
+        expect(handle.isOpen).toBe(true);
+        handle.close();
+        expect(calls).toEqual(["second true", "second false", "first false"]);
+        expect(warn).not.toHaveBeenCalled();
+        expect(error).not.toHaveBeenCalled();
+        warn.mockRestore();
+        error.mockRestore();
         wrapper.unmount();
     });
 });

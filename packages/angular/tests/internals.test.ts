@@ -2,6 +2,10 @@ import { ElementRef, type OutputEmitterRef, signal } from "@angular/core";
 import { describe, expect, it } from "vitest";
 import { resolveFocusTarget } from "../internal/utils/change-details.ts";
 import { controllable } from "../internal/utils/controllable.ts";
+import {
+    type HandleRoot,
+    OverlayHandleStore,
+} from "../internal/utils/overlay-handle.ts";
 import { panelOptions } from "../internal/utils/panel-transition.ts";
 import { portalOptions } from "../internal/utils/portal.ts";
 import {
@@ -108,5 +112,54 @@ describe("controllable", () => {
         state.set(false, null);
         expect(state.value()).toBe(false);
         expect(emitted).toEqual([false]);
+    });
+});
+
+describe("OverlayHandleStore", () => {
+    /** A root directive's overlay, enough for the handle: its open state and entry points. */
+    function fakeRoot(name: string, calls: string[]) {
+        const open = signal(false);
+        return {
+            overlay: {
+                open,
+                openFromHandle: (id: string | null) => {
+                    calls.push(`${name} open ${id}`);
+                    open.set(true);
+                },
+                openWithPayload: () => calls.push(`${name} payload`),
+                closeFromHandle: () => {
+                    calls.push(`${name} close`);
+                    open.set(false);
+                },
+            },
+        } as unknown as HandleRoot;
+    }
+
+    it("serves the newest attached root, and gives the handle back on detach", () => {
+        const calls: string[] = [];
+        const store = new OverlayHandleStore("dialog");
+        const first = fakeRoot("first", calls);
+        const second = fakeRoot("second", calls);
+        // no root: ignored
+        store.open(null);
+        expect(store.isOpen).toBe(false);
+        store.attach(first);
+        store.attach(second);
+        expect(store.root()).toBe(second);
+        store.open("a");
+        expect(calls).toEqual(["second open a"]);
+        // detaching the newest gives the handle back to the previous one
+        store.detach(second);
+        expect(store.root()).toBe(first);
+        store.close();
+        expect(calls).toEqual(["second open a", "first close"]);
+        // detaching an older root keeps the newest one serving
+        store.attach(second);
+        store.detach(first);
+        expect(store.root()).toBe(second);
+        store.detach(second);
+        expect(store.root()).toBeNull();
+        store.detach(second);
+        expect(store.root()).toBeNull();
     });
 });
