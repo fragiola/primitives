@@ -28,6 +28,10 @@ ends as the browser alone renders it, with the server's ids kept.
 
 - **Slider thumbs** need nothing: their position is a percentage of their value, written in the
   server's page.
+- **Collapsible and Accordion panels** open from the start render with their size variables at
+  `auto` and no enter transition, so the page shows them at once. A closed `hiddenUntilFound`
+  panel renders `hidden` (React writes `until-found` once mounted; Vue and Angular write it on the
+  server already).
 - **The Tabs Indicator** follows the selected tab's box, which only the browser can measure. With
   `renderBeforeHydration` (Base UI's name; Angular: `*tabsIndicator="true"`), the server writes a
   small inline script inside the Indicator. It measures the selected tab as the page parses, sets

@@ -86,6 +86,14 @@
                     "path": "api/tabs"
                 },
                 {
+                    "label": "Collapsible",
+                    "path": "api/collapsible"
+                },
+                {
+                    "label": "Accordion",
+                    "path": "api/accordion"
+                },
+                {
                     "label": "Field",
                     "path": "api/field"
                 },

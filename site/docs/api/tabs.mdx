@@ -18,6 +18,9 @@ WAI-ARIA APG [tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
 - **Disabled tabs stay focusable**, so they can be discovered, but are never selected.
 - **Panels**: Tab moves from the tab list to the selected panel, which is a tab stop of its own.
   An inactive panel is not rendered, unless `keepMounted` keeps it, `hidden`.
+- **Panel transitions**: a newly selected panel enters with `data-starting-style`, the previous one
+  exits with `data-ending-style` (and `inert`) before it unmounts; `data-activation-direction`
+  tells a recipe which side to slide from.
 - **Indicator**: it exposes the selected tab's box, relative to the list, as CSS variables, for a
   line that follows the selection.
 - **RTL**: in a horizontal list, ArrowRight and ArrowLeft swap.
@@ -119,8 +122,10 @@ No props of its own. Give it an accessible name (`aria-label` or `aria-labelledb
 
 ### Indicator
 
-It sets `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
-`--tabs-indicator-inline-size` and `--tabs-indicator-block-size`, and is not rendered while no tab
+It sets the logical `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
+`--tabs-indicator-inline-size` and `--tabs-indicator-block-size`, and the physical
+`--active-tab-left`, `--active-tab-right`, `--active-tab-top`, `--active-tab-bottom`,
+`--active-tab-width` and `--active-tab-height` (Base UI's names), and is not rendered while no tab
 is selected (Angular's `*tabsIndicator` is structural).
 
 | prop | type | default | description |
@@ -132,17 +137,24 @@ is selected (Angular's `*tabsIndicator` is structural).
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `value` | `string` | | required: the value of its tab (Angular: `*tabsPanel="value"`) |
-| `keepMounted` | `boolean` | `false` | keep an inactive panel rendered, `hidden` |
+| `keepMounted` | `boolean` | `false` | keep an inactive panel rendered, `hidden` once its exit ended |
 
 ## State and part attributes
 
 | part | attributes |
 | --- | --- |
-| Root | `data-orientation`, `data-activation` |
-| List | `role="tablist"`, `aria-orientation`, `data-orientation` |
-| Tab | `role="tab"`, `aria-selected`, `aria-controls`, `tabindex`, `aria-disabled` and `data-disabled` when disabled, `data-selected`, `data-orientation` |
-| Indicator | `aria-hidden="true"`, `data-orientation` |
-| Panel | `role="tabpanel"`, `aria-labelledby`, `tabindex="0"`, `data-selected`, `hidden` when kept mounted and inactive, `data-orientation` |
+| Root | `data-orientation`, `data-activation`, `data-activation-direction` |
+| List | `role="tablist"`, `aria-orientation`, `data-orientation`, `data-activation-direction` |
+| Tab | `role="tab"`, `aria-selected`, `aria-controls`, `tabindex`, `aria-disabled` and `data-disabled` when disabled, `data-selected`, `data-orientation`, `data-activation-direction` |
+| Indicator | `aria-hidden="true"`, `data-orientation`, `data-activation-direction` |
+| Panel | `role="tabpanel"`, `aria-labelledby`, `tabindex="0"`, `data-selected`, `data-starting-style` / `data-ending-style`, `inert` while it exits, `hidden` when kept mounted and inactive, `data-orientation`, `data-activation-direction` |
+
+`data-activation-direction` is where the newly selected tab sits from the previous one: `left`,
+`right`, `up`, `down`, or `none` before any change. It is physical, as the Indicator's travel: in
+RTL the next tab is on the left. A panel that becomes selected renders with `data-starting-style`
+for a frame (not on the first render); one that stops being selected stays, `inert`, with
+`data-ending-style` until its animations end. Two panels exist together while one exits: stack
+them in one grid cell, or animate the enter only.
 
 ## Keyboard
 
@@ -158,6 +170,6 @@ is selected (Angular's `*tabsIndicator` is structural).
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsPanelProps`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/tabs` | `Tabs`, `TabsRootProps`, `TabsRootEmits`, `TabsRootState`, `TabsListState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsIndicatorState`, `TabsPanelProps`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |
+| `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsPanelProps`, `TabsPanelState`, `ActivationDirection`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/tabs` | `Tabs`, `TabsRootProps`, `TabsRootEmits`, `TabsRootState`, `TabsListState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorProps`, `TabsIndicatorState`, `TabsPanelProps`, `TabsPanelState`, `ActivationDirection`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelState`, `ActivationDirection`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |

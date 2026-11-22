@@ -19,7 +19,9 @@ windows. Its only runtime dependency is `@floating-ui/dom`, in the positioning e
 
 Each mechanism is its own entry, so a component pulls in only the ones it uses: Dialog uses
 `/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and
-`/direction`; Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
+`/direction` (and `/presence` for its panels' enter and exit); Collapsible uses `/presence` alone
+(its panel size and find-in-page match), Accordion `/presence`, `/collection` and `/direction`;
+Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
@@ -34,7 +36,7 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsKeyTarget`, `TabsKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality` |
@@ -47,7 +49,7 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement` |
-| `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
+| `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
 
