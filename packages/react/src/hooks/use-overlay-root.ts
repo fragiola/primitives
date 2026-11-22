@@ -34,6 +34,10 @@ export function useOverlayRoot(props: OverlayRootProps) {
             lastReason.current = reason;
             requested.current = next;
             setOpenState(next, { reason });
+            // a request the consumer turned down is forgotten once it is answered
+            queueMicrotask(() => {
+                requested.current = null;
+            });
         },
         [setOpenState],
     );

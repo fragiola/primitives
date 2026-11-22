@@ -22,7 +22,8 @@ export interface DatePickerPopupState {
 // Closing by these returns focus to the trigger; focus leaving does not (spec/calendar.md, "Focus").
 const RETURNS_FOCUS = new Set(["escape-key", "item-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (as Popover, D4 §3)
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+// and a close made through the controlled `open` (reason `none`), as Popover's
+const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
 
 /** The non-modal dialog holding the bound calendar (spec/calendar.md, pickers): `<div datePickerPopup>`. */
 @Directive({
@@ -76,7 +77,7 @@ export class DatePickerPopup {
                     returnFocus: {
                         when: RETURNS_FOCUS,
                         whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
-                        reason: () => overlay.lastReason.current,
+                        reason: () => overlay.lastReason.current ?? "none",
                         to: () => trigger,
                     },
                 });

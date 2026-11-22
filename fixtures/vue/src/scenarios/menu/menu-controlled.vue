@@ -15,6 +15,7 @@ const open = ref(false);
                 <Menu.Popup>
                     <Menu.Item>Edit</Menu.Item>
                     <Menu.Item>Delete</Menu.Item>
+                    <Menu.Item :close-on-click="false" @click="open = false">Done</Menu.Item>
                 </Menu.Popup>
             </Menu.Positioner>
         </Menu.Portal>

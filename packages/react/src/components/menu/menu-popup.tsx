@@ -21,7 +21,10 @@ const ROOT_RETURNS_FOCUS = new Set([
 ]);
 const SUBMENU_RETURNS_FOCUS = new Set(["escape-key", "list-navigation"]);
 // a modal menu's outside press reaches nothing, so focus goes back to the trigger
-const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// a root menu closed through the controlled `open` (reason `none`) returns focus left inside it,
+// as Popover does
+const RETURNS_FOCUS_UNFOCUSED = new Set(["none"]);
 
 function rootOf(context: MenuContextValue): MenuContextValue {
     return context.parent ? rootOf(context.parent) : context;
@@ -68,8 +71,8 @@ export function MenuPopup(
                 whenUnfocused: () =>
                     modalNow.current
                         ? MODAL_RETURNS_FOCUS_UNFOCUSED
-                        : undefined,
-                reason: () => lastReason.current,
+                        : RETURNS_FOCUS_UNFOCUSED,
+                reason: () => lastReason.current ?? (nested ? null : "none"),
                 to: () => trigger,
             },
         });

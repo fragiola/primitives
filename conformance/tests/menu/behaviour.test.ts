@@ -382,3 +382,15 @@ test("menu / controlled: a key on the open trigger leaves no highlight for a lat
         page.locator('[data-primitives-part="menu-item"][data-highlighted]'),
     ).toHaveCount(0);
 });
+
+test("menu / controlled: closed through `open` with focus inside, focus returns to the trigger", async ({
+    page,
+}) => {
+    await openScenario(page, "/menu/controlled");
+    const trigger = page.getByRole("button", { name: "Actions" });
+    await trigger.click();
+    await page.getByRole("menuitem", { name: "Done" }).click();
+    await expect(page.getByRole("menu")).toBeHidden();
+    await expectOutput(page, "open", "false");
+    await expect(trigger).toBeFocused();
+});

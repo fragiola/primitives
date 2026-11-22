@@ -35,10 +35,11 @@ export const CalendarGrid: PartComponent<
             const setElement = elementSetter(element);
             // a started range takes Escape before an enclosing overlay's layer (a picker, a
             // dialog, a popover) closes it: the next Escape closes (spec/calendar.md, "Keyboard")
+            // the started range is read when the key comes, never after a render
             watch(
-                () => [context.anchor.value !== null, element.value] as const,
-                ([started, grid], _, onCleanup) => {
-                    if (!started || grid === null) {
+                element,
+                (grid, _, onCleanup) => {
+                    if (grid === null) {
                         return;
                     }
                     onCleanup(
@@ -47,6 +48,7 @@ export const CalendarGrid: PartComponent<
                             () => context.cancelRange(),
                             {
                                 when: (event) =>
+                                    context.anchor.value !== null &&
                                     event.target instanceof Node &&
                                     grid.contains(event.target),
                             },

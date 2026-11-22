@@ -16,6 +16,7 @@ import { MENU_PARTS } from "./menu-parts.ts";
                     <div menuPopup [class]="styles.popup">
                         <div menuItem [class]="styles.item">Edit</div>
                         <div menuItem [class]="styles.item">Delete</div>
+                        <div menuItem [closeOnClick]="false" [class]="styles.item" (click)="open.set(false)">Done</div>
                     </div>
                 </div>
             </ng-container>

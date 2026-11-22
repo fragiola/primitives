@@ -182,11 +182,16 @@ Checks:
 
 ### `/menu/controlled`
 
-Content: a Trigger **"Actions"** with items **"Edit"** and **"Delete"**, and a button **"Open
-from outside"** that sets the page's `open` state. Output: `open: ...`.
+Content: a Trigger **"Actions"** with items **"Edit"**, **"Delete"** and **"Done"**
+(`closeOnClick` off: its click sets the page's `open` to `false`), and a button **"Open from
+outside"** that sets the page's `open` state. Output: `open: ...`.
 
-Checks: open with a click, focus the trigger and press Enter, then Escape; "Open from outside"
-opens the menu with no item highlighted.
+Checks:
+
+1. Open with a click, focus the trigger and press Enter, then Escape; "Open from outside" opens
+   the menu with no item highlighted.
+2. Open with a click, click "Done": the menu closes through `open` (reason `none`) and focus,
+   left inside it, returns to "Actions" (as Popover's, `popover.md` "Focus").
 
 ### `/menu/submenu`
 

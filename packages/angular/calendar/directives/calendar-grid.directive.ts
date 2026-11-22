@@ -1,7 +1,8 @@
 import {
+    afterNextRender,
     computed,
+    DestroyRef,
     Directive,
-    effect,
     inject,
     input,
     numberAttribute,
@@ -46,28 +47,26 @@ export class CalendarGrid {
         const grid = injectHost();
         const calendar = this.calendar;
         // a started range takes Escape before an enclosing overlay's layer (a picker, a dialog, a
-        // popover) closes it: the next Escape closes (spec/calendar.md, "Keyboard")
-        effect((onCleanup) => {
-            if (calendar.anchor() === null) {
-                return;
-            }
-            untracked(() =>
-                onCleanup(
-                    interceptEscape(
-                        grid.ownerDocument,
-                        () => {
-                            calendar.cancelRange();
-                            this.flush();
-                        },
-                        {
-                            when: (event) =>
-                                event.target instanceof Node &&
-                                grid.contains(event.target),
-                        },
-                    ),
-                ),
+        // popover) closes it, and the next Escape closes (spec/calendar.md, "Keyboard"). The
+        // started range is read when the key comes, never after a render; installed in the
+        // browser only (an after render hook never runs on a server)
+        let stop: (() => void) | null = null;
+        afterNextRender(() => {
+            stop = interceptEscape(
+                grid.ownerDocument,
+                () => {
+                    calendar.cancelRange();
+                    this.flush();
+                },
+                {
+                    when: (event) =>
+                        untracked(calendar.anchor) !== null &&
+                        event.target instanceof Node &&
+                        grid.contains(event.target),
+                },
             );
         });
+        inject(DestroyRef).onDestroy(() => stop?.());
     }
 
     protected onKeyDown(event: KeyboardEvent): void {

@@ -34,7 +34,10 @@ const ROOT_RETURNS_FOCUS = new Set([
 ]);
 const SUBMENU_RETURNS_FOCUS = new Set(["escape-key", "list-navigation"]);
 // a modal menu's outside press reaches nothing, so focus goes back to the trigger
-const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// a root menu closed through the controlled `open` (reason `none`) returns focus left inside it,
+// as Popover does
+const RETURNS_FOCUS_UNFOCUSED = new Set(["none"]);
 
 /** One menu level: roving focus, typeahead, Escape per level (spec/menu.md): `<div menuPopup>`. */
 @Directive({
@@ -99,8 +102,10 @@ export class MenuPopup {
                         whenUnfocused: () =>
                             !level.nested && untracked(level.isModal)
                                 ? MODAL_RETURNS_FOCUS_UNFOCUSED
-                                : undefined,
-                        reason: () => overlay.lastReason.current,
+                                : RETURNS_FOCUS_UNFOCUSED,
+                        reason: () =>
+                            overlay.lastReason.current ??
+                            (level.nested ? null : "none"),
                         to: () => trigger,
                     },
                 });
