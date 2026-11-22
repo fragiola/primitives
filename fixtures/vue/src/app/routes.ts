@@ -65,6 +65,8 @@ import MenuGroups from "../scenarios/menu/menu-groups.vue";
 import MenuLifecycle from "../scenarios/menu/menu-lifecycle.vue";
 import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
+import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
+import NavigationMenuNested from "../scenarios/navigation-menu/navigation-menu-nested.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
 import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
@@ -149,6 +151,8 @@ export const routes: Record<string, Component> = {
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/navigation-menu/basic": NavigationMenuBasic,
+    "/navigation-menu/nested": NavigationMenuNested,
     "/menu/checkbox-radio": MenuCheckboxRadio,
     "/context-menu/basic": ContextMenuBasic,
     "/context-menu/rtl": ContextMenuBasic,
