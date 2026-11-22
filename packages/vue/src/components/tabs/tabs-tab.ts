@@ -82,6 +82,8 @@ export const TabsTab: PartComponent<TabsTabProps, TabsTabState> =
                                 selected,
                                 disabled: props.disabled,
                                 orientation,
+                                "activation-direction":
+                                    context.activationDirection.value,
                             }),
                             onClick: () => {
                                 if (!props.disabled) {

@@ -3,11 +3,13 @@
 // from it tree-shakes to the same output as importing from the subpath. There is no `app.use()`
 // plugin: an app imports the components it uses.
 
+export * from "./components/accordion/index.ts";
 export * from "./components/avatar/index.ts";
 export * from "./components/button/index.ts";
 export * from "./components/calendar/index.ts";
 export * from "./components/checkbox/index.ts";
 export * from "./components/checkbox-group/index.ts";
+export * from "./components/collapsible/index.ts";
 export * from "./components/combobox/index.ts";
 export * from "./components/date-picker/index.ts";
 export * from "./components/date-range-picker/index.ts";
