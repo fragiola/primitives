@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SingleCalendar from "./single-calendar.vue";
 
-defineProps<{ locale: string }>();
+defineProps<{ locale?: string }>();
 </script>
 
 <template>

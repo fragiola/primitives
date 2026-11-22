@@ -22,6 +22,6 @@ import { Output } from "../../kit/output.ts";
 export class CalendarRange {
     protected readonly styles = calendar;
     protected readonly isoRange = isoRange;
-    readonly locale = input.required<string>();
+    readonly locale = input.required<string | undefined>();
     protected readonly value = signal<DateRange | null>(null);
 }

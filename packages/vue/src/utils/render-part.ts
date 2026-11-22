@@ -57,10 +57,15 @@ export function renderPart<State>(
             render({ props, state, children: h(PartChildren, { content }) }),
         );
     }
-    // an element's children must be an array: a single vnode would read as a slots object
+    // an element's children must be an array: a single vnode would read as a slots object; no
+    // content is no child (not a comment placeholder, which a void element such as an `input`
+    // cannot take from a server render: Epic #22)
     return h(as ?? tag, props, {
         default: () => {
             const nodes = content();
+            if (nodes === undefined || nodes === null) {
+                return [];
+            }
             return Array.isArray(nodes) ? nodes : [nodes];
         },
     });

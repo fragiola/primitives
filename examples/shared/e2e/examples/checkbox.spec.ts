@@ -1,11 +1,10 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // checkbox: pizza toppings, a CheckboxGroup with a parent checkbox (spec/checkbox.md).
@@ -48,6 +47,5 @@ test("axe finds no violation", async ({ page }) => {
     requireExamples("checkbox");
     await page.goto(`${EMBED_BASE}?id=checkbox`);
     await expect(page.getByRole("checkbox")).toHaveCount(4);
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

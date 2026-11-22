@@ -1,8 +1,8 @@
 import { computed, Directive, effect, input, untracked } from "@angular/core";
-import { createId } from "@fragiola/primitives/id";
 import {
     injectEnclosing,
     injectHost,
+    injectId,
 } from "@fragiola/primitives-angular/internal";
 import { FieldRoot } from "./field-root.directive.ts";
 
@@ -32,7 +32,7 @@ export class FieldDescription {
         "fieldRoot",
         "FieldDescription",
     );
-    private readonly generated = createId("primitives-field-description");
+    private readonly generated = injectId("primitives-field-description");
     protected readonly resolvedId = computed(() => this.id() ?? this.generated);
     readonly state = this.field.state;
 

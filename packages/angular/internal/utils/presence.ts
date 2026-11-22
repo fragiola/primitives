@@ -1,4 +1,9 @@
-import { computed, effect, linkedSignal, type Signal } from "@angular/core";
+import {
+    afterRenderEffect,
+    computed,
+    linkedSignal,
+    type Signal,
+} from "@angular/core";
 import { nextFrame, waitForAnimations } from "@fragiola/primitives/presence";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
@@ -14,6 +19,10 @@ export interface Presence {
  * `data-starting-style` for the first frame after mounting, `data-ending-style` until every
  * animation on the element has finished. The status derives from `open` in the same pass, so the
  * element's first render already carries `data-starting-style`; the effect only clears it.
+ *
+ * The effect runs after rendering (`afterRenderEffect`), as React's and Vue's post-render effects:
+ * the exit is awaited once the element carries `data-ending-style`, so its transition has started.
+ * A plain `effect` runs before the view is refreshed, finds no animation, and unmounts at once.
  */
 export function createPresence(
     open: Signal<boolean>,
@@ -31,7 +40,7 @@ export function createPresence(
             return wasShown ? "ending" : undefined;
         },
     });
-    effect((onCleanup) => {
+    afterRenderEffect((onCleanup) => {
         const current = status();
         const node = element();
         if (current === "starting" && node) {

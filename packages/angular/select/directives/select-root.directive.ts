@@ -12,7 +12,6 @@ import {
     signal,
 } from "@angular/core";
 import { bridgeForm } from "@fragiola/primitives/form";
-import { createId } from "@fragiola/primitives/id";
 import { fieldControl } from "@fragiola/primitives-angular/field";
 import {
     type ChangeDetails,
@@ -20,6 +19,7 @@ import {
     controllable,
     createHiddenInput,
     createOverlayRoot,
+    injectId,
     type OpenChangeEvent,
     placementSignal,
     setInputAttribute,
@@ -110,7 +110,7 @@ export class SelectRoot {
         () => this.disabled() || this.field.disabled(),
     );
     readonly highlighted = signal<string | null>(null);
-    readonly listId = `${createId("primitives-select")}-list`;
+    readonly listId = `${injectId("primitives-select")}-list`;
     readonly placed = placementSignal({ side: "bottom", align: "start" });
     readonly state = computed<SelectState>(() => ({
         open: this.overlay.open(),

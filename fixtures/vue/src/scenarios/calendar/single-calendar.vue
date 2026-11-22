@@ -8,7 +8,7 @@ import MonthView from "../../kit/ui/month-view.vue";
 
 // A single-date calendar with the scenario's options.
 defineProps<{
-    locale: string;
+    locale?: string;
     min?: PlainDate;
     max?: PlainDate;
     isDateUnavailable?: (date: PlainDate) => boolean;

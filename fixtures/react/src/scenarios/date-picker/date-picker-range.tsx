@@ -8,7 +8,7 @@ import { Output } from "../../kit/output.tsx";
 import { MonthView, RangeCalendar } from "../../kit/ui/calendar.tsx";
 import { DatePicker } from "../../kit/ui/date-picker.tsx";
 
-export function DatePickerRange({ locale }: { locale: string }) {
+export function DatePickerRange({ locale }: { locale?: string }) {
     const [value, setValue] = useState<DateRange | null>(null);
     return (
         <>

@@ -1,4 +1,4 @@
-import { computed, Directive, input } from "@angular/core";
+import { Directive, input } from "@angular/core";
 import { createDelayGroup } from "@fragiola/primitives/hover";
 
 /**
@@ -13,7 +13,11 @@ export class TooltipProvider {
     readonly closeDelay = input(0);
     /** ms after a close during which another tooltip of the group opens at once. */
     readonly timeout = input(400);
-    readonly group = computed(() =>
-        createDelayGroup({ timeout: this.timeout() }),
-    );
+    // one group for the provider's life, reading the current timeout: a change never leaves the
+    // open member in the previous group
+    private readonly delayGroup = createDelayGroup({
+        timeout: () => this.timeout(),
+    });
+    /** The provider's delay group (a getter, as the tooltips read it). */
+    readonly group = () => this.delayGroup;
 }

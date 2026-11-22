@@ -1,6 +1,7 @@
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
-import type { KeyboardEvent } from "react";
+import { interceptEscape } from "@fragiola/primitives/layers";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { CalendarContext, CalendarGridContext } from "./calendar-context.ts";
@@ -14,6 +15,31 @@ export interface CalendarGridProps extends PartProps<Record<string, never>> {
 export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
     const context = useRequiredContext(CalendarContext, "Calendar.Grid");
     const month = addMonths(context.visibleStart, offset);
+    const [element, setElement] = useState<HTMLElement | null>(null);
+    // read when the key comes, so the interception never waits for a render
+    const range = useRef({ started: false, cancel: context.cancelRange });
+    range.current = {
+        started: context.anchor !== null,
+        cancel: context.cancelRange,
+    };
+
+    // a started range takes Escape before an enclosing overlay's layer (a picker, a dialog, a
+    // popover) closes it: the next Escape closes (spec/calendar.md, "Keyboard")
+    useEffect(() => {
+        if (element === null) {
+            return undefined;
+        }
+        return interceptEscape(
+            element.ownerDocument,
+            () => range.current.cancel(),
+            {
+                when: (event) =>
+                    range.current.started &&
+                    event.target instanceof Node &&
+                    element.contains(event.target),
+            },
+        );
+    }, [element]);
 
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -59,6 +85,7 @@ export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
                     "data-primitives-part": `${context.component}-grid`,
                     onKeyDown,
                 },
+                setElement,
             )}
         </CalendarGridContext.Provider>
     );

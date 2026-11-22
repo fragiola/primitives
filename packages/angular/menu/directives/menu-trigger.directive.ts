@@ -62,6 +62,10 @@ export class MenuTrigger {
             highlight: "first" | "last",
             reason: "trigger-press" | "list-navigation",
         ) => {
+            // already open: nothing to open, and no highlight left for a later open
+            if (this.state().open) {
+                return;
+            }
             this.level.pendingHighlight = highlight;
             this.level.overlay.setOpen(true, reason);
         };

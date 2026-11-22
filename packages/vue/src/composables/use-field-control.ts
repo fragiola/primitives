@@ -60,15 +60,24 @@ export function useFieldControl(
     }
     const { events } = field;
 
+    // unregistered on unmount (or when the id changes), not in the watch's cleanup: a server
+    // render stops the watch once the control is rendered, before a later label reads it
+    let unregister: (() => void) | null = null;
     watch(
         options.id,
-        (id, _, onCleanup) => {
-            if (id !== undefined) {
-                onCleanup(field.registerControl(id, options.labelable));
-            }
+        (id) => {
+            unregister?.();
+            unregister =
+                id === undefined
+                    ? null
+                    : field.registerControl(id, options.labelable);
         },
         { immediate: true },
     );
+    onBeforeUnmount(() => {
+        unregister?.();
+        unregister = null;
+    });
 
     let stop: (() => void)[] = [];
     // from the mount on: the control's own state may be defined after this call

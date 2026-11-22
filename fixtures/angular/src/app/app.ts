@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation } from "@angular/core";
+import { DOCUMENT } from "@angular/common";
+import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { readQuery } from "../kit/query.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -27,11 +28,13 @@ import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
+import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
 import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
+import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.ts";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.ts";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
@@ -43,6 +46,7 @@ import { SliderControlled } from "../scenarios/slider/slider-controlled.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
+import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.ts";
@@ -62,7 +66,9 @@ import { ROUTES } from "./routes.ts";
         DialogRejectedClose,
         DialogNestedPopover,
         SettingsTabs,
+        TabsNoneSelected,
         PopoverBasic,
+        PopoverControlled,
         PopoverInitialFocus,
         PopoverPlacement,
         PopoverRtl,
@@ -71,6 +77,7 @@ import { ROUTES } from "./routes.ts";
         TooltipGroup,
         TooltipInDialog,
         MenuBasic,
+        MenuControlled,
         MenuSubmenu,
         MenuGroups,
         MenuModal,
@@ -112,11 +119,13 @@ import { ROUTES } from "./routes.ts";
             @case ("/tabs/automatic") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="horizontal"></main> }
             @case ("/tabs/manual") { <main class="p-6" scenario-settings-tabs activation="manual" orientation="horizontal"></main> }
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
+            @case ("/tabs/none-selected") { <main class="p-6" scenario-tabs-none-selected></main> }
             @case ("/popover/basic") { <main class="p-6" scenario-popover-basic></main> }
             @case ("/popover/initial-focus") { <main class="p-6" scenario-popover-initial-focus></main> }
             @case ("/popover/placement") { <main class="p-6" scenario-popover-placement></main> }
             @case ("/popover/rtl") { <main class="p-6" scenario-popover-rtl></main> }
             @case ("/popover/arrow") { <main class="p-6" scenario-popover-arrow></main> }
+            @case ("/popover/controlled") { <main class="p-6" scenario-popover-controlled></main> }
             @case ("/tooltip/basic") { <main class="p-6" scenario-tooltip-basic></main> }
             @case ("/tooltip/group") { <main class="p-6" scenario-tooltip-group></main> }
             @case ("/tooltip/in-dialog") { <main class="p-6" scenario-tooltip-in-dialog></main> }
@@ -124,6 +133,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/menu/submenu") { <main class="p-6" scenario-menu-submenu></main> }
             @case ("/menu/groups") { <main class="p-6" scenario-menu-groups></main> }
             @case ("/menu/modal") { <main class="p-6" scenario-menu-modal></main> }
+            @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }
@@ -170,8 +180,10 @@ import { ROUTES } from "./routes.ts";
     `,
 })
 export class App {
-    protected readonly query = readQuery(window.location.search);
-    protected readonly path = window.location.pathname;
+    // the document's location: the browser's, or the server render's URL (src/server)
+    private readonly location = inject(DOCUMENT).location;
+    protected readonly query = readQuery(this.location.search);
+    protected readonly path = this.location.pathname;
     protected readonly routes = ROUTES;
 
     /** The unavailable dates of `/calendar/unavailable`: weekends. */
@@ -181,7 +193,12 @@ export class App {
     };
 
     constructor() {
-        document.documentElement.dir = this.query.dir;
-        document.documentElement.lang = this.query.locale;
+        const html = inject(DOCUMENT).documentElement;
+        html.setAttribute("dir", this.query.dir);
+        if (this.query.lang === undefined) {
+            html.removeAttribute("lang");
+        } else {
+            html.setAttribute("lang", this.query.lang);
+        }
     }
 }

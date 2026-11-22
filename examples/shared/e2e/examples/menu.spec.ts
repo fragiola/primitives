@@ -1,12 +1,11 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     promoted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // menu: the "File" menu with its "Share" submenu (spec/menu.md). Non-modal: never promoted.
@@ -67,6 +66,5 @@ test("axe finds no violation with the menu open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=menu`);
     await page.getByRole("button", { name: "File" }).click();
     await expect(page.getByRole("menu")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

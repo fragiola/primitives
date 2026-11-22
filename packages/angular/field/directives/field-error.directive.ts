@@ -15,8 +15,10 @@ import {
     type FieldErrorMatch,
     fieldErrorShown,
 } from "@fragiola/primitives/form";
-import { createId } from "@fragiola/primitives/id";
-import { injectEnclosing } from "@fragiola/primitives-angular/internal";
+import {
+    injectEnclosing,
+    injectId,
+} from "@fragiola/primitives-angular/internal";
 import { FieldRoot } from "./field-root.directive.ts";
 
 /** The template context of `*fieldError`: the field's current messages. */
@@ -69,7 +71,7 @@ export class FieldError {
         "fieldRoot",
         "FieldError",
     );
-    private readonly generated = createId("primitives-field-error");
+    private readonly generated = injectId("primitives-field-error");
     private readonly resolvedId = computed(() => this.id() ?? this.generated);
     readonly state = this.field.state;
     /** Whether the error is shown (rendered). */

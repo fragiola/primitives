@@ -244,6 +244,38 @@ test("calendar / locale de-DE: German weekday headers, Monday first", async ({
     );
 });
 
+test.describe("calendar / single, no locale and no lang", () => {
+    test.use({ locale: "de-DE" });
+
+    test("takes the browser's language once mounted", async ({ page }) => {
+        await openScenario(page, "/calendar/single", {
+            locale: "none",
+            today: true,
+        });
+        expect(
+            await page.evaluate(() =>
+                document.documentElement.hasAttribute("lang"),
+            ),
+        ).toBe(false);
+        await expect(page.getByRole("columnheader").first()).toHaveText(
+            shortWeekday("de-DE", 2026, 11, 16),
+        );
+        await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
+    });
+
+    test("a picker's calendar keeps the focus it took when it switches language", async ({
+        page,
+    }) => {
+        await openScenario(page, "/date-picker/basic", {
+            locale: "none",
+            today: true,
+        });
+        await page.getByRole("button", { name: "Choose date" }).click();
+        await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
+        await expectFocusWithin(cell(page, 11, 20, 2026, "de-DE"));
+    });
+});
+
 test("calendar / locale de-DE: German names, Monday first", async ({
     page,
 }) => {
@@ -477,8 +509,9 @@ test("date-picker / range: closing cancels a started range", async ({
     const trigger = page.getByRole("button", { name: "Choose dates" });
     await trigger.click();
     await cell(page, 11, 10).click();
-    await page.keyboard.press("Escape");
-    await expect(trigger).toBeFocused();
+    // closed by its trigger (Escape would cancel the range first, see below)
+    await trigger.click();
+    await expect(page.getByRole("dialog")).toBeHidden();
     // reopened at once: the start on the 10th is gone, so the 13th starts a new range
     await trigger.click();
     await cell(page, 11, 13).click();
@@ -486,6 +519,28 @@ test("date-picker / range: closing cancels a started range", async ({
     await expectOutput(page, "value", "none");
     await cell(page, 11, 15).click();
     await expectOutput(page, "value", "2026-11-13..2026-11-15");
+});
+
+test("date-picker / range: Escape cancels a started range first, then closes", async ({
+    page,
+}) => {
+    await openScenario(page, "/date-picker/range", { today: true });
+    const trigger = page.getByRole("button", { name: "Choose dates" });
+    await trigger.click();
+    await cell(page, 11, 10).click();
+    await page.keyboard.press("Escape");
+    // the range calendar takes the first Escape: the popup stays, and the start on the 10th is
+    // gone (the 13th starts a new range instead of ending 10..13)
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await cell(page, 11, 13).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expectOutput(page, "value", "none");
+    // the start on the 13th is cancelled by the next Escape, and the one after closes
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeHidden();
+    await expect(trigger).toBeFocused();
 });
 
 test("date-picker / range: closes after the end date", async ({ page }) => {

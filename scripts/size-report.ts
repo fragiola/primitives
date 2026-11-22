@@ -9,6 +9,8 @@
 //
 // `pnpm size --check` writes nothing and fails when `docs/size.md` is not what it would write: CI
 // runs it after `pnpm build`, so a change that moves a size without regenerating the report fails.
+// The minified sizes must match exactly; a gzip size may move within GZIP_TOLERANCE, since Node's
+// zlib is not pinned (Epic #22: Node 24 and Node 26 gzip the same bytes a few bytes apart).
 // Sizes are exact byte counts, the output is sorted as the manifests list the entries: the same
 // build gives the same report.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -113,7 +115,10 @@ export function formatReport(
         "(ng-packagr's partial compilation, before an app's Angular linker).",
         "",
         "Regenerate it with `pnpm build && pnpm size`; CI runs `pnpm size --check`, which fails when",
-        "this file is not what `pnpm size` writes.",
+        "this file is not what `pnpm size` writes. The minified sizes must match exactly; the gzip",
+        `sizes may differ by ${GZIP_TOLERANCE.bytes} B or ${GZIP_TOLERANCE.ratio * 100}%, whichever is larger, since they`,
+        "come from Node's own zlib, which differs between Node versions (a change of code always",
+        "moves a minified size).",
     ];
     for (const pkg of packages) {
         const framework = pkg.entries.some(
@@ -158,12 +163,72 @@ export function formatReport(
     return `${lines.join("\n")}\n`;
 }
 
+/**
+ * How far a gzip size may move with no change of code: Node's zlib is not pinned (Node 24's and
+ * 26's give a few bytes apart for the same input), while the minified sizes, rolldown's, are
+ * exact. A change of code moves a minified size, so `--check` still catches it.
+ */
+export const GZIP_TOLERANCE = { bytes: 16, ratio: 0.02 } as const;
+
+/** `12,345 B` as a number, or `undefined`. */
+function parseBytes(cell: string): number | undefined {
+    const match = /^([\d,]+) B$/.exec(cell.trim());
+    return match?.[1] === undefined
+        ? undefined
+        : Number(match[1].replaceAll(",", ""));
+}
+
+/**
+ * Whether two reports say the same: the same lines, except gzip cells (the columns whose header
+ * names gzip) that may differ within {@link GZIP_TOLERANCE}.
+ */
+export function sameReport(current: string, expected: string): boolean {
+    if (current === expected) return true;
+    const left = current.split("\n");
+    const right = expected.split("\n");
+    if (left.length !== right.length) return false;
+    let gzipColumns: number[] = [];
+    for (let index = 0; index < right.length; index += 1) {
+        const a = left[index] as string;
+        const b = right[index] as string;
+        if (b.startsWith("| entry |")) {
+            gzipColumns = b
+                .split("|")
+                .map((cell, column) => (cell.includes("gzip") ? column : -1))
+                .filter((column) => column >= 0);
+        }
+        if (a === b) continue;
+        if (!b.startsWith("| ") || gzipColumns.length === 0) return false;
+        const cellsA = a.split("|");
+        const cellsB = b.split("|");
+        if (cellsA.length !== cellsB.length) return false;
+        for (let column = 0; column < cellsB.length; column += 1) {
+            const cellA = cellsA[column] as string;
+            const cellB = cellsB[column] as string;
+            if (cellA === cellB) continue;
+            const sizeA = parseBytes(cellA);
+            const sizeB = parseBytes(cellB);
+            if (
+                !gzipColumns.includes(column) ||
+                sizeA === undefined ||
+                sizeB === undefined ||
+                Math.abs(sizeA - sizeB) >
+                    Math.max(GZIP_TOLERANCE.bytes, sizeB * GZIP_TOLERANCE.ratio)
+            ) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 /** What `--check` says of the report on disk: nothing when it is up to date. */
 export function staleProblem(
     current: string | undefined,
     expected: string,
 ): string | undefined {
-    if (current === expected) return undefined;
+    if (current !== undefined && sameReport(current, expected))
+        return undefined;
     return current === undefined
         ? `${REPORT} does not exist: run \`pnpm build && pnpm size\` and commit it`
         : `${REPORT} is stale: run \`pnpm build && pnpm size\` and commit it`;

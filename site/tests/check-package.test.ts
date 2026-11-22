@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
     ADAPTERS,
@@ -7,6 +9,8 @@ import {
     manifestProblems,
     missingTargets,
     packedProblems,
+    pinnedPnpm,
+    pnpmInvocation,
     publishedExportsProblems,
     relativeTo,
     servedImports,
@@ -332,5 +336,40 @@ describe("attwProblems", () => {
             "NoResolution node16-esm ./tabs",
             "FalseCJS",
         ]);
+    });
+});
+
+// Epic #22 (#21): the scratch apps install and build with the pinned pnpm, never the machine's.
+describe("the scratch apps' pnpm", () => {
+    it("is the version package.json pins", () => {
+        expect(pinnedPnpm({ packageManager: "pnpm@12.21.0" })).toBe("12.21.0");
+        expect(() => pinnedPnpm({ packageManager: "pnpm@^12" })).toThrow();
+        expect(() => pinnedPnpm({})).toThrow();
+    });
+
+    it("runs the machine's pnpm when it is the pinned one, else pnpm dlx of the pinned", () => {
+        expect(pnpmInvocation("12.21.0", "12.21.0\n")).toEqual({
+            command: "pnpm",
+            prefix: [],
+        });
+        expect(pnpmInvocation("12.21.0", "11.2.0")).toEqual({
+            command: "pnpm",
+            prefix: ["dlx", "pnpm@12.21.0"],
+        });
+    });
+
+    it("pins the repository's pnpm in every scratch app's manifest", () => {
+        const source = readFileSync(
+            join(import.meta.dirname, "../../scripts/check-package.ts"),
+            "utf8",
+        );
+        expect(
+            source.match(/packageManager: `pnpm@\$\{PINNED_PNPM\}`/g),
+        ).toHaveLength(3);
+        // every pnpm command in a scratch app goes through the pinned one (publint runs in the
+        // repository, with its own pinned pnpm)
+        expect(source).not.toMatch(
+            /run\("pnpm", \["(install|exec", "(tsc|vite|vue-tsc|ngc))"/,
+        );
     });
 });

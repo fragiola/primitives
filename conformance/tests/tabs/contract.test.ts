@@ -50,3 +50,19 @@ test("tabs / manual and vertical: the root reports them", async ({ page }) => {
         "vertical",
     );
 });
+
+test("tabs / none-selected: no tab selected, no panel and no indicator rendered", async ({
+    page,
+}) => {
+    await openScenario(page, "/tabs/none-selected");
+    const tabs = part(page, "tabs", "tab");
+    await expect(tabs).toHaveCount(2);
+    for (const tab of await tabs.all()) {
+        await expect(tab).toHaveAttribute("data-disabled", "");
+        await expect(tab).not.toHaveAttribute("data-selected");
+        await expect(tab).toHaveAttribute("aria-selected", "false");
+    }
+    await expect(part(page, "tabs", "panel")).toHaveCount(0);
+    await expect(part(page, "tabs", "indicator")).toHaveCount(0);
+    await expectNoFalseStates(parts(page, "tabs"));
+});

@@ -53,13 +53,30 @@ import {
 
 const NONE: readonly unknown[] = [];
 
+/**
+ * `filter` over the consumer's own items: `never` for the item and `unknown` for what
+ * `itemToString` takes, so a filter typed for them (`ItemFilter<Country>`, the toolkit's
+ * `containsFilter<Country>()`) binds with no cast and no `any`, as Angular's (Epic #22).
+ */
+export type ComboboxFilter = (
+    item: never,
+    query: string,
+    itemToString: (item: unknown) => string,
+) => boolean;
+
+/** `isItemEqualToValue` over the consumer's own items (typed `(a: Country, b: Country)`). */
+export type ComboboxItemEquality = (item: never, value: never) => boolean;
+
+/** `itemToStringLabel` / `itemToStringValue` over the consumer's own items. */
+export type ComboboxItemToString = (item: never) => string;
+
 export interface ComboboxRootProps {
     open?: boolean;
     defaultOpen?: boolean;
     /** The items, or groups of items: the combobox filters them (spec/combobox.md). */
     items?: readonly unknown[];
     /** Whether an item matches the query; `null` turns filtering off. */
-    filter?: ItemFilter<unknown> | null;
+    filter?: ComboboxFilter | null;
     /** The most items the list renders; `-1` for no limit. */
     limit?: number;
     locale?: string;
@@ -69,9 +86,9 @@ export interface ComboboxRootProps {
     defaultValue?: unknown;
     inputValue?: string;
     defaultInputValue?: string;
-    isItemEqualToValue?: ItemEquality<unknown>;
-    itemToStringLabel?: (item: unknown) => string;
-    itemToStringValue?: (item: unknown) => string;
+    isItemEqualToValue?: ComboboxItemEquality;
+    itemToStringLabel?: ComboboxItemToString;
+    itemToStringValue?: ComboboxItemToString;
     name?: string;
     required?: boolean;
     disabled?: boolean;
@@ -108,7 +125,7 @@ export const ComboboxRoot: PublicComponent<
             },
             /** Whether an item matches the query; `null` turns filtering off. */
             filter: {
-                type: Function as PropType<ItemFilter<unknown> | null>,
+                type: Function as PropType<ComboboxFilter | null>,
                 default: undefined,
             },
             /** The most items the list renders; `-1` for no limit. */
@@ -124,15 +141,15 @@ export const ComboboxRoot: PublicComponent<
             inputValue: { type: String, default: undefined },
             defaultInputValue: { type: String, default: undefined },
             isItemEqualToValue: {
-                type: Function as PropType<ItemEquality<unknown>>,
+                type: Function as PropType<ComboboxItemEquality>,
                 default: undefined,
             },
             itemToStringLabel: {
-                type: Function as PropType<(item: unknown) => string>,
+                type: Function as PropType<ComboboxItemToString>,
                 default: undefined,
             },
             itemToStringValue: {
-                type: Function as PropType<(item: unknown) => string>,
+                type: Function as PropType<ComboboxItemToString>,
                 default: undefined,
             },
             name: { type: String, default: undefined },
@@ -152,10 +169,21 @@ export const ComboboxRoot: PublicComponent<
             // read at reset time too: the form reset takes the current default (as React does)
             const defaultValue = (): unknown =>
                 props.defaultValue ?? (props.multiple ? NONE : null);
+            // the consumer's callbacks take its own items, which are the items given here
             const label = (item: unknown) =>
-                itemLabel(item, props.itemToStringLabel);
+                itemLabel(
+                    item,
+                    props.itemToStringLabel as
+                        | ((item: unknown) => string)
+                        | undefined,
+                );
             const formValue = (item: unknown) =>
-                itemFormValue(item, props.itemToStringValue);
+                itemFormValue(
+                    item,
+                    props.itemToStringValue as
+                        | ((item: unknown) => string)
+                        | undefined,
+                );
             const valueState = useControllable<unknown, ChangeDetails>(
                 () => props.value,
                 defaultValue(),
@@ -228,13 +256,16 @@ export const ComboboxRoot: PublicComponent<
             // a value held in the consumer's `ref` is its reactive proxy: compare the raw objects
             const isEqual = (item: unknown, other: unknown) =>
                 props.isItemEqualToValue
-                    ? props.isItemEqualToValue(item, other)
+                    ? (props.isItemEqualToValue as ItemEquality<unknown>)(
+                          item,
+                          other,
+                      )
                     : Object.is(toRaw(item), toRaw(other));
 
             const filter = computed<ItemFilter<unknown> | null>(() =>
                 props.filter === undefined
                     ? containsFilter<unknown>(props.locale)
-                    : props.filter,
+                    : (props.filter as ItemFilter<unknown> | null),
             );
             const entries = computed<readonly unknown[]>(() => {
                 const items = props.items;

@@ -42,6 +42,29 @@ describe("createHoverIntent", () => {
 });
 
 describe("createDelayGroup", () => {
+    it("reads a timeout getter at each check, keeping its open member", () => {
+        let timeout = 400;
+        const group = createDelayGroup({ timeout: () => timeout });
+        const first = vi.fn();
+        group.opened(first);
+        timeout = 0;
+        group.opened(() => {});
+        expect(first).toHaveBeenCalledTimes(1);
+        group.closed(first, 1000);
+        expect(group.isInstant(1100)).toBe(true); // the second is still open
+    });
+
+    it("hands off within a timeout read when it checks", () => {
+        let timeout = 400;
+        const group = createDelayGroup({ timeout: () => timeout });
+        const member = () => {};
+        group.opened(member);
+        group.closed(member, 1000);
+        expect(group.isInstant(1300)).toBe(true);
+        timeout = 100;
+        expect(group.isInstant(1300)).toBe(false);
+    });
+
     it("hands off instantly while open and within the timeout", () => {
         const group = createDelayGroup({ timeout: 400 });
         expect(group.isInstant(0)).toBe(false);

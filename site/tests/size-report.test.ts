@@ -4,6 +4,7 @@ import {
     exportTarget,
     formatBytes,
     formatReport,
+    GZIP_TOLERANCE,
     isPackageOrSubpath,
     type PackageSizes,
     REPORT,
@@ -82,6 +83,43 @@ describe("staleProblem", () => {
             `${REPORT} does not exist`,
         );
         expect(staleProblem("b\n", "a\n")).toMatch(`${REPORT} is stale`);
+    });
+});
+
+// Epic #22 (#21): the gzip sizes come from Node's zlib, which is not pinned.
+describe("staleProblem across zlib versions", () => {
+    const report = (gzip: number, minified = 4000) =>
+        [
+            "# Bundle size",
+            "",
+            "| entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |",
+            "| --- | ---: | ---: | ---: | ---: |",
+            `| \`@x/dialog\` | ${formatBytes(minified)} | ${formatBytes(gzip)} | 2,000 B | 900 B |`,
+            "",
+        ].join("\n");
+
+    it("accepts gzip sizes a few bytes apart (another zlib)", () => {
+        expect(staleProblem(report(1200), report(1209))).toBeUndefined();
+        expect(staleProblem(report(1200), report(1184))).toBeUndefined();
+    });
+
+    it("still fails a gzip size past the tolerance", () => {
+        const far = Math.ceil(1200 * GZIP_TOLERANCE.ratio) + 1;
+        expect(staleProblem(report(1200), report(1200 + far))).toMatch(
+            "is stale",
+        );
+    });
+
+    it("fails any change of a minified size, the code's own measure", () => {
+        expect(staleProblem(report(1200, 4000), report(1200, 4001))).toMatch(
+            "is stale",
+        );
+    });
+
+    it("fails a change outside the tables", () => {
+        expect(
+            staleProblem(report(1200), report(1200).replace("Bundle", "Size")),
+        ).toMatch("is stale");
     });
 });
 

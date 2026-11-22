@@ -1,13 +1,17 @@
 import {
+    afterNextRender,
     computed,
+    DestroyRef,
     Directive,
     inject,
     input,
     numberAttribute,
+    untracked,
 } from "@angular/core";
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
-import { injectFlush } from "@fragiola/primitives-angular/internal";
+import { interceptEscape } from "@fragiola/primitives/layers";
+import { injectFlush, injectHost } from "@fragiola/primitives-angular/internal";
 import { CALENDAR } from "../utils/calendar-state.ts";
 
 /**
@@ -38,6 +42,32 @@ export class CalendarGrid {
         addMonths(this.calendar.visibleStart(), this.offset()),
     );
     private readonly flush = injectFlush();
+
+    constructor() {
+        const grid = injectHost();
+        const calendar = this.calendar;
+        // a started range takes Escape before an enclosing overlay's layer (a picker, a dialog, a
+        // popover) closes it, and the next Escape closes (spec/calendar.md, "Keyboard"). The
+        // started range is read when the key comes, never after a render; installed in the
+        // browser only (an after render hook never runs on a server)
+        let stop: (() => void) | null = null;
+        afterNextRender(() => {
+            stop = interceptEscape(
+                grid.ownerDocument,
+                () => {
+                    calendar.cancelRange();
+                    this.flush();
+                },
+                {
+                    when: (event) =>
+                        untracked(calendar.anchor) !== null &&
+                        event.target instanceof Node &&
+                        grid.contains(event.target),
+                },
+            );
+        });
+        inject(DestroyRef).onDestroy(() => stop?.());
+    }
 
     protected onKeyDown(event: KeyboardEvent): void {
         const calendar = this.calendar;

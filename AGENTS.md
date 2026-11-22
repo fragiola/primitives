@@ -17,8 +17,8 @@ the guidelines (`../guidelines`, the `fragiola-ecosystem` skill); this file wins
 | `packages/react` | `@fragiola/primitives-react` | the React primitives, one entry per component (`/dialog`, `/tabs`) | the toolkit (exact version); peer `react`, `react-dom` ^19 |
 | `packages/vue` | `@fragiola/primitives-vue` | the Vue primitives, one entry per component | the toolkit (exact version); peer `vue` ^3.5 |
 | `packages/angular` | `@fragiola/primitives-angular` | the Angular standalone directives, one ng-packagr secondary entry point per component | the toolkit (exact version); peer `@angular/core` ^22 |
-| `fixtures/<framework>` | private | one app per framework, rendering every spec scenario at `/<component>/<scenario>` with the recipes | the framework package, the recipes |
-| `conformance` | private | the Playwright suite: behaviour (with axe), contract and visual layers, run against every fixture | |
+| `fixtures/<framework>` | private | one app per framework, rendering every spec scenario at `/<component>/<scenario>` with the recipes, in the browser and on a server (`src/server/entry-server`, `build:ssr`) | the framework package, the recipes |
+| `conformance` | private | the Playwright suite: behaviour (with axe), contract, visual and ssr layers, run against every fixture (the ssr layer against its server render, `conformance/src/ssr-server.ts`) | |
 | `examples/shared` | `examples-shared`, private | the styling layer (recipes keyed on `data-*`, the five example themes), the examples' metadata, the embed protocol, the manifest builder, the overlay promotion, every examples Playwright spec | no framework |
 | `examples/<framework>` | private | the site's examples, one embed app per framework | the framework package |
 | `site` | private | the site export (`export.ts`, `contract.ts`, `dev.ts`, `dev-proxy.ts`), the pages of fragiola.com/primitives, the repository's script tests | |
@@ -69,8 +69,12 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
      calendar systems, virtualization) stay out of the components that do not need them.
    - The **bundle guard** (`scripts/check-bundle.ts`, run by `pnpm build` and in CI) builds a
      fixture app per framework importing two components and fails when any other component's code
-     or an unused mechanism is in its output; a test plants an import and sees it fail.
-     `pnpm size` keeps the per-entry size report in `docs/size.md`.
+     or an unused mechanism is in its output; it then reads every component entry of the built
+     packages alone (its chunks and the entries it imports, through their source maps) and fails
+     when one holds another component's code, but the ones it is built on (`ENTRY_DEPENDENCIES`:
+     Field, Checkbox's group, the calendars); tests plant imports and see them fail.
+     `pnpm size` keeps the per-entry size report in `docs/size.md` (`--check`: minified sizes
+     exact, gzip sizes within a small tolerance, since Node's zlib is not pinned).
 7. **The primitive contract** (`../guidelines/components/primitives.md`, with this library's
    decisions in [`docs/decisions.md`](docs/decisions.md)):
    - one namespace per component (`Dialog.Root`, `Dialog.Trigger`, ...; Angular: standalone
@@ -211,7 +215,7 @@ Pin dependencies to exact versions published at least 7 days ago (`npm view <pkg
 | `pnpm e2e` | the conformance suite, then every examples app's Playwright suite |
 | `pnpm dev` | every fixture's dev server (`--framework vue` for one) |
 | `pnpm site:export` / `site:dev` | the site export (`--base /primitives`), the embeds with hot reload on port 5191 |
-| `pnpm check:package` | pack, check every `exports` subpath, `publint`, `attw --profile esm-only`, the toolkit's exact pin, a scratch app per framework |
+| `pnpm check:package` | pack, check every `exports` subpath, `publint`, `attw --profile esm-only`, the toolkit's exact pin, a scratch app per framework (installed and built with the pinned pnpm, `pnpm dlx pnpm@<version>` when the machine's differs) |
 | `pnpm size` | the per-entry size report (`docs/size.md`; `--check` fails when it is stale) |
 | `pnpm changeset` / `release:version` | Changesets |
 

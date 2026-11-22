@@ -33,13 +33,15 @@ describe("the conformance registry", () => {
             expect(manifest.name).toBe(implementation.fixture);
             expect(manifest.scripts.dev).toContain(String(implementation.port));
             ports.add(implementation.port);
+            ports.add(implementation.ssrPort);
             expect([...implementation.layers].sort()).toEqual([
                 "behaviour",
                 "contract",
+                "ssr",
                 "visual",
             ]);
         }
-        expect(ports.size).toBe(IMPLEMENTATIONS.length);
+        expect(ports.size).toBe(IMPLEMENTATIONS.length * 2);
     });
 
     it("has a test folder per component, with the three layers", () => {
@@ -57,6 +59,26 @@ describe("the conformance registry", () => {
                     `${dir} ${layer}`,
                 ).toBe(true);
             }
+        }
+    });
+});
+
+// Epic #22 (#20): every fixture renders on the server too, for the ssr layer.
+describe("the ssr layer", () => {
+    it("has a server entry and a build:ssr script in every fixture", () => {
+        for (const implementation of IMPLEMENTATIONS) {
+            const dir = join(root, "fixtures", implementation.name);
+            const manifest = JSON.parse(
+                readFileSync(join(dir, "package.json"), "utf8"),
+            ) as { scripts: Record<string, string> };
+            expect(manifest.scripts["build:ssr"]).toMatch(
+                /vite build --ssr src\/server\/entry-server\.tsx? --outDir dist-ssr\/server/,
+            );
+            expect(
+                ["entry-server.ts", "entry-server.tsx"].some((name) =>
+                    existsSync(join(dir, "src/server", name)),
+                ),
+            ).toBe(true);
         }
     });
 });

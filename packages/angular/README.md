@@ -45,7 +45,7 @@ export class Profile {}
 | entry | directives |
 | --- | --- |
 | `/dialog` | `[dialogRoot]`, `[dialogTrigger]`, `*dialogPortal`, `[dialogBackdrop]`, `[dialogPopup]`, `[dialogTitle]`, `[dialogDescription]`, `[dialogClose]`; `injectDialog()` |
-| `/tabs` | `[tabsRoot]`, `[tabsList]`, `[tabsTab]`, `[tabsIndicator]`, `[tabsPanel]`; `injectTabs()` |
+| `/tabs` | `[tabsRoot]`, `[tabsList]`, `[tabsTab]`, `*tabsIndicator`, `[tabsPanel]`; `injectTabs()` |
 | `/internal` | what the entries share; not an app's API |
 
 Controlled state with two-way bindings (`[(open)]`, `[(value)]`); each part's state through

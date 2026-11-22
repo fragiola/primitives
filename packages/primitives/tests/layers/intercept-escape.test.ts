@@ -38,4 +38,31 @@ describe("interceptEscape", () => {
         expect(intercepted).not.toHaveBeenCalled();
         stop();
     });
+
+    it("takes only the keys `when` accepts, and leaves the others to the layers", () => {
+        const layerEscape = vi.fn();
+        const layer = pushLayer(document, {
+            elements: () => [],
+            onEscape: layerEscape,
+        });
+        const inside = document.createElement("button");
+        const outside = document.createElement("button");
+        document.body.append(inside, outside);
+        const intercepted = vi.fn();
+        const stop = interceptEscape(document, intercepted, {
+            when: (event) => inside.contains(event.target as Node),
+        });
+        outside.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        );
+        expect(intercepted).not.toHaveBeenCalled();
+        expect(layerEscape).toHaveBeenCalledOnce();
+        inside.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        );
+        expect(intercepted).toHaveBeenCalledOnce();
+        expect(layerEscape).toHaveBeenCalledOnce();
+        stop();
+        layer.remove();
+    });
 });

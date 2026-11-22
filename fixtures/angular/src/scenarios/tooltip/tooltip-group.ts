@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from "@angular/core";
+import { Component, signal, ViewEncapsulation } from "@angular/core";
 import {
     TooltipPopup,
     TooltipPortal,
@@ -27,7 +27,7 @@ const TOOLS = [
         TooltipPopup,
     ],
     template: `
-        <ng-container tooltipProvider [delay]="800" [timeout]="400">
+        <ng-container tooltipProvider [delay]="800" [timeout]="timeout()">
             <div class="flex gap-2">
                 @for (tool of tools; track tool.label) {
                     <ng-container tooltipRoot>
@@ -41,7 +41,7 @@ const TOOLS = [
                 }
             </div>
             <div class="mt-30">
-                <button type="button">Elsewhere</button>
+                <button type="button">Elsewhere</button>{{ " " }}<button type="button" (click)="timeout.set(0)">No hand-off</button>
             </div>
         </ng-container>
     `,
@@ -49,4 +49,5 @@ const TOOLS = [
 export class TooltipGroup {
     protected readonly styles = tooltip;
     protected readonly tools = TOOLS;
+    protected readonly timeout = signal(400);
 }

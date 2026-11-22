@@ -7,6 +7,7 @@ import { VISUALLY_HIDDEN_INPUT_STYLE } from "@fragiola/primitives/form";
  * element (the checkbox's `<button>`) cannot add a sibling from a template. It goes right after
  * `anchor` (the container's comment, or the host element), as React renders it after its part,
  * with the structural hidden style unless it is `type="hidden"`; it is removed with the directive.
+ * It is inserted after the first render (Epic #22: server rendering and hydration).
  */
 export function createHiddenInput(
     anchor: Node,
@@ -21,18 +22,15 @@ export function createHiddenInput(
         input.tabIndex = -1;
         Object.assign(input.style, VISUALLY_HIDDEN_INPUT_STYLE);
     }
-    const insert = () =>
-        anchor.parentNode?.insertBefore(input, anchor.nextSibling);
-    if (anchor.parentNode !== null) {
-        insert();
-    } else {
-        // the root node of a view that is not attached yet (inside an `@if`)
-        afterNextRender(() => {
-            if (!input.isConnected) {
-                insert();
-            }
-        });
-    }
+    // after the render, never during it: a hydration walks the server's DOM as its template has
+    // it, and a node inserted on the way breaks it (NG0502). So the server renders none (an after
+    // render hook never runs there), and the browser inserts it once its view is in the page (a
+    // view inside an `@if` is attached after its directives are made)
+    afterNextRender(() => {
+        if (!input.isConnected) {
+            anchor.parentNode?.insertBefore(input, anchor.nextSibling);
+        }
+    });
     inject(DestroyRef).onDestroy(() => input.remove());
     return input;
 }

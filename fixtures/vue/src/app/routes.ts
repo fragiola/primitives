@@ -27,11 +27,13 @@ import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
+import MenuControlled from "../scenarios/menu/menu-controlled.vue";
 import MenuGroups from "../scenarios/menu/menu-groups.vue";
 import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
+import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
 import PopoverInitialFocus from "../scenarios/popover/popover-initial-focus.vue";
 import PopoverPlacement from "../scenarios/popover/popover-placement.vue";
 import PopoverRtl from "../scenarios/popover/popover-rtl.vue";
@@ -44,6 +46,7 @@ import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
 import TabsManual from "../scenarios/tabs/tabs-manual.vue";
+import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
 import TooltipGroup from "../scenarios/tooltip/tooltip-group.vue";
@@ -59,11 +62,13 @@ export const routes: Record<string, Component> = {
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
+    "/tabs/none-selected": TabsNoneSelected,
     "/popover/basic": PopoverBasic,
     "/popover/initial-focus": PopoverInitialFocus,
     "/popover/placement": PopoverPlacement,
     "/popover/rtl": PopoverRtl,
     "/popover/arrow": PopoverArrow,
+    "/popover/controlled": PopoverControlled,
     "/tooltip/basic": TooltipBasic,
     "/tooltip/group": TooltipGroup,
     "/tooltip/in-dialog": TooltipInDialog,
@@ -71,6 +76,7 @@ export const routes: Record<string, Component> = {
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,
     "/menu/modal": MenuModal,
+    "/menu/controlled": MenuControlled,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,

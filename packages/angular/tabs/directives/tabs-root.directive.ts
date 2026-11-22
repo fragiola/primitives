@@ -8,7 +8,6 @@ import {
     signal,
     untracked,
 } from "@angular/core";
-import { createId } from "@fragiola/primitives/id";
 import type {
     ChangeDetails,
     ChangeReason,
@@ -17,6 +16,7 @@ import type {
 import {
     controllable,
     dataValues,
+    injectId,
 } from "@fragiola/primitives-angular/internal";
 
 export interface TabInfo {
@@ -63,7 +63,7 @@ export class TabsRoot {
     );
     /** The selected tab's value. */
     readonly selected = this.selection.value;
-    readonly baseId = createId("primitives-tabs");
+    readonly baseId = injectId("primitives-tabs");
     readonly tabs = new Map<HTMLElement, TabInfo>();
     readonly list = signal<HTMLElement | null>(null);
     /** Bumped when a tab registers, so the roving tabindex and the indicator follow. */

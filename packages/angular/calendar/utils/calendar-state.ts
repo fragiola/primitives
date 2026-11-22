@@ -1,10 +1,12 @@
 import {
     afterEveryRender,
     computed,
+    DOCUMENT,
     effect,
     InjectionToken,
     inject,
     type OutputEmitterRef,
+    PLATFORM_ID,
     type Signal,
     signal,
     untracked,
@@ -26,10 +28,10 @@ import {
     today,
     toIsoDate,
 } from "@fragiola/primitives/date";
-import { createId } from "@fragiola/primitives/id";
 import {
     type ChangeDetails,
     controllable,
+    injectId,
 } from "@fragiola/primitives-angular/internal";
 import {
     type CalendarComponent,
@@ -71,12 +73,18 @@ export interface CalendarInputs {
 /** The enclosing calendar's state, for its parts (provided by both roots). */
 export const CALENDAR = new InjectionToken<CalendarState>("CALENDAR");
 
-/** The document's `lang`, then the browser's language (spec/README.md, "Normalized API names"). */
-function documentLocale(): string {
-    if (typeof document !== "undefined" && document.documentElement.lang) {
-        return document.documentElement.lang;
+/**
+ * The document's `lang`, then the browser's language (spec/calendar.md, "API"). A server render
+ * has a document (Angular's) but no browser: there it falls back to `en-US`, never the server's
+ * own language (Epic #22); hydration then writes the browser's text.
+ */
+function documentLocale(doc: Document, browser: boolean): string {
+    if (doc.documentElement.lang) {
+        return doc.documentElement.lang;
     }
-    return typeof navigator !== "undefined" ? navigator.language : "en-US";
+    return browser && typeof navigator !== "undefined"
+        ? navigator.language
+        : "en-US";
 }
 
 /**
@@ -125,7 +133,14 @@ export class CalendarState {
     });
     readonly min = computed(() => this.options().min ?? null);
     readonly max = computed(() => this.options().max ?? null);
-    readonly locale = computed(() => this.options().locale ?? documentLocale());
+    private readonly document = inject(DOCUMENT);
+    // `"browser"` or `"server"` (`isPlatformBrowser` lives in @angular/common, not a peer)
+    private readonly browser = inject(PLATFORM_ID) === "browser";
+    readonly locale = computed(
+        () =>
+            this.options().locale ??
+            documentLocale(this.document, this.browser),
+    );
     readonly firstDay = computed(
         () => this.options().firstDayOfWeek ?? firstDayOfWeek(this.locale()),
     );
@@ -154,7 +169,7 @@ export class CalendarState {
         return isRange(value) ? value : null;
     });
     readonly cells = new Map<string, HTMLElement>();
-    readonly baseId = createId("primitives-calendar");
+    readonly baseId = injectId("primitives-calendar");
     /** Whether a focus is pending (`null`: not decided yet; a calendar in a picker starts with one). */
     private focusPending: boolean | null = null;
 

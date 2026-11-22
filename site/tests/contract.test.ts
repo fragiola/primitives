@@ -198,6 +198,7 @@ describe("the sidebar", () => {
             "api/date-picker",
             "api/date-range-picker",
             "api/toolkit",
+            "server-rendering",
             "limitations",
             "https://github.com/fragiola/primitives/issues",
         ]);

@@ -1,6 +1,6 @@
 import type { FieldState } from "@fragiola/primitives/form";
 import { fieldStateAttributes } from "@fragiola/primitives/form";
-import { defineComponent, useId, watch } from "vue";
+import { defineComponent, onBeforeUnmount, useId, watch } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
     type PartComponent,
@@ -28,18 +28,16 @@ export const FieldLabel: PartComponent<FieldLabelProps, FieldState> =
                 const field = useRequiredContext(FieldKey, "Field.Label");
                 const generated = useId();
                 const id = () => props.id ?? generated;
-                watch(
-                    id,
-                    (current, _, onCleanup) => {
-                        field.labelId.value = current;
-                        onCleanup(() => {
-                            if (field.labelId.value === current) {
-                                field.labelId.value = undefined;
-                            }
-                        });
-                    },
-                    { immediate: true },
-                );
+                // cleared on unmount, not in the watch's cleanup: a server render stops the watch
+                // once the label is rendered, before the control reads the id (Epic #22)
+                watch(id, (current) => (field.labelId.value = current), {
+                    immediate: true,
+                });
+                onBeforeUnmount(() => {
+                    if (field.labelId.value === id()) {
+                        field.labelId.value = undefined;
+                    }
+                });
                 return () => {
                     const state = field.state.value;
                     const control = field.control.value;

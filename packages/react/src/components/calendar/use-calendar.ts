@@ -23,6 +23,7 @@ import {
     useMemo,
     useRef,
     useState,
+    useSyncExternalStore,
 } from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
@@ -47,12 +48,24 @@ export interface CalendarStateProps extends CalendarOptions {
     readOnly?: boolean;
 }
 
-/** The document's `lang`, then the browser's language (spec/README.md, "Normalized API names"). */
+/** The locale of the first render with no `locale`: a server knows neither of the others. */
+const FIRST_RENDER_LOCALE = "en-US";
+const serverLocale = () => FIRST_RENDER_LOCALE;
+// the document's language is read once per render: nothing announces its changes
+const subscribeNever = () => () => {};
+
+/**
+ * The document's `lang`, then the browser's language (spec/calendar.md, "API"). A server render
+ * has neither, so it, and the browser's hydration of it, use `en-US`; React renders again with
+ * the document's right after a hydration (Epic #22).
+ */
 function documentLocale(): string {
     if (typeof document !== "undefined" && document.documentElement.lang) {
         return document.documentElement.lang;
     }
-    return typeof navigator !== "undefined" ? navigator.language : "en-US";
+    return typeof navigator !== "undefined"
+        ? navigator.language
+        : FIRST_RENDER_LOCALE;
 }
 
 /** The options a bound calendar sets itself (they win over its picker's). */
@@ -95,7 +108,14 @@ export function useCalendar(
     const value = bound ? picker.value : ownValue;
     const min = options.min ?? null;
     const max = options.max ?? null;
-    const locale = options.locale ?? documentLocale();
+    // the server's snapshot while rendering on a server and hydrating, the document's otherwise:
+    // a page rendered in the browser alone reads it at once, with no second render
+    const defaultLocale = useSyncExternalStore(
+        subscribeNever,
+        documentLocale,
+        serverLocale,
+    );
+    const locale = options.locale ?? defaultLocale;
     const firstDay = options.firstDayOfWeek ?? firstDayOfWeek(locale);
     const visibleMonths = Math.max(1, options.visibleMonths ?? 1);
     const disabled = props.disabled ?? false;

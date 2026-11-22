@@ -30,11 +30,12 @@ spaces still gives valid `aria-controls` / `aria-labelledby`), `disabled`.
 **Panel**: `value` (string, required), `keepMounted` (`false`: an inactive panel is not rendered;
 `true`: it is rendered with `hidden`).
 
-**Indicator**: no props. It exposes the selected tab's box, relative to the List, as structural
+**Indicator**: `renderBeforeHydration` ("Server rendering"). It exposes the selected tab's box, relative to the List, as structural
 CSS variables: `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
 `--tabs-indicator-inline-size`, `--tabs-indicator-block-size`. It is not rendered while no tab is
-selected. In Angular, the Indicator is an attribute directive on the consumer's element, which
-stays in the DOM: while no tab is selected it carries no variables (wrap it in `@if` to remove it).
+selected, in every framework: Angular's is structural (`<span *tabsIndicator>`), as its panels
+are, so it leaves the DOM too (Epic #22; it was an attribute directive that stayed, with no
+variables).
 
 ## State attributes and ARIA
 
@@ -91,6 +92,17 @@ on them animates it.
 In horizontal orientation, ArrowLeft moves to the next tab and ArrowRight to the previous one. The
 Indicator's inline-start variable is measured from the List's inline-start edge.
 
+## Server rendering
+
+The Indicator is rendered once the selected tab is measured, which only a browser can do, so it
+first appears in place. **`renderBeforeHydration`** (Base UI's name, default
+`false`; Angular: `*tabsIndicator="true"`): a server render writes a small inline script inside the
+Indicator that measures the selected tab (`aria-selected="true"` in its list) as the page parses,
+sets the four variables, and removes itself, so the hydration finds the Indicator as the browser
+renders it (the toolkit's `placeTabsIndicator`). Off by default: a page whose Content Security
+Policy blocks inline scripts leaves it off. Decided by the behaviour rule: the APG says nothing,
+Base UI has this option.
+
 ## Scenarios
 
 ### `/tabs/automatic`
@@ -127,6 +139,14 @@ The same content with `orientation="vertical"`.
 
 Checks: the tablist has `aria-orientation="vertical"`; ArrowDown and ArrowUp move between tabs;
 ArrowRight does nothing.
+
+### `/tabs/none-selected`
+
+Tabs **"Account"** and **"Password"**, both disabled, with panels "Account settings" and
+"Password settings", an Indicator, and no `value` nor `defaultValue`.
+
+Checks: no tab is selected (`aria-selected="false"`, no `data-selected`), no panel and no
+Indicator is rendered.
 
 ### `/tabs/automatic?dir=rtl`
 

@@ -6,7 +6,7 @@ import {
     type Signal,
     type WritableSignal,
 } from "@angular/core";
-import { createId } from "@fragiola/primitives/id";
+import { injectId } from "./inject-id.ts";
 
 /**
  * The id of a part that names or describes another (a title, a description, a group label): the
@@ -18,7 +18,7 @@ export function labelId(
     target: WritableSignal<string | undefined>,
     prefix: string,
 ): Signal<string> {
-    const generated = createId(prefix);
+    const generated = injectId(prefix);
     const resolved = computed(() => id() ?? generated);
     effect(() => target.set(resolved()));
     inject(DestroyRef).onDestroy(() => target.set(undefined));

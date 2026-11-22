@@ -5,6 +5,6 @@ const isWeekend = (date: { year: number; month: number; day: number }) => {
     return day === 0 || day === 6;
 };
 
-export function CalendarUnavailable({ locale }: { locale: string }) {
+export function CalendarUnavailable({ locale }: { locale?: string }) {
     return <SingleCalendar locale={locale} isDateUnavailable={isWeekend} />;
 }

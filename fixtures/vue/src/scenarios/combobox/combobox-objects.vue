@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ItemFilter } from "@fragiola/primitives-vue/combobox";
 import { ref, useId } from "vue";
 import Output from "../../kit/output.vue";
 import { Combobox } from "../../kit/ui/combobox.ts";
@@ -8,12 +9,12 @@ import { COUNTRIES, type Country, matchCountry } from "./combobox-items.ts";
 const id = useId();
 const value = ref<Country | null>({ code: "BR", name: "Brazil" });
 const input = ref("Brazil");
-const toLabel = (country: unknown) => (country as Country).name;
-const toValue = (country: unknown) => (country as Country).code;
-const isEqual = (item: unknown, selected: unknown) =>
-    (item as Country).code === (selected as Country).code;
-const filter = (item: unknown, query: string) =>
-    matchCountry(item as Country, query);
+// typed by the consumer's own item: no cast (Epic #22)
+const toLabel = (country: Country) => country.name;
+const toValue = (country: Country) => country.code;
+const isEqual = (item: Country, selected: Country) =>
+    item.code === selected.code;
+const filter: ItemFilter<Country> = (item, query) => matchCountry(item, query);
 </script>
 
 <template>

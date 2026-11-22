@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
     bundleLeaks,
     chainProblems,
+    ENTRY_DEPENDENCIES,
+    entryLeaks,
     GUARD,
     type GuardRules,
     ownerOf,
@@ -157,6 +159,97 @@ describe("the bundle guard", () => {
         expect(chainProblems(["fixtures/react/guard/main.tsx"])).toEqual([
             "the source map names no component source",
             "the source map names no toolkit mechanism source",
+        ]);
+    });
+});
+
+// Epic #22 (#21): the two-component app cannot see Dialog's code inside Tabs, since both are
+// imported; each entry is also read alone.
+describe("the bundle guard, entry by entry", () => {
+    const SOURCES = {
+        react: {
+            dialog: "packages/react/src/components/dialog/dialog-popup.tsx",
+            tabs: "packages/react/src/components/tabs/tabs-list.tsx",
+        },
+        vue: {
+            dialog: "packages/vue/src/components/dialog/dialog-popup.ts",
+            tabs: "packages/vue/src/components/tabs/tabs-list.ts",
+        },
+        angular: {
+            dialog: "packages/angular/dialog/directives/dialog-popup.directive.ts",
+            tabs: "packages/angular/tabs/directives/tabs-list.directive.ts",
+        },
+    } as const;
+
+    for (const framework of ["react", "vue", "angular"] as const) {
+        it(`fails Tabs code planted inside Dialog's entry (${framework})`, () => {
+            const { dialog, tabs } = SOURCES[framework];
+            expect(entryLeaks(framework, "dialog", [dialog], [])).toEqual([]);
+            expect(entryLeaks(framework, "dialog", [dialog, tabs], [])).toEqual(
+                [`/dialog: the component "tabs": ${tabs}`],
+            );
+            // the other way round too
+            expect(entryLeaks(framework, "tabs", [tabs, dialog], [])).toEqual([
+                `/tabs: the component "dialog": ${dialog}`,
+            ]);
+        });
+    }
+
+    it("fails an entry importing another component's entry (Angular's secondary entries)", () => {
+        const { dialog } = SOURCES.angular;
+        expect(entryLeaks("angular", "dialog", [dialog], ["internal"])).toEqual(
+            [],
+        );
+        expect(
+            entryLeaks("angular", "dialog", [dialog], ["internal", "tabs"]),
+        ).toEqual(['/dialog: imports the component entry "/tabs"']);
+    });
+
+    it("accepts the components an entry is built on, and only those", () => {
+        expect(ENTRY_DEPENDENCIES.checkbox).toEqual([
+            "checkbox-group",
+            "field",
+        ]);
+        expect(
+            entryLeaks(
+                "react",
+                "checkbox",
+                [
+                    "packages/react/src/components/checkbox/checkbox-root.tsx",
+                    "packages/react/src/components/field/field-context.ts",
+                    "packages/react/src/components/checkbox-group/checkbox-group-context.ts",
+                ],
+                [],
+            ),
+        ).toEqual([]);
+        expect(
+            entryLeaks(
+                "react",
+                "select",
+                [
+                    "packages/react/src/components/select/select-root.tsx",
+                    "packages/react/src/components/checkbox/checkbox-root.tsx",
+                ],
+                [],
+            ),
+        ).toEqual([
+            '/select: the component "checkbox": packages/react/src/components/checkbox/checkbox-root.tsx',
+        ]);
+    });
+
+    it("fails another framework's code inside an entry", () => {
+        expect(
+            entryLeaks(
+                "vue",
+                "dialog",
+                [
+                    SOURCES.vue.dialog,
+                    "packages/react/src/components/dialog/dialog-popup.tsx",
+                ],
+                [],
+            ),
+        ).toEqual([
+            "/dialog: another framework's package: packages/react/src/components/dialog/dialog-popup.tsx",
         ]);
     });
 });

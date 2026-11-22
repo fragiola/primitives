@@ -220,3 +220,43 @@ test("popover / arrow: points at the trigger", async ({ page }) => {
     expect(centre).toBeGreaterThanOrEqual(triggerBox.x - 2);
     expect(centre).toBeLessThanOrEqual(triggerBox.x + triggerBox.width + 2);
 });
+
+test.describe("popover / controlled", () => {
+    const trigger = (page: Page) =>
+        page.getByRole("button", { name: "Settings", exact: true });
+    const popup = (page: Page) =>
+        page.getByRole("dialog", { name: "Quick settings" });
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/popover/controlled");
+    });
+
+    test("closed through `open` with focus inside, focus returns to the trigger", async ({
+        page,
+    }) => {
+        await page.getByRole("button", { name: "Show settings" }).click();
+        await expect(popup(page)).toBeVisible();
+        await expect(page.getByRole("button", { name: "Done" })).toBeFocused();
+        await page.getByRole("button", { name: "Done" }).click();
+        await expectOutput(page, "open", "false");
+        await expect(popup(page)).toBeHidden();
+        await expect(trigger(page)).toBeFocused();
+    });
+
+    test("a close through `open` uses its own reason, not the previous one", async ({
+        page,
+    }) => {
+        // closed first by focus leaving it (focus-out: no focus return), then opened and closed by
+        // the page: that close must not reuse focus-out's reason
+        await trigger(page).click();
+        await expect(page.getByRole("button", { name: "Done" })).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(popup(page)).toBeHidden();
+        await expect(trigger(page)).toBeFocused();
+        await page.getByRole("button", { name: "Show settings" }).click();
+        await expect(page.getByRole("button", { name: "Done" })).toBeFocused();
+        await page.getByRole("button", { name: "Done" }).click();
+        await expect(popup(page)).toBeHidden();
+        await expect(trigger(page)).toBeFocused();
+    });
+});

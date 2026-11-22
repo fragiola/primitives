@@ -1,13 +1,12 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     messages,
     openHosted,
     part,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // tabs: account settings in tabs (spec/tabs.md): automatic activation, a disabled tab that stays
@@ -86,6 +85,5 @@ test("axe finds no violation", async ({ page }) => {
     requireExamples("tabs");
     await page.goto(`${EMBED_BASE}?id=tabs`);
     await expect(page.getByRole("tablist")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

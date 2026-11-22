@@ -46,7 +46,7 @@ const SECTIONS = [
                 @for (section of sections; track section.value) {
                     <button tabsTab [value]="section.value" [disabled]="section.disabled" [class]="styles.tab">{{ section.label }}</button>
                 }
-                <span tabsIndicator [class]="styles.indicator"></span>
+                <span *tabsIndicator [class]="styles.indicator"></span>
             </div>
             @for (section of sections; track section.value) {
                 <div *tabsPanel="section.value" [class]="styles.panel">

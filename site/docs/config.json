@@ -123,6 +123,10 @@
             "label": "More",
             "pages": [
                 {
+                    "label": "Server rendering",
+                    "path": "server-rendering"
+                },
+                {
                     "label": "Known limitations",
                     "path": "limitations"
                 },

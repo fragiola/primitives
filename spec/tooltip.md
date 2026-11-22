@@ -83,6 +83,10 @@ trigger to another trigger of the group, the new one opens **at once** (`data-in
 previous one closes. The hand-off also applies within `timeout` ms after the group's last tooltip
 closed; after that, the next one waits for `delay` again.
 
+The Provider's props may change at runtime (Epic #22): it keeps **one** group for its life, which
+reads the current `timeout` at each check, so the open tooltip stays its member and the next
+hand-off uses the new value.
+
 ## Dismissal and layering
 
 The open tooltip is not a layer: it takes no outside press and never closes an enclosing overlay.
@@ -128,7 +132,8 @@ Checks:
 
 A Provider (`delay` `800`, `timeout` `400`) with three Tooltips: Triggers **"Bold"**, **"Italic"**,
 **"Underline"** (in a row), popups **"Bold (Ctrl+B)"**, **"Italic (Ctrl+I)"**, **"Underline
-(Ctrl+U)"**; and, apart from them, a button **"Elsewhere"**.
+(Ctrl+U)"**; and, apart from them, a button **"Elsewhere"** and a button **"No hand-off"**
+that sets the Provider's `timeout` to `0`.
 
 Checks:
 
@@ -137,6 +142,10 @@ Checks:
    (Ctrl+B)": only one `tooltip` is visible.
 3. Moving to "Elsewhere", waiting 1 s (past `timeout`), then hovering "Underline": no tooltip for
    the first 400 ms; it opens after the delay.
+4. Focus "Bold" (its tooltip opens), "No hand-off" (clicked without moving focus), then hover
+   "Italic": "Italic (Ctrl+I)" opens and "Bold (Ctrl+B)" closes: one group across the change.
+5. "No hand-off", then hover "Bold", move to "Elsewhere" and at once hover "Underline": it waits
+   for the delay (the new `timeout` applies).
 
 ### `/tooltip/in-dialog`
 

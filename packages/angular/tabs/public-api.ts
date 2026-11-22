@@ -6,7 +6,10 @@ export type {
     ChangeReason,
     ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
-export { TabsIndicator } from "./directives/tabs-indicator.directive.ts";
+export {
+    TabsIndicator,
+    type TabsIndicatorState,
+} from "./directives/tabs-indicator.directive.ts";
 export { TabsList } from "./directives/tabs-list.directive.ts";
 export {
     TabsPanel,

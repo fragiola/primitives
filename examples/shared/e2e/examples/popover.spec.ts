@@ -1,12 +1,11 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     promoted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // popover: the "Notifications" popover (spec/popover.md). It is non-modal: never promoted.
@@ -65,6 +64,5 @@ test("axe finds no violation with the popover open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=popover`);
     await page.getByRole("button", { name: "Notifications" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

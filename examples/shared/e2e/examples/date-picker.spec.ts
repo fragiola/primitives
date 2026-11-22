@@ -1,12 +1,11 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, type FrameLocator, type Page, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     promoted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // date-picker: a booking form (spec/calendar.md). Today is fixed at Friday 2026-11-20, as in the
@@ -86,6 +85,5 @@ test("axe finds no violation with the calendar open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=date-picker`);
     await page.getByRole("button", { name: /^Check-in:/ }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

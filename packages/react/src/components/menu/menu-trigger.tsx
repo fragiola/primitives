@@ -21,6 +21,10 @@ export function MenuTrigger({ disabled = false, ...props }: MenuTriggerProps) {
         highlight: "first" | "last",
         reason: "trigger-press" | "list-navigation",
     ) => {
+        // already open: nothing to open, and no highlight left for a later open (spec/menu.md)
+        if (context.open) {
+            return;
+        }
         context.pendingHighlight.current = highlight;
         context.setOpen(true, reason);
     };

@@ -48,7 +48,7 @@ export class DatePickerBasic {
     protected readonly styles = datePicker;
     protected readonly calendarStyles = calendar;
     protected readonly iso = iso;
-    readonly locale = input.required<string>();
+    readonly locale = input.required<string | undefined>();
     protected readonly value = signal<PlainDate | null>(null);
     protected readonly open = signal(false);
     protected readonly reason = signal<string | undefined>(undefined);

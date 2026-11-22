@@ -22,7 +22,7 @@ const TABS = [
     <Tabs.Root v-model:value="value" :activation="activation" :orientation="orientation">
         <Tabs.List>
             <Tabs.Tab v-for="tab in TABS" :key="tab.value" :value="tab.value" :disabled="tab.disabled">{{ tab.label }}</Tabs.Tab>
-            <Tabs.Indicator />
+            <Tabs.Indicator render-before-hydration />
         </Tabs.List>
         <Tabs.Panel v-for="tab in TABS" :key="tab.value" :value="tab.value">
             <p><TextRuns :runs="[tab.label, ' settings']" /></p>

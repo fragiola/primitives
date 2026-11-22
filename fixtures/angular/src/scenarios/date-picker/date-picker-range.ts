@@ -47,6 +47,6 @@ export class DatePickerRange {
     protected readonly styles = datePicker;
     protected readonly calendarStyles = calendar;
     protected readonly isoRange = isoRange;
-    readonly locale = input.required<string>();
+    readonly locale = input.required<string | undefined>();
     protected readonly value = signal<DateRange | null>(null);
 }
