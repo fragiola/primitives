@@ -1,17 +1,13 @@
-import type { ReactNode } from "react";
-import { createPortal } from "react-dom";
+import {
+    type OverlayPortalProps,
+    useOverlayPortal,
+} from "../../hooks/use-overlay-portal.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { MenuContext } from "./menu-context.ts";
 
-export interface MenuPortalProps {
-    children?: ReactNode;
-    container?: Element | null;
-}
+export interface MenuPortalProps extends OverlayPortalProps {}
 
-export function MenuPortal({ children, container }: MenuPortalProps) {
+export function MenuPortal(props: MenuPortalProps) {
     const context = useRequiredContext(MenuContext, "Menu.Portal");
-    if (!context.presence.mounted || typeof document === "undefined") {
-        return null;
-    }
-    return createPortal(children, container ?? document.body);
+    return useOverlayPortal(context.presence.mounted, props);
 }

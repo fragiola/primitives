@@ -19,7 +19,12 @@ export interface DatePickerPopupProps extends PartProps<DatePickerPopupState> {}
 const RETURNS_FOCUS = new Set(["escape-key", "item-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (as Popover, D4 §3)
 // and a close made through the controlled `open` (reason `none`), as Popover's
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// (and a handle's or the actions' `imperative-action`, whose focus return is `none`'s)
+const RETURNS_FOCUS_UNFOCUSED = new Set([
+    "outside-press",
+    "none",
+    "imperative-action",
+]);
 
 /** The non-modal dialog holding the bound calendar (spec/calendar.md, pickers). */
 export function DatePickerPopup(props: DatePickerPopupProps) {
@@ -34,7 +39,7 @@ export function DatePickerPopup(props: DatePickerPopupProps) {
         const session = openOverlaySession(popup.ownerDocument, {
             elements: () => [positioner ?? popup],
             ignore: () => [trigger],
-            dismiss: (reason) => setOpen(false, reason),
+            dismiss: (reason, event) => setOpen(false, reason, event),
             focusOut: () => [trigger],
             returnFocus: {
                 when: RETURNS_FOCUS,
@@ -57,14 +62,14 @@ export function DatePickerPopup(props: DatePickerPopupProps) {
         const last = tabbables.at(-1) ?? popup;
         if (event.shiftKey && (active === first || active === popup)) {
             event.preventDefault();
-            setOpen(false, "focus-out");
+            setOpen(false, "focus-out", event.nativeEvent);
             trigger?.focus();
         } else if (!event.shiftKey && active === last) {
             event.preventDefault();
             const next = trigger
                 ? nextTabbableAfter(trigger, [positioner, popup])
                 : null;
-            setOpen(false, "focus-out");
+            setOpen(false, "focus-out", event.nativeEvent);
             next?.focus();
         }
     };
@@ -80,6 +85,7 @@ export function DatePickerPopup(props: DatePickerPopupProps) {
             "data-primitives-part": `${context.component}-popup`,
             ...stateAttributes({
                 open,
+                closed: !open,
                 side: context.placed.side,
                 align: context.placed.align,
                 "starting-style": status === "starting",

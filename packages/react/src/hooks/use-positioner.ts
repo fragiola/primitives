@@ -11,15 +11,21 @@ export interface PositionerProps {
     anchor?: Element | null;
 }
 
-/** Positions an overlay's positioner from its props, with the given defaults. */
+/**
+ * Positions an overlay's positioner from its props, with the given defaults, while `mounted` (open
+ * or its exit running): a kept-mounted closed overlay is not positioned (spec/README.md,
+ * "Lifecycle").
+ */
 export function usePositioner(
     props: PositionerProps,
     defaults: { side: Side; align: Align },
     anchor: Element | null,
     positioner: HTMLElement | null,
     arrow: HTMLElement | null,
+    mounted = true,
 ) {
-    return useAnchorPosition(props.anchor ?? anchor, positioner, arrow, {
+    const target = mounted ? (props.anchor ?? anchor) : null;
+    return useAnchorPosition(target, positioner, arrow, {
         side: props.side ?? defaults.side,
         align: props.align ?? defaults.align,
         sideOffset: props.sideOffset ?? 0,

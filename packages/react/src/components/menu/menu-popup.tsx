@@ -24,8 +24,8 @@ const SUBMENU_RETURNS_FOCUS = new Set(["escape-key", "list-navigation"]);
 // a modal menu's outside press reaches nothing, so focus goes back to the trigger
 const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
 // a root menu closed through the controlled `open` (reason `none`) returns focus left inside it,
-// as Popover does
-const RETURNS_FOCUS_UNFOCUSED = new Set(["none"]);
+// as Popover does; so does a handle's or the actions' close (`imperative-action`)
+const RETURNS_FOCUS_UNFOCUSED = new Set(["none", "imperative-action"]);
 
 function rootOf(context: MenuContextValue): MenuContextValue {
     return context.parent ? rootOf(context.parent) : context;
@@ -56,6 +56,9 @@ export function MenuPopup(
     const modal = context.modal && !nested;
     const modalNow = useRef(modal);
     modalNow.current = modal;
+    // read when the session needs them: the active trigger may move while it is open
+    const triggers = useRef(context);
+    triggers.current = context;
 
     useEffect(() => {
         if (!open || popup === null) {
@@ -66,8 +69,8 @@ export function MenuPopup(
         const doc = popup.ownerDocument;
         const session = openOverlaySession(doc, {
             elements: () => [positioner ?? popup],
-            ignore: () => [trigger],
-            dismiss: (reason) => setOpen(false, reason),
+            ignore: () => triggers.current.triggers,
+            dismiss: (reason, event) => setOpen(false, reason, event),
             returnFocus: {
                 when: nested ? SUBMENU_RETURNS_FOCUS : ROOT_RETURNS_FOCUS,
                 whenUnfocused: () =>
@@ -75,9 +78,19 @@ export function MenuPopup(
                         ? MODAL_RETURNS_FOCUS_UNFOCUSED
                         : RETURNS_FOCUS_UNFOCUSED,
                 reason: () => lastReason.current ?? (nested ? null : "none"),
-                to: () => trigger,
+                to: () => triggers.current.trigger,
             },
         });
+        return session.end;
+    }, [open, popup, positioner, setOpen, lastReason, nested]);
+
+    // on open, and when it moves to another trigger: the keyboard's item, else the popup with no
+    // highlight (spec/menu.md, "Focus")
+    // biome-ignore lint/correctness/useExhaustiveDependencies: a new active trigger focuses again
+    useEffect(() => {
+        if (!open || popup === null) {
+            return;
+        }
         const items = menuItems(popup);
         const highlight = pendingHighlight.current;
         pendingHighlight.current = null;
@@ -88,17 +101,7 @@ export function MenuPopup(
                   ? items.at(-1)
                   : undefined;
         (target ?? popup).focus({ preventScroll: true });
-        return session.end;
-    }, [
-        open,
-        popup,
-        positioner,
-        trigger,
-        setOpen,
-        lastReason,
-        pendingHighlight,
-        nested,
-    ]);
+    }, [open, popup, trigger, pendingHighlight]);
 
     // spec/menu.md, "Modal": the root level locks the scroll and blocks the outside pointer while
     // open; on its own, so toggling `modal` while open keeps the session (and the focus) as it is
@@ -162,14 +165,14 @@ export function MenuPopup(
                         ? previousTabbableBefore(root.trigger, skip)
                         : nextTabbableAfter(root.trigger, skip)
                     : null;
-                context.closeAll("focus-out");
+                context.closeAll("focus-out", event.nativeEvent);
                 target?.focus();
                 return;
             }
             default:
                 if (nested && event.key === closeKey) {
                     event.preventDefault();
-                    setOpen(false, "list-navigation");
+                    setOpen(false, "list-navigation", event.nativeEvent);
                     return;
                 }
                 if (
@@ -203,12 +206,14 @@ export function MenuPopup(
         {
             id: context.popupId,
             role: "menu",
-            "aria-labelledby": context.triggerId,
+            // the active trigger names the menu (a submenu's: its SubmenuTrigger)
+            "aria-labelledby": context.activeTriggerId ?? context.triggerId,
             "aria-orientation": "vertical",
             tabIndex: -1,
             "data-primitives-part": "menu-popup",
             ...stateAttributes({
                 open,
+                closed: !open,
                 side: context.placed.side,
                 align: context.placed.align,
                 nested,

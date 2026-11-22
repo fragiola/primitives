@@ -1,6 +1,7 @@
 import { PopoverArrow } from "./popover-arrow.tsx";
 import { PopoverClose } from "./popover-close.tsx";
 import { PopoverDescription } from "./popover-description.tsx";
+import { createPopoverHandle } from "./popover-handle.ts";
 import { PopoverPopup } from "./popover-popup.tsx";
 import { PopoverPortal } from "./popover-portal.tsx";
 import { PopoverPositioner } from "./popover-positioner.tsx";
@@ -19,4 +20,5 @@ export const Popover = {
     Title: PopoverTitle,
     Description: PopoverDescription,
     Close: PopoverClose,
+    createHandle: createPopoverHandle,
 };

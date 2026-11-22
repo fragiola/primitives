@@ -1,4 +1,5 @@
 import { scrollIntoViewWithin } from "@fragiola/primitives/collection";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useLayoutEffect, useRef } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -60,9 +61,13 @@ export function SelectItem({
                     // the trigger keeps DOM focus
                     onPointerDown: (event: PointerEvent) =>
                         event.preventDefault(),
-                    onClick: () => {
+                    onClick: (event: ReactMouseEvent) => {
                         if (!disabled) {
-                            context.choose(value, "item-press");
+                            context.choose(
+                                value,
+                                "item-press",
+                                event.nativeEvent,
+                            );
                         }
                     },
                 },

@@ -38,6 +38,7 @@ export function MenuPositioner({
         context.trigger,
         context.positioner,
         null,
+        context.presence.mounted,
     );
     const { setPlaced } = context;
     useLayoutEffect(() => setPlaced(placed), [placed, setPlaced]);
@@ -47,11 +48,13 @@ export function MenuPositioner({
         { open: context.open, ...placed },
         {
             role: "presentation",
+            hidden: context.presence.mounted ? undefined : true,
             // a modal menu blocks the pointer outside; its levels take it back (spec/menu.md)
             style: context.modal ? { pointerEvents: "auto" } : undefined,
             "data-primitives-part": "menu-positioner",
             ...stateAttributes({
                 open: context.open,
+                closed: !context.open,
                 side: placed.side,
                 align: placed.align,
                 nested,

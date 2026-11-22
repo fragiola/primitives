@@ -50,6 +50,7 @@ export function SelectPositioner({
         trigger,
         positioner,
         null,
+        context.presence.mounted,
     );
     useLayoutEffect(() => setPlaced(placed), [placed, setPlaced]);
     useEffect(() => {
@@ -59,7 +60,7 @@ export function SelectPositioner({
         const session = openOverlaySession(positioner.ownerDocument, {
             elements: () => [positioner],
             ignore: () => [trigger],
-            dismiss: (reason) => setOpen(false, reason),
+            dismiss: (reason, event) => setOpen(false, reason, event),
             returnFocus: {
                 when: NEVER,
                 whenUnfocused: () =>
@@ -92,11 +93,13 @@ export function SelectPositioner({
         { open, ...placed },
         {
             role: "presentation",
+            hidden: context.presence.mounted ? undefined : true,
             // a modal select blocks the pointer outside; its list takes it back (spec/select.md)
             style: modal ? { pointerEvents: "auto" } : undefined,
             "data-primitives-part": "select-positioner",
             ...stateAttributes({
                 open,
+                closed: !open,
                 side: placed.side,
                 align: placed.align,
             }),

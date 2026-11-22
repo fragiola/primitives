@@ -1,17 +1,13 @@
-import type { ReactNode } from "react";
-import { createPortal } from "react-dom";
+import {
+    type OverlayPortalProps,
+    useOverlayPortal,
+} from "../../hooks/use-overlay-portal.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { TooltipContext } from "./tooltip-context.ts";
 
-export interface TooltipPortalProps {
-    children?: ReactNode;
-    container?: Element | null;
-}
+export interface TooltipPortalProps extends OverlayPortalProps {}
 
-export function TooltipPortal({ children, container }: TooltipPortalProps) {
+export function TooltipPortal(props: TooltipPortalProps) {
     const context = useRequiredContext(TooltipContext, "Tooltip.Portal");
-    if (!context.presence.mounted || typeof document === "undefined") {
-        return null;
-    }
-    return createPortal(children, container ?? document.body);
+    return useOverlayPortal(context.presence.mounted, props);
 }

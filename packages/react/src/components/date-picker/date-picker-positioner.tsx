@@ -39,6 +39,7 @@ export function DatePickerPositioner({
         context.trigger,
         context.positioner,
         null,
+        context.presence.mounted,
     );
     const { setPlaced } = context;
     useLayoutEffect(() => setPlaced(placed), [placed, setPlaced]);
@@ -48,9 +49,11 @@ export function DatePickerPositioner({
         { open: context.open, ...placed },
         {
             role: "presentation",
+            hidden: context.presence.mounted ? undefined : true,
             "data-primitives-part": `${context.component}-positioner`,
             ...stateAttributes({
                 open: context.open,
+                closed: !context.open,
                 side: placed.side,
                 align: placed.align,
             }),

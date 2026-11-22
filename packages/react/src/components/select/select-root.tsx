@@ -87,20 +87,21 @@ export function SelectRoot({
     );
     const { setOpen } = root;
     const openOn = useCallback(
-        (entry: string | null, reason: ChangeReason) => {
-            setHighlighted(entry);
-            setOpen(true, reason);
+        (entry: string | null, reason: ChangeReason, event?: Event) => {
+            if (setOpen(true, reason, event)) {
+                setHighlighted(entry);
+            }
         },
         [setOpen],
     );
     const choose = useCallback(
-        (entry: string, reason: ChangeReason) => {
+        (entry: string, reason: ChangeReason, event?: Event) => {
             const item = items.find((candidate) => candidate.value === entry);
             if (item === undefined || item.disabled) {
                 return;
             }
-            setValue(entry, { reason });
-            setOpen(false, reason);
+            setValue(entry, { reason, event });
+            setOpen(false, reason, event);
         },
         [items, setValue, setOpen],
     );

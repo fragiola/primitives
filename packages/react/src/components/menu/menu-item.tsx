@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useElement } from "../../hooks/use-element.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -45,9 +46,9 @@ export function MenuItem({
             "data-primitives-part": "menu-item",
             ...stateAttributes({ highlighted: item.highlighted, disabled }),
             ...item.handlers,
-            onClick: () => {
+            onClick: (event: MouseEvent) => {
                 if (!disabled && closeOnClick) {
-                    context.closeAll("item-press");
+                    context.closeAll("item-press", event.nativeEvent);
                 }
             },
         },

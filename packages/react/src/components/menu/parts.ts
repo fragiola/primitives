@@ -1,5 +1,6 @@
 import { MenuGroup } from "./menu-group.tsx";
 import { MenuGroupLabel } from "./menu-group-label.tsx";
+import { createMenuHandle } from "./menu-handle.ts";
 import { MenuItem } from "./menu-item.tsx";
 import { MenuPopup } from "./menu-popup.tsx";
 import { MenuPortal } from "./menu-portal.tsx";
@@ -22,4 +23,5 @@ export const Menu = {
     GroupLabel: MenuGroupLabel,
     SubmenuRoot: MenuSubmenuRoot,
     SubmenuTrigger: MenuSubmenuTrigger,
+    createHandle: createMenuHandle,
 };

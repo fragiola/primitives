@@ -16,6 +16,8 @@ export function TooltipArrow(
             "aria-hidden": "true",
             "data-primitives-part": "tooltip-arrow",
             ...stateAttributes({
+                open: context.open,
+                closed: !context.open,
                 side: context.placed.side,
                 align: context.placed.align,
             }),

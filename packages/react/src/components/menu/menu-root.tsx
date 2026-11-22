@@ -11,13 +11,16 @@ import {
 } from "react";
 import {
     type OverlayRootProps,
+    type OverlayTriggerRootProps,
     useOverlayRoot,
 } from "../../hooks/use-overlay-root.ts";
+import { useAttachHandle } from "../../hooks/use-overlay-trigger.ts";
 import {
     MenuContext,
     type MenuContextValue,
     type SafeArea,
 } from "./menu-context.ts";
+import type { MenuHandle } from "./menu-handle.ts";
 
 export interface MenuSubmenuRootProps extends OverlayRootProps {
     /** Arrow keys wrap at the ends (default `true`). */
@@ -25,12 +28,20 @@ export interface MenuSubmenuRootProps extends OverlayRootProps {
     children?: ReactNode;
 }
 
-export interface MenuRootProps extends MenuSubmenuRootProps {
+export interface MenuRootProps<Payload = unknown>
+    extends Omit<MenuSubmenuRootProps, "children">,
+        OverlayTriggerRootProps {
     /**
      * Locks the page's scroll and blocks the pointer outside the menu while it is open (default
      * `false`: the APG menu button is non-modal; spec/menu.md, "Modal").
      */
     modal?: boolean;
+    /** Connects Triggers rendered outside the Root (spec/menu.md, "Detached triggers"). */
+    handle?: MenuHandle<Payload>;
+    /** The content, or a function of the active trigger's payload. */
+    children?:
+        | ReactNode
+        | ((state: { payload: Payload | undefined }) => ReactNode);
 }
 
 function useMenuRoot(
@@ -38,7 +49,7 @@ function useMenuRoot(
         loopFocus = true,
         modal: modalProp = false,
         ...props
-    }: Omit<MenuRootProps, "children">,
+    }: Omit<MenuRootProps, "children" | "handle">,
     nested: boolean,
 ) {
     const parent = useContext(MenuContext);
@@ -58,9 +69,12 @@ function useMenuRoot(
     const modal = owner ? owner.modal : modalProp;
     const { setOpen } = root;
     const closeAll = useCallback(
-        (reason: "item-press" | "focus-out" | "outside-press") => {
-            setOpen(false, reason);
-            owner?.closeAll(reason);
+        (
+            reason: "item-press" | "focus-out" | "outside-press",
+            event?: Event,
+        ) => {
+            setOpen(false, reason, event);
+            owner?.closeAll(reason, event);
         },
         [setOpen, owner],
     );
@@ -97,10 +111,19 @@ function useMenuRoot(
 }
 
 /** Holds the state of one menu level; renders no element (spec/menu.md). */
-export function MenuRoot({ children, ...props }: MenuRootProps) {
+export function MenuRoot<Payload = unknown>({
+    children,
+    handle,
+    ...props
+}: MenuRootProps<Payload>) {
     const value = useMenuRoot(props, false);
+    useAttachHandle(handle, value);
     return (
-        <MenuContext.Provider value={value}>{children}</MenuContext.Provider>
+        <MenuContext.Provider value={value}>
+            {typeof children === "function"
+                ? children({ payload: value.payload as Payload | undefined })
+                : children}
+        </MenuContext.Provider>
     );
 }
 

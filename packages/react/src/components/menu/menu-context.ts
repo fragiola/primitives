@@ -24,7 +24,10 @@ export interface MenuContextValue extends OverlayRoot {
     placed: { side: Side; align: Align };
     setPlaced: (placed: { side: Side; align: Align }) => void;
     /** Closes this level and every level above it. */
-    closeAll: (reason: "item-press" | "focus-out" | "outside-press") => void;
+    closeAll: (
+        reason: "item-press" | "focus-out" | "outside-press",
+        event?: Event,
+    ) => void;
     /** The open submenu of this level, so hovering a sibling item can close it. */
     openSubmenu: MutableRefObject<MenuContextValue | null>;
     safeArea: MutableRefObject<SafeArea | null>;

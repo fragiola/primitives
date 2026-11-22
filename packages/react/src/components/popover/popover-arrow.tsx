@@ -16,6 +16,8 @@ export function PopoverArrow(
             "aria-hidden": "true",
             "data-primitives-part": "popover-arrow",
             ...stateAttributes({
+                open: context.open,
+                closed: !context.open,
                 side: context.placed.side,
                 align: context.placed.align,
             }),

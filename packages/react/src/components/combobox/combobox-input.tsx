@@ -26,9 +26,9 @@ export function ComboboxInput(
     const items = orderedItems(context);
     const active = items.find((item) => item.id === highlighted);
 
-    const openWith = (highlight: PendingHighlight) => {
+    const openWith = (highlight: PendingHighlight, event?: Event) => {
         context.pendingHighlight.current = highlight;
-        context.setOpen(true, "list-navigation");
+        context.setOpen(true, "list-navigation", event);
     };
     const move = (delta: 1 | -1) => {
         // past an end, the visual focus goes back to the input; from the input, to the near end
@@ -46,14 +46,21 @@ export function ComboboxInput(
                 event.preventDefault();
                 if (event.altKey) {
                     if (event.key === "ArrowDown" && !open) {
-                        openWith(null);
+                        openWith(null, event.nativeEvent);
                     } else if (event.key === "ArrowUp" && open) {
-                        context.setOpen(false, "list-navigation");
+                        context.setOpen(
+                            false,
+                            "list-navigation",
+                            event.nativeEvent,
+                        );
                     }
                     return;
                 }
                 if (!open) {
-                    openWith(event.key === "ArrowDown" ? "first" : "last");
+                    openWith(
+                        event.key === "ArrowDown" ? "first" : "last",
+                        event.nativeEvent,
+                    );
                     return;
                 }
                 move(event.key === "ArrowDown" ? 1 : -1);
@@ -79,7 +86,7 @@ export function ComboboxInput(
                 return;
             case "Tab":
                 if (open) {
-                    context.setOpen(false, "focus-out");
+                    context.setOpen(false, "focus-out", event.nativeEvent);
                 }
                 return;
             case "Backspace":
@@ -135,7 +142,7 @@ export function ComboboxInput(
                 context.markTyped();
                 context.pendingHighlight.current = null;
                 if (!open) {
-                    context.setOpen(true, "input-change");
+                    context.setOpen(true, "input-change", event.nativeEvent);
                 }
             },
             onClick: () => openOnPress(context),
