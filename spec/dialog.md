@@ -130,9 +130,19 @@ Checks: on open, focus is on "Cancel", not on "Delete" (the first tabbable eleme
 
 ### `/dialog/nested-popover`
 
-Lands with Popover (stage 0, the Overlays Epic): the popup of `/dialog/basic` also holds a Popover
-whose Escape and outside presses go to the popover first. The layering it checks is the toolkit's
-(`@fragiola/primitives/layers`), tested there until the scenario exists.
+The popup of `/dialog/basic` without its input (Title **"Edit profile"**, Description **"Change
+your display name."**, a Close **"Close"**), plus a [Popover](popover.md) inside it: a Trigger
+**"More info"** whose popup has Title **"About names"** and a Close **"Got it"**. The popover is a
+child layer of the dialog (`@fragiola/primitives/layers`).
+
+Checks (after opening the dialog, then the popover):
+
+1. Focus moves into the popover ("Got it", its first tabbable element).
+2. Escape closes the popover only, with focus back on "More info"; the dialog stays open. Escape
+   again closes the dialog.
+3. A press inside the dialog, outside the popover (on its title), closes only the popover; focus
+   goes to the dialog's popup, the focusable element (`tabindex="-1"`) the press landed in, so it
+   stays inside the dialog ([popover.md](popover.md#focus), "After an outside press").
 
 ### `/dialog/controlled`
 

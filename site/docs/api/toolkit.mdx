@@ -18,8 +18,10 @@ windows. Its only runtime dependency is `@floating-ui/dom`, in the positioning e
 ## One entry per mechanism
 
 Each mechanism is its own entry, so a component pulls in only the ones it uses: Dialog uses
-`/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and `/direction`. The root
-entry, `@fragiola/primitives`, only re-exports them.
+`/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and
+`/direction`; Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
+Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
+`/scroll-lock`. The root entry, `@fragiola/primitives`, only re-exports them.
 
 ## Exports
 
@@ -32,8 +34,8 @@ entry, `@fragiola/primitives`, only re-exports them.
 | `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `ValidityKey` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
-| `@fragiola/primitives/inert` | `inertOutside` |
-| `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside` |
+| `@fragiola/primitives/inert` | `inertOutside`, `blockOutsidePointer` |
+| `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement` |
@@ -44,19 +46,24 @@ entry, `@fragiola/primitives`, only re-exports them.
 ## The mechanisms
 
 - **Overlay**: an overlay session ties a layer, the focus-out watch and the focus return of one
-  open overlay together, and ends them with one call.
+  open overlay together, and ends them with one call. After an outside press, a popover's focus
+  returns only once the press has ended, and only when the press focused nothing
+  (`returnFocus.whenUnfocused`).
 - **Layers**: the stack of a document's open overlays. Escape and an outside press go to the
-  topmost layer only; a layer opened inside another is its child.
+  topmost layer only; a layer opened inside another is its child. A tooltip, which is no layer,
+  takes Escape before them (`interceptEscape`), so an enclosing dialog stays open.
 - **Focus**: the tabbable elements of a container, the focus trap, the initial focus, and whether
   the last interaction was the keyboard.
-- **Inert and scroll lock**: everything outside some elements made inert, and the document's
-  scroll locked (counted, so nested locks release in order), keeping the scrollbar gutter.
+- **Inert and scroll lock**: everything outside some elements made inert, the pointer blocked
+  outside a modal menu (the body stops taking pointer events), and the document's scroll locked
+  (counted, so nested locks release in order), keeping the scrollbar gutter.
 - **Presence**: the next frame and the end of an element's animations, for the
   `data-starting-style` and `data-ending-style` states.
 - **Collection**: the key maps of tabs, menus and chips, list navigation, typeahead and the
   combobox's item helpers.
-- **Positioning**: a floating element anchored to its trigger, with logical sides
-  (`inline-start`, `inline-end`) and aligns (Floating UI).
+- **Positioning**: a floating element anchored to its trigger (Floating UI), on Base UI's sides:
+  `top`, `bottom`, the logical `inline-start` and `inline-end`, and the physical `left` and
+  `right`; a flipped side keeps the kind it was asked with.
 - **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
   delay groups.
 - **Range, form, id, direction, date**: slider math and keys, the form bridge and field validity,

@@ -4,4 +4,7 @@
 // from it tree-shakes to the same output. There is no NgModule of every directive.
 
 export * from "@fragiola/primitives-angular/dialog";
+export * from "@fragiola/primitives-angular/menu";
+export * from "@fragiola/primitives-angular/popover";
 export * from "@fragiola/primitives-angular/tabs";
+export * from "@fragiola/primitives-angular/tooltip";

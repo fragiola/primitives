@@ -120,4 +120,19 @@ describe("useControllableState", () => {
         expect(result.current[0]).toBe(false);
         expect(onChange).toHaveBeenCalledTimes(1);
     });
+
+    it("reports a change once when it is asked twice in the same task", async () => {
+        const onChange = vi.fn();
+        const { result } = renderHook(() =>
+            useControllableState<boolean, string>(true, true, onChange),
+        );
+        const set = result.current[1];
+        set(false, "first");
+        set(false, "again");
+        expect(onChange.mock.calls).toEqual([[false, "first"]]);
+        // a consumer that kept `true` can be asked again in a later task
+        await Promise.resolve();
+        set(false, "later");
+        expect(onChange).toHaveBeenCalledTimes(2);
+    });
 });

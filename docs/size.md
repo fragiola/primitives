@@ -20,7 +20,7 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 36,707 B | 13,863 B |
+| `@fragiola/primitives` | 37,988 B | 14,154 B |
 | `@fragiola/primitives/collection` | 3,550 B | 1,582 B |
 | `@fragiola/primitives/date` | 3,478 B | 1,508 B |
 | `@fragiola/primitives/direction` | 126 B | 125 B |
@@ -28,11 +28,11 @@ No peers: everything is bundled.
 | `@fragiola/primitives/form` | 2,353 B | 1,161 B |
 | `@fragiola/primitives/hover` | 424 B | 271 B |
 | `@fragiola/primitives/id` | 81 B | 98 B |
-| `@fragiola/primitives/inert` | 453 B | 319 B |
-| `@fragiola/primitives/layers` | 1,188 B | 597 B |
-| `@fragiola/primitives/overlay` | 1,626 B | 785 B |
+| `@fragiola/primitives/inert` | 812 B | 470 B |
+| `@fragiola/primitives/layers` | 1,452 B | 666 B |
+| `@fragiola/primitives/overlay` | 2,136 B | 958 B |
 | `@fragiola/primitives/pointer` | 1,425 B | 623 B |
-| `@fragiola/primitives/positioning` | 18,920 B | 7,444 B |
+| `@fragiola/primitives/positioning` | 19,059 B | 7,474 B |
 | `@fragiola/primitives/presence` | 330 B | 227 B |
 | `@fragiola/primitives/range` | 1,324 B | 673 B |
 | `@fragiola/primitives/scroll-lock` | 510 B | 306 B |
@@ -43,9 +43,12 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 13,159 B | 4,983 B | 9,003 B | 3,483 B |
-| `@fragiola/primitives-react/dialog` | 9,059 B | 3,558 B | 5,364 B | 2,207 B |
-| `@fragiola/primitives-react/tabs` | 5,734 B | 2,439 B | 5,295 B | 2,236 B |
+| `@fragiola/primitives-react` | 50,370 B | 16,776 B | 24,399 B | 7,506 B |
+| `@fragiola/primitives-react/dialog` | 9,669 B | 3,749 B | 5,464 B | 2,240 B |
+| `@fragiola/primitives-react/menu` | 34,840 B | 12,789 B | 11,124 B | 4,172 B |
+| `@fragiola/primitives-react/popover` | 28,972 B | 10,933 B | 6,951 B | 2,793 B |
+| `@fragiola/primitives-react/tabs` | 5,834 B | 2,481 B | 5,395 B | 2,274 B |
+| `@fragiola/primitives-react/tooltip` | 26,832 B | 10,310 B | 6,717 B | 2,771 B |
 
 ## @fragiola/primitives-vue
 
@@ -53,9 +56,12 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 14,670 B | 5,135 B | 10,512 B | 3,630 B |
-| `@fragiola/primitives-vue/dialog` | 9,475 B | 3,674 B | 5,778 B | 2,286 B |
-| `@fragiola/primitives-vue/tabs` | 6,192 B | 2,394 B | 5,791 B | 2,200 B |
+| `@fragiola/primitives-vue` | 54,042 B | 16,994 B | 28,077 B | 7,522 B |
+| `@fragiola/primitives-vue/dialog` | 10,025 B | 3,832 B | 5,818 B | 2,306 B |
+| `@fragiola/primitives-vue/menu` | 35,875 B | 12,803 B | 12,150 B | 4,132 B |
+| `@fragiola/primitives-vue/popover` | 29,549 B | 11,100 B | 7,497 B | 2,879 B |
+| `@fragiola/primitives-vue/tabs` | 6,250 B | 2,419 B | 5,849 B | 2,226 B |
+| `@fragiola/primitives-vue/tooltip` | 27,055 B | 10,301 B | 6,931 B | 2,660 B |
 
 ## @fragiola/primitives-angular
 
@@ -63,7 +69,10 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 31,260 B | 6,857 B | 27,098 B | 5,352 B |
-| `@fragiola/primitives-angular/internal` | 3,217 B | 1,438 B | 3,006 B | 1,341 B |
-| `@fragiola/primitives-angular/dialog` | 18,709 B | 4,641 B | 15,002 B | 3,279 B |
-| `@fragiola/primitives-angular/tabs` | 13,614 B | 3,469 B | 13,205 B | 3,251 B |
+| `@fragiola/primitives-angular` | 108,384 B | 21,105 B | 82,409 B | 11,705 B |
+| `@fragiola/primitives-angular/internal` | 22,729 B | 8,821 B | 3,514 B | 1,544 B |
+| `@fragiola/primitives-angular/dialog` | 19,219 B | 4,788 B | 15,043 B | 3,287 B |
+| `@fragiola/primitives-angular/menu` | 51,498 B | 14,550 B | 27,760 B | 5,883 B |
+| `@fragiola/primitives-angular/popover` | 41,029 B | 12,266 B | 18,974 B | 4,088 B |
+| `@fragiola/primitives-angular/tabs` | 13,614 B | 3,469 B | 13,246 B | 3,260 B |
+| `@fragiola/primitives-angular/tooltip` | 38,262 B | 11,714 B | 18,117 B | 4,107 B |

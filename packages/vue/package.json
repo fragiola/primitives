@@ -9,6 +9,9 @@
         "aria",
         "dialog",
         "tabs",
+        "menu",
+        "popover",
+        "tooltip",
         "primitives",
         "ui"
     ],
@@ -42,11 +45,29 @@
             "import": "./dist/dialog.js",
             "default": "./dist/dialog.js"
         },
+        "./menu": {
+            "@fragiola/source": "./src/components/menu/index.ts",
+            "types": "./dist/menu.d.ts",
+            "import": "./dist/menu.js",
+            "default": "./dist/menu.js"
+        },
+        "./popover": {
+            "@fragiola/source": "./src/components/popover/index.ts",
+            "types": "./dist/popover.d.ts",
+            "import": "./dist/popover.js",
+            "default": "./dist/popover.js"
+        },
         "./tabs": {
             "@fragiola/source": "./src/components/tabs/index.ts",
             "types": "./dist/tabs.d.ts",
             "import": "./dist/tabs.js",
             "default": "./dist/tabs.js"
+        },
+        "./tooltip": {
+            "@fragiola/source": "./src/components/tooltip/index.ts",
+            "types": "./dist/tooltip.d.ts",
+            "import": "./dist/tooltip.js",
+            "default": "./dist/tooltip.js"
         },
         "./package.json": "./package.json"
     },
@@ -68,10 +89,25 @@
                 "import": "./dist/dialog.js",
                 "default": "./dist/dialog.js"
             },
+            "./menu": {
+                "types": "./dist/menu.d.ts",
+                "import": "./dist/menu.js",
+                "default": "./dist/menu.js"
+            },
+            "./popover": {
+                "types": "./dist/popover.d.ts",
+                "import": "./dist/popover.js",
+                "default": "./dist/popover.js"
+            },
             "./tabs": {
                 "types": "./dist/tabs.d.ts",
                 "import": "./dist/tabs.js",
                 "default": "./dist/tabs.js"
+            },
+            "./tooltip": {
+                "types": "./dist/tooltip.d.ts",
+                "import": "./dist/tooltip.js",
+                "default": "./dist/tooltip.js"
             },
             "./package.json": "./package.json"
         }

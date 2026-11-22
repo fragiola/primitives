@@ -12,5 +12,6 @@ export * from "./utils/inject-enclosing.ts";
 export * from "./utils/label-id.ts";
 export * from "./utils/overlay-root.ts";
 export * from "./utils/portal.ts";
+export * from "./utils/positioner.ts";
 export * from "./utils/presence.ts";
 export * from "./utils/state-attributes.ts";

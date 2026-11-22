@@ -86,6 +86,21 @@ describe("useControllable", () => {
         expect(state.value.value).toBe(false);
         expect(onChange).toHaveBeenCalledTimes(1);
     });
+
+    it("reports a change once when it is asked twice in the same task", async () => {
+        const onChange = vi.fn();
+        const state = useControllable<boolean, string>(
+            () => true,
+            true,
+            onChange,
+        );
+        state.set(false, "first");
+        state.set(false, "again");
+        expect(onChange.mock.calls).toEqual([[false, "first"]]);
+        await Promise.resolve();
+        state.set(false, "later");
+        expect(onChange).toHaveBeenCalledTimes(2);
+    });
 });
 
 describe("helpers", () => {

@@ -25,6 +25,15 @@ export interface OverlaySessionOptions {
      */
     returnFocus?: {
         when?: ReadonlySet<string>;
+        /**
+         * Reasons that return focus only once the press that dismissed the overlay has ended, and
+         * only when it left focus nowhere (on the body): a press on a focusable element keeps the
+         * focus it gave (spec/popover.md, "Focus": Base UI's focus after an outside press). A
+         * getter is read when the session ends (a menu's `modal` may change while it is open).
+         */
+        whenUnfocused?:
+            | ReadonlySet<string>
+            | (() => ReadonlySet<string> | undefined);
         reason: () => string | null;
         to: () => HTMLElement | null | false;
     };
@@ -46,11 +55,33 @@ export function openOverlaySession(
     doc: Document,
     options: OverlaySessionOptions,
 ): OverlaySession {
+    const view = doc.defaultView;
+    // the outside press in progress, if any: its end runs `afterPress` (once focus has settled)
+    let pressing = false;
+    let afterPress: (() => void) | null = null;
+    const onPressEnd = () => {
+        doc.removeEventListener("pointerup", onPressEnd, true);
+        doc.removeEventListener("pointercancel", onPressEnd, true);
+        pressing = false;
+        const pending = afterPress;
+        afterPress = null;
+        if (pending) {
+            // a touch press focuses its target on the compatibility mousedown, after pointerup
+            view?.setTimeout(pending, 0);
+        }
+    };
     const layer = pushLayer(doc, {
         elements: options.elements,
         ignore: options.ignore,
         onEscape: () => options.dismiss("escape-key"),
-        onOutsidePress: () => options.dismiss("outside-press"),
+        onOutsidePress: () => {
+            if (!pressing) {
+                pressing = true;
+                doc.addEventListener("pointerup", onPressEnd, true);
+                doc.addEventListener("pointercancel", onPressEnd, true);
+            }
+            options.dismiss("outside-press");
+        },
     });
     const focusOut = options.focusOut;
     const stopWatching = focusOut
@@ -61,7 +92,12 @@ export function openOverlaySession(
                   ...focusOut(),
                   ...layer.elementsAbove(),
               ],
-              () => options.dismiss("focus-out"),
+              () => {
+                  // the outside press that already dismissed the overlay moved the focus
+                  if (!pressing) {
+                      options.dismiss("focus-out");
+                  }
+              },
           )
         : () => {};
     let ended = false;
@@ -75,11 +111,32 @@ export function openOverlaySession(
             layer.remove();
             stopWatching();
             const returnFocus = options.returnFocus;
-            if (
-                returnFocus &&
-                (!returnFocus.when ||
-                    returnFocus.when.has(returnFocus.reason() ?? ""))
-            ) {
+            if (!returnFocus) {
+                return;
+            }
+            const reason = returnFocus.reason() ?? "";
+            const unfocused =
+                typeof returnFocus.whenUnfocused === "function"
+                    ? returnFocus.whenUnfocused()
+                    : returnFocus.whenUnfocused;
+            if (unfocused?.has(reason)) {
+                const focusIfUnfocused = () => {
+                    const active = doc.activeElement;
+                    if (active === null || active === doc.body) {
+                        const target = returnFocus.to();
+                        if (target && target.isConnected === true) {
+                            target.focus({ preventScroll: true });
+                        }
+                    }
+                };
+                if (pressing) {
+                    afterPress = focusIfUnfocused;
+                } else {
+                    view?.setTimeout(focusIfUnfocused, 0);
+                }
+                return;
+            }
+            if (!returnFocus.when || returnFocus.when.has(reason)) {
                 const target = returnFocus.to();
                 if (target) {
                     target.focus({ preventScroll: true });

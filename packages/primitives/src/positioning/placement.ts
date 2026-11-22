@@ -1,26 +1,40 @@
 import type { Placement } from "@floating-ui/dom";
 import type { Direction } from "../direction/direction.ts";
 
-/** A logical side (spec/README.md, `data-side`). */
-export type Side = "top" | "bottom" | "start" | "end";
+/**
+ * The side of the anchor an overlay sits on (spec/README.md, `data-side`; Base UI's names, D4 §3
+ * "Naming"): `inline-start` and `inline-end` follow the direction (`inline-end` is the right in
+ * LTR, the left in RTL), `left` and `right` are physical.
+ */
+export type Side =
+    | "top"
+    | "bottom"
+    | "left"
+    | "right"
+    | "inline-start"
+    | "inline-end";
 export type Align = "start" | "center" | "end";
 
-/** The Floating UI placement of a logical side and align, in a direction. */
+type PhysicalSide = "top" | "bottom" | "left" | "right";
+
+function physicalSide(side: Side, direction: Direction): PhysicalSide {
+    switch (side) {
+        case "inline-start":
+            return direction === "rtl" ? "right" : "left";
+        case "inline-end":
+            return direction === "rtl" ? "left" : "right";
+        default:
+            return side;
+    }
+}
+
+/** The Floating UI placement of a side and align, in a direction. */
 export function toPlacement(
     side: Side,
     align: Align,
     direction: Direction,
 ): Placement {
-    const physical =
-        side === "start"
-            ? direction === "rtl"
-                ? "right"
-                : "left"
-            : side === "end"
-              ? direction === "rtl"
-                  ? "left"
-                  : "right"
-              : side;
+    const physical = physicalSide(side, direction);
     if (align === "center") {
         return physical;
     }
@@ -35,25 +49,27 @@ export function toPlacement(
     return `${physical}-${physicalAlign}`;
 }
 
-/** The logical side and align of a resolved Floating UI placement. */
+/**
+ * The side and align of a resolved Floating UI placement. A horizontal side is named as it was
+ * asked: logically (`inline-start` / `inline-end`) when `requested` is a logical side, physically
+ * (`left` / `right`) otherwise, so a flipped `inline-end` reports `inline-start`.
+ */
 export function fromPlacement(
     placement: Placement,
     direction: Direction,
+    requested: Side = "bottom",
 ): { side: Side; align: Align } {
     const [physical, edge] = placement.split("-") as [
-        string,
+        PhysicalSide,
         "start" | "end" | undefined,
     ];
+    const logical = requested === "inline-start" || requested === "inline-end";
     const side: Side =
-        physical === "left"
-            ? direction === "rtl"
-                ? "end"
-                : "start"
-            : physical === "right"
-              ? direction === "rtl"
-                  ? "start"
-                  : "end"
-              : (physical as Side);
+        logical && (physical === "left" || physical === "right")
+            ? (physical === "left") === (direction === "rtl")
+                ? "inline-end"
+                : "inline-start"
+            : physical;
     if (edge === undefined) {
         return { side, align: "center" };
     }

@@ -29,6 +29,21 @@ repeated here.
 | Recipes location | `examples/shared/src/recipes/`, private, never published. | `architecture/native-primitives.md#examples-styling`, `decisions.md#np-examples-styling` |
 | Toolkit entry granularity | One entry per POC folder (mechanism): `overlay`, `positioning`, `layers`, `focus`, `scroll-lock`, `inert`, `collection`, `presence`, `pointer`, `hover`, `range`, `form`, `id`, `direction`, `date`. | `architecture/native-primitives.md#tree-shaking-a-hard-requirement`, `decisions.md#np-entries` |
 
+## Overlays: details decided during Epic #7 (Issue #6)
+
+Questions the handoff §3, the APG and Base UI did not settle, decided by the Epic's stop condition
+(take the APG-closest option, record it in the spec and here).
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| How "unless the press landed on a focusable element" is checked | The toolkit's overlay session waits until the outside press has ended (pointerup, then a task, for touch), then returns focus only when focus is on the body: whatever the press focused, it keeps (`returnFocus.whenUnfocused`). A press inside a dialog's popup (`tabindex="-1"`) therefore keeps focus on that popup | testing the press target for focusability at pointerdown (misses a focusable ancestor and the browser's own focus rules) | `popover.md` "Focus", `dialog.md` `/dialog/nested-popover` |
+| The focus an outside press gives | Not reported again as `focus-out`: the press already dismissed the overlay with `outside-press` | reporting both reasons | `popover.md` "Focus" |
+| `data-side` of a flipped side | Named as it was asked: a flipped `inline-end` reports `inline-start`, a flipped `right` reports `left` (Base UI) | always logical, or always physical | `popover.md` "Positioning", `README.md` |
+| How a modal menu blocks the outside pointer | The body stops taking pointer events (`@fragiola/primitives/inert`, `blockOutsidePointer`) and the trigger and every level's positioner take them back (`pointer-events: auto`, structural inline style): no extra backdrop element in the DOM | an invisible backdrop part (one more element in every framework's DOM and the goldens); capture listeners that cancel events (they cannot stop hover) | `menu.md` "Modal" |
+| A modal menu's outside press and focus | It closes every level and focus returns to the trigger (the press reaches nothing to focus); the keyboard is unchanged (no trap, no inert page: Tab still closes and moves on) | trapping focus like a dialog (the APG menu has no trap) | `menu.md` "Modal", "Focus" |
+| A submenu and `modal` | A submenu follows its root menu; `SubmenuRoot` takes no `modal` (Angular's shared `MenuRoot` directive accepts the input and ignores it on a submenu) | a per-level option | `menu.md` "API" |
+| A non-modal menu's outside press | Unchanged from the POC: no focus return, the press reaches the page | returning focus like the Popover (not in §3) | `menu.md` "Focus" |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,

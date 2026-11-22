@@ -2,8 +2,15 @@
 // list the entry plumbing follows. The React and Vue builds (tsdown.config.ts) take their entries
 // from it, Angular has one ng-packagr secondary entry point per name (`packages/angular/<name>/`),
 // and site/tests/entries.test.ts checks every manifest's `exports`, every root entry and the
-// Angular folders against it. A new component is added here first.
-export const COMPONENTS = ["dialog", "tabs"] as const;
+// Angular folders against it. A new component is added here first, in alphabetical order (the
+// order Biome sorts the root entries' re-exports in).
+export const COMPONENTS = [
+    "dialog",
+    "menu",
+    "popover",
+    "tabs",
+    "tooltip",
+] as const;
 
 export type ComponentName = (typeof COMPONENTS)[number];
 

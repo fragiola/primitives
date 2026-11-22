@@ -27,11 +27,16 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 
 | attribute | on |
 | --- | --- |
-| `data-open` | an open overlay (a dialog's popup and backdrop) |
+| `data-open` | an open overlay (a popup, its positioner, a dialog's backdrop) |
 | `data-popup-open` | a trigger while its overlay is open |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts once its animations end |
 | `data-selected` | a selected tab, and its panel |
+| `data-highlighted` | the menu item the keyboard or the pointer points at |
+| `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group) |
+| `data-nested` | a submenu's positioner and popup |
+| `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
+| `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
 | `data-orientation` | `horizontal` or `vertical` (a value) |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |

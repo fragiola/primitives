@@ -16,5 +16,15 @@
             "defaultCategory": "error"
         }
     },
-    "include": ["src", "internal", "dialog", "tabs", "tests", "*.config.ts"]
+    "include": [
+        "src",
+        "internal",
+        "dialog",
+        "tabs",
+        "popover",
+        "tooltip",
+        "menu",
+        "tests",
+        "*.config.ts"
+    ]
 }

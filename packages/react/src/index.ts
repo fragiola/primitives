@@ -3,4 +3,7 @@
 // importing from it tree-shakes to the same output as importing from the subpath.
 
 export * from "./components/dialog/index.ts";
+export * from "./components/menu/index.ts";
+export * from "./components/popover/index.ts";
 export * from "./components/tabs/index.ts";
+export * from "./components/tooltip/index.ts";
