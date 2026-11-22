@@ -1,4 +1,6 @@
 import type { ComponentType } from "react";
+import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
+import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.tsx";
 import { CalendarSingle } from "../scenarios/calendar/calendar-single.tsx";
@@ -30,6 +32,7 @@ import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
 import { FieldMatch } from "../scenarios/field/field-match.tsx";
 import { FieldMoreControls } from "../scenarios/field/field-more-controls.tsx";
+import { FieldSettings } from "../scenarios/field/field-settings.tsx";
 import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
@@ -44,14 +47,20 @@ import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.tsx";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.tsx";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
+import { ProgressBasic } from "../scenarios/progress/progress-basic.tsx";
+import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx";
+import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
 import { SelectModal } from "../scenarios/select/select-modal.tsx";
+import { SeparatorBasic } from "../scenarios/separator/separator-basic.tsx";
 import { SliderBasic } from "../scenarios/slider/slider-basic.tsx";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.tsx";
 import { SliderLabelValue } from "../scenarios/slider/slider-label-value.tsx";
 import { SliderRange } from "../scenarios/slider/slider-range.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
+import { SwitchBasic } from "../scenarios/switch/switch-basic.tsx";
+import { SwitchControlled } from "../scenarios/switch/switch-controlled.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
 import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
@@ -100,6 +109,11 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
+    "/radio-group/basic": RadioGroupBasic,
+    "/radio-group/controlled": RadioGroupControlled,
+    "/switch/basic": SwitchBasic,
+    "/switch/controlled": SwitchControlled,
+    "/button/basic": ButtonBasic,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,
@@ -112,6 +126,7 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/field/async": FieldAsync,
     "/field/match": FieldMatch,
     "/field/more-controls": FieldMoreControls,
+    "/field/settings": FieldSettings,
     "/fieldset/basic": FieldsetBasic,
     "/form/basic": FormBasic,
     "/calendar/single": CalendarSingle,
@@ -124,5 +139,8 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
+    "/progress/basic": ProgressBasic,
+    "/avatar/basic": AvatarBasic,
+    "/separator/basic": SeparatorBasic,
     "/direction/provider": DirectionProviderScenario,
 };
