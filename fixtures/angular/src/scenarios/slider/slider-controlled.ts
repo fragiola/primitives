@@ -3,9 +3,9 @@ import {
     SliderControl,
     SliderIndicator,
     SliderRoot,
+    type SliderRootValue,
     SliderThumb,
     SliderTrack,
-    type SliderValue,
 } from "@fragiola/primitives-angular/slider";
 import { slider } from "examples-shared/recipes/slider";
 import { Output } from "../../kit/output.ts";
@@ -34,7 +34,7 @@ export class SliderControlled {
     protected readonly value = signal(70);
     protected readonly requested = signal<number | undefined>(undefined);
 
-    protected onValueChange(next: SliderValue): void {
+    protected onValueChange(next: SliderRootValue): void {
         const value = next as number;
         this.requested.set(value);
         if (value <= 80) {

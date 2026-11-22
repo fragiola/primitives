@@ -3,9 +3,9 @@ import {
     SliderControl,
     SliderIndicator,
     SliderRoot,
+    type SliderRootValue,
     SliderThumb,
     SliderTrack,
-    type SliderValue,
 } from "@fragiola/primitives-angular/slider";
 import { slider } from "examples-shared/recipes/slider";
 import { Output } from "../../kit/output.ts";
@@ -31,5 +31,5 @@ import { Output } from "../../kit/output.ts";
 export class SliderVertical {
     protected readonly styles = slider;
     protected readonly value = signal(30);
-    protected readonly single = (value: SliderValue) => value as number;
+    protected readonly single = (value: SliderRootValue) => value as number;
 }
