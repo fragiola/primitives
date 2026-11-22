@@ -45,6 +45,12 @@
             "import": "./dist/index.js",
             "default": "./dist/index.js"
         },
+        "./calendar": {
+            "@fragiola/source": "./src/components/calendar/index.ts",
+            "types": "./dist/calendar.d.ts",
+            "import": "./dist/calendar.js",
+            "default": "./dist/calendar.js"
+        },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
             "types": "./dist/checkbox.d.ts",
@@ -62,6 +68,18 @@
             "types": "./dist/combobox.d.ts",
             "import": "./dist/combobox.js",
             "default": "./dist/combobox.js"
+        },
+        "./date-picker": {
+            "@fragiola/source": "./src/components/date-picker/index.ts",
+            "types": "./dist/date-picker.d.ts",
+            "import": "./dist/date-picker.js",
+            "default": "./dist/date-picker.js"
+        },
+        "./date-range-picker": {
+            "@fragiola/source": "./src/components/date-range-picker/index.ts",
+            "types": "./dist/date-range-picker.d.ts",
+            "import": "./dist/date-range-picker.js",
+            "default": "./dist/date-range-picker.js"
         },
         "./dialog": {
             "@fragiola/source": "./src/components/dialog/index.ts",
@@ -86,6 +104,12 @@
             "types": "./dist/popover.d.ts",
             "import": "./dist/popover.js",
             "default": "./dist/popover.js"
+        },
+        "./range-calendar": {
+            "@fragiola/source": "./src/components/range-calendar/index.ts",
+            "types": "./dist/range-calendar.d.ts",
+            "import": "./dist/range-calendar.js",
+            "default": "./dist/range-calendar.js"
         },
         "./select": {
             "@fragiola/source": "./src/components/select/index.ts",
@@ -126,6 +150,11 @@
                 "import": "./dist/index.js",
                 "default": "./dist/index.js"
             },
+            "./calendar": {
+                "types": "./dist/calendar.d.ts",
+                "import": "./dist/calendar.js",
+                "default": "./dist/calendar.js"
+            },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",
                 "import": "./dist/checkbox.js",
@@ -140,6 +169,16 @@
                 "types": "./dist/combobox.d.ts",
                 "import": "./dist/combobox.js",
                 "default": "./dist/combobox.js"
+            },
+            "./date-picker": {
+                "types": "./dist/date-picker.d.ts",
+                "import": "./dist/date-picker.js",
+                "default": "./dist/date-picker.js"
+            },
+            "./date-range-picker": {
+                "types": "./dist/date-range-picker.d.ts",
+                "import": "./dist/date-range-picker.js",
+                "default": "./dist/date-range-picker.js"
             },
             "./dialog": {
                 "types": "./dist/dialog.d.ts",
@@ -160,6 +199,11 @@
                 "types": "./dist/popover.d.ts",
                 "import": "./dist/popover.js",
                 "default": "./dist/popover.js"
+            },
+            "./range-calendar": {
+                "types": "./dist/range-calendar.d.ts",
+                "import": "./dist/range-calendar.js",
+                "default": "./dist/range-calendar.js"
             },
             "./select": {
                 "types": "./dist/select.d.ts",

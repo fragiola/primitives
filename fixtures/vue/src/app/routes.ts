@@ -1,4 +1,9 @@
 import type { Component } from "vue";
+import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
+import CalendarRange from "../scenarios/calendar/calendar-range.vue";
+import CalendarSingle from "../scenarios/calendar/calendar-single.vue";
+import CalendarTwoMonths from "../scenarios/calendar/calendar-two-months.vue";
+import CalendarUnavailable from "../scenarios/calendar/calendar-unavailable.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxGroupScenario from "../scenarios/checkbox/checkbox-group.vue";
@@ -11,6 +16,8 @@ import ComboboxGroups from "../scenarios/combobox/combobox-groups.vue";
 import ComboboxMultiple from "../scenarios/combobox/combobox-multiple.vue";
 import ComboboxObjects from "../scenarios/combobox/combobox-objects.vue";
 import ComboboxRejectedInput from "../scenarios/combobox/combobox-rejected-input.vue";
+import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
+import DatePickerRange from "../scenarios/date-picker/date-picker-range.vue";
 import DialogBasic from "../scenarios/dialog/dialog-basic.vue";
 import DialogControlled from "../scenarios/dialog/dialog-controlled.vue";
 import DialogInitialFocus from "../scenarios/dialog/dialog-initial-focus.vue";
@@ -87,4 +94,13 @@ export const routes: Record<string, Component> = {
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
+    "/calendar/single": CalendarSingle,
+    "/calendar/min-max": CalendarMinMax,
+    "/calendar/unavailable": CalendarUnavailable,
+    "/calendar/locale": CalendarSingle,
+    "/calendar/rtl": CalendarSingle,
+    "/calendar/two-months": CalendarTwoMonths,
+    "/calendar/range": CalendarRange,
+    "/date-picker/basic": DatePickerBasic,
+    "/date-picker/range": DatePickerRange,
 };
