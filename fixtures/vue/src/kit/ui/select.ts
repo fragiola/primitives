@@ -11,5 +11,9 @@ export const Select = {
     Popup: styled(Primitive.Popup, select.popup),
     List: styled(Primitive.List, select.list),
     Item: styled(Primitive.Item, select.item),
+    ItemText: styled(Primitive.ItemText, select["item-text"]),
+    Group: styled(Primitive.Group, select.group),
+    GroupLabel: styled(Primitive.GroupLabel, select["group-label"]),
+    Separator: styled(Primitive.Separator, select.separator),
     ItemIndicator: styled(Primitive.ItemIndicator, select["item-indicator"]),
 };

@@ -2,6 +2,9 @@ import type { Component } from "vue";
 import AccordionBasic from "../scenarios/accordion/accordion-basic.vue";
 import AccordionHorizontal from "../scenarios/accordion/accordion-horizontal.vue";
 import AccordionMultiple from "../scenarios/accordion/accordion-multiple.vue";
+import AlertDialogBasic from "../scenarios/alert-dialog/alert-dialog-basic.vue";
+import AlertDialogDetached from "../scenarios/alert-dialog/alert-dialog-detached.vue";
+import AlertDialogLifecycle from "../scenarios/alert-dialog/alert-dialog-lifecycle.vue";
 import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
 import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
@@ -24,6 +27,8 @@ import ComboboxLifecycle from "../scenarios/combobox/combobox-lifecycle.vue";
 import ComboboxMultiple from "../scenarios/combobox/combobox-multiple.vue";
 import ComboboxObjects from "../scenarios/combobox/combobox-objects.vue";
 import ComboboxRejectedInput from "../scenarios/combobox/combobox-rejected-input.vue";
+import ContextMenuBasic from "../scenarios/context-menu/context-menu-basic.vue";
+import ContextMenuLifecycle from "../scenarios/context-menu/context-menu-lifecycle.vue";
 import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
 import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
 import DatePickerLifecycle from "../scenarios/date-picker/date-picker-lifecycle.vue";
@@ -48,6 +53,7 @@ import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
+import MenuCheckboxRadio from "../scenarios/menu/menu-checkbox-radio.vue";
 import MenuControlled from "../scenarios/menu/menu-controlled.vue";
 import MenuDetached from "../scenarios/menu/menu-detached.vue";
 import MenuGroups from "../scenarios/menu/menu-groups.vue";
@@ -67,6 +73,7 @@ import RadioGroupBasic from "../scenarios/radio-group/radio-group-basic.vue";
 import RadioGroupControlled from "../scenarios/radio-group/radio-group-controlled.vue";
 import SelectBasic from "../scenarios/select/select-basic.vue";
 import SelectControlled from "../scenarios/select/select-controlled.vue";
+import SelectGroups from "../scenarios/select/select-groups.vue";
 import SelectLifecycle from "../scenarios/select/select-lifecycle.vue";
 import SelectModal from "../scenarios/select/select-modal.vue";
 import SeparatorBasic from "../scenarios/separator/separator-basic.vue";
@@ -99,6 +106,9 @@ export const routes: Record<string, Component> = {
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/alert-dialog/basic": AlertDialogBasic,
+    "/alert-dialog/detached": AlertDialogDetached,
+    "/alert-dialog/lifecycle": AlertDialogLifecycle,
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
@@ -129,6 +139,10 @@ export const routes: Record<string, Component> = {
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/menu/checkbox-radio": MenuCheckboxRadio,
+    "/context-menu/basic": ContextMenuBasic,
+    "/context-menu/rtl": ContextMenuBasic,
+    "/context-menu/lifecycle": ContextMenuLifecycle,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,
@@ -143,6 +157,7 @@ export const routes: Record<string, Component> = {
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
     "/select/lifecycle": SelectLifecycle,
+    "/select/groups": SelectGroups,
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
