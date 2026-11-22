@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them). The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`, which no other component imports; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -54,6 +54,7 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `isAnimating`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
+| `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
 
 ## The mechanisms
 
@@ -104,6 +105,17 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
   `right`; a flipped side keeps the kind it was asked with. Its `direction` option (a direction,
   or a getter read at every placement) is a [DirectionProvider](/docs/api/direction)'s: the
   logical sides follow it. Without it, the anchor's computed direction, read at every placement.
+- **Swipe**: `watchSwipe(element, options)` follows a press on `element` that moves 6 px
+  (`SWIPE_LOCK_DISTANCE`) along the axis of its `directions` and reports it as a swipe
+  (`onStart`, `onMove(movement)`, `onEnd(end)` with the release velocity in px per ms, or `null`
+  when canceled): a move along the other axis, or one a scrollable element under the pointer
+  takes (scroll containment), is let go; a touch that may be a swipe does not scroll the page; no
+  swipe starts on a text control or an element marked `data-swipe-ignore`, nor, with the mouse, on
+  an interactive element. `swipeRelease(direction, end, size, snap?)` decides the release:
+  dismiss past half the size or on a flick (0.5 px per ms), or settle (on the closest snap point,
+  `resolveSnapPoints` measuring them in px). `swipeMovement` damps a move past the fully open
+  position, `swipeProgress` gives the share of the way to closed. A drawer's swipe
+  ([Drawer](/docs/api/drawer)); a toast can reuse it.
 - **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
   delay groups. `watchLongPress(element, { delay, moveTolerance, pointerTypes, onLongPress })`
   (`LongPressOptions`; defaults 500 ms, 10 px, touch only) calls `onLongPress(point, event)` once a

@@ -6,8 +6,8 @@ description: Overlays opened from overlays form a tree - Escape one level at a t
 An overlay opened from inside another one is its **child**: a Popover opened from a Dialog, a
 Menu opened from that Popover, a submenu of that Menu. Together the open overlays of a page form a
 tree, whatever the DOM position of their portals (each one is portaled to the end of `body`).
-Every overlay follows it: Dialog, AlertDialog, Popover, Menu and its submenus, ContextMenu,
-Select, Combobox and the date pickers. Nothing needs configuring: put a Trigger inside a popup and
+Every overlay follows it: Dialog, AlertDialog, Drawer, Popover, Menu and its submenus,
+ContextMenu, NavigationMenu and its nested levels, Select, Combobox and the date pickers. Nothing needs configuring: put a Trigger inside a popup and
 its overlay is that popup's child.
 
 ## How the tree behaves

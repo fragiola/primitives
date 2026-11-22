@@ -375,10 +375,12 @@ function vueProps(component: string, sources: Sources) {
 const SHARED_PARTS: Record<string, string> = {
     "range-calendar": "calendar",
     "date-range-picker": "date-picker",
-    // spec/alert-dialog.md, spec/context-menu.md: built on Dialog's and Menu's parts (Angular
-    // gives them their own selectors, as subclasses of Dialog's and Menu's directives)
+    // spec/alert-dialog.md, spec/context-menu.md, spec/drawer.md: built on Dialog's and Menu's
+    // parts (Angular gives them their own selectors, as subclasses of Dialog's and Menu's
+    // directives)
     "alert-dialog": "dialog",
     "context-menu": "menu",
+    drawer: "dialog",
 };
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
