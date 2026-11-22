@@ -1,5 +1,11 @@
-// The entry of @fragiola/primitives/range: range math (snapping, fractions, thumbs) and the slider key map.
+// The entry of @fragiola/primitives/range: range math (snapping, fractions, thumbs), the slider key map and a progress's value.
 
+export {
+    type ProgressOptions,
+    type ProgressStatus,
+    type ProgressValue,
+    progressValue,
+} from "./progress.ts";
 export {
     fractionAlong,
     moveThumb,

@@ -9,6 +9,7 @@ export * from "./focus/index.ts";
 export * from "./form/index.ts";
 export * from "./hover/index.ts";
 export * from "./id/index.ts";
+export * from "./image/index.ts";
 export * from "./inert/index.ts";
 export * from "./layers/index.ts";
 export * from "./overlay/index.ts";

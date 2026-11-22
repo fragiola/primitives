@@ -62,6 +62,7 @@ export const MECHANISMS = [
     "form",
     "hover",
     "id",
+    "image",
     "inert",
     "layers",
     "overlay",
