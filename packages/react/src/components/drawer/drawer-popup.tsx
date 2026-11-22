@@ -30,9 +30,12 @@ export interface DrawerPopupState {
     expanded: boolean;
 }
 
-export interface DrawerPopupProps
-    extends PartProps<DrawerPopupState>,
-        Pick<DialogPopupProps, "initialFocus" | "finalFocus"> {}
+export interface DrawerPopupProps extends PartProps<DrawerPopupState> {
+    /** Focused on open (default: the first tabbable element, else the popup). */
+    initialFocus?: DialogPopupProps["initialFocus"];
+    /** Focused on close (default: the active trigger, else the element focused before opening). */
+    finalFocus?: DialogPopupProps["finalFocus"];
+}
 
 interface Sizes {
     popupHeight: number;

@@ -22,13 +22,11 @@ export type {
 } from "../../utils/change-details.ts";
 export type { OverlayHandle } from "../../utils/overlay-handle.ts";
 export type { RenderProp } from "../../utils/render-element.tsx";
-export type {
-    DialogBackdropProps as DrawerBackdropProps,
-    DialogBackdropState as DrawerBackdropState,
-} from "../dialog/dialog-backdrop.tsx";
+export type { DialogBackdropState as DrawerBackdropState } from "../dialog/dialog-backdrop.tsx";
 export type { DialogPortalProps as DrawerPortalProps } from "../dialog/dialog-portal.tsx";
 export type { DialogTriggerState as DrawerTriggerState } from "../dialog/dialog-trigger.tsx";
 export type { DialogViewportState as DrawerViewportState } from "../dialog/dialog-viewport.tsx";
+export type { DrawerBackdropProps } from "./drawer-backdrop.tsx";
 export { createDrawerHandle, type DrawerHandle } from "./drawer-handle.ts";
 export type { DrawerPopupProps, DrawerPopupState } from "./drawer-popup.tsx";
 export type { DrawerRootProps } from "./drawer-root.tsx";

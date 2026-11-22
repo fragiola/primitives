@@ -30,7 +30,6 @@ export {
     type NavigationMenuPositionerState,
 } from "./directives/navigation-menu-positioner.directive.ts";
 export {
-    NAVIGATION_MENU_CONTENT,
     type NavigationMenuOrientation,
     NavigationMenuRoot,
     type NavigationMenuRootState,

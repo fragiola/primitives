@@ -7,8 +7,10 @@ import {
 } from "../dialog/dialog-backdrop.tsx";
 import { DrawerContext } from "./drawer-context.ts";
 
+export interface DrawerBackdropProps extends DialogBackdropProps {}
+
 /** Dialog's Backdrop, with the swipe's `data-swiping` and `--drawer-swipe-progress`. */
-export function DrawerBackdrop({ style, ...props }: DialogBackdropProps) {
+export function DrawerBackdrop({ style, ...props }: DrawerBackdropProps) {
     const { swipe } = useRequiredContext(DrawerContext, "Drawer.Backdrop");
     return (
         <DialogBackdrop
