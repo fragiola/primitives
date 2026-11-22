@@ -112,8 +112,13 @@ export function SliderRoot({
     latest.current = { current, onValueCommit, output };
 
     // a form reset returns the slider to its default (spec/README.md, "Forms")
-    const initial = useRef({ defaultValue, min, setCurrent });
-    initial.current = { defaultValue, min, setCurrent };
+    const initial = useRef({
+        defaultValue,
+        min,
+        setCurrent,
+        reset: field.reset,
+    });
+    initial.current = { defaultValue, min, setCurrent, reset: field.reset };
     useEffect(() => {
         const element = firstInput.current;
         if (element === null) {
@@ -125,8 +130,14 @@ export function SliderRoot({
                     defaultValue: given,
                     min: lowest,
                     setCurrent: set,
+                    reset,
                 } = initial.current;
-                set(toArray(given ?? lowest), { reason: "none" });
+                const next = toArray(given ?? lowest);
+                // no change reported when the slider already is at its default
+                if (!sameValues(next, latest.current.current)) {
+                    reset();
+                    set(next, { reason: "none" });
+                }
             },
         });
     }, []);

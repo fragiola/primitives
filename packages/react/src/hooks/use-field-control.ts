@@ -9,6 +9,7 @@ import {
     useLayoutEffect,
     useMemo,
     useRef,
+    useState,
 } from "react";
 import { FieldContext } from "../components/field/field-context.ts";
 import { stateAttributes } from "../utils/state-attributes.ts";
@@ -45,6 +46,12 @@ export interface FieldControlBinding {
     attributes: Record<`data-${string}`, string>;
     onFocus: () => void;
     onBlur: () => void;
+    /**
+     * Called by the control's form reset, before it returns to its default: the value it reports
+     * next is no change (spec/form.md, "A form reset does not clear the Form's errors nor the
+     * fields' states"), only its filled state and custom validity follow it.
+     */
+    reset: () => void;
 }
 
 const OUTSIDE: FieldControlBinding = {
@@ -55,6 +62,7 @@ const OUTSIDE: FieldControlBinding = {
     attributes: {},
     onFocus: () => {},
     onBlur: () => {},
+    reset: () => {},
 };
 
 function serialize(value: unknown): string {
@@ -75,6 +83,14 @@ export function useFieldControl(
     latest.current = options;
     const initial = useRef<string | null>(null);
     const previous = useRef<string | null>(null);
+    // a form reset is pending: the next render reports its value as on mount (a new render even
+    // when the value already is the default, so the mark never outlives the reset)
+    const resetting = useRef(false);
+    const [resets, setResets] = useState(0);
+    const reset = useCallback(() => {
+        resetting.current = true;
+        setResets((count) => count + 1);
+    }, []);
 
     const { id, labelable, labelFocuses = false } = options;
     const registerControl = field?.registerControl;
@@ -98,6 +114,7 @@ export function useFieldControl(
 
     const events = field?.events;
     const serialized = serialize(options.value);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `resets` re-runs it on a form reset
     useEffect(() => {
         if (events === undefined) {
             return;
@@ -109,12 +126,19 @@ export function useFieldControl(
             events.mounted(input(), value, filled);
             return;
         }
+        const isReset = resetting.current;
+        resetting.current = false;
         if (previous.current === serialized) {
             return;
         }
         previous.current = serialized;
+        if (isReset) {
+            // a reset changes no field state: no `dirty`, no cleared server errors, nothing shown
+            events.mounted(input(), value, filled);
+            return;
+        }
         events.changed(input(), value, serialized !== initial.current, filled);
-    }, [events, serialized]);
+    }, [events, serialized, resets]);
 
     // inside a Form, the Form runs the submission attempts (spec/form.md)
     const inForm = field?.inForm ?? false;
@@ -161,6 +185,7 @@ export function useFieldControl(
             attributes: stateAttributes(fieldStateAttributes(field.state)),
             onFocus: events.focused,
             onBlur,
+            reset,
         };
-    }, [field, events, onBlur, labelFocuses, id]);
+    }, [field, events, onBlur, reset, labelFocuses, id]);
 }

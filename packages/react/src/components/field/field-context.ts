@@ -3,7 +3,10 @@ import { createContext } from "react";
 
 /** What a control inside the field reports (spec/field.md, "Integration contract"). */
 export interface FieldControlEvents {
-    /** The control mounted: its value, whether it is filled. Sets the custom validity, shows nothing. */
+    /**
+     * The control mounted, or its form was reset (no change: spec/form.md): its value, whether it
+     * is filled. Sets the custom validity, shows nothing.
+     */
     mounted: (
         input: HTMLInputElement | null,
         value: unknown,

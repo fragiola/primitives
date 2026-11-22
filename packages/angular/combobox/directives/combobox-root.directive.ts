@@ -495,6 +495,7 @@ export class ComboboxRoot {
     /** A form reset: the default value, and its label in the input. */
     private reset(): void {
         const fallback = this.fallbackValue();
+        this.field.reset();
         this.selection.set(fallback, { reason: "none" });
         this.text.set(this.multiple() ? "" : this.label(fallback), {
             reason: "none",

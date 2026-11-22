@@ -125,8 +125,18 @@ export function DatePickerRootBase({
     );
 
     // a form reset returns the value to its default; a failed validation focuses the trigger
-    const latest = useRef({ defaultValue, setValue, trigger: root.trigger });
-    latest.current = { defaultValue, setValue, trigger: root.trigger };
+    const latest = useRef({
+        defaultValue,
+        setValue,
+        trigger: root.trigger,
+        reset: field.reset,
+    });
+    latest.current = {
+        defaultValue,
+        setValue,
+        trigger: root.trigger,
+        reset: field.reset,
+    };
     const named = formName !== undefined;
     useEffect(() => {
         const element = input.current;
@@ -137,6 +147,7 @@ export function DatePickerRootBase({
             reset: () => {
                 const current = latest.current;
                 const initial = current.defaultValue ?? null;
+                current.reset();
                 current.setValue(initial, { reason: "none" });
                 element.value = formValue(initial);
             },

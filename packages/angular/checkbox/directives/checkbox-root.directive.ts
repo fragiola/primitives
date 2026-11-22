@@ -235,6 +235,7 @@ export class CheckboxRoot {
                     if (this.inGroup()) {
                         this.group?.reset();
                     } else {
+                        this.field.reset();
                         this.own.set(this.defaultChecked(), { reason: "none" });
                     }
                     // the browser reset the input after the state: write the state back

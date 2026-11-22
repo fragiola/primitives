@@ -77,10 +77,11 @@ export function CheckboxGroup({
             setValue(checked ? [...allValues] : [], { reason: "none" }),
         [allValues, setValue],
     );
-    const reset = useCallback(
-        () => setValue(defaultValue, { reason: "none" }),
-        [defaultValue, setValue],
-    );
+    const { reset: markReset } = field;
+    const reset = useCallback(() => {
+        markReset();
+        setValue(defaultValue, { reason: "none" });
+    }, [defaultValue, setValue, markReset]);
     const registerId = useCallback((entry: string, id: string | null) => {
         setIds((current) => {
             if (id === null) {

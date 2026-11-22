@@ -2,7 +2,7 @@ import {
     fieldStateAttributes,
     onSubmitAttempt,
 } from "@fragiola/primitives/form";
-import { inject, onBeforeUnmount, onMounted, watch } from "vue";
+import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { FieldKey } from "../components/field/field-context.ts";
 import { stateAttributes } from "../utils/state-attributes.ts";
 
@@ -34,6 +34,12 @@ export interface FieldControlBinding {
     attributes: () => Record<string, string>;
     onFocus: () => void;
     onBlur: () => void;
+    /**
+     * Called by the control's form reset, before it returns to its default: the value it reports
+     * next is no change (spec/form.md, "A form reset does not clear the Form's errors nor the
+     * fields' states"), only its filled state and custom validity follow it.
+     */
+    reset: () => void;
 }
 
 /** Outside a field: nothing of a field's. */
@@ -45,6 +51,7 @@ export const OUTSIDE_FIELD: FieldControlBinding = {
     attributes: () => ({}),
     onFocus: () => {},
     onBlur: () => {},
+    reset: () => {},
 };
 
 function serialize(value: unknown): string {
@@ -95,6 +102,10 @@ export function useFieldControl(
     onBeforeUnmount(detach);
 
     let stop: (() => void)[] = [];
+    // a form reset is pending: the next flush reports the value as on mount (the counter flushes
+    // even when the value already is the default, so the mark never outlives the reset)
+    let resetting = false;
+    const resets = ref(0);
     // from the mount on: the control's own state may be defined after this call
     onMounted(() => {
         const initial = serialize(options.value());
@@ -112,12 +123,23 @@ export function useFieldControl(
         // after the render: the validated element holds the new value
         stop.push(
             watch(
-                () => serialize(options.value()),
-                (serialized) => {
+                [() => serialize(options.value()), resets],
+                ([serialized]) => {
+                    const isReset = resetting;
+                    resetting = false;
                     if (previous === serialized) {
                         return;
                     }
                     previous = serialized;
+                    if (isReset) {
+                        // a reset changes no field state: no `dirty`, no cleared server errors
+                        events.mounted(
+                            options.input(),
+                            options.value(),
+                            options.filled(),
+                        );
+                        return;
+                    }
                     events.changed(
                         options.input(),
                         options.value(),
@@ -156,5 +178,9 @@ export function useFieldControl(
             stateAttributes(fieldStateAttributes(field.state.value)),
         onFocus: events.focused,
         onBlur: () => events.blurred(options.input(), options.value()),
+        reset: () => {
+            resetting = true;
+            resets.value += 1;
+        },
     };
 }

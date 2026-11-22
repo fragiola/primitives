@@ -138,6 +138,7 @@ export class CheckboxGroup {
 
     /** A form reset: back to `defaultValue`. */
     reset(): void {
+        this.field.reset();
         this.selection.set(this.defaultValue(), { reason: "none" });
     }
 

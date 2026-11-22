@@ -195,11 +195,16 @@ export class SliderRoot {
             const first = inputs[0];
             if (first !== undefined) {
                 stop = bridgeForm(first, {
-                    reset: () =>
-                        this.current.set(
-                            toArray(this.defaultValue() ?? this.min()),
-                            { reason: "none" },
-                        ),
+                    reset: () => {
+                        const initial = toArray(
+                            this.defaultValue() ?? this.min(),
+                        );
+                        // no change reported when the slider already is at its default
+                        if (!sameValues(initial, untracked(this.values))) {
+                            this.field.reset();
+                            this.current.set(initial, { reason: "none" });
+                        }
+                    },
                 });
             }
         });

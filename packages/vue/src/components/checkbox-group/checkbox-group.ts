@@ -130,6 +130,7 @@ export const CheckboxGroup: PartComponent<
                     });
                 },
                 reset() {
+                    field.reset();
                     state.set(props.defaultValue, { reason: "none" });
                 },
                 ids: ref({}),

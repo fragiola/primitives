@@ -115,8 +115,20 @@ export function CheckboxRoot({
         }
     };
 
-    const latest = useRef({ group, inGroup, defaultChecked, setOwn });
-    latest.current = { group, inGroup, defaultChecked, setOwn };
+    const latest = useRef({
+        group,
+        inGroup,
+        defaultChecked,
+        setOwn,
+        reset: field.reset,
+    });
+    latest.current = {
+        group,
+        inGroup,
+        defaultChecked,
+        setOwn,
+        reset: field.reset,
+    };
     useEffect(() => {
         const element = input.current;
         if (element === null) {
@@ -129,6 +141,7 @@ export function CheckboxRoot({
                     current.group?.reset();
                     return;
                 }
+                current.reset();
                 current.setOwn(current.defaultChecked, { reason: "none" });
                 element.checked = current.defaultChecked;
             },

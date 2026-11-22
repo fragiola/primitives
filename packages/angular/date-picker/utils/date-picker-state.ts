@@ -182,6 +182,7 @@ export function createDatePicker(
                 onCleanup(
                     bridgeForm(hidden, {
                         reset: () => {
+                            field.reset();
                             state.set(inputs.defaultValue() ?? null, {
                                 reason: "none",
                             });

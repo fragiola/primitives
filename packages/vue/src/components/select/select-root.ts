@@ -155,6 +155,7 @@ export const SelectRoot: PublicComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
+                                field.reset();
                                 state.set(props.defaultValue, {
                                     reason: "none",
                                 });

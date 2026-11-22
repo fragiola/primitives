@@ -6,6 +6,7 @@ import {
     effect,
     inject,
     type Signal,
+    signal,
     untracked,
 } from "@angular/core";
 import { onSubmitAttempt } from "@fragiola/primitives/form";
@@ -63,6 +64,12 @@ export interface FieldControlBinding {
     data: Signal<FieldControlData>;
     focused: () => void;
     blurred: () => void;
+    /**
+     * Called by the control's form reset, before it returns to its default: the value it reports
+     * next is no change (spec/form.md, "A form reset does not clear the Form's errors nor the
+     * fields' states"), only its filled state and custom validity follow it.
+     */
+    reset: () => void;
 }
 
 const NONE = computed(() => null);
@@ -84,6 +91,7 @@ const OUTSIDE: FieldControlBinding = {
     })),
     focused: () => {},
     blurred: () => {},
+    reset: () => {},
 };
 
 function serialize(value: unknown): string {
@@ -130,9 +138,14 @@ export function fieldControl(
 
     let initial: string | null = null;
     let previous: string | null = null;
+    // a form reset is pending: the next render reports the value as on mount (the counter runs the
+    // effect even when the value already is the default, so the mark never outlives the reset)
+    let resetting = false;
+    const resets = signal(0);
     afterRenderEffect(() => {
         const value = options.value();
         const filled = options.filled();
+        resets();
         const serialized = serialize(value);
         untracked(() => {
             if (initial === null) {
@@ -141,10 +154,17 @@ export function fieldControl(
                 events.mounted(options.input(), value, filled);
                 return;
             }
+            const isReset = resetting;
+            resetting = false;
             if (previous === serialized) {
                 return;
             }
             previous = serialized;
+            if (isReset) {
+                // a reset changes no field state: no `dirty`, no cleared server errors
+                events.mounted(options.input(), value, filled);
+                return;
+            }
             events.changed(
                 options.input(),
                 value,
@@ -191,6 +211,10 @@ export function fieldControl(
         focused: events.focused,
         blurred: () =>
             events.blurred(options.input(), untracked(options.value)),
+        reset: () => {
+            resetting = true;
+            resets.update((count) => count + 1);
+        },
     };
 }
 

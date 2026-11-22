@@ -168,6 +168,7 @@ export const CheckboxRoot: PartComponent<
                                     group?.reset();
                                     return;
                                 }
+                                field.reset();
                                 own.set(props.defaultChecked, {
                                     reason: "none",
                                 });

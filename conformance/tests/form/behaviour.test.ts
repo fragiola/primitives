@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
-import { expectSubmitted } from "../../src/form.ts";
-import { expectOutput } from "../../src/output.ts";
+import { expectSubmitted, resetForm } from "../../src/form.ts";
+import { expectOutput, output } from "../../src/output.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/form.md
@@ -79,6 +79,20 @@ test.describe("form / basic", () => {
         await expectOutput(page, "cleared", "empty");
         await submit(page).click();
         await expectSubmitted(page, "email=ada@example.com&username=admins");
+    });
+
+    test("a form reset keeps the server's errors", async ({ page }) => {
+        const username = textbox(page, "Username");
+        await textbox(page, "Email").fill("ada@example.com");
+        await username.fill("admin");
+        await submit(page).click();
+        await shown(page, taken);
+        await resetForm(page);
+        // the controls reset a task after the reset event: let it pass, and the render after it
+        await page.waitForTimeout(200);
+        await shown(page, taken);
+        await expect(username).toHaveAttribute("aria-invalid", "true");
+        await expect(output(page)).not.toContainText("cleared: empty");
     });
 
     test("has no axe violation, before and after the server's answer", async ({

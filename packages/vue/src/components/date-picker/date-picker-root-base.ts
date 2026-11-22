@@ -166,6 +166,7 @@ export function defineDatePickerRoot(
                         bridgeForm(element, {
                             reset: () => {
                                 const initial = props.defaultValue ?? null;
+                                field.reset();
                                 value.set(initial, { reason: "none" });
                                 element.value = isoValue(
                                     value.value.value ?? null,

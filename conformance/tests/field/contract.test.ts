@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import { resetForm } from "../../src/form.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/field.md: anatomy, state attributes, ARIA wiring, the integration contract
@@ -247,6 +248,18 @@ test("field / controls: the integrated controls take the field's ids, name and s
             '[data-primitives-part^="field-"], [data-primitives-part^="checkbox-"], [data-primitives-part^="select-"], [data-primitives-part^="slider-"]',
         ),
     );
+
+    // a form reset returns the values to their defaults, not the fields' states (spec/field.md,
+    // check 6): still dirty and touched, only `filled` follows the value
+    await resetForm(page);
+    await expect(checkbox).toHaveAttribute("aria-checked", "false");
+    await expect(thumb).toHaveAttribute("aria-valuenow", "50");
+    await expectHas(
+        [terms, checkbox],
+        ["valid", "dirty", "touched"],
+        ["invalid", "filled"],
+    );
+    await expectHas([volume, slider], ["dirty", "filled"], []);
 });
 
 test("field / more-controls: the group and the pickers take the field's ids, name and states", async ({

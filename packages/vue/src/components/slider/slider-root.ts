@@ -221,6 +221,7 @@ export const SliderRoot: PartComponent<
                                     props.defaultValue ?? props.min,
                                 );
                                 if (!sameValues(initial, values.value)) {
+                                    field.reset();
                                     state.set(initial, { reason: "none" });
                                 }
                             },

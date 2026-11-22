@@ -292,8 +292,20 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         limit,
     ]);
 
-    const reset = useRef({ defaultValue, setValue, setInputValueState, label });
-    reset.current = { defaultValue, setValue, setInputValueState, label };
+    const reset = useRef({
+        defaultValue,
+        setValue,
+        setInputValueState,
+        label,
+        markReset: field.reset,
+    });
+    reset.current = {
+        defaultValue,
+        setValue,
+        setInputValueState,
+        label,
+        markReset: field.reset,
+    };
     const triggerElement = root.trigger;
     useEffect(() => {
         const element = hidden.current;
@@ -303,6 +315,7 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         return bridgeForm(element, {
             reset: () => {
                 const current = reset.current;
+                current.markReset();
                 current.setValue(current.defaultValue, { reason: "none" });
                 current.setInputValueState(
                     latest.current.multiple

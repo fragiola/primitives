@@ -359,6 +359,7 @@ export const ComboboxRoot: PublicComponent<
                         bridgeForm(element, {
                             reset: () => {
                                 const initial = defaultValue();
+                                field.reset();
                                 valueState.set(initial, { reason: "none" });
                                 inputState.set(
                                     props.multiple ? "" : label(initial),

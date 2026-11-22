@@ -119,6 +119,9 @@ Checks:
 7. Axe finds no violation, before and after the server's answer.
 8. Contract layer: the Form is a `FORM` with `form-root` and `novalidate`; the invalid
    Username's field parts carry `data-invalid` while the server error is shown.
+9. **A form reset.** With the server error shown, `form.reset()` keeps "This username is taken."
+   shown and "Username" `aria-invalid="true"`, and prints no `cleared:` line: a reset does not
+   clear the Form's errors.
 
 ## Differences from Base UI
 

@@ -136,6 +136,7 @@ export class SelectRoot {
             stop = bridgeForm(hidden, {
                 reset: () => {
                     const fallback = this.defaultValue();
+                    this.field.reset();
                     this.selection.set(fallback, { reason: "none" });
                     // a value that did not change does not re-run the effect
                     hidden.value = fallback ?? "";
