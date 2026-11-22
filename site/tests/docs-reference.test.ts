@@ -324,7 +324,17 @@ function vueProps(component: string, sources: Sources) {
                             folders.some((each) =>
                                 sources.files(each).includes(path),
                             ) && sources.read(path).includes(declaration),
-                    ) ?? `${folder}/${kebab(implementation)}.ts`;
+                    ) ??
+                // else the part's own file, in the first folder that has it (an AlertDialog's
+                // Title is Dialog's `dialog-title.ts`)
+                folders
+                    .map((each) => `${each}/${kebab(implementation)}.ts`)
+                    .find((path) =>
+                        folders.some((each) =>
+                            sources.files(each).includes(path),
+                        ),
+                    ) ??
+                `${folder}/${kebab(implementation)}.ts`;
             const whole = sources.read(file);
             let text = whole.slice(Math.max(0, whole.indexOf(declaration)));
             // a part made by a factory its roots share (`defineCalendarRoot(...)`): the factory's
@@ -365,6 +375,10 @@ function vueProps(component: string, sources: Sources) {
 const SHARED_PARTS: Record<string, string> = {
     "range-calendar": "calendar",
     "date-range-picker": "date-picker",
+    // spec/alert-dialog.md, spec/context-menu.md: built on Dialog's and Menu's parts (Angular
+    // gives them their own selectors, as subclasses of Dialog's and Menu's directives)
+    "alert-dialog": "dialog",
+    "context-menu": "menu",
 };
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
@@ -381,10 +395,17 @@ function angularProps(
     return new Map(
         parts.map((part) => {
             // a component that is no namespace is its one part (CheckboxGroup); a shared part is
-            // its base component's directive (RangeCalendar's Cell is `[calendarCell]`)
+            // its own directive when its entry has one (`[alertDialogPopup]`, a subclass of
+            // `DialogPopup`), else its base component's (RangeCalendar's Cell is `[calendarCell]`)
+            const shared = SHARED_PARTS[component];
+            const ownFile = `packages/angular/${component}/directives/${kebab(`${pascal(component)}${part}`)}.directive.ts`;
             const owner =
-                part !== "Root" && SHARED_PARTS[component]
-                    ? SHARED_PARTS[component]
+                part !== "Root" &&
+                shared &&
+                !sources
+                    .files(`packages/angular/${component}/directives`)
+                    .includes(ownFile)
+                    ? shared
                     : component;
             const directive =
                 part === pascal(component) ? part : `${pascal(owner)}${part}`;
@@ -442,15 +463,26 @@ function angularProps(
             }
             // an input bound under an alias (`boundValue = input(…, { alias: "value" })`) is its
             // alias, but a structural directive's microsyntax inputs (`alias: "dialogPortal"`,
-            // `"tabsPanelKeepMounted"`) keep their property's name
-            const prefix = selector.slice(1, -1);
+            // `"tabsPanelKeepMounted"`) keep their property's name, also when the input is its
+            // base directive's (`ContextMenuCheckboxItemIndicator extends MenuCheckboxItemIndicator`,
+            // `alias: "menuCheckboxItemIndicator"`)
+            const prefixes = [
+                selector.slice(1, -1),
+                ...[...text.matchAll(/selector:\s*"([^"]*)"/g)].flatMap(
+                    (match) =>
+                        [...(match[1] ?? "").matchAll(/\[(\w+)\]/g)].map(
+                            (each) => each[1] ?? "",
+                        ),
+                ),
+            ];
             const inputs = [
                 ...text.matchAll(
                     /readonly (\w+) =\s*input(?:\.required)?[<(]([^;]*);/g,
                 ),
             ].map((match) => {
                 const alias = /alias:\s*"(\w+)"/.exec(match[2] ?? "")?.[1];
-                return alias !== undefined && !alias.startsWith(prefix)
+                return alias !== undefined &&
+                    !prefixes.some((prefix) => alias.startsWith(prefix))
                     ? alias
                     : (match[1] ?? "");
             });
@@ -837,6 +869,21 @@ describe("the docs reference check", () => {
             "Description",
             "Close",
         ]);
+    });
+
+    it("reads a part built on another component's: its own subclass, or the base's file", () => {
+        // `AlertDialogBackdrop extends DialogBackdrop`, in the dialog entry
+        expect(
+            angularProps("alert-dialog", ["Backdrop"], disk).get("Backdrop"),
+        ).toEqual(["forceRender"]);
+        // the base's structural input keeps its name (`alias: "menuCheckboxItemIndicator"`)
+        expect(
+            angularProps("context-menu", ["CheckboxItemIndicator"], disk).get(
+                "CheckboxItemIndicator",
+            ),
+        ).toContain("options");
+        // Vue's AlertDialog.Title is Dialog's `dialog-title.ts`
+        expect(vueProps("alert-dialog", disk).has("Title")).toBe(true);
     });
 
     it("reads a method of a props interface as a prop", () => {
