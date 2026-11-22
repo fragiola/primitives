@@ -17,6 +17,7 @@ import { TabsRoot } from "./tabs-root.directive.ts";
         "data-primitives-part": "tabs-list",
         "[attr.aria-orientation]": "root.orientation()",
         "[attr.data-orientation]": "data().orientation",
+        "[attr.data-activation-direction]": "data().activationDirection",
         "(keydown)": "onKeyDown($event)",
     },
 })
@@ -24,7 +25,10 @@ export class TabsList {
     /** A DirectionProvider's direction, else `null` (the computed one is read). */
     private readonly direction = injectProvidedDirection();
     protected readonly root = inject(TabsRoot);
-    readonly state = computed(() => ({ orientation: this.root.orientation() }));
+    readonly state = computed(() => ({
+        orientation: this.root.orientation(),
+        activationDirection: this.root.activationDirection(),
+    }));
     protected readonly data = computed(() => dataValues(this.state()));
     private readonly list = registerHost(this.root.list);
 

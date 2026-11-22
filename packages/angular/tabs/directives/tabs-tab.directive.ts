@@ -8,12 +8,13 @@ import {
     input,
 } from "@angular/core";
 import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
-import { TabsRoot } from "./tabs-root.directive.ts";
+import { type ActivationDirection, TabsRoot } from "./tabs-root.directive.ts";
 
 export interface TabsTabState {
     selected: boolean;
     disabled: boolean;
     orientation: string;
+    activationDirection: ActivationDirection;
 }
 
 /** A tab: `<button tabsTab value="account">`. A disabled tab stays focusable, is never selected. */
@@ -32,6 +33,7 @@ export interface TabsTabState {
         "[attr.data-selected]": "data().selected",
         "[attr.data-disabled]": "data().disabled",
         "[attr.data-orientation]": "data().orientation",
+        "[attr.data-activation-direction]": "data().activationDirection",
         "(click)": "onClick()",
     },
 })
@@ -44,6 +46,7 @@ export class TabsTab {
         selected: this.root.selected() === this.value(),
         disabled: this.disabled(),
         orientation: this.root.orientation(),
+        activationDirection: this.root.activationDirection(),
     }));
     protected readonly data = computed(() => dataValues(this.state()));
     // the roving tab stop: the selected tab, else the first tab

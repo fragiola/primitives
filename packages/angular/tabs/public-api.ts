@@ -16,6 +16,7 @@ export {
     type TabsPanelState,
 } from "./directives/tabs-panel.directive.ts";
 export {
+    type ActivationDirection,
     type TabInfo,
     TabsRoot,
     type TabsRootState,

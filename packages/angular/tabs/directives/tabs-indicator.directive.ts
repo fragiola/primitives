@@ -9,23 +9,35 @@ import {
     signal,
     untracked,
 } from "@angular/core";
-import { placeTabsIndicator } from "@fragiola/primitives/collection";
+import {
+    placeTabsIndicator,
+    type TabsIndicatorBox,
+    tabsIndicatorBox,
+} from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import {
     conditionalView,
     writeAttributes,
 } from "@fragiola/primitives-angular/internal";
-import { TabsRoot } from "./tabs-root.directive.ts";
+import { type ActivationDirection, TabsRoot } from "./tabs-root.directive.ts";
 
+/** Every variable the Indicator writes, removed while it is not measured. */
 const VARIABLES = [
     "--tabs-indicator-inset-inline-start",
     "--tabs-indicator-inset-block-start",
     "--tabs-indicator-inline-size",
     "--tabs-indicator-block-size",
-] as const;
+    "--active-tab-left",
+    "--active-tab-right",
+    "--active-tab-top",
+    "--active-tab-bottom",
+    "--active-tab-width",
+    "--active-tab-height",
+] as const satisfies readonly (keyof TabsIndicatorBox)[];
 
 export interface TabsIndicatorState {
     orientation: "horizontal" | "vertical";
+    activationDirection: ActivationDirection;
 }
 
 /** The inline script of a server-rendered Indicator (`renderBeforeHydration`). */
@@ -52,10 +64,11 @@ export class TabsIndicator {
     });
     readonly state = computed<TabsIndicatorState>(() => ({
         orientation: this.root.orientation(),
+        activationDirection: this.root.activationDirection(),
     }));
 
-    /** The selected tab's box (the four variables' values), once measured. */
-    private readonly box = signal<readonly number[] | null>(null);
+    /** The selected tab's box (the variables' values), once measured. */
+    private readonly box = signal<TabsIndicatorBox | null>(null);
 
     constructor() {
         const root = this.root;
@@ -71,6 +84,8 @@ export class TabsIndicator {
                     "aria-hidden": "true",
                     "data-primitives-part": "tabs-indicator",
                     "data-orientation": untracked(this.state).orientation,
+                    "data-activation-direction": untracked(this.state)
+                        .activationDirection,
                 }),
         );
         // only a server writes the script (an after render effect never runs there), which removes
@@ -90,10 +105,13 @@ export class TabsIndicator {
         }
         afterRenderEffect(() => {
             const host = element();
-            const orientation = this.state().orientation;
+            const { orientation, activationDirection } = this.state();
             if (host !== null) {
                 untracked(() =>
-                    writeAttributes(host, { "data-orientation": orientation }),
+                    writeAttributes(host, {
+                        "data-orientation": orientation,
+                        "data-activation-direction": activationDirection,
+                    }),
                 );
             }
         });
@@ -115,18 +133,13 @@ export class TabsIndicator {
                         box.set(null);
                         return;
                     }
-                    const listRect = list.getBoundingClientRect();
-                    const tabRect = tab.getBoundingClientRect();
-                    const inlineStart =
-                        getDirection(list) === "rtl"
-                            ? listRect.right - tabRect.right
-                            : tabRect.left - listRect.left;
-                    box.set([
-                        inlineStart,
-                        tabRect.top - listRect.top,
-                        tabRect.width,
-                        tabRect.height,
-                    ]);
+                    box.set(
+                        tabsIndicatorBox(
+                            list,
+                            tab,
+                            getDirection(list) === "rtl",
+                        ),
+                    );
                 };
                 measure();
                 const view = list.ownerDocument.defaultView;
@@ -143,12 +156,12 @@ export class TabsIndicator {
             if (host === null) {
                 return;
             }
-            VARIABLES.forEach((name, index) => {
-                const value = values?.[index];
+            VARIABLES.forEach((name) => {
+                const value = values?.[name];
                 if (value === undefined) {
                     host.style.removeProperty(name);
                 } else {
-                    host.style.setProperty(name, `${value}px`);
+                    host.style.setProperty(name, value);
                 }
             });
         });

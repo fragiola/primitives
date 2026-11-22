@@ -4,10 +4,15 @@ import {
     computed,
     Directive,
     input,
+    linkedSignal,
     output,
     signal,
     untracked,
 } from "@angular/core";
+import {
+    type ActivationDirection,
+    activationDirection,
+} from "@fragiola/primitives/collection";
 import type {
     ChangeDetails,
     ChangeReason,
@@ -24,9 +29,12 @@ export interface TabInfo {
     disabled: boolean;
 }
 
+export type { ActivationDirection };
+
 export interface TabsRootState {
     orientation: "horizontal" | "vertical";
     activation: "automatic" | "manual";
+    activationDirection: ActivationDirection;
 }
 
 /** spec/tabs.md: `<div tabsRoot [(value)]="value">`. */
@@ -37,6 +45,7 @@ export interface TabsRootState {
         "data-primitives-part": "tabs-root",
         "[attr.data-orientation]": "data().orientation",
         "[attr.data-activation]": "data().activation",
+        "[attr.data-activation-direction]": "data().activationDirection",
     },
 })
 export class TabsRoot {
@@ -68,9 +77,32 @@ export class TabsRoot {
     readonly list = signal<HTMLElement | null>(null);
     /** Bumped when a tab registers, so the roving tabindex and the indicator follow. */
     readonly version = signal(0);
+    /**
+     * Where the selected tab sits from the one selected before it (spec/tabs.md,
+     * `data-activation-direction`): derived from the selection, so the render that selects a tab
+     * (and its panel's first frame) already carries it. Measured on the page, before that render
+     * (the tabs do not move when the selection changes).
+     */
+    readonly activationDirection = linkedSignal<
+        string | undefined,
+        ActivationDirection
+    >({
+        source: this.selected,
+        computation: (value, previous) =>
+            previous === undefined
+                ? "none"
+                : untracked(() =>
+                      activationDirection(
+                          this.tabElement(previous.source),
+                          this.tabElement(value),
+                          this.orientation(),
+                      ),
+                  ),
+    });
     readonly state = computed<TabsRootState>(() => ({
         orientation: this.orientation(),
         activation: this.activation(),
+        activationDirection: this.activationDirection(),
     }));
     protected readonly data = computed(() => dataValues(this.state()));
 
@@ -103,6 +135,15 @@ export class TabsRoot {
     // whitespace and `aria-controls` / `aria-labelledby` (lists of ids) still name one element.
     tabId(value: string): string {
         return `${this.baseId}-tab-${encodeURIComponent(value)}`;
+    }
+
+    private tabElement(value: string | undefined): HTMLElement | null {
+        if (value === undefined) {
+            return null;
+        }
+        return (
+            this.list()?.ownerDocument.getElementById(this.tabId(value)) ?? null
+        );
     }
 
     panelId(value: string): string {

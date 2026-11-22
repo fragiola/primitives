@@ -22,3 +22,17 @@ export function dataValues<K extends string>(
     }
     return values;
 }
+
+/**
+ * The same as attributes, for a part a structural directive renders (it writes them on the element,
+ * with no host binding): `{ open: true }` gives `{ "data-open": "" }`.
+ */
+export function dataAttributes(
+    state: Record<string, boolean | string | null | undefined>,
+): Record<string, string | null> {
+    const attributes: Record<string, string | null> = {};
+    for (const [key, value] of Object.entries(state)) {
+        attributes[`data-${key}`] = dataValue(value);
+    }
+    return attributes;
+}
