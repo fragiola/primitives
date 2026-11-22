@@ -210,6 +210,19 @@ describe("the bundle guard, entry by entry", () => {
             "checkbox-group",
             "field",
         ]);
+        // Epic #29: a Radio on its group's context, the new form controls on Field, and the
+        // components that are no form control on nothing
+        expect(ENTRY_DEPENDENCIES.radio).toEqual(["radio-group", "field"]);
+        expect(ENTRY_DEPENDENCIES["radio-group"]).toEqual(["field"]);
+        expect(ENTRY_DEPENDENCIES.switch).toEqual(["field"]);
+        for (const name of [
+            "avatar",
+            "button",
+            "progress",
+            "separator",
+        ] as const) {
+            expect(ENTRY_DEPENDENCIES[name]).toBeUndefined();
+        }
         expect(
             entryLeaks(
                 "react",

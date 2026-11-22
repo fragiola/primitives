@@ -47,6 +47,18 @@
             "import": "./dist/index.js",
             "default": "./dist/index.js"
         },
+        "./avatar": {
+            "@fragiola/source": "./src/components/avatar/index.ts",
+            "types": "./dist/avatar.d.ts",
+            "import": "./dist/avatar.js",
+            "default": "./dist/avatar.js"
+        },
+        "./button": {
+            "@fragiola/source": "./src/components/button/index.ts",
+            "types": "./dist/button.d.ts",
+            "import": "./dist/button.js",
+            "default": "./dist/button.js"
+        },
         "./calendar": {
             "@fragiola/source": "./src/components/calendar/index.ts",
             "types": "./dist/calendar.d.ts",
@@ -119,6 +131,24 @@
             "import": "./dist/popover.js",
             "default": "./dist/popover.js"
         },
+        "./progress": {
+            "@fragiola/source": "./src/components/progress/index.ts",
+            "types": "./dist/progress.d.ts",
+            "import": "./dist/progress.js",
+            "default": "./dist/progress.js"
+        },
+        "./radio": {
+            "@fragiola/source": "./src/components/radio/index.ts",
+            "types": "./dist/radio.d.ts",
+            "import": "./dist/radio.js",
+            "default": "./dist/radio.js"
+        },
+        "./radio-group": {
+            "@fragiola/source": "./src/components/radio-group/index.ts",
+            "types": "./dist/radio-group.d.ts",
+            "import": "./dist/radio-group.js",
+            "default": "./dist/radio-group.js"
+        },
         "./range-calendar": {
             "@fragiola/source": "./src/components/range-calendar/index.ts",
             "types": "./dist/range-calendar.d.ts",
@@ -131,11 +161,23 @@
             "import": "./dist/select.js",
             "default": "./dist/select.js"
         },
+        "./separator": {
+            "@fragiola/source": "./src/components/separator/index.ts",
+            "types": "./dist/separator.d.ts",
+            "import": "./dist/separator.js",
+            "default": "./dist/separator.js"
+        },
         "./slider": {
             "@fragiola/source": "./src/components/slider/index.ts",
             "types": "./dist/slider.d.ts",
             "import": "./dist/slider.js",
             "default": "./dist/slider.js"
+        },
+        "./switch": {
+            "@fragiola/source": "./src/components/switch/index.ts",
+            "types": "./dist/switch.d.ts",
+            "import": "./dist/switch.js",
+            "default": "./dist/switch.js"
         },
         "./tabs": {
             "@fragiola/source": "./src/components/tabs/index.ts",
@@ -175,6 +217,16 @@
                 "types": "./dist/index.d.ts",
                 "import": "./dist/index.js",
                 "default": "./dist/index.js"
+            },
+            "./avatar": {
+                "types": "./dist/avatar.d.ts",
+                "import": "./dist/avatar.js",
+                "default": "./dist/avatar.js"
+            },
+            "./button": {
+                "types": "./dist/button.d.ts",
+                "import": "./dist/button.js",
+                "default": "./dist/button.js"
             },
             "./calendar": {
                 "types": "./dist/calendar.d.ts",
@@ -236,6 +288,21 @@
                 "import": "./dist/popover.js",
                 "default": "./dist/popover.js"
             },
+            "./progress": {
+                "types": "./dist/progress.d.ts",
+                "import": "./dist/progress.js",
+                "default": "./dist/progress.js"
+            },
+            "./radio": {
+                "types": "./dist/radio.d.ts",
+                "import": "./dist/radio.js",
+                "default": "./dist/radio.js"
+            },
+            "./radio-group": {
+                "types": "./dist/radio-group.d.ts",
+                "import": "./dist/radio-group.js",
+                "default": "./dist/radio-group.js"
+            },
             "./range-calendar": {
                 "types": "./dist/range-calendar.d.ts",
                 "import": "./dist/range-calendar.js",
@@ -246,10 +313,20 @@
                 "import": "./dist/select.js",
                 "default": "./dist/select.js"
             },
+            "./separator": {
+                "types": "./dist/separator.d.ts",
+                "import": "./dist/separator.js",
+                "default": "./dist/separator.js"
+            },
             "./slider": {
                 "types": "./dist/slider.d.ts",
                 "import": "./dist/slider.js",
                 "default": "./dist/slider.js"
+            },
+            "./switch": {
+                "types": "./dist/switch.d.ts",
+                "import": "./dist/switch.js",
+                "default": "./dist/switch.js"
             },
             "./tabs": {
                 "types": "./dist/tabs.d.ts",

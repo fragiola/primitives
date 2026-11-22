@@ -38,6 +38,13 @@
         "range-calendar",
         "date-picker",
         "date-range-picker",
+        "button",
+        "radio",
+        "radio-group",
+        "switch",
+        "progress",
+        "avatar",
+        "separator",
         "tests",
         "*.config.ts"
     ]
