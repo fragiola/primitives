@@ -67,6 +67,8 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
+import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
+import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
@@ -154,6 +156,8 @@ import { ROUTES } from "./routes.ts";
         MenuModal,
         MenuDetached,
         MenuLifecycle,
+        NavigationMenuBasic,
+        NavigationMenuNested,
         MenuCheckboxRadio,
         ContextMenuBasic,
         ContextMenuLifecycle,
@@ -256,6 +260,8 @@ import { ROUTES } from "./routes.ts";
             @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
             @case ("/menu/detached") { <main class="p-6" scenario-menu-detached></main> }
             @case ("/menu/lifecycle") { <main class="p-6" scenario-menu-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/navigation-menu/basic") { <main class="p-6" scenario-navigation-menu-basic></main> }
+            @case ("/navigation-menu/nested") { <main class="p-6" scenario-navigation-menu-nested></main> }
             @case ("/menu/checkbox-radio") { <main class="p-6" scenario-menu-checkbox-radio></main> }
             @case ("/context-menu/basic") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }

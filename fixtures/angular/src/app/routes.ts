@@ -47,6 +47,8 @@ export const ROUTES: readonly string[] = [
     "/menu/controlled",
     "/menu/detached",
     "/menu/lifecycle",
+    "/navigation-menu/basic",
+    "/navigation-menu/nested",
     "/menu/checkbox-radio",
     "/context-menu/basic",
     "/context-menu/rtl",
