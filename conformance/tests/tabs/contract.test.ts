@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Locator, test } from "@playwright/test";
 import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
 import { openScenario } from "../../src/scenario.ts";
 
@@ -65,4 +65,79 @@ test("tabs / none-selected: no tab selected, no panel and no indicator rendered"
     await expect(part(page, "tabs", "panel")).toHaveCount(0);
     await expect(part(page, "tabs", "indicator")).toHaveCount(0);
     await expectNoFalseStates(parts(page, "tabs"));
+});
+
+// spec/tabs.md, the Indicator's physical variables and `data-activation-direction` (Epic #32)
+const variables = (indicator: Locator, names: readonly string[]) =>
+    indicator.evaluate(
+        (element, names) =>
+            Object.fromEntries(
+                names.map((name) => [
+                    name,
+                    getComputedStyle(element).getPropertyValue(name).trim(),
+                ]),
+            ),
+        names,
+    );
+
+test("tabs / animated: the Indicator's physical variables match the logical ones", async ({
+    page,
+}) => {
+    await openScenario(page, "/tabs/animated");
+    const indicator = part(page, "tabs", "indicator");
+    await expect(indicator).toHaveCount(1);
+    const box = await variables(indicator, [
+        "--active-tab-left",
+        "--active-tab-right",
+        "--active-tab-top",
+        "--active-tab-bottom",
+        "--active-tab-width",
+        "--active-tab-height",
+        "--tabs-indicator-inset-inline-start",
+        "--tabs-indicator-inline-size",
+    ]);
+    for (const value of Object.values(box)) {
+        expect(value).toMatch(/px$/);
+    }
+    expect(box["--active-tab-left"]).toBe(
+        box["--tabs-indicator-inset-inline-start"],
+    );
+    expect(box["--active-tab-width"]).toBe(box["--tabs-indicator-inline-size"]);
+    for (const name of ["root", "list", "tab", "indicator", "panel"]) {
+        await expect(part(page, "tabs", name).first()).toHaveAttribute(
+            "data-activation-direction",
+            "none",
+        );
+    }
+});
+
+test("tabs / animated in RTL: the right offset is the inline start", async ({
+    page,
+}) => {
+    await openScenario(page, "/tabs/animated", { dir: "rtl" });
+    const indicator = part(page, "tabs", "indicator");
+    await expect(indicator).toHaveCount(1);
+    const box = await variables(indicator, [
+        "--active-tab-right",
+        "--tabs-indicator-inset-inline-start",
+    ]);
+    expect(box["--active-tab-right"]).toBe(
+        box["--tabs-indicator-inset-inline-start"],
+    );
+});
+
+test("tabs / vertical: the top offset is the block start", async ({ page }) => {
+    await openScenario(page, "/tabs/vertical");
+    const indicator = part(page, "tabs", "indicator");
+    await expect(indicator).toHaveCount(1);
+    const box = await variables(indicator, [
+        "--active-tab-top",
+        "--tabs-indicator-inset-block-start",
+        "--active-tab-height",
+        "--tabs-indicator-block-size",
+    ]);
+    expect(box["--active-tab-top"]).toBe(
+        box["--tabs-indicator-inset-block-start"],
+    );
+    expect(box["--active-tab-height"]).toBe(box["--tabs-indicator-block-size"]);
 });
