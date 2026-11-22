@@ -68,15 +68,83 @@ describe("the CI workflow", () => {
     });
 
     // Releasing waits for the maintainer to validate the library (AGENTS.md, "CI").
-    it("publishes nothing and triggers no www build", () => {
+    it("publishes nothing", () => {
         expect(existsSync(join(root, ".github/workflows/release.yml"))).toBe(
             false,
         );
         expect(workflow()).not.toMatch(
             /npm publish|pnpm publish|changeset publish/,
         );
-        expect(workflow()).not.toContain("repository_dispatch");
-        expect(workflow()).not.toContain("WWW_DISPATCH_TOKEN");
-        expect(workflow()).not.toContain("fragiola/www/dispatches");
+    });
+});
+
+/** The workflow's jobs, by id: the text of each job's block under `jobs:`. */
+function jobs(): Map<string, string> {
+    const body = workflow().split(/^jobs:\n/m)[1] ?? "";
+    const blocks = new Map<string, string>();
+    for (const block of body.split(/^(?= {2}[\w-]+:\s*$)/m)) {
+        const id = /^ {2}([\w-]+):/.exec(block)?.[1];
+        if (id !== undefined) {
+            blocks.set(id, block);
+        }
+    }
+    return blocks;
+}
+
+// A push to main asks fragiola/www to rebuild fragiola.com (guidelines, repository.md#ci and
+// docs/site.md "sync"), and runs nothing else: main is what its pull request tested.
+describe("the www trigger", () => {
+    const pushToMain =
+        "if: github.event_name == 'push' && github.ref == 'refs/heads/main'";
+
+    it("runs the workflow on a push to main", () => {
+        expect(workflow()).toMatch(
+            /^on:\n(?: {2}.*\n)*? {2}push:\n {4}branches: \[main\]\n/m,
+        );
+    });
+
+    it("has a Trigger www build job that runs only on a push to main", () => {
+        const job = jobs().get("trigger-www-build");
+        expect(job).toBeDefined();
+        expect(job).toContain("name: Trigger www build");
+        expect(job).toContain(pushToMain);
+    });
+
+    it("dispatches project-updated to fragiola/www, skipped without the secret", () => {
+        const job = jobs().get("trigger-www-build") ?? "";
+        expect(job).toContain("repos/fragiola/www/dispatches");
+        expect(job).toContain("event_type=project-updated");
+        expect(job).toContain("client_payload[slug]=primitives");
+        expect(job).toContain("if: env.WWW_DISPATCH_TOKEN != ''");
+    });
+
+    it("reads only the WWW_DISPATCH_TOKEN secret, and only in the trigger", () => {
+        const secrets = [...workflow().matchAll(/secrets\.(\w+)/g)].map(
+            (match) => match[1],
+        );
+        expect(new Set(secrets)).toEqual(new Set(["WWW_DISPATCH_TOKEN"]));
+        for (const [id, job] of jobs()) {
+            if (id !== "trigger-www-build") {
+                expect(job, id).not.toContain("WWW_DISPATCH_TOKEN");
+                expect(job, id).not.toContain("fragiola/www/dispatches");
+            }
+        }
+    });
+
+    it("runs no other job on a push", () => {
+        for (const [id, job] of jobs()) {
+            if (id === "trigger-www-build") {
+                continue;
+            }
+            // a job either skips push itself, runs only on pull requests, or needs one that does
+            const guarded =
+                job.includes("if: github.event_name != 'push'") ||
+                job.includes("if: github.event_name == 'pull_request'") ||
+                /needs: changes\n/.test(job);
+            expect(guarded, id).toBe(true);
+        }
+        expect(jobs().get("changes")).toContain(
+            "if: github.event_name != 'push'",
+        );
     });
 });
