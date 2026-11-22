@@ -28,6 +28,12 @@ export type { ComboboxListSlots, ComboboxListState } from "./combobox-list.ts";
 export type { ComboboxPopupState } from "./combobox-popup.ts";
 export type { ComboboxPortalProps } from "./combobox-portal.ts";
 export type { ComboboxPositionerState } from "./combobox-positioner.ts";
-export type { ComboboxRootEmits, ComboboxRootProps } from "./combobox-root.ts";
+export type {
+    ComboboxFilter,
+    ComboboxItemEquality,
+    ComboboxItemToString,
+    ComboboxRootEmits,
+    ComboboxRootProps,
+} from "./combobox-root.ts";
 export type { ComboboxValueSlots } from "./combobox-value.ts";
 export { Combobox } from "./parts.ts";
