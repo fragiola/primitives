@@ -20,3 +20,43 @@ export function validatePassword(value: unknown): string[] {
 export function validateCode(value: unknown): string | null {
     return value === "AAA" ? "This code is taken." : null;
 }
+
+/** /field/async: `ada` is taken, and its answer is the slow one (spec/field.md). */
+export function checkUsername(
+    value: unknown,
+    resolved: (value: string) => void,
+): Promise<string | null> {
+    const text = String(value ?? "");
+    return new Promise((resolve) => {
+        setTimeout(
+            () => {
+                resolved(text);
+                resolve(text === "ada" ? "This username is taken." : null);
+            },
+            text === "ada" ? 400 : 50,
+        );
+    });
+}
+
+/** /field/match: the range error's `match`. */
+export function outOfRange(validity: {
+    rangeUnderflow: boolean;
+    rangeOverflow: boolean;
+}): boolean {
+    return validity.rangeUnderflow || validity.rangeOverflow;
+}
+
+/** /field/more-controls: at least one topping. */
+export function validateToppings(value: unknown): string | null {
+    return Array.isArray(value) && value.length === 0
+        ? "Choose a topping."
+        : null;
+}
+
+/** /form/basic: a work address ends in `@example.com`. */
+export function validateWorkEmail(value: unknown): string | null {
+    const text = String(value ?? "");
+    return text !== "" && !text.endsWith("@example.com")
+        ? "Use your work email."
+        : null;
+}

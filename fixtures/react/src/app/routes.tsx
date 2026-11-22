@@ -17,15 +17,22 @@ import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
+import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.tsx";
 import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.tsx";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.tsx";
+import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.tsx";
+import { FieldAsync } from "../scenarios/field/field-async.tsx";
 import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
+import { FieldMatch } from "../scenarios/field/field-match.tsx";
+import { FieldMoreControls } from "../scenarios/field/field-more-controls.tsx";
 import { FieldValidation } from "../scenarios/field/field-validation.tsx";
+import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
+import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
 import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
@@ -42,6 +49,7 @@ import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
 import { SelectModal } from "../scenarios/select/select-modal.tsx";
 import { SliderBasic } from "../scenarios/slider/slider-basic.tsx";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.tsx";
+import { SliderLabelValue } from "../scenarios/slider/slider-label-value.tsx";
 import { SliderRange } from "../scenarios/slider/slider-range.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
@@ -97,9 +105,15 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/slider/vertical": SliderVertical,
     "/slider/rtl": SliderBasic,
     "/slider/controlled": SliderControlled,
+    "/slider/label-value": SliderLabelValue,
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
+    "/field/async": FieldAsync,
+    "/field/match": FieldMatch,
+    "/field/more-controls": FieldMoreControls,
+    "/fieldset/basic": FieldsetBasic,
+    "/form/basic": FormBasic,
     "/calendar/single": CalendarSingle,
     "/calendar/min-max": CalendarMinMax,
     "/calendar/unavailable": CalendarUnavailable,
@@ -109,4 +123,6 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/calendar/range": CalendarRange,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
+    "/date-picker/form": DatePickerForm,
+    "/direction/provider": DirectionProviderScenario,
 };

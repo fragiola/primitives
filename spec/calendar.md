@@ -384,8 +384,8 @@ picker's parts carry `date-range-picker-<part>`, its calendar's `range-calendar-
 A `<form>` with a DatePicker `name="arrival"`, `required` (Trigger **"Arrival: "** and the value,
 or "none"; Popup `aria-label` **"Choose date"**), a DateRangePicker `name="stay"`, `required`
 (Trigger **"Stay: "** and the range; Popup `aria-label` **"Choose dates"**), a DatePicker
-`name="departure"`, `readOnly`, `defaultValue` 2026-11-30 (Trigger **"Departure: "** and the
-value; Popup `aria-label` **"Departure date"**), a DatePicker `name="return"`, `disabled` (Trigger
+`name="departure"`, `readOnly`, `value` 2026-11-30 (the fixture holds it; Trigger
+**"Departure: "** and the value; Popup `aria-label` **"Departure date"**), a DatePicker `name="return"`, `disabled` (Trigger
 **"Return: "** and the value), and **"Submit"** and **"Reset"** buttons. "Today" is 2026-11-20.
 Output: `form: ...`.
 
