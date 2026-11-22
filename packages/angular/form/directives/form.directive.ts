@@ -16,6 +16,7 @@ import {
     type FormErrors,
     firstInDocumentOrder,
     focusFieldControl,
+    formErrorsFor,
     guardFormSubmit,
     withoutFormErrors,
 } from "@fragiola/primitives/form";
@@ -73,7 +74,7 @@ export class Form {
     /** The Form's own copy of `errors`. */
     private readonly current = linkedSignal(() => this.errors());
     private readonly fields = new Set<FormField>();
-    // a submission went on: the next `errors` (the server's answer) focuses the first invalid field
+    // a submission went on: the next `errors` (the server's answer) focuses the first field it names
     private submitted = false;
 
     /** What the Fields inside read (spec/form.md). */
@@ -113,12 +114,18 @@ export class Form {
                     return;
                 }
                 this.submitted = false;
-                // once the fields rendered the server's answer
+                // once the fields rendered the server's answer: the first field it names
                 afterNextRender(
-                    () =>
+                    () => {
+                        const errors = untracked(this.current);
                         focusFirst(
-                            [...this.fields].filter((field) => field.invalid()),
-                        ),
+                            [...this.fields].filter(
+                                (field) =>
+                                    formErrorsFor(errors, field.name()).length >
+                                    0,
+                            ),
+                        );
+                    },
                     { injector },
                 );
             });

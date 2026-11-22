@@ -3,6 +3,7 @@ import {
     type FormErrors,
     firstInDocumentOrder,
     focusFieldControl,
+    formErrorsFor,
     guardFormSubmit,
     withoutFormErrors,
 } from "@fragiola/primitives/form";
@@ -89,11 +90,16 @@ export const Form: PartComponent<FormProps, FormState, FormEmits> =
                         errors.value = next ?? NO_ERRORS;
                         if (submitted) {
                             submitted = false;
-                            // once the fields rendered the new errors
+                            // once the fields rendered the new errors: the first field the
+                            // server's answer names
                             void nextTick().then(() =>
                                 focusFirst(
-                                    [...fields].filter((field) =>
-                                        field.invalid(),
+                                    [...fields].filter(
+                                        (field) =>
+                                            formErrorsFor(
+                                                errors.value,
+                                                field.name(),
+                                            ).length > 0,
                                     ),
                                 ),
                             );

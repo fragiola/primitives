@@ -213,7 +213,6 @@ export const FieldRoot: PartComponent<FieldRootProps, FieldState> =
                                     handle?.input() ?? null,
                                     handle?.value(),
                                 ),
-                            invalid: () => state.value.valid === false,
                             focusTarget: () => handle?.focusTarget() ?? null,
                         });
                     });

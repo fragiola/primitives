@@ -164,7 +164,6 @@ export class FieldRoot {
                 this.form.register({
                     name: () => untracked(this.name),
                     submitAttempt: () => this.attemptSubmit(),
-                    invalid: () => untracked(this.showsInvalid),
                     focusTarget: () => this.entry?.focusTarget() ?? null,
                 }),
             );

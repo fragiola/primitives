@@ -14,8 +14,6 @@ export interface FormField {
      * pending async run counts as not invalid.
      */
     submitAttempt: () => boolean;
-    /** Whether the field is invalid now, without validating it. */
-    invalid: () => boolean;
     /** The element the Form focuses when the field is the first invalid one. */
     focusTarget: () => HTMLElement | null;
 }

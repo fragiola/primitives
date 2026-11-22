@@ -49,7 +49,9 @@ Every native form attribute is forwarded (`action`, `method`, ...).
    `preventDefault` and submit with `fetch`).
 
 **Server errors after a submission.** When `errors` changes after a submission went on (the
-server answered), focus moves to the first invalid field, as for a blocked submission.
+server answered), focus moves to the first field that has server errors, in document order, as for
+a blocked submission (only the server's errors count: a field invalid by its own validation alone
+does not take focus).
 
 A form reset does not clear the Form's errors nor the fields' states (Base UI).
 
@@ -68,8 +70,8 @@ Nothing of its own (Enter in a text field submits, natively).
 
 ## Focus
 
-A blocked submission, and server errors that arrive after one went on, focus the first invalid
-field's control.
+A blocked submission focuses the first invalid field's control; server errors that arrive after
+a submission went on focus the control of the first field they name.
 
 ## Pointer
 

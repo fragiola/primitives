@@ -9,8 +9,6 @@ export interface FormField {
     name: () => string | undefined;
     /** Validates as on a submission attempt; whether the field is invalid now. */
     submitAttempt: () => boolean;
-    /** Whether the field shows an error now (its server errors included). */
-    invalid: () => boolean;
     /** The element the Form focuses when it is the first invalid field. */
     focusTarget: () => HTMLElement | null;
 }
