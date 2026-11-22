@@ -27,12 +27,19 @@ export interface Presence {
 export function createPresence(
     open: Signal<boolean>,
     element: Signal<HTMLElement | null>,
+    options: {
+        /** Whether an element open on the first render starts with `data-starting-style` (`true`). */
+        enterOnMount?: boolean;
+    } = {},
 ): Presence {
     const status = linkedSignal<boolean, TransitionStatus>({
         source: open,
         computation: (isOpen, previous) => {
             if (isOpen) {
-                return "starting";
+                // the first render's state already shows itself, unless it enters on mount
+                return previous === undefined && options.enterOnMount === false
+                    ? undefined
+                    : "starting";
             }
             const wasShown =
                 previous !== undefined &&

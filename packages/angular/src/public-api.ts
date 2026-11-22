@@ -4,11 +4,13 @@
 // the root entry only re-exports them, so importing from it tree-shakes to the same output. There
 // is no NgModule of every directive.
 
+export * from "@fragiola/primitives-angular/accordion";
 export * from "@fragiola/primitives-angular/avatar";
 export * from "@fragiola/primitives-angular/button";
 export * from "@fragiola/primitives-angular/calendar";
 export * from "@fragiola/primitives-angular/checkbox";
 export * from "@fragiola/primitives-angular/checkbox-group";
+export * from "@fragiola/primitives-angular/collapsible";
 export * from "@fragiola/primitives-angular/combobox";
 export * from "@fragiola/primitives-angular/date-picker";
 export * from "@fragiola/primitives-angular/date-range-picker";

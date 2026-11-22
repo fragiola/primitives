@@ -3,6 +3,9 @@ import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { DirectionProvider } from "@fragiola/primitives-angular/direction";
 import { readQuery } from "../kit/query.ts";
+import { AccordionBasic } from "../scenarios/accordion/accordion-basic.ts";
+import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.ts";
+import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.ts";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
 import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -11,6 +14,8 @@ import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.ts";
+import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.ts";
+import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.ts";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.ts";
@@ -64,6 +69,7 @@ import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.ts";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
+import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
@@ -85,6 +91,12 @@ import { ROUTES } from "./routes.ts";
         DialogNestedPopover,
         SettingsTabs,
         TabsNoneSelected,
+        TabsAnimated,
+        CollapsibleBasic,
+        CollapsibleHiddenUntilFound,
+        AccordionBasic,
+        AccordionMultiple,
+        AccordionHorizontal,
         PopoverBasic,
         PopoverControlled,
         PopoverInitialFocus,
@@ -156,6 +168,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/tabs/manual") { <main class="p-6" scenario-settings-tabs activation="manual" orientation="horizontal"></main> }
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
             @case ("/tabs/none-selected") { <main class="p-6" scenario-tabs-none-selected></main> }
+            @case ("/tabs/animated") { <main class="p-6" scenario-tabs-animated></main> }
+            @case ("/collapsible/basic") { <main class="p-6" scenario-collapsible-basic></main> }
+            @case ("/collapsible/hidden-until-found") { <main class="p-6" scenario-collapsible-hidden-until-found></main> }
+            @case ("/accordion/basic") { <main class="p-6" scenario-accordion-basic></main> }
+            @case ("/accordion/multiple") { <main class="p-6" scenario-accordion-multiple></main> }
+            @case ("/accordion/horizontal") { <main class="p-6" scenario-accordion-horizontal></main> }
             @case ("/popover/basic") { <main class="p-6" scenario-popover-basic></main> }
             @case ("/popover/initial-focus") { <main class="p-6" scenario-popover-initial-focus></main> }
             @case ("/popover/placement") { <main class="p-6" scenario-popover-placement></main> }
