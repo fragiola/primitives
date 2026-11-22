@@ -198,6 +198,8 @@ Checks:
 8. On "Orange" (disabled, `aria-disabled="true"`), Enter and a click do nothing (it stays open).
 9. Escape closes without changing the value (`reason: escape-key`).
 10. Open, click "Cherry": `value: cherry`. Open, click outside: closes (`reason: outside-press`).
+    Non-modal: open, then click "Reset": the list closes and the press reaches the page ("Reset"
+    is focused).
 11. Open, ArrowDown, Tab: the highlighted item is chosen and the list closes.
 12. "Submit" with no value submits nothing (`form: none`) and focuses the trigger; with Banana,
     `form: fruit=banana`.

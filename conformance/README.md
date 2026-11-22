@@ -64,3 +64,6 @@ top-left corner.
 | `axe.ts` | `expectNoAxeViolations` |
 | `contract.ts` | `part(page, component, name)`, `parts(page, component)`, `expectNoFalseStates` |
 | `visual.ts` | `visualOnlyInCi`, `expectScreen` |
+| `form.ts` | `expectSubmitted(page, entries)`: the form scenarios' `form: ...` line |
+| `pointer.ts` | `pointAlong`, `pressAlong`, `dragFrom`: whole-pixel presses and drags along a box |
+| `slider.ts` | `sliderState`, `expectSliderValue` |
