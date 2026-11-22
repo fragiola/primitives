@@ -19,3 +19,5 @@ export * from "./components/select/index.ts";
 export * from "./components/slider/index.ts";
 export * from "./components/tabs/index.ts";
 export * from "./components/tooltip/index.ts";
+export * from "./direction/index.ts";
+export * from "./render/index.ts";

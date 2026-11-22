@@ -7,6 +7,7 @@ import {
     useEffect,
     useRef,
 } from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useElement } from "../../hooks/use-element.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { mergeRefs } from "../../utils/merge-refs.ts";
@@ -39,6 +40,7 @@ export function MenuSubmenuTrigger({
     ...props
 }: MenuSubmenuTriggerProps) {
     const submenu = useRequiredContext(MenuContext, "Menu.SubmenuTrigger");
+    const direction = useContext(DirectionContext);
     const parent = submenu.parent;
     if (parent === null) {
         throw new Error(
@@ -88,7 +90,8 @@ export function MenuSubmenuTrigger({
             onClick: () => open(null, "trigger-press"),
             onKeyDown: (event: KeyboardEvent) => {
                 const { open: openKey } = submenuKeys(
-                    element !== null && getDirection(element) === "rtl",
+                    element !== null &&
+                        getDirection(element, direction) === "rtl",
                 );
                 if (
                     event.key === openKey ||

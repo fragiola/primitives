@@ -1,6 +1,7 @@
 import { chipArrows, stepThroughNone } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
-import type { ChangeEvent, KeyboardEvent } from "react";
+import { type ChangeEvent, type KeyboardEvent, useContext } from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -20,6 +21,7 @@ export function ComboboxInput(
     props: PartProps<{ open: boolean; disabled: boolean }>,
 ) {
     const context = useRequiredContext(ComboboxContext, "Combobox.Input");
+    const direction = useContext(DirectionContext);
     const { open, disabled, highlighted, field } = context;
     const items = orderedItems(context);
     const active = items.find((item) => item.id === highlighted);
@@ -94,7 +96,8 @@ export function ComboboxInput(
                 if (
                     context.multiple &&
                     event.key ===
-                        chipArrows(getDirection(input) === "rtl").previous &&
+                        chipArrows(getDirection(input, direction) === "rtl")
+                            .previous &&
                     input.selectionStart === 0 &&
                     input.selectionEnd === 0 &&
                     chips.length > 0

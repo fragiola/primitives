@@ -5,7 +5,8 @@ import {
     nearestThumb,
     valueAtFraction,
 } from "@fragiola/primitives/range";
-import { type PointerEvent, useEffect, useRef } from "react";
+import { type PointerEvent, useContext, useEffect, useRef } from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -21,10 +22,13 @@ import {
  */
 export function SliderControl(props: PartProps<SliderState>) {
     const context = useRequiredContext(SliderContext, "Slider.Control");
+    const direction = useContext(DirectionContext);
     const endDrag = useRef<(() => void) | null>(null);
     useEffect(() => () => endDrag.current?.(), []);
     const latest = useRef(context);
     latest.current = context;
+    const provided = useRef(direction);
+    provided.current = direction;
 
     const valueAt = (element: HTMLElement, x: number, y: number) => {
         const { min, max, step, orientation } = latest.current;
@@ -32,7 +36,7 @@ export function SliderControl(props: PartProps<SliderState>) {
             element.getBoundingClientRect(),
             { x, y },
             orientation,
-            getDirection(element) === "rtl",
+            getDirection(element, provided.current) === "rtl",
         );
         return valueAtFraction(fraction, { min, max, step });
     };
