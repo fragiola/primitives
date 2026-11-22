@@ -67,9 +67,13 @@ export function MenuPopup(
         // Escape, an item and the trigger give focus back to this level's trigger; the closing
         // arrow of a submenu gives it back to its submenu trigger
         const doc = popup.ownerDocument;
+        // a context menu's area is no trigger that toggles it: a press on it is outside the menu,
+        // but it is still what the menu was opened from (spec/context-menu.md)
+        const area = !nested && triggers.current.component === "context-menu";
         const session = openOverlaySession(doc, {
             elements: () => [positioner ?? popup],
-            ignore: () => triggers.current.triggers,
+            ignore: () => (area ? [] : triggers.current.triggers),
+            owner: () => triggers.current.triggers,
             dismiss: (reason, event) => setOpen(false, reason, event),
             returnFocus: {
                 when: nested ? SUBMENU_RETURNS_FOCUS : ROOT_RETURNS_FOCUS,
@@ -78,7 +82,10 @@ export function MenuPopup(
                         ? MODAL_RETURNS_FOCUS_UNFOCUSED
                         : RETURNS_FOCUS_UNFOCUSED,
                 reason: () => lastReason.current ?? (nested ? null : "none"),
-                to: () => triggers.current.trigger,
+                to: () =>
+                    nested
+                        ? triggers.current.trigger
+                        : triggers.current.returnTarget(),
             },
         });
         return session.end;
@@ -160,10 +167,12 @@ export function MenuPopup(
                 event.preventDefault();
                 const root = rootOf(context);
                 const skip = positioners(context);
-                const target = root.trigger
+                // after the trigger (a context menu: the element focused when it opened)
+                const from = root.returnTarget() ?? root.trigger;
+                const target = from
                     ? event.shiftKey
-                        ? previousTabbableBefore(root.trigger, skip)
-                        : nextTabbableAfter(root.trigger, skip)
+                        ? previousTabbableBefore(from, skip)
+                        : nextTabbableAfter(from, skip)
                     : null;
                 context.closeAll("focus-out", event.nativeEvent);
                 target?.focus();
@@ -199,6 +208,7 @@ export function MenuPopup(
     };
 
     const status = context.presence.status;
+    const contextMenu = context.component === "context-menu";
     return renderElement(
         "div",
         props,
@@ -206,11 +216,15 @@ export function MenuPopup(
         {
             id: context.popupId,
             role: "menu",
-            // the active trigger names the menu (a submenu's: its SubmenuTrigger)
-            "aria-labelledby": context.activeTriggerId ?? context.triggerId,
+            // the active trigger names the menu (a submenu's: its SubmenuTrigger); no button names
+            // a context menu (spec/context-menu.md)
+            "aria-labelledby":
+                contextMenu && !nested
+                    ? undefined
+                    : (context.activeTriggerId ?? context.triggerId),
             "aria-orientation": "vertical",
             tabIndex: -1,
-            "data-primitives-part": "menu-popup",
+            "data-primitives-part": `${context.component}-popup`,
             ...stateAttributes({
                 open,
                 closed: !open,
@@ -221,6 +235,11 @@ export function MenuPopup(
                 "ending-style": status === "ending",
             }),
             onKeyDown,
+            // no browser menu over a context menu (spec/context-menu.md, "Pointer")
+            onContextMenu: contextMenu
+                ? (event: { preventDefault: () => void }) =>
+                      event.preventDefault()
+                : undefined,
         },
         context.setPopup,
     );

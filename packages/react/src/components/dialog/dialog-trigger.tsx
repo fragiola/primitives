@@ -33,6 +33,11 @@ export function DialogTrigger<Payload = unknown>({
         { handle, payload, id: idProp },
     );
     const state = { open: active, disabled };
+    // named by its Root (an AlertDialog's parts are Dialog's), or its handle before one attaches
+    const component =
+        root?.component ??
+        (handle as { component?: string } | undefined)?.component ??
+        "dialog";
     return renderElement(
         "button",
         props,
@@ -44,7 +49,7 @@ export function DialogTrigger<Payload = unknown>({
             "aria-haspopup": "dialog",
             "aria-expanded": active,
             "aria-controls": active ? root?.popupId : undefined,
-            "data-primitives-part": "dialog-trigger",
+            "data-primitives-part": `${component}-trigger`,
             ...stateAttributes({ "popup-open": active, disabled }),
             onClick: (event: MouseEvent<HTMLElement>) =>
                 root?.setOpen(

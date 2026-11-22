@@ -25,7 +25,7 @@ export function DialogViewport(props: PartProps<DialogViewportState>) {
         {
             role: "presentation",
             hidden: presence.mounted ? undefined : true,
-            "data-primitives-part": "dialog-viewport",
+            "data-primitives-part": `${context.component}-viewport`,
             ...stateAttributes({
                 open,
                 closed: !open,

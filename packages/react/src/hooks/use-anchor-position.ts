@@ -2,6 +2,7 @@ import {
     type Align,
     anchorFloating,
     type Side,
+    type VirtualAnchor,
 } from "@fragiola/primitives/positioning";
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { DirectionContext } from "../direction/direction-context.ts";
@@ -16,7 +17,7 @@ export interface PositionOptions {
 
 /** Positions `floating` next to `anchor` while both exist, and reports where it ended up. */
 export function useAnchorPosition(
-    anchor: Element | null,
+    anchor: Element | VirtualAnchor | null,
     floating: HTMLElement | null,
     arrow: HTMLElement | null,
     options: PositionOptions,

@@ -1,7 +1,12 @@
 import { createContext } from "react";
 import type { OverlayRoot } from "../../hooks/use-overlay-root.ts";
 
+/** The component a dialog's parts belong to: their part attribute's prefix. */
+export type DialogComponent = "dialog" | "alert-dialog";
+
 export interface DialogContextValue extends OverlayRoot {
+    /** `alert-dialog`: never dismissed from outside, focuses its first Close (spec/alert-dialog.md). */
+    component: DialogComponent;
     backdrop: HTMLElement | null;
     setBackdrop: (element: HTMLElement | null) => void;
     viewport: HTMLElement | null;

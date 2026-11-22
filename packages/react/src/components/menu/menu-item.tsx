@@ -43,7 +43,7 @@ export function MenuItem({
             role: "menuitem",
             tabIndex: -1,
             "aria-disabled": disabled ? "true" : undefined,
-            "data-primitives-part": "menu-item",
+            "data-primitives-part": `${context.component}-item`,
             ...stateAttributes({ highlighted: item.highlighted, disabled }),
             ...item.handlers,
             onClick: (event: MouseEvent) => {

@@ -11,10 +11,18 @@ export interface SelectItemData {
     disabled?: boolean;
 }
 
+/** An Item that registered itself (a Select without `items`: spec/select.md, "API"). */
+export interface RegisteredItem extends SelectItemData {
+    element: HTMLElement;
+}
+
 export interface SelectContextValue extends OverlayRoot {
     /** The enclosing field's binding, for the trigger (spec/field.md). */
     field: FieldControlBinding;
+    /** The Root's `items`, else the registered Items, in DOM order. */
     items: readonly SelectItemData[];
+    /** Without `items`, the Items register themselves (`null` with `items`). */
+    registerItem: ((item: RegisteredItem) => () => void) | null;
     value: string | null;
     disabled: boolean;
     required: boolean;
@@ -44,6 +52,11 @@ export interface SelectItemContextValue {
 export const SelectItemContext = createContext<SelectItemContextValue | null>(
     null,
 );
+
+/** What a Group gives its GroupLabel: where the label reports its id. */
+export const SelectGroupContext = createContext<
+    ((id: string | undefined) => void) | null
+>(null);
 
 /** The item to highlight when the list opens: the selected one, else the first enabled one. */
 export function initialHighlight(

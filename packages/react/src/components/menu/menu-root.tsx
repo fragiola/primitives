@@ -1,26 +1,12 @@
-import { createTypeahead } from "@fragiola/primitives/collection";
-import type { Align, Side } from "@fragiola/primitives/positioning";
-import {
-    type ReactNode,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
-import {
-    type OverlayRootProps,
-    type OverlayTriggerRootProps,
-    useOverlayRoot,
+import type { ReactNode } from "react";
+import type {
+    OverlayRootProps,
+    OverlayTriggerRootProps,
 } from "../../hooks/use-overlay-root.ts";
 import { useAttachHandle } from "../../hooks/use-overlay-trigger.ts";
-import {
-    MenuContext,
-    type MenuContextValue,
-    type SafeArea,
-} from "./menu-context.ts";
+import { MenuContext } from "./menu-context.ts";
 import type { MenuHandle } from "./menu-handle.ts";
+import { useMenuRoot } from "./use-menu-root.ts";
 
 export interface MenuSubmenuRootProps extends OverlayRootProps {
     /** Arrow keys wrap at the ends (default `true`). */
@@ -42,72 +28,6 @@ export interface MenuRootProps<Payload = unknown>
     children?:
         | ReactNode
         | ((state: { payload: Payload | undefined }) => ReactNode);
-}
-
-function useMenuRoot(
-    {
-        loopFocus = true,
-        modal: modalProp = false,
-        ...props
-    }: Omit<MenuRootProps, "children" | "handle">,
-    nested: boolean,
-) {
-    const parent = useContext(MenuContext);
-    const root = useOverlayRoot(props);
-    const pendingHighlight = useRef<"first" | "last" | null>(null);
-    const typeahead = useMemo(() => createTypeahead(), []);
-    const labels = useMemo(() => new Map<Element, string>(), []);
-    const openSubmenu = useRef<MenuContextValue | null>(null);
-    const safeArea = useRef<SafeArea | null>(null);
-    const [placed, setPlaced] = useState<{ side: Side; align: Align }>(
-        nested
-            ? { side: "inline-end", align: "start" }
-            : { side: "bottom", align: "start" },
-    );
-    const owner = nested ? parent : null;
-    // a submenu follows its root menu
-    const modal = owner ? owner.modal : modalProp;
-    const { setOpen } = root;
-    const closeAll = useCallback(
-        (
-            reason: "item-press" | "focus-out" | "outside-press",
-            event?: Event,
-        ) => {
-            setOpen(false, reason, event);
-            owner?.closeAll(reason, event);
-        },
-        [setOpen, owner],
-    );
-    const value: MenuContextValue = useMemo(
-        () => ({
-            ...root,
-            parent: owner,
-            loopFocus,
-            modal,
-            pendingHighlight,
-            typeahead,
-            labels,
-            placed,
-            setPlaced,
-            closeAll,
-            openSubmenu,
-            safeArea,
-        }),
-        [root, owner, loopFocus, modal, typeahead, labels, placed, closeAll],
-    );
-    // a parent level knows its open submenu, so a hovered sibling can close it
-    useEffect(() => {
-        if (owner === null || !value.open) {
-            return undefined;
-        }
-        owner.openSubmenu.current = value;
-        return () => {
-            if (owner.openSubmenu.current === value) {
-                owner.openSubmenu.current = null;
-            }
-        };
-    }, [owner, value]);
-    return value;
 }
 
 /** Holds the state of one menu level; renders no element (spec/menu.md). */

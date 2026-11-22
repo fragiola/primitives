@@ -17,6 +17,6 @@ export function DialogDescription(props: PartProps<Record<string, never>>) {
         "p",
         props,
         {},
-        { id, "data-primitives-part": "dialog-description" },
+        { id, "data-primitives-part": `${context.component}-description` },
     );
 }

@@ -1,4 +1,8 @@
-import type { Align, Side } from "@fragiola/primitives/positioning";
+import type {
+    Align,
+    Side,
+    VirtualAnchor,
+} from "@fragiola/primitives/positioning";
 import { useAnchorPosition } from "./use-anchor-position.ts";
 
 export interface PositionerProps {
@@ -19,7 +23,7 @@ export interface PositionerProps {
 export function usePositioner(
     props: PositionerProps,
     defaults: { side: Side; align: Align },
-    anchor: Element | null,
+    anchor: Element | VirtualAnchor | null,
     positioner: HTMLElement | null,
     arrow: HTMLElement | null,
     mounted = true,

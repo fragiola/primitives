@@ -1,5 +1,9 @@
 import type { createTypeahead } from "@fragiola/primitives/collection";
-import type { Align, Side } from "@fragiola/primitives/positioning";
+import type {
+    Align,
+    Side,
+    VirtualAnchor,
+} from "@fragiola/primitives/positioning";
 import { createContext, type MutableRefObject } from "react";
 import type { OverlayRoot } from "../../hooks/use-overlay-root.ts";
 
@@ -10,7 +14,15 @@ export interface SafeArea {
     submenu: HTMLElement;
 }
 
+/** The component a menu's parts belong to: their part attribute's prefix (spec/context-menu.md). */
+export type MenuComponent = "menu" | "context-menu";
+
 export interface MenuContextValue extends OverlayRoot {
+    component: MenuComponent;
+    /** What the positioner anchors to instead of the trigger (a context menu's point), or `null`. */
+    anchor: Element | VirtualAnchor | null;
+    /** Where focus returns on close, and where Tab moves on from: the trigger, for a Menu. */
+    returnTarget: () => HTMLElement | null;
     /** The menu this one is a submenu of. */
     parent: MenuContextValue | null;
     loopFocus: boolean;
@@ -34,3 +46,36 @@ export interface MenuContextValue extends OverlayRoot {
 }
 
 export const MenuContext = createContext<MenuContextValue | null>(null);
+
+/** The state a CheckboxItem or a RadioItem gives its indicator. */
+export interface MenuCheckableItemState {
+    checked: boolean;
+    highlighted: boolean;
+    disabled: boolean;
+}
+
+export const MenuCheckboxItemContext =
+    createContext<MenuCheckableItemState | null>(null);
+
+export const MenuRadioItemContext =
+    createContext<MenuCheckableItemState | null>(null);
+
+/** What a RadioGroup gives its items. */
+export interface MenuRadioGroupContextValue {
+    value: string | null;
+    setValue: (value: string, event: Event) => void;
+    disabled: boolean;
+}
+
+export const MenuRadioGroupContext =
+    createContext<MenuRadioGroupContextValue | null>(null);
+
+/** The `data-checked` / `data-unchecked` pair of a checkable item and its indicator. */
+export function checkedAttributes(state: MenuCheckableItemState) {
+    return {
+        checked: state.checked,
+        unchecked: !state.checked,
+        highlighted: state.highlighted,
+        disabled: state.disabled,
+    };
+}

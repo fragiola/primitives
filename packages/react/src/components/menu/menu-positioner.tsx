@@ -35,7 +35,7 @@ export function MenuPositioner({
         nested
             ? { side: "inline-end", align: "start" }
             : { side: "bottom", align: "start" },
-        context.trigger,
+        context.anchor ?? context.trigger,
         context.positioner,
         null,
         context.presence.mounted,
@@ -51,7 +51,7 @@ export function MenuPositioner({
             hidden: context.presence.mounted ? undefined : true,
             // a modal menu blocks the pointer outside; its levels take it back (spec/menu.md)
             style: context.modal ? { pointerEvents: "auto" } : undefined,
-            "data-primitives-part": "menu-positioner",
+            "data-primitives-part": `${context.component}-positioner`,
             ...stateAttributes({
                 open: context.open,
                 closed: !context.open,

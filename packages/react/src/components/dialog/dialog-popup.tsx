@@ -19,13 +19,23 @@ export interface DialogPopupState {
 }
 
 export interface DialogPopupProps extends PartProps<DialogPopupState> {
-    /** Focused on open (default: the first tabbable element, else the popup). */
+    /**
+     * Focused on open (default: the first tabbable element, else the popup; an AlertDialog's
+     * first Close first).
+     */
     initialFocus?: FocusTarget;
     /** Focused on close (default: the active trigger, else the element focused before opening). */
     finalFocus?: FocusTarget;
 }
 
 const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+
+/** An AlertDialog's default initial focus: its first Close (spec/alert-dialog.md, "Focus"). */
+function firstClose(popup: HTMLElement, component: string): HTMLElement | null {
+    return popup.querySelector<HTMLElement>(
+        `[data-primitives-part="${component}-close"]:not([disabled])`,
+    );
+}
 
 /** The modal dialog (spec/dialog.md): focus trap, inert page, scroll lock, its own layer. */
 export function DialogPopup({
@@ -36,7 +46,10 @@ export function DialogPopup({
     ...props
 }: DialogPopupProps) {
     const context = useRequiredContext(DialogContext, "Dialog.Popup");
-    const { open, popup, backdrop, viewport, setOpen, lastReason } = context;
+    const { open, popup, backdrop, viewport, setOpen, lastReason, component } =
+        context;
+    // an alert dialog is never dismissed from outside (spec/alert-dialog.md)
+    const alert = component === "alert-dialog";
     const focusTargets = useRef({ initialFocus, finalFocus });
     focusTargets.current = { initialFocus, finalFocus };
     // read when the session needs them: a trigger registered later, or the active one moving,
@@ -56,7 +69,12 @@ export function DialogPopup({
             owner: () => triggers.current.triggers,
             // a press on the backdrop or the viewport is outside this dialog, inside its parent
             backdrops: () => [backdrop, viewport],
-            dismiss: (reason, event) => setOpen(false, reason, event),
+            dismiss: (reason, event) => {
+                if (alert && reason === "outside-press") {
+                    return;
+                }
+                setOpen(false, reason, event);
+            },
             returnFocus: {
                 // a press on the backdrop or the viewport blurs the page: focus returns once the
                 // press has ended
@@ -73,8 +91,16 @@ export function DialogPopup({
             },
         });
         const initial = resolveFocusTarget(focusTargets.current.initialFocus);
-        focusInitial(popup, initial === false ? popup : initial);
-        const release = trapFocus(popup, session.elementsAbove);
+        focusInitial(
+            popup,
+            initial === false
+                ? popup
+                : (initial ?? (alert ? firstClose(popup, component) : null)),
+        );
+        // an alert dialog's outside press keeps the focus where it is
+        const release = trapFocus(popup, session.elementsAbove, {
+            holdOutsidePress: alert,
+        });
         const unlock = lockScroll(doc);
         const restoreInert = inertOutside(
             backdrop ? [popup, backdrop] : [popup],
@@ -85,7 +111,16 @@ export function DialogPopup({
             restoreInert();
             session.end();
         };
-    }, [open, popup, backdrop, viewport, setOpen, lastReason]);
+    }, [
+        open,
+        popup,
+        backdrop,
+        viewport,
+        setOpen,
+        lastReason,
+        alert,
+        component,
+    ]);
 
     const { nested, nestedDialogs, presence } = context;
     const status = presence.status;
@@ -103,13 +138,13 @@ export function DialogPopup({
         state,
         {
             id: context.popupId,
-            role: "dialog",
+            role: alert ? "alertdialog" : "dialog",
             "aria-modal": "true",
             "aria-labelledby": context.titleId,
             "aria-describedby": context.descriptionId,
             tabIndex: -1,
             hidden: presence.mounted ? undefined : true,
-            "data-primitives-part": "dialog-popup",
+            "data-primitives-part": `${context.component}-popup`,
             ...stateAttributes({
                 open,
                 closed: !open,

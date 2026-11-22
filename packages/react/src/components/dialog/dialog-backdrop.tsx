@@ -32,7 +32,7 @@ export function DialogBackdrop({
         {
             "aria-hidden": "true",
             hidden: presence.mounted ? undefined : true,
-            "data-primitives-part": "dialog-backdrop",
+            "data-primitives-part": `${context.component}-backdrop`,
             ...stateAttributes({
                 open,
                 closed: !open,

@@ -17,6 +17,6 @@ export function DialogTitle(props: PartProps<Record<string, never>>) {
         "h2",
         props,
         {},
-        { id, "data-primitives-part": "dialog-title" },
+        { id, "data-primitives-part": `${context.component}-title` },
     );
 }

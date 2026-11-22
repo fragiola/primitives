@@ -12,7 +12,7 @@ export function DialogClose(props: PartProps<Record<string, never>>) {
         {},
         {
             type: "button",
-            "data-primitives-part": "dialog-close",
+            "data-primitives-part": `${context.component}-close`,
             onClick: (event: MouseEvent) =>
                 context.setOpen(false, "close-press", event.nativeEvent),
         },

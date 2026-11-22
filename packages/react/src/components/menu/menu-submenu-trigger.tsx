@@ -82,7 +82,7 @@ export function MenuSubmenuTrigger({
             "aria-expanded": submenu.open,
             "aria-controls": submenu.open ? submenu.popupId : undefined,
             "aria-disabled": disabled ? "true" : undefined,
-            "data-primitives-part": "menu-submenu-trigger",
+            "data-primitives-part": `${parent.component}-submenu-trigger`,
             ...stateAttributes({
                 "popup-open": submenu.open,
                 highlighted: item.highlighted,
