@@ -201,7 +201,9 @@ Checkbox and radio items: `<div menuCheckboxItem [(checked)]="toolbar">` and
 indicators are structural (`<span *menuCheckboxItemIndicator>✓</span>`, rendered while checked;
 `*menuRadioItemIndicator="{ keepMounted: true }"` keeps one).
 
-`[menuRoot]` and `[menuSubmenuRoot]` are one directive, `MenuRoot`. `injectMenu()` gives a child
+`[menuRoot]` and `[menuSubmenuRoot]` are one directive, `MenuRoot`. The entry also exports its
+lower layer, which ContextMenu's directives extend: `MenuRootBase`, `MenuComponent`,
+`MENU_SUBMENU`, `SafeArea`, `indicatorOptions` and the checkable items' state types. `injectMenu()` gives a child
 component its level's state.
 
 </Framework>
@@ -213,7 +215,9 @@ Every part also takes what the [primitive contract](/docs/concepts/primitive-con
 it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
 `@open-change`, `:loop-focus`), and Angular as inputs and outputs (`[(open)]`,
 `(openChangeDetails)`, `[loopFocus]`). An item's activation is its `click` event (`onClick`,
-`@click`, `(click)`).
+`@click`, `(click)`). A CheckboxItem binds `v-model:checked` (`@checked-change`) in Vue and
+`[(checked)]` in Angular, whose `(checkedChangeDetails)` emits `{ value, details }`; a RadioGroup
+`v-model:value` and `[(value)]`, `(valueChangeDetails)`.
 
 ### Root
 
@@ -300,7 +304,7 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
-| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*menuCheckboxItemIndicator="{ keepMounted: true }"` |
+| `options` (angular) | `{ keepMounted? } \| true` | `{}` | the same option: `*menuCheckboxItemIndicator="{ keepMounted: true }"`, or `true` |
 
 ### RadioGroup
 
@@ -325,7 +329,7 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
-| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*menuRadioItemIndicator="{ keepMounted: true }"` |
+| `options` (angular) | `{ keepMounted? } \| true` | `{}` | the same option: `*menuRadioItemIndicator="{ keepMounted: true }"`, or `true` |
 
 ### SubmenuRoot
 
@@ -390,5 +394,5 @@ No props of its own.
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives-react/menu` | `Menu`, `MenuRootProps`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerProps`, `MenuPositionerState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `MenuCheckableItemState`, `MenuCheckboxItemIndicatorProps`, `MenuCheckboxItemProps`, `MenuCheckboxItemState`, `MenuHandle`, `MenuRadioGroupProps`, `MenuRadioItemIndicatorProps`, `MenuRadioItemProps`, `MenuRadioItemState`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createMenuHandle` |
-| `@fragiola/primitives-vue/menu` | `Menu`, `MenuRootProps`, `MenuRootEmits`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerState`, `MenuPopupState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createMenuHandle` |
-| `@fragiola/primitives-angular/menu` | `MenuRoot`, `MenuTrigger`, `MenuPortal`, `MenuPositioner`, `MenuPopup`, `MenuItem`, `MenuSeparator`, `MenuGroup`, `MenuGroupLabel`, `MenuCheckboxItem`, `MenuCheckboxItemIndicator`, `MenuRadioGroup`, `MenuRadioItem`, `MenuRadioItemIndicator`, `MenuSubmenuTrigger`, `injectMenu`, `MenuState`, `MenuTriggerState`, `MenuPositionerState`, `MenuPopupState`, `MenuItemState`, `MenuSubmenuTriggerState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createMenuHandle` |
+| `@fragiola/primitives-vue/menu` | `Menu`, `MenuRootProps`, `MenuRootEmits`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerState`, `MenuPopupState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createMenuHandle`, `MenuCheckableItemState`, `MenuCheckboxItemEmits`, `MenuCheckboxItemIndicatorProps`, `MenuCheckboxItemProps`, `MenuCheckboxItemState`, `MenuRadioGroupEmits`, `MenuRadioGroupProps`, `MenuRadioItemIndicatorProps`, `MenuRadioItemProps`, `MenuRadioItemState` |
+| `@fragiola/primitives-angular/menu` | `MenuRoot`, `MenuTrigger`, `MenuPortal`, `MenuPositioner`, `MenuPopup`, `MenuItem`, `MenuSeparator`, `MenuGroup`, `MenuGroupLabel`, `MenuCheckboxItem`, `MenuCheckboxItemIndicator`, `MenuRadioGroup`, `MenuRadioItem`, `MenuRadioItemIndicator`, `MenuSubmenuTrigger`, `injectMenu`, `MenuState`, `MenuTriggerState`, `MenuPositionerState`, `MenuPopupState`, `MenuItemState`, `MenuSubmenuTriggerState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createMenuHandle`, `MENU_SUBMENU`, `MenuCheckableItemState`, `MenuCheckboxItemState`, `MenuComponent`, `MenuRadioItemState`, `MenuRootBase`, `SafeArea`, `indicatorOptions` |

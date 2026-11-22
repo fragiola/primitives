@@ -147,7 +147,9 @@ export class EditProfile {
 `*dialogPortal="element"` portals into another container, `*dialogPortal="{ keepMounted: true }"`
 keeps the content while closed. `#dialog="dialogRoot"` gives the actions (`dialog.close()`,
 `dialog.unmount()`) and the active trigger's `dialog.payload()`; `(openChangeComplete)` reports
-the end of each transition. `injectDialog()` gives a child component the dialog's state.
+the end of each transition. `injectDialog()` gives a child component the dialog's state. The entry also exports its lower
+layer, which AlertDialog's directives extend: `DialogRootBase`, `DialogTriggerBase`,
+`DialogComponent`, `DIALOG_NESTING` and `DialogNesting`.
 
 </Framework>
 
@@ -245,4 +247,4 @@ No props of its own.
 | --- | --- |
 | `@fragiola/primitives-react/dialog` | `Dialog`, `DialogRootProps`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `DialogBackdropProps`, `DialogHandle`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createDialogHandle` |
 | `@fragiola/primitives-vue/dialog` | `Dialog`, `DialogRootProps`, `DialogRootEmits`, `DialogTriggerProps`, `DialogTriggerState`, `DialogPortalProps`, `DialogBackdropState`, `DialogPopupProps`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `DialogBackdropProps`, `DialogHandle`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createDialogHandle` |
-| `@fragiola/primitives-angular/dialog` | `DialogRoot`, `DialogTrigger`, `DialogPortal`, `DialogBackdrop`, `DialogPopup`, `DialogTitle`, `DialogDescription`, `DialogClose`, `injectDialog`, `DialogState`, `DialogTriggerState`, `DialogBackdropState`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `DialogHandle`, `DialogViewport`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createDialogHandle` |
+| `@fragiola/primitives-angular/dialog` | `DialogRoot`, `DialogTrigger`, `DialogPortal`, `DialogBackdrop`, `DialogPopup`, `DialogTitle`, `DialogDescription`, `DialogClose`, `injectDialog`, `DialogState`, `DialogTriggerState`, `DialogBackdropState`, `DialogPopupState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `DialogHandle`, `DialogViewport`, `DialogViewportState`, `FocusTarget`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createDialogHandle`, `DIALOG_NESTING`, `DialogComponent`, `DialogNesting`, `DialogRootBase`, `DialogTriggerBase` |

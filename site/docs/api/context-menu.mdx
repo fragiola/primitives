@@ -273,7 +273,7 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
-| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*contextMenuCheckboxItemIndicator="{ keepMounted: true }"` |
+| `options` (angular) | `{ keepMounted? } \| true` | `{}` | the same option: `*contextMenuCheckboxItemIndicator="{ keepMounted: true }"`, or `true` |
 
 ### RadioGroup
 
@@ -298,7 +298,7 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
-| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*contextMenuRadioItemIndicator="{ keepMounted: true }"` |
+| `options` (angular) | `{ keepMounted? } \| true` | `{}` | the same option: `*contextMenuRadioItemIndicator="{ keepMounted: true }"`, or `true` |
 
 ### SubmenuRoot
 
@@ -310,6 +310,7 @@ No props of its own.
 | `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
 | `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives the submenu's `close()` and `unmount()` |
 | `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+| `modal` (angular) | `boolean` | | read on the root level only: a submenu follows its root |
 
 ### SubmenuTrigger
 
@@ -348,5 +349,5 @@ No props of its own.
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives-react/context-menu` | `ContextMenu`, `ContextMenuRootProps`, `ContextMenuTriggerState`, `ContextMenuPortalProps`, `ContextMenuPositionerProps`, `ContextMenuPositionerState`, `ContextMenuItemProps`, `ContextMenuItemState`, `ContextMenuCheckboxItemProps`, `ContextMenuCheckboxItemState`, `ContextMenuCheckboxItemIndicatorProps`, `ContextMenuRadioGroupProps`, `ContextMenuRadioItemProps`, `ContextMenuRadioItemState`, `ContextMenuRadioItemIndicatorProps`, `ContextMenuSubmenuRootProps`, `ContextMenuSubmenuTriggerProps`, `ContextMenuSubmenuTriggerState`, `OverlayRootProps`, `OverlayPortalProps`, `OverlayActions`, `OpenChangeDetails`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/context-menu` | `ContextMenu`, `ContextMenuRootProps`, `ContextMenuRootEmits`, `ContextMenuTriggerState`, `ContextMenuPortalProps`, `ContextMenuPositionerState`, `ContextMenuPopupState`, `ContextMenuItemProps`, `ContextMenuItemState`, `ContextMenuSubmenuRootProps`, `ContextMenuSubmenuTriggerProps`, `ContextMenuSubmenuTriggerState`, `OverlayRootProps`, `OverlayRootEmits`, `OverlayPortalProps`, `OverlayActions`, `OpenChangeDetails`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/context-menu` | `ContextMenuRoot`, `ContextMenuTrigger`, `ContextMenuPortal`, `ContextMenuPositioner`, `ContextMenuPopup`, `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuGroup`, `ContextMenuGroupLabel`, `ContextMenuCheckboxItem`, `ContextMenuCheckboxItemIndicator`, `ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuRadioItemIndicator`, `ContextMenuSubmenuRoot`, `ContextMenuSubmenuTrigger`, `OverlayActions`, `OverlayPortalOptions`, `OpenChangeDetails`, `OpenChangeEvent`, `Side`, `Align`, `ChangeDetails`, `ChangeReason` |
+| `@fragiola/primitives-vue/context-menu` | `ContextMenu`, `ContextMenuRootProps`, `ContextMenuRootEmits`, `ContextMenuTriggerState`, `ContextMenuPortalProps`, `ContextMenuPositionerState`, `ContextMenuPopupState`, `ContextMenuItemProps`, `ContextMenuItemState`, `ContextMenuSubmenuRootProps`, `ContextMenuSubmenuTriggerProps`, `ContextMenuSubmenuTriggerState`, `OverlayRootProps`, `OverlayRootEmits`, `OverlayPortalProps`, `OverlayActions`, `OpenChangeDetails`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `ContextMenuCheckboxItemEmits`, `ContextMenuCheckboxItemIndicatorProps`, `ContextMenuCheckboxItemProps`, `ContextMenuCheckboxItemState`, `ContextMenuRadioGroupEmits`, `ContextMenuRadioGroupProps`, `ContextMenuRadioItemIndicatorProps`, `ContextMenuRadioItemProps`, `ContextMenuRadioItemState` |
+| `@fragiola/primitives-angular/context-menu` | `ContextMenuRoot`, `ContextMenuTrigger`, `ContextMenuPortal`, `ContextMenuPositioner`, `ContextMenuPopup`, `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuGroup`, `ContextMenuGroupLabel`, `ContextMenuCheckboxItem`, `ContextMenuCheckboxItemIndicator`, `ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuRadioItemIndicator`, `ContextMenuSubmenuRoot`, `ContextMenuSubmenuTrigger`, `OverlayActions`, `OverlayPortalOptions`, `OpenChangeDetails`, `OpenChangeEvent`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `ContextMenuCheckableItemState`, `ContextMenuCheckboxItemState`, `ContextMenuItemState`, `ContextMenuPoint`, `ContextMenuPopupState`, `ContextMenuPositionerState`, `ContextMenuRadioItemState`, `ContextMenuState`, `ContextMenuSubmenuTriggerState`, `ContextMenuTriggerState`, `ValueChangeEvent` |
