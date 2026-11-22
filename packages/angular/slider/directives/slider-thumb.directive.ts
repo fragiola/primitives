@@ -3,8 +3,10 @@ import {
     computed,
     DestroyRef,
     Directive,
+    effect,
     inject,
     input,
+    untracked,
 } from "@angular/core";
 import { getDirection } from "@fragiola/primitives/direction";
 import {
@@ -17,8 +19,10 @@ import {
     dataValues,
     injectFlush,
     injectHost,
+    injectId,
     ownAttribute,
 } from "@fragiola/primitives-angular/internal";
+import { writeLabelledBy } from "../utils/write-labelled-by.ts";
 import { SliderRoot } from "./slider-root.directive.ts";
 
 export interface SliderThumbState {
@@ -29,13 +33,17 @@ export interface SliderThumbState {
     dragging: boolean;
 }
 
-/** A `slider`: one value of the slider (spec/slider.md): `<div sliderThumb aria-label="Volume">`. */
+/**
+ * A `slider`: one value of the slider (spec/slider.md): `<div sliderThumb aria-label="Volume">`.
+ * With no name of its own, the field's label or the slider's Label names it.
+ */
 @Directive({
     selector: "[sliderThumb]",
     exportAs: "sliderThumb",
     host: {
         role: "slider",
         "data-primitives-part": "slider-thumb",
+        "[attr.id]": "resolvedId()",
         "[attr.tabindex]": "state().disabled ? null : 0",
         "[attr.aria-valuenow]": "state().value",
         "[attr.aria-valuemin]": "bounds().min",
@@ -62,7 +70,11 @@ export class SliderThumb {
         ((value: number, index: number) => string) | undefined
     >(undefined);
     readonly disabled = input(false, { transform: booleanAttribute });
+    /** Its id (generated unless given): the Value's `for` lists it. */
+    readonly id = input<string | undefined>(undefined);
     private readonly host = injectHost();
+    private readonly generated = injectId("primitives-slider-thumb");
+    protected readonly resolvedId = computed(() => this.id() ?? this.generated);
     private readonly flush = injectFlush();
     private readonly position = computed(
         () =>
@@ -99,7 +111,10 @@ export class SliderThumb {
     });
     protected readonly valueText = computed(() => {
         const state = this.state();
-        return this.getAriaValueText()?.(state.value, state.index) ?? null;
+        const own = this.getAriaValueText();
+        return own === undefined
+            ? this.root.valueText(state.value)
+            : own(state.value, state.index);
     });
     /** Structural: the thumb's centre on its value. */
     protected readonly style = computed(() => {
@@ -129,12 +144,27 @@ export class SliderThumb {
     constructor() {
         inject(DestroyRef).onDestroy(this.root.registerThumb(this.host));
         const { field } = this.root;
-        // the field's label names a thumb that has no name of its own
-        const named = ownAttribute("aria-label") !== null;
         writeFieldAria(field, this.host, {
             "aria-describedby": field.describedBy,
             "aria-invalid": field.ariaInvalid,
-            ...(named ? {} : { "aria-labelledby": field.labelledBy }),
+        });
+        // the field's label, or the Label, names a thumb that has no name of its own
+        if (ownAttribute("aria-label") === null) {
+            writeLabelledBy(this.host, [field.labelledBy, this.root.labelId]);
+        }
+        // its id by its value's index, for the Value's `for`
+        effect((onCleanup) => {
+            const index = this.position();
+            const id = this.resolvedId();
+            untracked(() => {
+                this.root.thumbIds.update((ids) => ({ ...ids, [index]: id }));
+                onCleanup(() =>
+                    this.root.thumbIds.update((ids) => {
+                        const { [index]: _, ...rest } = ids;
+                        return rest;
+                    }),
+                );
+            });
         });
     }
 
@@ -151,7 +181,7 @@ export class SliderThumb {
             min: bounds.min,
             max: bounds.max,
             orientation: root.orientation(),
-            rtl: getDirection(this.host) === "rtl",
+            rtl: getDirection(this.host, root.providedDirection()) === "rtl",
         });
         if (target === null) {
             return;

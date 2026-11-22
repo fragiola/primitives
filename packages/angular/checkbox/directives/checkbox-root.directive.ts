@@ -111,12 +111,16 @@ export class CheckboxRoot {
             this.group !== null &&
             (this.parent() || this.value() !== undefined),
     );
+    // inside a CheckboxGroup that is a field's control, the group is the control: its checkboxes
+    // take the field's name and disabled through it, and are no field control themselves
     protected readonly field = fieldControl({
         id: this.hostId,
         labelable: true,
         value: computed(() => this.state().checked),
         filled: computed(() => this.state().checked),
         input: () => this.hidden,
+        focusTarget: () => this.host,
+        part: this.group?.field.inField ?? false,
     });
     readonly state = computed<CheckboxState>(() => {
         const group = this.group;
@@ -138,7 +142,7 @@ export class CheckboxRoot {
             indeterminate,
             disabled:
                 this.disabled() ||
-                (group?.disabled() ?? false) ||
+                (group?.isDisabled() ?? false) ||
                 this.field.disabled(),
             required: this.required(),
         };
@@ -180,7 +184,12 @@ export class CheckboxRoot {
             setInputAttribute(
                 hidden,
                 "name",
-                parent ? null : (this.field.name() ?? this.name() ?? null),
+                parent
+                    ? null
+                    : (this.field.name() ??
+                          this.group?.field.name() ??
+                          this.name() ??
+                          null),
             );
             hidden.value = this.value() ?? "on";
             hidden.checked = this.inputChecked();

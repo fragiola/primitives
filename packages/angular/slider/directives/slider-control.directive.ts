@@ -49,7 +49,7 @@ export class SliderControl {
             this.host.getBoundingClientRect(),
             { x, y },
             root.orientation(),
-            getDirection(this.host) === "rtl",
+            getDirection(this.host, root.providedDirection()) === "rtl",
         );
         return valueAtFraction(fraction, {
             min: root.min(),
