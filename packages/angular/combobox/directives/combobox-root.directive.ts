@@ -25,7 +25,6 @@ import {
     toggleItem,
 } from "@fragiola/primitives/collection";
 import { bridgeForm } from "@fragiola/primitives/form";
-import { createId } from "@fragiola/primitives/id";
 import { fieldControl } from "@fragiola/primitives-angular/field";
 import {
     type ChangeDetails,
@@ -34,6 +33,7 @@ import {
     createHiddenInput,
     createOverlayRoot,
     injectFlush,
+    injectId,
     type OpenChangeEvent,
     placementSignal,
     setInputAttribute,
@@ -197,7 +197,7 @@ export class ComboboxRoot {
     readonly inputGroup = signal<HTMLElement | null>(null);
     readonly chips = signal<HTMLElement | null>(null);
     readonly clearButton = signal<HTMLElement | null>(null);
-    readonly listId = `${createId("primitives-combobox")}-list`;
+    readonly listId = `${injectId("primitives-combobox")}-list`;
     /** What to highlight once the list renders, after the keyboard or a press opened it. */
     readonly pendingHighlight = signal<PendingHighlight>(null);
     readonly placed = placementSignal({ side: "bottom", align: "start" });

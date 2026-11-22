@@ -3,8 +3,10 @@ import {
     computed,
     Directive,
     effect,
+    inject,
     input,
     output,
+    PLATFORM_ID,
     signal,
     untracked,
 } from "@angular/core";
@@ -128,9 +130,15 @@ export class SliderRoot {
         writeFieldAria(this.field, host, {
             "aria-labelledby": this.field.labelledBy,
         });
-        // one `type="hidden"` input per value, after the consumer's children (as React renders)
+        // one `type="hidden"` input per value, after the consumer's children (as React renders);
+        // in the browser only, as the other hidden inputs (a server's would be a second set once
+        // the page is hydrated)
         const inputs = this.inputs;
+        const browser = inject(PLATFORM_ID) === "browser";
         effect(() => {
+            if (!browser) {
+                return;
+            }
             const values = this.values();
             const name = this.field.name() ?? this.name();
             untracked(() => {

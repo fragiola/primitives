@@ -12,7 +12,6 @@ import {
     untracked,
 } from "@angular/core";
 import { bridgeForm } from "@fragiola/primitives/form";
-import { createId } from "@fragiola/primitives/id";
 import { CheckboxGroup } from "@fragiola/primitives-angular/checkbox-group";
 import {
     fieldControl,
@@ -24,6 +23,7 @@ import {
     createHiddenInput,
     dataValues,
     injectHost,
+    injectId,
     setInputAttribute,
     type ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
@@ -189,7 +189,7 @@ export class CheckboxRoot {
         });
 
         // the parent's aria-controls lists the children's ids (the consumer's own, or one made here)
-        const generated = createId("primitives-checkbox");
+        const generated = injectId("primitives-checkbox");
         let registered: string | null = null;
         const destroyRef = inject(DestroyRef);
         afterNextRender(() => {

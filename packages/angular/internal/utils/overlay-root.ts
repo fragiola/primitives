@@ -6,7 +6,6 @@ import {
     signal,
     untracked,
 } from "@angular/core";
-import { createId } from "@fragiola/primitives/id";
 import type {
     ChangeDetails,
     ChangeReason,
@@ -14,6 +13,7 @@ import type {
 } from "./change-details.ts";
 import { controllable } from "./controllable.ts";
 import { injectFlush } from "./flush.ts";
+import { injectId } from "./inject-id.ts";
 import { createPresence } from "./presence.ts";
 
 /**
@@ -56,7 +56,7 @@ export function createOverlayRoot(
             requested = null;
         });
     });
-    const id = createId(prefix);
+    const id = injectId(prefix);
     const flush = injectFlush();
     return {
         open: state.value,
@@ -64,6 +64,10 @@ export function createOverlayRoot(
             lastReason.current = reason;
             requested = next;
             state.set(next, { reason });
+            // a request the consumer turned down is forgotten once it is answered
+            queueMicrotask(() => {
+                requested = null;
+            });
             // the popup (and its focus) or the focus return, before the next event
             flush();
         },

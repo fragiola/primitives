@@ -7,13 +7,13 @@ import {
     output,
 } from "@angular/core";
 import type { FieldState } from "@fragiola/primitives/form";
-import { createId } from "@fragiola/primitives/id";
 import {
     type ChangeDetails,
     controllable,
     dataValue,
     injectFlush,
     injectHost,
+    injectId,
     type ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
 import { injectField } from "../inject/inject-field.ts";
@@ -71,7 +71,7 @@ export class FieldControl {
         (value, details) => this.valueChangeDetails.emit({ value, details }),
     );
     protected readonly current = this.text.value;
-    private readonly generated = createId("primitives-field-control");
+    private readonly generated = injectId("primitives-field-control");
     protected readonly resolvedId = computed(() => this.id() ?? this.generated);
     protected readonly field = fieldControl({
         id: this.resolvedId,

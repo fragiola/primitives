@@ -1,5 +1,5 @@
 import { Directive } from "@angular/core";
-import { createId } from "@fragiola/primitives/id";
+import { injectId } from "@fragiola/primitives-angular/internal";
 
 /** A `group` of items, named by its GroupLabel (spec/combobox.md): `<div comboboxGroup>`. */
 @Directive({
@@ -13,5 +13,5 @@ import { createId } from "@fragiola/primitives/id";
 })
 export class ComboboxGroup {
     /** Its GroupLabel's id. */
-    readonly labelId = `${createId("primitives-combobox-group")}-label`;
+    readonly labelId = `${injectId("primitives-combobox-group")}-label`;
 }

@@ -10,8 +10,11 @@ import {
     untracked,
 } from "@angular/core";
 import { scrollIntoViewWithin } from "@fragiola/primitives/collection";
-import { createId } from "@fragiola/primitives/id";
-import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
+import {
+    dataValues,
+    injectHost,
+    injectId,
+} from "@fragiola/primitives-angular/internal";
 import {
     type ComboboxItemValue,
     ComboboxRoot,
@@ -48,7 +51,7 @@ export class ComboboxItem {
     private readonly root = inject(ComboboxRoot);
     readonly value = input.required<ComboboxItemValue>();
     readonly disabled = input(false, { transform: booleanAttribute });
-    protected readonly id = createId("primitives-combobox-item");
+    protected readonly id = injectId("primitives-combobox-item");
     readonly state = computed<ComboboxItemState>(() => ({
         highlighted: this.root.highlighted() === this.id,
         selected: this.root.isSelected(this.value()),
