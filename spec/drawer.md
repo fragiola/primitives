@@ -46,7 +46,7 @@ As [Dialog's](dialog.md#api), part by part, with:
   the edge a swipe dismisses it towards; `snapPoints` (an array of snap points, below; vertical
   directions only); `snapPoint` / `defaultSnapPoint` / `onSnapPointChange(snapPoint, details)`
   (the active snap point, controlled or not; `details` is `{ reason, event }`, reason `swipe`, or
-  `none` when the drawer opens on its default and resets it after closing); `handle` takes a
+  `none` when an opening returns it to the default); `handle` takes a
   Drawer handle. No `modal` prop: a drawer is modal.
 - **createHandle**: `createDrawerHandle<Payload>()` (React and Vue also `Drawer.createHandle`),
   with Dialog's methods.
@@ -59,7 +59,8 @@ string a height in `px` or `rem` (`"148px"`, `"30rem"`). A snap point is the **h
 shown**: the popup is moved towards its edge by its height minus that height (the snap point's
 **offset**), never more than its own height and the viewport's. Points within 1 px of each other
 count once. Without `snapPoint` or `defaultSnapPoint`, a drawer with snap points opens on the
-first one; it opens on `defaultSnapPoint` again after it closed (uncontrolled).
+first one; every opening returns to that default snap point (an uncontrolled one is set, a
+controlled one is reported with reason `none`).
 
 The open change of a swipe has the new reason **`swipe`** (Base UI's), with the `pointerup` as its
 event; its focus return is `close-press`'s (to the active trigger).

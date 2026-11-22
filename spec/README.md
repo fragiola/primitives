@@ -10,6 +10,7 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | --- | --- |
 | [dialog.md](dialog.md) | Dialog |
 | [alert-dialog.md](alert-dialog.md) | AlertDialog (on Dialog's parts) |
+| [drawer.md](drawer.md) | Drawer (on Dialog's parts, with the swipe and snap points) |
 | [tabs.md](tabs.md) | Tabs |
 | [collapsible.md](collapsible.md) | Collapsible |
 | [accordion.md](accordion.md) | Accordion |
@@ -17,6 +18,7 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [tooltip.md](tooltip.md) | Tooltip |
 | [menu.md](menu.md) | Menu (with submenus, checkbox and radio items) |
 | [context-menu.md](context-menu.md) | ContextMenu (on Menu's parts) |
+| [navigation-menu.md](navigation-menu.md) | NavigationMenu |
 | [field.md](field.md) | Field |
 | [fieldset.md](fieldset.md) | Fieldset |
 | [form.md](form.md) | Form |
@@ -46,7 +48,8 @@ direction, panel enter and exit states and physical Indicator variables); then t
 mechanisms (Epic #35, Issue #33: the nested overlay tree, detached triggers, the open change
 details, the lifecycle controls and Dialog's Viewport and nested dialogs, [below](#overlays);
 Issue #34: AlertDialog, ContextMenu, Menu's checkbox and radio items, and Select's groups,
-separators, item text and optional `items`).
+separators, item text and optional `items`); then Drawer and NavigationMenu (Epic #38: Issue #36,
+the toolkit's swipe mechanism and Drawer; Issue #37, NavigationMenu), which complete stage 1.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -147,17 +150,18 @@ The reasons are shared:
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
 | `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
-| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10) |
+| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key) |
 | `input-change` | typing opened or changed a combobox |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
 | `clear-press` | a combobox's Clear was pressed |
 | `chip-remove-press` | a combobox chip's remove button was pressed |
-| `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup) |
+| `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
 | `keyboard` | a key changed a slider's value |
 | `track-press` | a press on a slider's control moved a thumb |
 | `drag` | a pointer drag moved a slider's thumb |
+| `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md) |
 | `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
 | `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed) |
 
@@ -219,9 +223,10 @@ every field on submission, focuses the first invalid one, and shows server error
 
 ## Overlays
 
-Every overlay (Dialog, AlertDialog, Popover, Tooltip, Menu and its submenus, ContextMenu, Select,
-Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35, Issues #33
-and #34). Each spec says what it adds.
+Every overlay (Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu and its submenus, ContextMenu,
+Select, Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35,
+Issues #33 and #34). Each spec says what it adds. NavigationMenu's popup is a layer of the nested
+overlay tree too, with a value change and no lifecycle controls (spec/navigation-menu.md).
 
 ### The nested overlay tree
 
@@ -282,11 +287,11 @@ scope).
 
 ### Detached triggers
 
-Dialog, AlertDialog, Popover, Menu and Tooltip (Base UI's detached triggers; a ContextMenu has
-one Trigger area and no handle):
+Dialog, AlertDialog, Drawer, Popover, Menu and Tooltip (Base UI's detached triggers; a ContextMenu
+has one Trigger area and no handle):
 
 - A **handle** connects a Root and its Triggers: `createDialogHandle<Payload>()` (and
-  `createAlertDialogHandle`, `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
+  `createAlertDialogHandle`, `createDrawerHandle`, `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
   `openWithPayload(payload)`, `close()` (reason `imperative-action`) and the getter `isOpen`. A
   call while no Root is attached does nothing (no console output). The Roots attached to one
   handle form a stack: the newest mounted serves it, and when it unmounts the previous one serves
@@ -322,7 +327,7 @@ Every overlay has a `/<component>/lifecycle` scenario of one shape (its spec giv
 - with `?cancel` in the URL, its `onOpenChange` calls `details.cancel()` for every close, and
   prints its reason as `canceled`; the overlay is uncontrolled (no `open` prop), so the cancel
   alone keeps it open;
-- Dialog, AlertDialog and Popover also render a button **"Close with actions"** inside the popup,
+- Dialog, AlertDialog, Drawer and Popover also render a button **"Close with actions"** inside the popup,
   which calls the actions' `close()`.
 
 The common checks (`conformance/tests/lifecycle`), for each overlay:
@@ -338,7 +343,7 @@ The common checks (`conformance/tests/lifecycle`), for each overlay:
    and working (`open: true`, still visible, the next Escape canceled again). A Tooltip, which is
    no layer, reports the pointer leaving instead of the outside press; an AlertDialog, which an
    outside press never dismisses, reports nothing for it.
-5. Dialog, AlertDialog and Popover: "Close with actions" closes it with `reason:
+5. Dialog, AlertDialog, Drawer and Popover: "Close with actions" closes it with `reason:
    imperative-action`.
 6. Axe finds no violation, closed (kept mounted) and open.
 
