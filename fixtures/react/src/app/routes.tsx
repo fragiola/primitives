@@ -32,6 +32,7 @@ import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
+import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.tsx";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.tsx";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
@@ -66,6 +67,7 @@ export const routes: Record<string, ComponentType<{ locale: string }>> = {
     "/popover/placement": PopoverPlacement,
     "/popover/rtl": PopoverRtl,
     "/popover/arrow": PopoverArrow,
+    "/popover/controlled": PopoverControlled,
     "/tooltip/basic": TooltipBasic,
     "/tooltip/group": TooltipGroup,
     "/tooltip/in-dialog": TooltipInDialog,

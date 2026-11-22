@@ -76,6 +76,10 @@ The positioning types (`Side`, `Align`) are re-exported as types from the compon
   trigger) **unless the press landed on a focusable element**, which keeps the focus the press
   gave it. The check runs once the press has ended (`@fragiola/primitives/overlay`,
   `returnFocus.whenUnfocused`): focus returns only when the press left it on the body.
+- **A close made through the controlled `open`** (the consumer's own, reason `none`; Epic #22):
+  it uses its own reason, never the previous change's. Focus returns to `finalFocus` (else the
+  trigger) only when it was left on the body or inside the closing popup, as after an outside
+  press; focus the consumer put elsewhere stays there.
 
 ## Pointer
 
@@ -181,6 +185,20 @@ A Trigger **"With arrow"** and a popup with an Arrow (the fixture gives it
 
 Checks: the arrow's centre is horizontally within the trigger's box (±2 px); contract layer:
 Arrow has `aria-hidden="true"` and `data-side="bottom"`.
+
+### `/popover/controlled`
+
+Content: a button **"Show settings"**, then a popover with trigger **"Settings"**, title
+**"Quick settings"** and a button **"Done"**; both buttons set the page's `open` state (not
+through the popover). Output: `open: ...`.
+
+Checks:
+
+1. "Show settings" opens it with focus on "Done"; "Done" closes it and focus returns to
+   "Settings".
+2. Opened by "Settings", closed by Shift+Tab (`focus-out`, no focus return), then opened by
+   "Show settings" and closed by "Done": focus returns to "Settings" (the close does not reuse
+   `focus-out`).
 
 ## Differences from Base UI
 

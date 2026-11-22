@@ -29,8 +29,9 @@ export interface PopoverPopupProps extends PartProps<PopoverPopupState> {
 
 // Closing by these returns focus to the trigger; focus leaving does not (spec/popover.md).
 const RETURNS_FOCUS = new Set(["escape-key", "close-press", "trigger-press"]);
-// an outside press returns it only when the press focused nothing (D4 §3, Base UI)
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+// an outside press returns it only when the press focused nothing (D4 §3, Base UI); so does a
+// close made through the controlled `open` (reason `none`): focus left inside the popup goes back
+const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
 
 /** The non-modal popover (spec/popover.md): not trapped, it closes when focus leaves it. */
 export function PopoverPopup({
@@ -55,7 +56,7 @@ export function PopoverPopup({
             returnFocus: {
                 when: RETURNS_FOCUS,
                 whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
-                reason: () => lastReason.current,
+                reason: () => lastReason.current ?? "none",
                 to: () => {
                     const final = resolveFocusTarget(
                         focusTargets.current.finalFocus,

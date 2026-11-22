@@ -118,6 +118,31 @@ describe("openOverlaySession", () => {
         expect(document.activeElement).toBe(outside);
     });
 
+    it("returns focus left inside the closing overlay, as focus left on the body", async () => {
+        const { trigger, popup, inside, outside } = setup();
+        const settle = () => new Promise((resolve) => setTimeout(resolve, 5));
+        const open = () =>
+            openOverlaySession(document, {
+                elements: () => [popup],
+                dismiss: () => {},
+                returnFocus: {
+                    whenUnfocused: new Set(["none"]),
+                    reason: () => "none",
+                    to: () => trigger,
+                },
+            });
+        // closed by its consumer with focus inside (the popup is still mounted, exiting)
+        inside.focus();
+        open().end();
+        await settle();
+        expect(document.activeElement).toBe(trigger);
+        // focus already elsewhere stays there
+        outside.focus();
+        open().end();
+        await settle();
+        expect(document.activeElement).toBe(outside);
+    });
+
     it("reports an outside press once, not again as focus-out when the press moves focus", () => {
         const { trigger, popup, inside, outside } = setup();
         const dismiss = vi.fn();

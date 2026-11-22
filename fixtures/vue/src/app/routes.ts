@@ -32,6 +32,7 @@ import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
+import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
 import PopoverInitialFocus from "../scenarios/popover/popover-initial-focus.vue";
 import PopoverPlacement from "../scenarios/popover/popover-placement.vue";
 import PopoverRtl from "../scenarios/popover/popover-rtl.vue";
@@ -66,6 +67,7 @@ export const routes: Record<string, Component> = {
     "/popover/placement": PopoverPlacement,
     "/popover/rtl": PopoverRtl,
     "/popover/arrow": PopoverArrow,
+    "/popover/controlled": PopoverControlled,
     "/tooltip/basic": TooltipBasic,
     "/tooltip/group": TooltipGroup,
     "/tooltip/in-dialog": TooltipInDialog,

@@ -27,9 +27,10 @@ export interface OverlaySessionOptions {
         when?: ReadonlySet<string>;
         /**
          * Reasons that return focus only once the press that dismissed the overlay has ended, and
-         * only when it left focus nowhere (on the body): a press on a focusable element keeps the
-         * focus it gave (spec/popover.md, "Focus": Base UI's focus after an outside press). A
-         * getter is read when the session ends (a menu's `modal` may change while it is open).
+         * only when it left focus nowhere (on the body) or inside the closing overlay (which is
+         * leaving, with its exit animation): a press on a focusable element keeps the focus it
+         * gave (spec/popover.md, "Focus": Base UI's focus after an outside press). A getter is
+         * read when the session ends (a menu's `modal` may change while it is open).
          */
         whenUnfocused?:
             | ReadonlySet<string>
@@ -122,7 +123,12 @@ export function openOverlaySession(
             if (unfocused?.has(reason)) {
                 const focusIfUnfocused = () => {
                     const active = doc.activeElement;
-                    if (active === null || active === doc.body) {
+                    const inside =
+                        active !== null &&
+                        options
+                            .elements()
+                            .some((element) => element?.contains(active));
+                    if (active === null || active === doc.body || inside) {
                         const target = returnFocus.to();
                         if (target && target.isConnected === true) {
                             target.focus({ preventScroll: true });
