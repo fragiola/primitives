@@ -45,6 +45,8 @@
         "progress",
         "avatar",
         "separator",
+        "collapsible",
+        "accordion",
         "tests",
         "*.config.ts"
     ]

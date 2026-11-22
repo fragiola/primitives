@@ -5,11 +5,13 @@
 // Angular folders against it. A new component is added here first, in alphabetical order (the
 // order Biome sorts the root entries' re-exports in).
 export const COMPONENTS = [
+    "accordion",
     "avatar",
     "button",
     "calendar",
     "checkbox",
     "checkbox-group",
+    "collapsible",
     "combobox",
     "date-picker",
     "date-range-picker",
