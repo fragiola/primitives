@@ -2,6 +2,9 @@ import type { ComponentType } from "react";
 import { AccordionBasic } from "../scenarios/accordion/accordion-basic.tsx";
 import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.tsx";
 import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx";
+import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.tsx";
+import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.tsx";
+import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
@@ -24,6 +27,8 @@ import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.tsx"
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
+import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.tsx";
+import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
@@ -48,6 +53,7 @@ import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
+import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
 import { MenuDetached } from "../scenarios/menu/menu-detached.tsx";
 import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
@@ -67,6 +73,7 @@ import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx"
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
+import { SelectGroups } from "../scenarios/select/select-groups.tsx";
 import { SelectLifecycle } from "../scenarios/select/select-lifecycle.tsx";
 import { SelectModal } from "../scenarios/select/select-modal.tsx";
 import { SeparatorBasic } from "../scenarios/separator/separator-basic.tsx";
@@ -102,6 +109,9 @@ export const routes: Record<
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/alert-dialog/basic": AlertDialogBasic,
+    "/alert-dialog/detached": AlertDialogDetached,
+    "/alert-dialog/lifecycle": AlertDialogLifecycle,
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
@@ -132,6 +142,10 @@ export const routes: Record<
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/menu/checkbox-radio": MenuCheckboxRadio,
+    "/context-menu/basic": ContextMenuBasic,
+    "/context-menu/rtl": ContextMenuBasic,
+    "/context-menu/lifecycle": ContextMenuLifecycle,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,
@@ -146,6 +160,7 @@ export const routes: Record<
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
     "/select/lifecycle": SelectLifecycle,
+    "/select/groups": SelectGroups,
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,

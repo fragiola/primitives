@@ -28,6 +28,31 @@ export const Menu = {
     GroupLabel: (props: ComponentProps<typeof Primitive.GroupLabel>) => (
         <Primitive.GroupLabel className={menu["group-label"]} {...props} />
     ),
+    CheckboxItem: (props: ComponentProps<typeof Primitive.CheckboxItem>) => (
+        <Primitive.CheckboxItem className={menu["checkbox-item"]} {...props} />
+    ),
+    CheckboxItemIndicator: (
+        props: ComponentProps<typeof Primitive.CheckboxItemIndicator>,
+    ) => (
+        <Primitive.CheckboxItemIndicator
+            className={menu["checkbox-item-indicator"]}
+            {...props}
+        />
+    ),
+    RadioGroup: (props: ComponentProps<typeof Primitive.RadioGroup>) => (
+        <Primitive.RadioGroup className={menu["radio-group"]} {...props} />
+    ),
+    RadioItem: (props: ComponentProps<typeof Primitive.RadioItem>) => (
+        <Primitive.RadioItem className={menu["radio-item"]} {...props} />
+    ),
+    RadioItemIndicator: (
+        props: ComponentProps<typeof Primitive.RadioItemIndicator>,
+    ) => (
+        <Primitive.RadioItemIndicator
+            className={menu["radio-item-indicator"]}
+            {...props}
+        />
+    ),
     SubmenuTrigger: (
         props: ComponentProps<typeof Primitive.SubmenuTrigger>,
     ) => (

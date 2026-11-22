@@ -23,6 +23,18 @@ export const Select = {
     Item: (props: ComponentProps<typeof Primitive.Item>) => (
         <Primitive.Item className={select.item} {...props} />
     ),
+    ItemText: (props: ComponentProps<typeof Primitive.ItemText>) => (
+        <Primitive.ItemText className={select["item-text"]} {...props} />
+    ),
+    Group: (props: ComponentProps<typeof Primitive.Group>) => (
+        <Primitive.Group className={select.group} {...props} />
+    ),
+    GroupLabel: (props: ComponentProps<typeof Primitive.GroupLabel>) => (
+        <Primitive.GroupLabel className={select["group-label"]} {...props} />
+    ),
+    Separator: (props: ComponentProps<typeof Primitive.Separator>) => (
+        <Primitive.Separator className={select.separator} {...props} />
+    ),
     ItemIndicator: (props: ComponentProps<typeof Primitive.ItemIndicator>) => (
         <Primitive.ItemIndicator
             className={select["item-indicator"]}
