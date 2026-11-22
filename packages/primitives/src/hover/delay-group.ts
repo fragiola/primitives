@@ -11,13 +11,22 @@ export interface DelayGroup {
  * The coordination of a tooltip delay group (spec/tooltip.md, "Delay group"): at most one member
  * open, and the instant hand-off. It knows the open member's close callback and the time of the
  * last close, never a member's open state: each member keeps its own and reports here.
+ *
+ * `timeout` may be a getter, read at each check: a provider whose timeout changes keeps one group
+ * (and its open member) instead of making a new one.
  */
-export function createDelayGroup(options: { timeout: number }): DelayGroup {
+export function createDelayGroup(options: {
+    timeout: number | (() => number);
+}): DelayGroup {
+    const timeout = () =>
+        typeof options.timeout === "function"
+            ? options.timeout()
+            : options.timeout;
     let current: (() => void) | null = null;
     let lastClosed = Number.NEGATIVE_INFINITY;
     return {
         isInstant(now = Date.now()) {
-            return current !== null || now - lastClosed <= options.timeout;
+            return current !== null || now - lastClosed <= timeout();
         },
         opened(close) {
             const previous = current;

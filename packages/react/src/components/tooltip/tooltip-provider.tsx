@@ -1,5 +1,5 @@
 import { createDelayGroup } from "@fragiola/primitives/hover";
-import { type ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import { TooltipProviderContext } from "./tooltip-context.ts";
 
 export interface TooltipProviderProps {
@@ -19,9 +19,16 @@ export function TooltipProvider({
     timeout = 400,
     children,
 }: TooltipProviderProps) {
+    // one group for the provider's life, reading the current timeout: a change of a prop never
+    // leaves the open member in a group of its own
+    const timeoutRef = useRef(timeout);
+    timeoutRef.current = timeout;
+    const [group] = useState(() =>
+        createDelayGroup({ timeout: () => timeoutRef.current }),
+    );
     const value = useMemo(
-        () => ({ delay, closeDelay, group: createDelayGroup({ timeout }) }),
-        [delay, closeDelay, timeout],
+        () => ({ delay, closeDelay, group }),
+        [delay, closeDelay, group],
     );
     return (
         <TooltipProviderContext.Provider value={value}>

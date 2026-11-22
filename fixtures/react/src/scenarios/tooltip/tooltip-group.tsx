@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Tooltip } from "../../kit/ui/tooltip.tsx";
 
 const TOOLS = [
@@ -7,8 +8,9 @@ const TOOLS = [
 ];
 
 export function TooltipGroup() {
+    const [timeout, setGroupTimeout] = useState(400);
     return (
-        <Tooltip.Provider delay={800} timeout={400}>
+        <Tooltip.Provider delay={800} timeout={timeout}>
             <div className="flex gap-2">
                 {TOOLS.map((tool) => (
                     <Tooltip.Root key={tool.label}>
@@ -22,7 +24,10 @@ export function TooltipGroup() {
                 ))}
             </div>
             <div className="mt-30">
-                <button type="button">Elsewhere</button>
+                <button type="button">Elsewhere</button>{" "}
+                <button type="button" onClick={() => setGroupTimeout(0)}>
+                    No hand-off
+                </button>
             </div>
         </Tooltip.Provider>
     );

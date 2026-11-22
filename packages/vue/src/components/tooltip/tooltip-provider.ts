@@ -35,7 +35,8 @@ export const TooltipProvider: PublicComponent<
             provide(TooltipProviderKey, {
                 delay: () => props.delay,
                 closeDelay: () => props.closeDelay,
-                group: createDelayGroup({ timeout: props.timeout }),
+                // the timeout read at each check: reactive, in one group
+                group: createDelayGroup({ timeout: () => props.timeout }),
             });
             return () => slots.default?.();
         },

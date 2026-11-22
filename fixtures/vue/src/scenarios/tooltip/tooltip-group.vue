@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { Tooltip } from "../../kit/ui/tooltip.ts";
 
 const TOOLS = [
@@ -6,10 +7,11 @@ const TOOLS = [
     { label: "Italic", hint: "Italic (Ctrl+I)" },
     { label: "Underline", hint: "Underline (Ctrl+U)" },
 ];
+const timeout = ref(400);
 </script>
 
 <template>
-    <Tooltip.Provider :delay="800" :timeout="400">
+    <Tooltip.Provider :delay="800" :timeout="timeout">
         <div class="flex gap-2">
             <Tooltip.Root v-for="tool in TOOLS" :key="tool.label">
                 <Tooltip.Trigger>{{ tool.label }}</Tooltip.Trigger>
@@ -21,7 +23,7 @@ const TOOLS = [
             </Tooltip.Root>
         </div>
         <div class="mt-30">
-            <button type="button">Elsewhere</button>
+            <button type="button">Elsewhere</button>{{ " " }}<button type="button" @click="timeout = 0">No hand-off</button>
         </div>
     </Tooltip.Provider>
 </template>

@@ -152,6 +152,45 @@ test.describe("tooltip / group", () => {
         await expect(page.getByRole("tooltip")).toHaveCount(1);
     });
 
+    // Epic #22 (#19): the provider's timeout changes at runtime ("No hand-off" sets it to 0),
+    // clicked without moving focus or the pointer
+    const noHandOff = (page: Page) =>
+        button(page, "No hand-off").evaluate((element) =>
+            (element as HTMLButtonElement).click(),
+        );
+
+    test("a timeout changed while one is open keeps one group: the next closes it", async ({
+        page,
+    }) => {
+        await button(page, "Bold").focus();
+        await expect(tooltip(page, "Bold (Ctrl+B)")).toBeVisible();
+        await noHandOff(page);
+        await hover(page, button(page, "Italic"));
+        await expect(tooltip(page, "Italic (Ctrl+I)")).toBeVisible();
+        await expect(tooltip(page, "Bold (Ctrl+B)")).toBeHidden();
+        await expect(page.getByRole("tooltip")).toHaveCount(1);
+    });
+
+    test("a timeout changed at runtime applies to the next hand-off", async ({
+        page,
+    }) => {
+        await noHandOff(page);
+        await msUntilShown(
+            page,
+            button(page, "Bold"),
+            tooltip(page, "Bold (Ctrl+B)"),
+        );
+        await hover(page, button(page, "Elsewhere"));
+        await expect(page.getByRole("tooltip")).toHaveCount(0);
+        // within the old timeout (400 ms), past the new one (0)
+        const elapsed = await msUntilShown(
+            page,
+            button(page, "Underline"),
+            tooltip(page, "Underline (Ctrl+U)"),
+        );
+        expect(elapsed).toBeGreaterThanOrEqual(700);
+    });
+
     test("after the timeout, the next one waits for the delay again", async ({
         page,
     }) => {
