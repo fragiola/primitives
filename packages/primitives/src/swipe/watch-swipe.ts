@@ -37,6 +37,9 @@ export interface SwipeOptions {
 /** The distance a pointer moves before a swipe locks on an axis (or lets it go), in px. */
 export const SWIPE_LOCK_DISTANCE = 6;
 
+/** How far a touch moves along the swipe's axis before its page scroll is held back, in px. */
+const TOUCH_CLAIM_DISTANCE = 2;
+
 /** How far back the release velocity looks, in ms. */
 const VELOCITY_WINDOW = 100;
 
@@ -328,8 +331,11 @@ export function watchSwipe(
             axis === "y"
                 ? touch.clientX - gesture.x
                 : touch.clientY - gesture.y;
+        // only a move that already leans on the swipe's axis: a jitter or a move along the other
+        // axis is left to the browser (a carousel in a bottom sheet still scrolls)
         if (
-            Math.abs(along) >= Math.abs(across) &&
+            Math.abs(along) >= TOUCH_CLAIM_DISTANCE &&
+            Math.abs(along) > Math.abs(across) &&
             !scrollsFirst(gesture.target, element, axis, along)
         ) {
             event.preventDefault();

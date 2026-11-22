@@ -56,7 +56,7 @@ function snapPointHeight(
 /**
  * Measures `points` for a popup of `popupHeight` in a viewport of `viewportHeight` (spec/drawer.md,
  * "Snap points"): each one's height (clamped to the popup and the viewport) and offset. Invalid
- * points are left out; two points within 1 px of each other count once (the later one).
+ * points are left out; two points within 1 px of each other count once (the earlier one).
  */
 export function resolveSnapPoints(
     points: readonly SnapPoint[],
@@ -78,11 +78,9 @@ export function resolveSnapPoints(
             continue;
         }
         const clamped = clamp(height, 0, max);
-        const duplicate = resolved.findIndex(
-            (point) => Math.abs(point.height - clamped) <= 1,
-        );
-        if (duplicate !== -1) {
-            resolved.splice(duplicate, 1);
+        // a point within 1 px of an earlier one is that one (the default, the first, stays)
+        if (resolved.some((point) => Math.abs(point.height - clamped) <= 1)) {
+            continue;
         }
         resolved.push({
             value,

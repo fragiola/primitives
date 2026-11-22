@@ -209,8 +209,10 @@ describe("watchSwipe", () => {
             document.getElementById("text")?.dispatchEvent(event);
             return event;
         };
+        expect(touch(1).defaultPrevented).toBe(false);
         expect(touch(3).defaultPrevented).toBe(true);
         expect(touch(2, 10).defaultPrevented).toBe(false);
+        expect(touch(3, 3).defaultPrevented).toBe(false);
         stop();
     });
 

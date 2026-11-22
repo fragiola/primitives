@@ -31,14 +31,14 @@ describe("resolveSnapPoints", () => {
         ]);
     });
 
-    it("leaves out invalid points and counts points within 1 px once (the later one)", () => {
+    it("leaves out invalid points and counts points within 1 px once (the earlier one)", () => {
         expect(
             resolveSnapPoints(["50%", -1, Number.NaN, 300, "300.5px"], {
                 popupHeight: 600,
                 viewportHeight: 800,
                 rootFontSize: 10,
             }),
-        ).toEqual([{ value: "300.5px", height: 300.5, offset: 299.5 }]);
+        ).toEqual([{ value: 300, height: 300, offset: 300 }]);
     });
 
     it("has no point before the popup or the viewport is measured", () => {
