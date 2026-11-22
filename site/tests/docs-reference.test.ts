@@ -406,7 +406,7 @@ function angularProps(
             const prefix = selector.slice(1, -1);
             const inputs = [
                 ...text.matchAll(
-                    /readonly (\w+) = input(?:\.required)?[<(]([^;]*);/g,
+                    /readonly (\w+) =\s*input(?:\.required)?[<(]([^;]*);/g,
                 ),
             ].map((match) => {
                 const alias = /alias:\s*"(\w+)"/.exec(match[2] ?? "")?.[1];
@@ -415,7 +415,7 @@ function angularProps(
                     : (match[1] ?? "");
             });
             const outputs = [
-                ...text.matchAll(/readonly (\w+) = output[<(]/g),
+                ...text.matchAll(/readonly (\w+) =\s*output[<(]/g),
             ].flatMap((match) => {
                 const name = match[1] ?? "";
                 if (name.endsWith("ChangeDetails"))

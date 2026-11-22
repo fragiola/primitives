@@ -107,7 +107,7 @@ No props of its own.
 | `sizes` | `string` | | the `img`'s `sizes`, also used for the load |
 | `crossOrigin` | `"anonymous" \| "use-credentials" \| ""` | | the `img`'s `crossorigin`, also used for the load |
 | `referrerPolicy` | `string` | | the `img`'s `referrerpolicy`, also used for the load |
-| `onLoadingStatusChange` (react, vue) | `(status: ImageLoadingStatus) => void` | | each new status but `idle`; Angular's `(loadingStatusChange)` output, above |
+| `onLoadingStatusChange` | `(status: ImageLoadingStatus) => void` | | each new status but `idle` (Vue: `@loading-status-change`, Angular: `(loadingStatusChange)`) |
 
 ### Fallback
 
