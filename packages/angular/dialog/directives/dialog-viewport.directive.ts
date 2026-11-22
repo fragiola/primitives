@@ -26,7 +26,10 @@ export interface DialogViewportState {
         "[attr.data-open]": "data().open",
         "[attr.data-closed]": "data().closed",
         "[attr.data-nested]": "data().nested",
-        "[attr.data-nested-dialog-open]": "data()['nested-dialog-open']",
+        "[attr.data-nested-dialog-open]":
+            "root.nestsDrawers ? null : data()['nested-dialog-open']",
+        "[attr.data-nested-drawer-open]":
+            "root.nestsDrawers ? data()['nested-dialog-open'] : null",
         "[attr.data-starting-style]": "data()['starting-style']",
         "[attr.data-ending-style]": "data()['ending-style']",
     },

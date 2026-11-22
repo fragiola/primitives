@@ -59,11 +59,17 @@ function firstClose(popup: HTMLElement, part: string): HTMLElement | null {
         "[attr.aria-labelledby]": "root.titleId() ?? null",
         "[attr.aria-describedby]": "root.descriptionId() ?? null",
         "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
-        "[style.--nested-dialogs]": "root.nestedDialogs()",
+        "[style.--nested-dialogs]":
+            "root.nestsDrawers ? null : root.nestedDialogs()",
+        "[style.--nested-drawers]":
+            "root.nestsDrawers ? root.nestedDialogs() : null",
         "[attr.data-open]": "data().open",
         "[attr.data-closed]": "data().closed",
         "[attr.data-nested]": "data().nested",
-        "[attr.data-nested-dialog-open]": "data()['nested-dialog-open']",
+        "[attr.data-nested-dialog-open]":
+            "root.nestsDrawers ? null : data()['nested-dialog-open']",
+        "[attr.data-nested-drawer-open]":
+            "root.nestsDrawers ? data()['nested-dialog-open'] : null",
         "[attr.data-starting-style]": "data()['starting-style']",
         "[attr.data-ending-style]": "data()['ending-style']",
     },

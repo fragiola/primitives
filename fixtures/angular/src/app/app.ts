@@ -45,6 +45,11 @@ import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.t
 import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.ts";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.ts";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.ts";
+import { DrawerBasic } from "../scenarios/drawer/drawer-basic.ts";
+import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.ts";
+import { DrawerNested } from "../scenarios/drawer/drawer-nested.ts";
+import { DrawerSide } from "../scenarios/drawer/drawer-side.ts";
+import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.ts";
 import { FieldAsync } from "../scenarios/field/field-async.ts";
 import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
@@ -113,6 +118,11 @@ import { ROUTES } from "./routes.ts";
         DialogNestedDialogs,
         DialogDetached,
         DialogLifecycle,
+        DrawerBasic,
+        DrawerSide,
+        DrawerSnapPoints,
+        DrawerNested,
+        DrawerLifecycle,
         AlertDialogBasic,
         AlertDialogDetached,
         AlertDialogLifecycle,
@@ -208,6 +218,11 @@ import { ROUTES } from "./routes.ts";
             @case ("/dialog/nested-dialogs") { <main class="p-6" scenario-dialog-nested-dialogs></main> }
             @case ("/dialog/detached") { <main class="p-6" scenario-dialog-detached></main> }
             @case ("/dialog/lifecycle") { <main class="p-6" scenario-dialog-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/drawer/basic") { <main class="p-6" scenario-drawer-basic></main> }
+            @case ("/drawer/side") { <main class="p-6" scenario-drawer-side></main> }
+            @case ("/drawer/snap-points") { <main class="p-6" scenario-drawer-snap-points></main> }
+            @case ("/drawer/nested") { <main class="p-6" scenario-drawer-nested></main> }
+            @case ("/drawer/lifecycle") { <main class="p-6" scenario-drawer-lifecycle [cancel]="query.cancel"></main> }
             @case ("/alert-dialog/basic") { <main class="p-6" scenario-alert-dialog-basic></main> }
             @case ("/alert-dialog/detached") { <main class="p-6" scenario-alert-dialog-detached></main> }
             @case ("/alert-dialog/lifecycle") { <main class="p-6" scenario-alert-dialog-lifecycle [cancel]="query.cancel"></main> }
