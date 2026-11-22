@@ -16,6 +16,8 @@
         "combobox",
         "checkbox",
         "slider",
+        "calendar",
+        "date-picker",
         "field",
         "forms",
         "primitives",
