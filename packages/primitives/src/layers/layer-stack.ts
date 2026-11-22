@@ -1,102 +1,219 @@
 /**
- * The stack of open overlays of a document (spec/dialog.md, "Dismissal and layering"). Escape and
- * outside presses go to the topmost layer first:
+ * The tree of open overlays of a document (spec/README.md, "The nested overlay tree"). A layer's
+ * parent is decided when it is pushed: the newest open layer that contains one of its owner
+ * elements (the triggers it was opened from), else the newest that contains the focused element,
+ * else none. So a trigger inside a portaled popup makes its overlay a child of that popup's
+ * overlay, wherever the child's own portal sits in the DOM.
  *
- * - Escape closes the topmost layer only;
- * - a press is walked from the top: each layer the press is outside of is dismissed, until a
- *   layer that contains it (a layer opened inside another counts as inside it, since it is above).
+ * - Escape closes the newest layer (with an `onEscape`) only;
+ * - an outside press keeps the deepest layer that contains the press (its elements, or its
+ *   `ignore` list: a press on an overlay's own trigger toggles it itself) and its ancestors, and
+ *   dismisses every other open layer, newest first; a press outside every layer dismisses all;
+ * - removing a layer re-parents its children to its parent, and tells each descendant still open
+ *   that an ancestor closed (`onParentClose`), newest first.
  */
+type Elements = () => readonly (Element | null | undefined)[];
+
 export interface LayerOptions {
-    /** The elements that make up the layer (its popup, positioner, backdrop). */
-    elements: () => readonly (Element | null | undefined)[];
+    /** The elements that make up the layer (its popup, positioner). */
+    elements: Elements;
     /** Elements a press on does not dismiss the layer (its trigger, which toggles it itself). */
-    ignore?: () => readonly (Element | null | undefined)[];
+    ignore?: Elements;
+    /**
+     * Elements that cover the page under the layer (a dialog's backdrop and viewport): a press on
+     * one is outside this layer, but inside its parent.
+     */
+    backdrops?: Elements;
+    /** The elements the overlay was opened from (its triggers), which decide its parent. */
+    owner?: Elements;
     onEscape?: (event: KeyboardEvent) => void;
     onOutsidePress?: (event: PointerEvent) => void;
+    /** An ancestor layer was removed while this one is still open. */
+    onParentClose?: () => void;
 }
 
 export interface Layer {
-    /** Whether the layer is the topmost one of its document. */
+    /** Whether the layer is the newest open layer of its document. */
     isTop: () => boolean;
-    /** The elements of the layers opened after this one (its child layers). */
+    /** The elements of the layer's descendants (its child layers, recursively). */
     elementsAbove: () => Element[];
     remove: () => void;
 }
 
-interface Stack {
-    layers: LayerOptions[];
+interface LayerNode {
+    options: LayerOptions;
+    parent: LayerNode | null;
+}
+
+interface Tree {
+    /** Every open layer, oldest first. */
+    nodes: LayerNode[];
     teardown: () => void;
 }
 
-const stacks = new WeakMap<Document, Stack>();
+const trees = new WeakMap<Document, Tree>();
 
-function contains(
-    list: readonly (Element | null | undefined)[],
-    target: EventTarget | null,
-): boolean {
+function contains(list: Elements | undefined, target: unknown): boolean {
     return (
+        list !== undefined &&
         target instanceof Node &&
-        list.some((element) => element?.contains(target) === true)
+        list().some((element) => element?.contains(target) === true)
     );
 }
 
-function createStack(doc: Document): Stack {
-    const stack: Stack = { layers: [], teardown: () => {} };
+function depth(node: LayerNode): number {
+    let count = 0;
+    for (let at = node.parent; at !== null; at = at.parent) {
+        count += 1;
+    }
+    return count;
+}
+
+function isAncestorOrSelf(
+    candidate: LayerNode,
+    node: LayerNode | null,
+): boolean {
+    for (let at = node; at !== null; at = at.parent) {
+        if (at === candidate) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/** The deepest layer a press on `target` is inside of (null: outside every layer). */
+function layerOfPress(
+    tree: Tree,
+    target: EventTarget | null,
+): LayerNode | null {
+    let found: LayerNode | null = null;
+    let foundDepth = -1;
+    const consider = (node: LayerNode | null) => {
+        if (node === null) {
+            return;
+        }
+        const nodeDepth = depth(node);
+        // the newest wins a tie: the nodes are walked oldest first
+        if (nodeDepth >= foundDepth) {
+            found = node;
+            foundDepth = nodeDepth;
+        }
+    };
+    for (const node of tree.nodes) {
+        if (
+            contains(node.options.elements, target) ||
+            contains(node.options.ignore, target)
+        ) {
+            consider(node);
+        } else if (contains(node.options.backdrops, target)) {
+            // a press on a layer's backdrop is outside it, inside its parent
+            consider(node.parent);
+        }
+    }
+    return found;
+}
+
+function createTree(doc: Document): Tree {
+    const tree: Tree = { nodes: [], teardown: () => {} };
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key !== "Escape" || event.defaultPrevented) {
             return;
         }
-        const top = stack.layers.at(-1);
-        if (top?.onEscape) {
+        const top = tree.nodes.at(-1);
+        if (top?.options.onEscape) {
             event.preventDefault();
             event.stopPropagation();
-            top.onEscape(event);
+            top.options.onEscape(event);
         }
     };
     const onPointerDown = (event: PointerEvent) => {
-        for (const layer of [...stack.layers].reverse()) {
-            if (contains(layer.elements(), event.target)) {
-                return;
+        const inside = layerOfPress(tree, event.target);
+        for (const node of [...tree.nodes].reverse()) {
+            if (!isAncestorOrSelf(node, inside)) {
+                node.options.onOutsidePress?.(event);
             }
-            if (layer.ignore && contains(layer.ignore(), event.target)) {
-                return;
-            }
-            layer.onOutsidePress?.(event);
         }
     };
     doc.addEventListener("keydown", onKeyDown, true);
     doc.addEventListener("pointerdown", onPointerDown, true);
-    stack.teardown = () => {
+    tree.teardown = () => {
         doc.removeEventListener("keydown", onKeyDown, true);
         doc.removeEventListener("pointerdown", onPointerDown, true);
     };
-    return stack;
+    return tree;
 }
 
-/** Pushes a layer on its document's stack; `remove` pops it (in any order). */
-export function pushLayer(doc: Document, options: LayerOptions): Layer {
-    let stack = stacks.get(doc);
-    if (stack === undefined) {
-        stack = createStack(doc);
-        stacks.set(doc, stack);
+/** The newest open layer that contains one of `elements`. */
+function newestContaining(
+    tree: Tree,
+    elements: readonly (Element | null | undefined)[],
+): LayerNode | null {
+    for (const node of [...tree.nodes].reverse()) {
+        const own = node.options.elements();
+        if (
+            elements.some(
+                (element) =>
+                    element != null &&
+                    own.some((part) => part?.contains(element) === true),
+            )
+        ) {
+            return node;
+        }
     }
-    const current = stack;
-    current.layers.push(options);
+    return null;
+}
+
+function descendants(tree: Tree, node: LayerNode): LayerNode[] {
+    return tree.nodes.filter(
+        (candidate) =>
+            candidate !== node && isAncestorOrSelf(node, candidate.parent),
+    );
+}
+
+/** Pushes a layer on its document's tree; `remove` takes it out (in any order). */
+export function pushLayer(doc: Document, options: LayerOptions): Layer {
+    let tree = trees.get(doc);
+    if (tree === undefined) {
+        tree = createTree(doc);
+        trees.set(doc, tree);
+    }
+    const current = tree;
+    const parent =
+        newestContaining(current, options.owner?.() ?? []) ??
+        newestContaining(current, [doc.activeElement]);
+    const node: LayerNode = { options, parent };
+    current.nodes.push(node);
+    let removed = false;
     return {
-        isTop: () => current.layers.at(-1) === options,
+        isTop: () => current.nodes.at(-1) === node,
         elementsAbove: () =>
-            current.layers
-                .slice(current.layers.indexOf(options) + 1)
-                .flatMap((layer) => layer.elements())
+            descendants(current, node)
+                .flatMap((child) => child.options.elements())
                 .filter((element): element is Element => element != null),
         remove: () => {
-            const index = current.layers.indexOf(options);
-            if (index !== -1) {
-                current.layers.splice(index, 1);
+            if (removed) {
+                return;
             }
-            if (current.layers.length === 0) {
+            removed = true;
+            const below = descendants(current, node);
+            const index = current.nodes.indexOf(node);
+            if (index !== -1) {
+                current.nodes.splice(index, 1);
+            }
+            for (const child of current.nodes) {
+                if (child.parent === node) {
+                    child.parent = node.parent;
+                }
+            }
+            if (current.nodes.length === 0) {
                 current.teardown();
-                stacks.delete(doc);
+                trees.delete(doc);
+            }
+            // closing an overlay closes the overlays opened from it, newest first
+            for (const child of below.reverse()) {
+                if (current.nodes.includes(child)) {
+                    child.options.onParentClose?.();
+                }
             }
         },
     };

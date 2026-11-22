@@ -1,8 +1,22 @@
 import { watchFocusOutside } from "../layers/focus-outside.ts";
 import { pushLayer } from "../layers/layer-stack.ts";
 
-/** How an overlay asks to be dismissed (spec/README.md, "Change details"). */
-export type DismissReason = "escape-key" | "outside-press" | "focus-out";
+/**
+ * How an overlay asks to be dismissed (spec/README.md, "Change details"): `none` when the overlay
+ * it was opened from closed (spec/README.md, "The nested overlay tree").
+ */
+export type DismissReason =
+    | "escape-key"
+    | "outside-press"
+    | "focus-out"
+    | "none";
+
+/** The DOM event that dismissed it: `undefined` when an ancestor overlay closed. */
+export type DismissEvent =
+    | KeyboardEvent
+    | PointerEvent
+    | FocusEvent
+    | undefined;
 
 type Elements = () => readonly (Element | null | undefined)[];
 
@@ -11,8 +25,21 @@ export interface OverlaySessionOptions {
     elements: Elements;
     /** Elements a press on does not dismiss it (its trigger, which toggles it itself). */
     ignore?: Elements;
-    /** Called when Escape, an outside press or (with `focusOut`) focus leaving dismisses it. */
-    dismiss: (reason: DismissReason) => void;
+    /**
+     * The elements it was opened from (its triggers), which make it a child of the overlay that
+     * contains them (default: `ignore`).
+     */
+    owner?: Elements;
+    /**
+     * Elements that cover the page under it (a dialog's backdrop and viewport): a press on one is
+     * outside this overlay but inside its parent.
+     */
+    backdrops?: Elements;
+    /**
+     * Called when Escape, an outside press, (with `focusOut`) focus leaving, or the close of the
+     * overlay it was opened from (`none`) dismisses it, with the event that did.
+     */
+    dismiss: (reason: DismissReason, event?: DismissEvent) => void;
     /**
      * Non-modal overlays: dismiss when focus moves outside the overlay, its child layers and these
      * elements (usually the trigger).
@@ -41,7 +68,7 @@ export interface OverlaySessionOptions {
 }
 
 export interface OverlaySession {
-    /** The elements of the layers opened after this one (its child layers). */
+    /** The elements of the overlays opened from this one (its descendant layers). */
     elementsAbove: () => Element[];
     /** Ends the session: removes the layer and the focus watch, then returns focus if due. */
     end: () => void;
@@ -74,15 +101,19 @@ export function openOverlaySession(
     const layer = pushLayer(doc, {
         elements: options.elements,
         ignore: options.ignore,
-        onEscape: () => options.dismiss("escape-key"),
-        onOutsidePress: () => {
+        backdrops: options.backdrops,
+        owner: options.owner ?? options.ignore,
+        onEscape: (event) => options.dismiss("escape-key", event),
+        onOutsidePress: (event) => {
             if (!pressing) {
                 pressing = true;
                 doc.addEventListener("pointerup", onPressEnd, true);
                 doc.addEventListener("pointercancel", onPressEnd, true);
             }
-            options.dismiss("outside-press");
+            options.dismiss("outside-press", event);
         },
+        // closing an overlay closes the overlays opened from it
+        onParentClose: () => options.dismiss("none", undefined),
     });
     const focusOut = options.focusOut;
     const stopWatching = focusOut
@@ -93,10 +124,10 @@ export function openOverlaySession(
                   ...focusOut(),
                   ...layer.elementsAbove(),
               ],
-              () => {
+              (event) => {
                   // the outside press that already dismissed the overlay moved the focus
                   if (!pressing) {
-                      options.dismiss("focus-out");
+                      options.dismiss("focus-out", event);
                   }
               },
           )

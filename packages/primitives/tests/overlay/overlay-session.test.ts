@@ -32,8 +32,78 @@ describe("openOverlaySession", () => {
         outside.dispatchEvent(
             new PointerEvent("pointerdown", { bubbles: true }),
         );
-        expect(dismiss.mock.calls).toEqual([["escape-key"], ["outside-press"]]);
+        expect(dismiss.mock.calls.map(([reason]) => reason)).toEqual([
+            "escape-key",
+            "outside-press",
+        ]);
+        // with the event that dismissed it
+        expect(dismiss.mock.calls[0]?.[1]).toBeInstanceOf(KeyboardEvent);
+        expect(dismiss.mock.calls[1]?.[1]).toBeInstanceOf(PointerEvent);
         session.end();
+    });
+
+    it("is a child of the overlay its trigger sits in, and closes with it (reason none)", () => {
+        const { trigger, popup } = setup();
+        const dialog = document.createElement("div");
+        document.body.append(dialog);
+        dialog.append(trigger);
+        const closeDialog = vi.fn();
+        const dismiss = vi.fn();
+        const parent = openOverlaySession(document, {
+            elements: () => [dialog],
+            dismiss: closeDialog,
+        });
+        // the owner defaults to the ignored elements (the trigger)
+        const child = openOverlaySession(document, {
+            elements: () => [popup],
+            ignore: () => [trigger],
+            dismiss,
+        });
+        expect(parent.elementsAbove()).toEqual([popup]);
+        // a press inside the parent dismisses the child only
+        dialog.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        expect(dismiss).toHaveBeenCalledWith(
+            "outside-press",
+            expect.any(PointerEvent),
+        );
+        expect(closeDialog).not.toHaveBeenCalled();
+        dismiss.mockClear();
+        parent.end();
+        expect(dismiss).toHaveBeenCalledWith("none", undefined);
+        child.end();
+    });
+
+    it("counts a press on its backdrops as outside it, inside its parent", () => {
+        const { trigger, popup } = setup();
+        const parentPopup = document.createElement("div");
+        const viewport = document.createElement("div");
+        document.body.append(parentPopup, viewport);
+        parentPopup.append(trigger);
+        viewport.append(popup);
+        const closeParent = vi.fn();
+        const dismiss = vi.fn();
+        const parent = openOverlaySession(document, {
+            elements: () => [parentPopup],
+            dismiss: closeParent,
+        });
+        const child = openOverlaySession(document, {
+            elements: () => [popup],
+            backdrops: () => [viewport],
+            owner: () => [trigger],
+            dismiss,
+        });
+        viewport.dispatchEvent(
+            new PointerEvent("pointerdown", { bubbles: true }),
+        );
+        expect(dismiss).toHaveBeenCalledWith(
+            "outside-press",
+            expect.any(PointerEvent),
+        );
+        expect(closeParent).not.toHaveBeenCalled();
+        child.end();
+        parent.end();
     });
 
     it("dismisses when focus leaves, if asked", () => {
@@ -48,7 +118,10 @@ describe("openOverlaySession", () => {
         trigger.focus();
         expect(dismiss).not.toHaveBeenCalled();
         outside.focus();
-        expect(dismiss).toHaveBeenCalledWith("focus-out");
+        expect(dismiss).toHaveBeenCalledWith(
+            "focus-out",
+            expect.any(FocusEvent),
+        );
         session.end();
     });
 
@@ -157,7 +230,9 @@ describe("openOverlaySession", () => {
         );
         outside.focus();
         outside.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
-        expect(dismiss.mock.calls).toEqual([["outside-press"]]);
+        expect(dismiss.mock.calls.map(([reason]) => reason)).toEqual([
+            "outside-press",
+        ]);
         session.end();
     });
 });
