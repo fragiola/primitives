@@ -1,7 +1,7 @@
 import { Component, signal, ViewEncapsulation } from "@angular/core";
 import { combobox } from "examples-shared/recipes/combobox";
 import { Output } from "../../kit/output.ts";
-import { PRODUCE, type Produce } from "./combobox-items.ts";
+import { PRODUCE, type Produce, type ProduceGroup } from "./combobox-items.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { printValues } from "./fruits.ts";
 
@@ -25,7 +25,7 @@ let count = 0;
                     <div comboboxPopup [class]="styles.popup">
                         <div comboboxEmpty [class]="styles.empty">Nothing found.</div>
                         <div comboboxList #list="comboboxList" [class]="styles.list">
-                            @for (group of list.entries(); track group.label; let index = $index) {
+                            @for (group of asGroups(list.entries()); track group.label; let index = $index) {
                                 @if (index > 0) {
                                     <div comboboxSeparator [class]="styles.separator"></div>
                                 }
@@ -45,6 +45,10 @@ let count = 0;
     `,
 })
 export class ComboboxGroups {
+    /** The List's entries as produce groups: the API types an item as `unknown`. */
+    protected asGroups(entries: readonly unknown[]): readonly ProduceGroup[] {
+        return entries as readonly ProduceGroup[];
+    }
     protected readonly styles = combobox;
     protected readonly id = `combobox-groups-${++count}`;
     protected readonly produce = PRODUCE;

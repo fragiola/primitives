@@ -3,7 +3,7 @@ import { combobox } from "examples-shared/recipes/combobox";
 import { Output } from "../../kit/output.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { FRUIT_COMBOBOX } from "./fruit-combobox.ts";
-import { FRUITS, type Fruit, printValues } from "./fruits.ts";
+import { asFruits, FRUITS, type Fruit, printValues } from "./fruits.ts";
 
 let count = 0;
 
@@ -20,6 +20,7 @@ let count = 0;
     `,
 })
 export class ComboboxRejectedInput {
+    protected readonly asFruits = asFruits;
     protected readonly styles = combobox;
     protected readonly id = `combobox-rejected-input-${++count}`;
     protected readonly fruits = FRUITS;

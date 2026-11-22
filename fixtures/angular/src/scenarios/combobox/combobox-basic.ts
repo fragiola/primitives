@@ -3,7 +3,7 @@ import { combobox } from "examples-shared/recipes/combobox";
 import { Output } from "../../kit/output.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { FRUIT_COMBOBOX } from "./fruit-combobox.ts";
-import { FRUITS, type Fruit, printValues } from "./fruits.ts";
+import { asFruits, FRUITS, type Fruit, printValues } from "./fruits.ts";
 
 let count = 0;
 
@@ -19,6 +19,7 @@ let count = 0;
     `,
 })
 export class ComboboxBasic {
+    protected readonly asFruits = asFruits;
     protected readonly styles = combobox;
     protected readonly id = `combobox-basic-${++count}`;
     protected readonly fruits = FRUITS;

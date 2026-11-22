@@ -1,4 +1,7 @@
-import { Combobox as Primitive } from "@fragiola/primitives-react/combobox";
+import {
+    type ComboboxListProps,
+    Combobox as Primitive,
+} from "@fragiola/primitives-react/combobox";
 import { combobox } from "examples-shared/recipes/combobox";
 import type { ComponentProps } from "react";
 
@@ -39,8 +42,9 @@ export const Combobox = {
     Empty: (props: ComponentProps<typeof Primitive.Empty>) => (
         <Primitive.Empty className={combobox.empty} {...props} />
     ),
-    List: (props: ComponentProps<typeof Primitive.List>) => (
-        <Primitive.List className={combobox.list} {...props} />
+    // generic, as the primitive: the entries' type comes from the render function
+    List: <Entry,>(props: ComboboxListProps<Entry>) => (
+        <Primitive.List<Entry> className={combobox.list} {...props} />
     ),
     Group: (props: ComponentProps<typeof Primitive.Group>) => (
         <Primitive.Group className={combobox.group} {...props} />

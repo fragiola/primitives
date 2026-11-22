@@ -5,7 +5,7 @@ import { Output } from "../../kit/output.ts";
 import { TOPPINGS } from "./combobox-items.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { FRUIT_POPUP, fruitChips } from "./fruit-combobox.ts";
-import { FRUITS } from "./fruits.ts";
+import { asFruits, FRUITS } from "./fruits.ts";
 
 const NUTS = TOPPINGS.filter((topping) => topping.value === "nuts");
 
@@ -36,7 +36,7 @@ let count = 0;
                     <div comboboxPositioner [sideOffset]="4" [class]="styles.positioner">
                         <div comboboxPopup [class]="styles.popup">
                             <div comboboxList #toppingList="comboboxList" [class]="styles.list">
-                                @for (topping of toppingList.entries(); track topping.value) {
+                                @for (topping of asFruits(toppingList.entries()); track topping.value) {
                                     <div comboboxItem [value]="topping" [class]="styles.item">{{ topping.label }}</div>
                                 }
                             </div>
@@ -53,6 +53,7 @@ let count = 0;
     `,
 })
 export class ComboboxForm {
+    protected readonly asFruits = asFruits;
     protected readonly styles = combobox;
     protected readonly id = `combobox-form-fruit-${++count}`;
     protected readonly toppingsId = `combobox-form-toppings-${count}`;

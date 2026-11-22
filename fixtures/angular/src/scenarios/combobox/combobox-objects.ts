@@ -24,7 +24,7 @@ let count = 0;
                     <div comboboxPopup [class]="styles.popup">
                         <div comboboxEmpty [class]="styles.empty">No country found.</div>
                         <div comboboxList #list="comboboxList" [class]="styles.list">
-                            @for (country of list.entries(); track country.code) {
+                            @for (country of asCountries(list.entries()); track country.code) {
                                 <div comboboxItem [value]="country" [class]="styles.item">{{ country.name }}<span *comboboxItemIndicator [class]="styles['item-indicator']">✓</span></div>
                             }
                         </div>
@@ -36,6 +36,10 @@ let count = 0;
     `,
 })
 export class ComboboxObjects {
+    /** The List's entries as countries: the API types an item as `unknown`. */
+    protected asCountries(entries: readonly unknown[]): readonly Country[] {
+        return entries as readonly Country[];
+    }
     protected readonly styles = combobox;
     protected readonly id = `combobox-objects-${++count}`;
     protected readonly countries = COUNTRIES;

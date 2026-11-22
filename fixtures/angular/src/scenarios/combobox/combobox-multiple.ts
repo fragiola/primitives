@@ -3,7 +3,7 @@ import { combobox } from "examples-shared/recipes/combobox";
 import { Output } from "../../kit/output.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { FRUIT_POPUP_WITH_INDICATOR, fruitChips } from "./fruit-combobox.ts";
-import { FRUITS, type Fruit, printValues } from "./fruits.ts";
+import { asFruits, FRUITS, type Fruit, printValues } from "./fruits.ts";
 
 const DEFAULT = FRUITS.filter(
     (fruit) => fruit.value === "apple" || fruit.value === "cherry",
@@ -34,6 +34,7 @@ let count = 0;
     `,
 })
 export class ComboboxMultiple {
+    protected readonly asFruits = asFruits;
     protected readonly styles = combobox;
     protected readonly id = `combobox-multiple-${++count}`;
     protected readonly fruits = FRUITS;

@@ -41,8 +41,8 @@ import {
 } from "@fragiola/primitives-angular/internal";
 
 /** An item, a value, or a list of values: the consumer's own type (spec/combobox.md, "API"). */
-// biome-ignore lint/suspicious/noExplicitAny: an item is the consumer's own type
-export type ComboboxItemValue = any;
+// `unknown` in the declarations (no `any`): a template narrows it to its own item type
+export type ComboboxItemValue = unknown;
 
 /** A rendered Item, as the Root knows it. */
 export interface ComboboxItemInfo {
@@ -76,9 +76,10 @@ export class ComboboxRoot {
     /** The items, or groups of items: the combobox filters them, the List renders the matches. */
     readonly items = input<readonly ComboboxItemValue[] | undefined>(undefined);
     /** Whether an item matches the query; `null` turns filtering off. */
-    readonly filter = input<ItemFilter<ComboboxItemValue> | null | undefined>(
-        undefined,
-    );
+    // The callbacks take the consumer's own items: their parameters are `never` in the
+    // declarations, so a function typed for them (`(country: Country) => string`) binds with no
+    // `any`; the Root calls them with the items it was given.
+    readonly filter = input<ItemFilter<never> | null | undefined>(undefined);
     /** The most items the list renders; `-1` for no limit. */
     readonly limit = input(-1);
     readonly locale = input<string | undefined>(undefined);
@@ -101,15 +102,21 @@ export class ComboboxRoot {
     readonly inputValueChange = output<string>();
     readonly defaultInputValue = input<string | undefined>(undefined);
     readonly inputValueChangeDetails = output<ValueChangeEvent<string>>();
-    readonly isItemEqualToValue = input<
-        ItemEquality<ComboboxItemValue> | undefined
-    >(undefined);
-    readonly itemToStringLabel = input<
-        ((item: ComboboxItemValue) => string) | undefined
-    >(undefined);
-    readonly itemToStringValue = input<
-        ((item: ComboboxItemValue) => string) | undefined
-    >(undefined);
+    readonly isItemEqualToValue = input<ItemEquality<never> | undefined>(
+        undefined,
+    );
+    readonly itemToStringLabel = input<((item: never) => string) | undefined>(
+        undefined,
+    );
+    readonly itemToStringValue = input<((item: never) => string) | undefined>(
+        undefined,
+    );
+    private readonly equality = computed(
+        () =>
+            this.isItemEqualToValue() as
+                | ItemEquality<ComboboxItemValue>
+                | undefined,
+    );
     readonly name = input<string | undefined>(undefined);
     readonly required = input(false, { transform: booleanAttribute });
     readonly disabled = input(false, { transform: booleanAttribute });
@@ -195,7 +202,10 @@ export class ComboboxRoot {
     }));
 
     private readonly resolvedFilter = computed(() => {
-        const filter = this.filter();
+        const filter = this.filter() as
+            | ItemFilter<ComboboxItemValue>
+            | null
+            | undefined;
         return filter === undefined
             ? containsFilter<ComboboxItemValue>(this.locale())
             : filter;
@@ -296,16 +306,26 @@ export class ComboboxRoot {
 
     /** An item's text (`itemToStringLabel`). */
     label(item: ComboboxItemValue): string {
-        return itemLabel(item, this.itemToStringLabel());
+        return itemLabel(
+            item,
+            this.itemToStringLabel() as
+                | ((item: ComboboxItemValue) => string)
+                | undefined,
+        );
     }
 
     /** An item's form value (`itemToStringValue`). */
     formValue(item: ComboboxItemValue): string {
-        return itemFormValue(item, this.itemToStringValue());
+        return itemFormValue(
+            item,
+            this.itemToStringValue() as
+                | ((item: ComboboxItemValue) => string)
+                | undefined,
+        );
     }
 
     isSelected(item: ComboboxItemValue): boolean {
-        return includesItem(this.values(), item, this.isItemEqualToValue());
+        return includesItem(this.values(), item, this.equality());
     }
 
     setInputValue(next: string, reason: ChangeReason): void {
@@ -350,10 +370,9 @@ export class ComboboxRoot {
             this.setOpen(false, "item-press");
             return;
         }
-        this.selection.set(
-            toggleItem(this.values(), item, this.isItemEqualToValue()),
-            { reason: "item-press" },
-        );
+        this.selection.set(toggleItem(this.values(), item, this.equality()), {
+            reason: "item-press",
+        });
         if (this.inputValue().trim() !== "") {
             this.text.set("", { reason: "input-clear" });
             this.setOpen(false, "item-press");

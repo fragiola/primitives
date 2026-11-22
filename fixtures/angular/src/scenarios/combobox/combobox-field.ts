@@ -6,7 +6,7 @@ import { Output } from "../../kit/output.ts";
 import { FIELD_PARTS } from "../field/field-parts.ts";
 import { COMBOBOX_PARTS } from "./combobox-parts.ts";
 import { FRUIT_POPUP } from "./fruit-combobox.ts";
-import { FRUITS } from "./fruits.ts";
+import { asFruits, FRUITS } from "./fruits.ts";
 
 /** The combobox inside a Field: labelled, described and validated by it (spec/combobox.md). */
 @Component({
@@ -34,6 +34,7 @@ import { FRUITS } from "./fruits.ts";
     `,
 })
 export class ComboboxField {
+    protected readonly asFruits = asFruits;
     protected readonly styles = combobox;
     protected readonly fieldStyles = field;
     protected readonly fruits = FRUITS;

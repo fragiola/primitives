@@ -12,7 +12,7 @@ export const FRUIT_POPUP = `
             <div comboboxPopup [class]="styles.popup">
                 <div comboboxEmpty [class]="styles.empty">No fruit found.</div>
                 <div comboboxList #list="comboboxList" [class]="styles.list">
-                    @for (fruit of list.entries(); track fruit.value) {
+                    @for (fruit of asFruits(list.entries()); track fruit.value) {
                         <div comboboxItem [value]="fruit" [disabled]="fruit.disabled ?? false" [class]="styles.item">{{ fruit.label }}</div>
                     }
                 </div>
@@ -28,7 +28,7 @@ export const FRUIT_POPUP_WITH_INDICATOR = `
             <div comboboxPopup [class]="styles.popup">
                 <div comboboxEmpty [class]="styles.empty">No fruit found.</div>
                 <div comboboxList #list="comboboxList" [class]="styles.list">
-                    @for (fruit of list.entries(); track fruit.value) {
+                    @for (fruit of asFruits(list.entries()); track fruit.value) {
                         <div comboboxItem [value]="fruit" [disabled]="fruit.disabled ?? false" [class]="styles.item">{{ fruit.label }}<span *comboboxItemIndicator [class]="styles['item-indicator']">✓</span></div>
                     }
                 </div>
@@ -65,7 +65,7 @@ export const FRUIT_COMBOBOX = `
 export function fruitChips(root: string, id: string, buttons: string): string {
     return `
         <div comboboxChips [class]="styles.chips">
-            @for (item of ${root}.value(); track item.value) {
+            @for (item of asFruits(${root}.value()); track item.value) {
                 <div comboboxChip [class]="styles.chip">{{ item.label }}<button comboboxChipRemove [attr.aria-label]="'Remove ' + item.label" [class]="styles['chip-remove']">×</button></div>
             }
             <input comboboxInput [id]="${id}" [class]="styles.input" />

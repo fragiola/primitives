@@ -4,15 +4,20 @@ import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ComboboxContext, orderedItems } from "./combobox-context.ts";
 
-export interface ComboboxListProps
+export interface ComboboxListProps<Entry = unknown>
     extends Omit<PartProps<{ empty: boolean }>, "children"> {
-    /** Nodes, or a render function of each matching entry (an item, or a group). */
-    // biome-ignore lint/suspicious/noExplicitAny: an entry is the consumer's own item type
-    children?: ReactNode | ((entry: any, index: number) => ReactNode);
+    /**
+     * Nodes, or a render function of each matching entry (an item, or a group). `Entry` is the
+     * consumer's own type, inferred from the function's parameter.
+     */
+    children?: ReactNode | ((entry: Entry, index: number) => ReactNode);
 }
 
 /** The `listbox`. Applies the highlight the keyboard asked for once its items render. */
-export function ComboboxList({ children, ...props }: ComboboxListProps) {
+export function ComboboxList<Entry = unknown>({
+    children,
+    ...props
+}: ComboboxListProps<Entry>) {
     const context = useRequiredContext(ComboboxContext, "Combobox.List");
     const { list, pendingHighlight, setHighlighted, itemCount, open } = context;
 
@@ -37,7 +42,10 @@ export function ComboboxList({ children, ...props }: ComboboxListProps) {
         : itemCount === 0;
     const content =
         typeof children === "function"
-            ? context.entries.map((entry, index) => children(entry, index))
+            ? context.entries.map((entry, index) =>
+                  // the Root holds the consumer's items: the render function names their type
+                  children(entry as Entry, index),
+              )
             : children;
     return renderElement(
         "div",

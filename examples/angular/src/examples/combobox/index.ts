@@ -52,7 +52,7 @@ const FRUITS: Fruit[] = [
             <label for="fruits" [class]="styles.label">Fruits</label>
             <ng-container comboboxRoot #combobox="comboboxRoot" multiple [items]="fruits" [defaultValue]="initial" name="fruits">
                 <div comboboxChips [class]="styles.chips">
-                    @for (fruit of chips(combobox.value()); track fruit.value) {
+                    @for (fruit of asFruits(combobox.value()); track fruit.value) {
                         <div comboboxChip [class]="styles.chip">{{ fruit.label }}<button comboboxChipRemove [attr.aria-label]="'Remove ' + fruit.label" [class]="styles.chipRemove">×</button></div>
                     }
                     <input comboboxInput id="fruits" [class]="styles.input" />
@@ -62,7 +62,7 @@ const FRUITS: Fruit[] = [
                         <div comboboxPopup [class]="styles.popup">
                             <div comboboxEmpty [class]="styles.empty">No fruit found.</div>
                             <div comboboxList #list="comboboxList" [class]="styles.list">
-                                @for (fruit of list.entries(); track fruit.value) {
+                                @for (fruit of asFruits(list.entries()); track fruit.value) {
                                     <div comboboxItem [value]="fruit" [class]="styles.item">{{ fruit.label }}<span *comboboxItemIndicator [class]="styles.itemIndicator">✓</span></div>
                                 }
                             </div>
@@ -77,8 +77,11 @@ export default class FruitTags {
     protected readonly styles = styles;
     protected readonly fruits = FRUITS;
     protected readonly initial = [FRUITS[0]];
-    /** The combobox's value, as the fruits it holds. */
-    protected chips(value: unknown): Fruit[] {
-        return value as Fruit[];
+    /**
+     * The combobox's values or the List's entries, as fruits: its API types an item as
+     * `unknown`, the consumer's own type.
+     */
+    protected asFruits(items: unknown): readonly Fruit[] {
+        return items as readonly Fruit[];
     }
 }
