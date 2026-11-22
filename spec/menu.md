@@ -27,13 +27,22 @@ Positioner and Popup carry `data-nested`.
 
 ## API
 
-**Root**: `open`, `defaultOpen`, `onOpenChange(open, details)`, `loopFocus` (`true`: arrow keys
-wrap; Base UI's name, D4 §3 "Naming", the POC's `loop`), `modal` (`false`; see "Modal").
+**Root**: `open`, `defaultOpen`, `onOpenChange(open, details)` (an `OpenChangeDetails`,
+[README](README.md#open-change-details)), `onOpenChangeComplete(open)`, the actions (`close()`,
+`unmount()`; React `actionsRef`), `loopFocus` (`true`: arrow keys wrap; Base UI's name, D4 §3
+"Naming", the POC's `loop`), `modal` (`false`; see "Modal"), `handle`, `triggerId` /
+`defaultTriggerId` (the active trigger, [README](README.md#detached-triggers)); its content may
+be a function of the active trigger's `payload`.
 
-**SubmenuRoot**: `open`, `defaultOpen`, `onOpenChange`, `loopFocus`. Its default positioning is
-`side="inline-end" align="start"`. It follows its root menu's `modal`.
+**SubmenuRoot**: `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete`, the actions,
+`loopFocus`. Its default positioning is `side="inline-end" align="start"`. It follows its root
+menu's `modal`. It takes no handle (its trigger is its SubmenuTrigger).
 
-**Trigger**: `disabled`.
+**Trigger**: `disabled`, `handle`, `payload`, `id` (as [Dialog's](dialog.md#api)).
+
+**createHandle**: `createMenuHandle<Payload>()` (React and Vue also `Menu.createHandle`).
+
+**Portal**: `container`, `keepMounted` (`false`; [README](README.md#lifecycle)).
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`.
 
@@ -50,9 +59,9 @@ opens it).
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming"), `data-disabled` |
-| Positioner | as Popover's, plus `data-nested` for a submenu |
-| Popup | `role="menu"`, `aria-labelledby` (the Trigger's or SubmenuTrigger's id), `aria-orientation="vertical"`, `tabindex="-1"`, `data-open`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style`, `data-nested` |
+| Trigger | `aria-haspopup="menu"`, `aria-expanded` (`"true"` on the active trigger while open), `aria-controls` (on the active trigger while open), `data-popup-open` on the active trigger while open (Base UI's name, D4 §3 "Naming"), `data-disabled`, an `id` |
+| Positioner | as Popover's (`data-open` / `data-closed`; `hidden` while kept mounted and closed), plus `data-nested` for a submenu |
+| Popup | `role="menu"`, `aria-labelledby` (the active Trigger's or the SubmenuTrigger's id), `aria-orientation="vertical"`, `tabindex="-1"`, `data-open` / `data-closed`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style`, `data-nested` |
 | Item | `role="menuitem"`, `tabindex="-1"`, `aria-disabled="true"` and `data-disabled` when disabled, `data-highlighted` while highlighted |
 | SubmenuTrigger | `role="menuitem"`, `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while its submenu is open, `data-highlighted`, `data-disabled` |
 | Separator | `role="separator"`, `aria-orientation="horizontal"` |
@@ -103,6 +112,10 @@ reaches the new level (AGENTS.md, "Porting a component", item 8).
   for a submenu's Escape).
 - An outside press on a non-modal menu moves no focus (the press puts it where the user pressed);
   on a modal menu, where the press reaches nothing, focus returns to the Trigger.
+- A close with the reason `imperative-action` (a handle, the actions) returns focus as `none`
+  does: a root menu's focus left inside it goes back to its Trigger.
+- **Moving to another trigger** (detached triggers): a press on another Trigger of the open menu
+  moves the menu there and focuses its popup with no highlight, as a pointer opening does.
 
 ## Pointer
 
@@ -134,8 +147,18 @@ Both end when the menu closes. A submenu follows its root: it adds no lock of it
 
 ## Dismissal and layering
 
-Each menu level is a layer; a submenu is a child layer of its parent menu. Escape closes one level;
-an outside press, Tab and item activation close them all.
+Each menu level is a layer of the nested overlay tree; a submenu is a child layer of its parent
+menu, and a menu opened from inside another overlay (a Popover's popup) is that overlay's child
+([`/dialog/nested-tree`](dialog.md#dialognested-tree)). Escape closes one level; an outside press,
+Tab and item activation close them all; a press inside a parent level closes the levels below it
+only.
+
+## Detached triggers
+
+As [Dialog's](dialog.md#detached-triggers) ([README](README.md#detached-triggers)): the menu
+anchors to its active trigger and is labelled by it; a press on another Trigger while open moves it
+there (it stays open, with that Trigger's payload, `onOpenChange(true, details)` with
+`trigger-press`); the keys of the Trigger table open it from any of its Triggers.
 
 ## Positioning
 
@@ -145,7 +168,8 @@ As [popover.md](popover.md#positioning), with the defaults above. A submenu flip
 
 ## Animation
 
-As [popover.md](popover.md#animation), for each level.
+As [popover.md](popover.md#animation), for each level; `keepMounted`, `onOpenChangeComplete` and the
+actions as [README](README.md#lifecycle).
 
 ## RTL
 
@@ -247,6 +271,38 @@ Checks:
    wheel scrolls the page.
 4. Reopen; the pointer still works inside: clicking "Rename" prints `action: Rename`.
 5. Reopen; clicking "Options" closes the menu (`reason: trigger-press`).
+
+### `/menu/detached`
+
+One Menu opened from three rows. A list of three rows, each with the name **"Ada"**, **"Grace"**,
+**"Alan"** as text and a Trigger **"Actions for Ada"** (`id="actions-ada"`, `payload` `"Ada"`),
+**"Actions for Grace"** (`actions-grace`), **"Actions for Alan"** (`actions-alan`), with the
+`handle` of a Root after the list. The Root's content is a function of the payload: a Positioner
+and a Popup with the items **"Rename <name>"** and **"Delete <name>"** (one text node each);
+clicking an item prints it. Output: `open: ...`, `reason: ...`, `trigger: <id or none>`,
+`chosen: <the last item clicked, or none>`.
+
+Checks:
+
+1. Click "Actions for Grace": a `menu` named "Actions for Grace" with the items "Rename Grace" and
+   "Delete Grace", its top below the trigger's bottom and its start edge aligned with the
+   trigger's (±1 px); only "Actions for Grace" has `aria-expanded="true"`.
+2. Click "Actions for Alan" while it is open: the menu stays open (`open: true`, `reason:
+   trigger-press`, `trigger: actions-alan`), is named "Actions for Alan" with "Rename Alan", below
+   "Actions for Alan"; "Actions for Grace" has `aria-expanded="false"`.
+3. Click "Delete Alan": `chosen: Delete Alan`, the menu closes (`reason: item-press`), focus on
+   "Actions for Alan".
+4. Focus "Actions for Ada" and press ArrowDown: a `menu` named "Actions for Ada" opens with "Rename
+   Ada" focused (`reason: list-navigation`, `trigger: actions-ada`).
+5. Axe finds no violation while open.
+
+### `/menu/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a Trigger **"Actions"**;
+a Portal with `keepMounted` holding a Positioner (the kept-mounted part) and a Popup with the
+items **"Edit"** and **"Delete"**.
+
+Checks: the common checks (no "Close with actions").
 
 ## Differences from Base UI
 

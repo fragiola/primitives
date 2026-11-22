@@ -28,7 +28,9 @@ and scroll arrows are out of scope.
 
 - `value`, `defaultValue` (`null`), `onValueChange(value, details)`: the selected item's `value`
   (a string), or `null`.
-- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)`.
+- `open`, `defaultOpen` (`false`), `onOpenChange(open, details)` (an `OpenChangeDetails`,
+  [README](README.md#open-change-details); `trigger` is the Trigger), `onOpenChangeComplete(open)`,
+  the actions (`close()`, `unmount()`; React `actionsRef`).
 - `items`: every item, `{ value, label, disabled? }[]`. The Root needs them while the list is
   closed (the Value's label, typeahead on the closed trigger, the hidden input); the consumer
   renders the Items from the same array.
@@ -41,6 +43,9 @@ and scroll arrows are out of scope.
 `label`.
 
 **ItemIndicator**: `keepMounted` (`false`).
+
+**Portal**: `container`, `keepMounted` (`false`: the list stays rendered, hidden, while closed;
+[README](README.md#lifecycle)).
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`, `sideOffset` `4`.
 `--anchor-width` lets the consumer make the popup at least as wide as the trigger.
@@ -63,7 +68,7 @@ only one, and the list never covers what the user just read.
 | --- | --- |
 | Trigger | `role="combobox"`, `type="button"`, `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls` (the List's id, while open), `aria-activedescendant` (the highlighted item's id, while open), `aria-required="true"` when required, `disabled` and `data-disabled`, `data-popup-open` while the list is open (Base UI's name, D4 §3 "Naming"), `data-placeholder` while nothing is selected |
 | Value | `data-placeholder` while nothing is selected |
-| Positioner, Popup | as Popover's (Popup has no role) |
+| Positioner, Popup | as Popover's (Popup has no role): `data-open` / `data-closed`; the Positioner `hidden` while kept mounted and closed |
 | List | `role="listbox"`, an `id`, `aria-labelledby` (the trigger's labels: the consumer's `<label>` and the trigger) |
 | Item | `role="option"`, an `id`, `aria-selected` (`"true"` on the selected item, `"false"` on the others), `aria-disabled="true"` and `data-disabled`, `data-highlighted`, `data-selected` |
 | ItemIndicator | `aria-hidden="true"` |
@@ -160,7 +165,9 @@ As [popover.md](popover.md#positioning), from the Trigger (see "Item alignment")
 
 ## Animation
 
-As [popover.md](popover.md#animation).
+As [popover.md](popover.md#animation); `keepMounted`, `onOpenChangeComplete` and the actions as
+[README](README.md#lifecycle). A canceled close (`details.cancel()`) leaves the list open with its
+highlight; a choice whose close is canceled still changes the value.
 
 ## RTL
 
@@ -234,6 +241,15 @@ Checks ("Modal"):
 
 The non-modal default is checked by `/select/basic` (check 10: while open, the page keeps the
 pointer and its scroll).
+
+### `/select/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a `<label for>`
+**"Fruit"** for the Trigger of a Select with the basic items and placeholder **"Choose a
+fruit"**; its Portal has `keepMounted` (the Positioner is the kept-mounted part). The checks open
+it with a click on the trigger.
+
+Checks: the common checks (no "Close with actions").
 
 ## Differences from Base UI
 

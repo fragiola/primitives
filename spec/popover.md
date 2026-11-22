@@ -23,11 +23,17 @@ shown on hover is a [Tooltip](tooltip.md).
 
 ## API
 
-**Root**: `open`, `defaultOpen` (`false`), `onOpenChange(open, details)`.
+**Root**: `open`, `defaultOpen` (`false`), `onOpenChange(open, details)` (an
+`OpenChangeDetails`, [README](README.md#open-change-details)), `onOpenChangeComplete(open)`, the
+actions (`close()`, `unmount()`; React `actionsRef`), `handle`, `triggerId` / `defaultTriggerId`
+(the active trigger, [README](README.md#detached-triggers)); its content may be a function of the
+active trigger's `payload`.
 
-**Trigger**: `disabled`.
+**Trigger**: `disabled`, `handle`, `payload`, `id` (as [Dialog's](dialog.md#api)).
 
-**Portal**: `container`.
+**createHandle**: `createPopoverHandle<Payload>()` (React and Vue also `Popover.createHandle`).
+
+**Portal**: `container`, `keepMounted` (`false`; [README](README.md#lifecycle)).
 
 **Positioner**: `side` (`"bottom"`; one of `top`, `bottom`, `inline-start`, `inline-end`, `left`,
 `right`), `align` (`"center"`; `start`, `center`, `end`), `sideOffset` (`0`, px), `alignOffset`
@@ -44,10 +50,10 @@ The positioning types (`Side`, `Align`) are re-exported as types from the compon
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming"), `data-disabled` |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin`; structural inline style (`position`, `top`, `left`) |
-| Popup | `role="dialog"` (no `aria-modal`), `aria-labelledby` / `aria-describedby` when Title / Description exist, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
-| Arrow | `data-side`, `data-align`, `aria-hidden="true"`; structural inline style placing it along the popup's edge |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded` (`"true"` on the active trigger while open), `aria-controls` (on the active trigger while open), `data-popup-open` on the active trigger while open (Base UI's name, D4 §3 "Naming"), `data-disabled`, an `id` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin`; structural inline style (`position`, `top`, `left`); `hidden` while kept mounted and closed |
+| Popup | `role="dialog"` (no `aria-modal`), `aria-labelledby` / `aria-describedby` when Title / Description exist, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
+| Arrow | `data-side`, `data-align`, `data-open` / `data-closed`, `aria-hidden="true"`; structural inline style placing it along the popup's edge |
 | Title, Description | an `id` |
 
 ## Keyboard
@@ -69,7 +75,8 @@ The positioning types (`Side`, `Align`) are re-exported as types from the compon
   even though it is portalled: Tab from the open popover's trigger enters the popup.
 - When focus leaves the popup and its child layers (by Tab, or by clicking a focusable element
   outside), the popover closes (reason `focus-out` or `outside-press`).
-- **On close**: Escape, Close and the trigger return focus to `finalFocus`, else the trigger.
+- **On close**: Escape, Close and the trigger return focus to `finalFocus`, else the active
+  trigger.
   Focus leaving (`focus-out`) moves no focus: it is already where the user put it.
 - **After an outside press** (D4 §3 "Popover focus after an outside press", a change from the
   POC, following Base UI since the APG says nothing): focus returns to `finalFocus` (else the
@@ -79,7 +86,10 @@ The positioning types (`Side`, `Align`) are re-exported as types from the compon
 - **A close made through the controlled `open`** (the consumer's own, reason `none`; Epic #22):
   it uses its own reason, never the previous change's. Focus returns to `finalFocus` (else the
   trigger) only when it was left on the body or inside the closing popup, as after an outside
-  press; focus the consumer put elsewhere stays there.
+  press; focus the consumer put elsewhere stays there. A close with the reason
+  `imperative-action` (a handle, the actions) returns focus the same way.
+- **Moving to another trigger** (detached triggers): a press on another Trigger of the open
+  popover moves it there; focus then moves into the popup again, as on an opening.
 
 ## Pointer
 
@@ -90,10 +100,18 @@ The positioning types (`Side`, `Align`) are re-exported as types from the compon
 
 ## Dismissal and layering
 
-The popover is a layer (see [dialog.md](dialog.md#dismissal-and-layering)). Opened inside another
-layer (a Dialog's popup), it is that layer's child: Escape and a press inside the parent close
-the popover first ([`/dialog/nested-popover`](dialog.md#dialognested-popover)). No scroll lock, no
-inert page.
+The popover is a layer of the nested overlay tree (see
+[dialog.md](dialog.md#dismissal-and-layering)). Opened from inside another layer (a Dialog's
+popup), it is that layer's child: Escape and a press inside the parent close the popover first
+([`/dialog/nested-popover`](dialog.md#dialognested-popover)); a Menu opened from its popup is its
+own child ([`/dialog/nested-tree`](dialog.md#dialognested-tree)), so focus moving into that menu
+is not focus leaving the popover. No scroll lock, no inert page.
+
+## Detached triggers
+
+As [Dialog's](dialog.md#detached-triggers) ([README](README.md#detached-triggers)): the
+popover anchors to its active trigger, and a press on another Trigger while open moves it there
+(it stays open with that Trigger's payload, `onOpenChange(true, details)` with `trigger-press`).
 
 ## Positioning
 
@@ -112,8 +130,10 @@ inert page.
 ## Animation
 
 Popup carries `data-starting-style` / `data-ending-style` as in [dialog.md](dialog.md#animation);
-the Positioner stays mounted until the popup's exit animations finish. `--transform-origin` points
-at the anchor so a scale transition grows from it.
+the Positioner stays mounted until the popup's exit animations finish (with the Portal's
+`keepMounted`, it is then hidden: `hidden`, `data-closed`). `--transform-origin` points at the
+anchor so a scale transition grows from it. `onOpenChangeComplete`, the actions and
+`preventUnmountOnClose()` as [README](README.md#lifecycle).
 
 ## RTL
 
@@ -199,6 +219,34 @@ Checks:
 2. Opened by "Settings", closed by Shift+Tab (`focus-out`, no focus return), then opened by
    "Show settings" and closed by "Done": focus returns to "Settings" (the close does not reuse
    `focus-out`).
+
+### `/popover/detached`
+
+Two Triggers with the `handle` of one Root, which sits after them: **"Info for Ada"**
+(`id="info-ada"`, `payload` `"Ada"`) and **"Info for Grace"** (`info-grace`, `"Grace"`), in a row.
+The Root's content is a function of the payload: a Positioner (`sideOffset` 4) and a Popup with
+Title **"About <name>"** (one text node) and a Close **"Close"**. Output: `open: ...`,
+`reason: ...`, `trigger: <id or none>`.
+
+Checks:
+
+1. Click "Info for Ada": a `dialog` named "About Ada", below "Info for Ada" (its top under the
+   trigger's bottom, overlapping it horizontally); output `trigger: info-ada`.
+2. Click "Info for Grace" while it is open: it stays open (`open: true`, `reason: trigger-press`,
+   `trigger: info-grace`), is now named "About Grace", below "Info for Grace"; only "Info for
+   Grace" has `aria-expanded="true"` (contract layer: and `data-popup-open`).
+3. Escape closes it and returns focus to "Info for Grace".
+4. Axe finds no violation while open.
+
+### `/popover/lifecycle`
+
+The lifecycle scenario ([README](README.md#the-lifecycle-scenarios)): a Trigger **"Open
+popover"**; a Portal with `keepMounted` holding a Positioner (the kept-mounted part, `hidden`
+while closed) and a Popup with Title **"Lifecycle"**, a button **"Close with actions"** and a
+Close **"Close"**.
+
+Checks: the common checks; "Close with actions" moves focus, left inside the popup, back to "Open
+popover" (the focus return of `none`).
 
 ## Differences from Base UI
 
