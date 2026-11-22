@@ -7,7 +7,9 @@ import {
     requireExamples,
 } from "../helpers.ts";
 
-// slider: a volume and a price range (spec/slider.md).
+// slider: a volume and a price range (spec/slider.md), each named by its Slider.Label ("Volume",
+// "Price") and showing its Slider.Value; the price is formatted as US dollars (`format`,
+// `locale="en-US"`), which also gives the thumbs their `aria-valuetext`.
 
 test("the keyboard steps and jumps; the range thumbs stay ten apart", async ({
     page,
@@ -20,9 +22,12 @@ test("the keyboard steps and jumps; the range thumbs stay ten apart", async ({
         "slider-thumb",
     );
     await expect(volume).toHaveAttribute("aria-valuenow", "50");
+    const values = frame.locator('[data-primitives-part="slider-value"]');
+    await expect(values.nth(0)).toHaveText("50");
     await volume.focus();
     await page.keyboard.press("ArrowRight");
     await expect(volume).toHaveAttribute("aria-valuenow", "51");
+    await expect(values.nth(0)).toHaveText("51");
     await page.keyboard.press("PageDown");
     await expect(volume).toHaveAttribute("aria-valuenow", "41");
     await page.keyboard.press("End");
@@ -30,10 +35,14 @@ test("the keyboard steps and jumps; the range thumbs stay ten apart", async ({
 
     const min = frame.getByRole("slider", { name: "Minimum price" });
     const max = frame.getByRole("slider", { name: "Maximum price" });
+    await expect(frame.getByRole("group", { name: "Price" })).toBeVisible();
     await expect(min).toHaveAttribute("aria-valuetext", "$20");
+    await expect(values.nth(1)).toHaveText("$20 – $80");
     await min.focus();
     await page.keyboard.press("End");
     await expect(min).toHaveAttribute("aria-valuenow", "70");
+    await expect(min).toHaveAttribute("aria-valuetext", "$70");
+    await expect(values.nth(1)).toHaveText("$70 – $80");
     await max.focus();
     await page.keyboard.press("Home");
     await expect(max).toHaveAttribute("aria-valuenow", "80");
