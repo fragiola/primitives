@@ -8,7 +8,7 @@ import { blockOutsidePointer } from "@fragiola/primitives/inert";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import { lockScroll } from "@fragiola/primitives/scroll-lock";
-import { defineComponent, watch } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import { useProvidedDirection } from "../../direction/direction-context.ts";
@@ -62,6 +62,9 @@ export const MenuPopup: PartComponent<
             const context = useRequiredContext(MenuKey, "Menu.Popup");
             const nested = context.parent !== null;
             const setPopup = elementSetter(context.popup);
+            // whether the layer is open: the opening focus waits for it, or a parent dialog's
+            // focus trap (which accepts its child layers only) takes the focus back
+            const layered = ref(false);
 
             watch(
                 () =>
@@ -107,7 +110,11 @@ export const MenuPopup: PartComponent<
                                     : context.returnTarget(),
                         },
                     });
-                    onCleanup(() => session.end());
+                    layered.value = true;
+                    onCleanup(() => {
+                        session.end();
+                        layered.value = false;
+                    });
                 },
                 { flush: "post", immediate: true },
             );
@@ -120,9 +127,10 @@ export const MenuPopup: PartComponent<
                         context.open.value,
                         context.popup.value,
                         context.trigger.value,
+                        layered.value,
                     ] as const,
-                ([open, popup]) => {
-                    if (!open || popup === null) {
+                ([open, popup, , isLayered]) => {
+                    if (!open || popup === null || !isLayered) {
                         return;
                     }
                     const items = menuItems(popup);

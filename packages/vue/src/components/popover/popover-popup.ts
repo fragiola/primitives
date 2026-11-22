@@ -5,7 +5,7 @@ import {
 } from "@fragiola/primitives/focus";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
 import type { Align, Side } from "@fragiola/primitives/positioning";
-import { defineComponent, type PropType, watch } from "vue";
+import { defineComponent, type PropType, ref, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
@@ -64,6 +64,9 @@ export const PopoverPopup: PartComponent<PopoverPopupProps, PopoverPopupState> =
             setup(props, { attrs, slots }) {
                 const context = useRequiredContext(PopoverKey, "Popover.Popup");
                 const setPopup = elementSetter(context.popup);
+                // whether the layer is open: the opening focus waits for it, or a parent dialog's
+                // focus trap (which accepts its child layers only) takes the focus back
+                const layered = ref(false);
                 watch(
                     () =>
                         [
@@ -101,7 +104,11 @@ export const PopoverPopup: PartComponent<PopoverPopupProps, PopoverPopupState> =
                                 },
                             },
                         );
-                        onCleanup(session.end);
+                        layered.value = true;
+                        onCleanup(() => {
+                            session.end();
+                            layered.value = false;
+                        });
                     },
                     { flush: "post", immediate: true },
                 );
@@ -113,9 +120,10 @@ export const PopoverPopup: PartComponent<PopoverPopupProps, PopoverPopupState> =
                             context.open.value,
                             context.popup.value,
                             context.trigger.value,
+                            layered.value,
                         ] as const,
-                    ([open, popup]) => {
-                        if (!open || popup === null) {
+                    ([open, popup, , isLayered]) => {
+                        if (!open || popup === null || !isLayered) {
                             return;
                         }
                         const initial = resolveFocusTarget(props.initialFocus);
