@@ -25,13 +25,18 @@ export const positionerProps = {
     anchor: { type: Object as () => Element | null, default: undefined },
 };
 
-/** Positions an overlay's positioner next to its anchor while both exist; reports where it went. */
+/**
+ * Positions an overlay's positioner next to its anchor while both exist and the overlay is
+ * `mounted` (open or its exit running): a kept-mounted closed overlay is not positioned
+ * (spec/README.md, "Lifecycle"). Reports where it went.
+ */
 export function usePositioner(
     props: PositionerProps,
     defaults: { side: Side; align: Align },
     anchor: Ref<HTMLElement | null>,
     positioner: Ref<HTMLElement | null>,
     arrow: Ref<HTMLElement | null> | null,
+    mounted?: Ref<boolean>,
 ) {
     const direction = useProvidedDirection();
     const placed = ref<{ side: Side; align: Align }>({
@@ -41,7 +46,9 @@ export function usePositioner(
     watch(
         () =>
             [
-                props.anchor ?? anchor.value,
+                mounted === undefined || mounted.value
+                    ? (props.anchor ?? anchor.value)
+                    : null,
                 positioner.value,
                 arrow?.value ?? null,
                 props.side ?? defaults.side,

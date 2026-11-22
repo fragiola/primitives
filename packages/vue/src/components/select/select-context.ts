@@ -22,9 +22,9 @@ export interface SelectContext extends OverlayRoot {
     modal: () => boolean;
     highlighted: Ref<string | null>;
     /** Opens the list with this item highlighted. */
-    openOn: (value: string | null, reason: ChangeReason) => void;
+    openOn: (value: string | null, reason: ChangeReason, event?: Event) => void;
     /** Chooses an enabled item and closes. */
-    choose: (value: string, reason: ChangeReason) => void;
+    choose: (value: string, reason: ChangeReason, event?: Event) => void;
     listId: string;
     /** The id of item `value`'s option element. */
     itemId: (value: string) => string;

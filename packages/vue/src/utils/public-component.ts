@@ -39,6 +39,11 @@ export interface ContentSlots {
     default?: () => VNode[];
 }
 
+/** The slots of an overlay Root with detached triggers: its content, with the active payload. */
+export interface OverlayRootSlots<Payload = unknown> {
+    default?: (scope: { payload: Payload | undefined }) => VNode[];
+}
+
 /** Gives a component the public type its declaration states (see `PublicComponent`). */
 export function publicComponent<T>(component: unknown): T {
     return component as T;

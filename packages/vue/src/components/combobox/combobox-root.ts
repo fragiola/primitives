@@ -39,6 +39,7 @@ import {
 import type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
 } from "../../utils/change-details.ts";
 import {
     type ContentSlots,
@@ -96,7 +97,8 @@ export interface ComboboxRootProps {
 
 export type ComboboxRootEmits = {
     "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
+    openChange: (open: boolean, details: OpenChangeDetails) => true;
+    openChangeComplete: (open: boolean) => true;
     "update:value": (value: unknown) => true;
     valueChange: (value: unknown, details: ChangeDetails) => true;
     "update:inputValue": (value: string) => true;
@@ -163,8 +165,10 @@ export const ComboboxRoot: PublicComponent<
             "update:inputValue": (_value: string) => true,
             inputValueChange: (_value: string, _details: ChangeDetails) => true,
         },
-        setup(props, { emit, slots }) {
+        setup(props, { emit, slots, expose }) {
             const root = useOverlayRoot(props, emit);
+            // a template ref on the Root: `close()` and `unmount()` (spec/README.md, "Lifecycle")
+            expose(root.actions);
             const multiple = () => props.multiple;
             // read at reset time too: the form reset takes the current default (as React does)
             const defaultValue = (): unknown =>
@@ -232,19 +236,24 @@ export const ComboboxRoot: PublicComponent<
                 current: null,
             };
 
-            const setOpen = (next: boolean, reason: ChangeReason) => {
-                if (!next || reason !== "input-change") {
+            const setOpen = (
+                next: boolean,
+                reason: ChangeReason,
+                event?: Event,
+            ): boolean => {
+                // a close the consumer cancels leaves the list, its text and highlight as they are
+                const changed = root.setOpen(next, reason, event);
+                if ((!next || reason !== "input-change") && (changed || next)) {
                     typed.value = false;
                 }
-                root.setOpen(next, reason);
-                if (next) {
-                    return;
+                if (next || !changed) {
+                    return changed;
                 }
                 // a list reopened during its exit animation starts with no highlight
                 highlighted.value = null;
                 pendingHighlight.current = null;
                 if (reason === "item-press") {
-                    return;
+                    return changed;
                 }
                 // closing without a choice resets the text (spec/combobox.md, "Choosing an item")
                 const text = props.multiple ? "" : label(value.value);
@@ -253,6 +262,7 @@ export const ComboboxRoot: PublicComponent<
                         reason: text === "" ? "input-clear" : "none",
                     });
                 }
+                return changed;
             };
             // a value held in the consumer's `ref` is its reactive proxy: compare the raw objects
             const isEqual = (item: unknown, other: unknown) =>

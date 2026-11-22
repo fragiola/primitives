@@ -15,14 +15,22 @@ export const TooltipProviderKey: InjectionKey<TooltipProviderContext> =
     Symbol("TooltipProvider");
 
 export interface TooltipContext extends OverlayRoot {
-    /** Opens now; `instant` when no delay ran (focus, the group's hand-off). */
-    show: (reason: ChangeReason, instant: boolean) => void;
-    hide: (reason: ChangeReason) => void;
-    /** The trigger's hover: starts the delay (or opens at once in a hand-off). */
-    hoverStart: () => void;
-    hoverEnd: () => void;
-    /** A press on the trigger closes and blocks reopening until the pointer leaves. */
-    press: () => void;
+    /**
+     * Opens now, from `trigger` (default: the active one); `instant` when no delay ran (focus,
+     * the group's hand-off, a move to another trigger).
+     */
+    show: (
+        reason: ChangeReason,
+        instant: boolean,
+        event?: Event,
+        trigger?: HTMLElement | null,
+    ) => void;
+    hide: (reason: ChangeReason, event?: Event) => void;
+    /** A trigger's hover: starts the delay (or opens at once in a hand-off or a move). */
+    hoverStart: (trigger: HTMLElement, event: Event) => void;
+    hoverEnd: (trigger: HTMLElement) => void;
+    /** A press on a trigger closes and blocks reopening until the pointer leaves. */
+    press: (event: Event) => void;
     instant: Ref<boolean>;
     disabled: () => boolean;
     arrow: ShallowRef<HTMLElement | null>;

@@ -52,7 +52,9 @@ export function defineLabelledPart<Context extends object>(
 
 /** A Close part: closes its overlay (reason `close-press`). */
 export function defineClosePart<
-    Context extends { setOpen: (open: boolean, reason: "close-press") => void },
+    Context extends {
+        setOpen: (open: boolean, reason: "close-press", event?: Event) => void;
+    },
 >(
     name: string,
     key: InjectionKey<Context>,
@@ -75,8 +77,8 @@ export function defineClosePart<
                         {
                             type: "button",
                             "data-primitives-part": part,
-                            onClick: () =>
-                                context.setOpen(false, "close-press"),
+                            onClick: (event: MouseEvent) =>
+                                context.setOpen(false, "close-press", event),
                         },
                     );
             },

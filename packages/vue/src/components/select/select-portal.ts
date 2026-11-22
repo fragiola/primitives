@@ -1,36 +1,28 @@
-import { defineComponent, type PropType } from "vue";
+import { defineComponent } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import {
+    type OverlayPortalProps,
+    overlayPortalProps,
+    useOverlayPortal,
+} from "../../utils/overlay-portal.ts";
 import {
     type ContentSlots,
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { renderPortal } from "../../utils/render-portal.ts";
 import { SelectKey } from "./select-context.ts";
 
-export interface SelectPortalProps {
-    /** Where the content goes (default: `body`). */
-    container?: Element | string | null;
-}
+export interface SelectPortalProps extends OverlayPortalProps {}
 
+/** Moves the content to `container` (default: the body) while mounted, or always with `keep-mounted`. */
 export const SelectPortal: PublicComponent<SelectPortalProps, ContentSlots> =
     publicComponent(
         defineComponent({
             name: "SelectPortal",
-            props: {
-                container: {
-                    type: [Object, String] as PropType<Element | string | null>,
-                    default: undefined,
-                },
-            },
+            props: overlayPortalProps,
             setup(props, { slots }) {
                 const context = useRequiredContext(SelectKey, "Select.Portal");
-                return () =>
-                    renderPortal(
-                        context.presence.mounted,
-                        props.container,
-                        () => slots.default?.(),
-                    );
+                return useOverlayPortal(context.presence.mounted, props, slots);
             },
         }),
     );

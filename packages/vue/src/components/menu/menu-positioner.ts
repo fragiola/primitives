@@ -42,6 +42,7 @@ export const MenuPositioner: PartComponent<
                 context.trigger,
                 context.positioner,
                 null,
+                context.presence.mounted,
             );
             watch(placed, (value) => (context.placed.value = value), {
                 immediate: true,
@@ -55,6 +56,9 @@ export const MenuPositioner: PartComponent<
                     { open, ...placed.value },
                     {
                         role: "presentation",
+                        hidden: context.presence.mounted.value
+                            ? undefined
+                            : true,
                         // a modal menu blocks the pointer outside; its levels take it back
                         style: context.modal()
                             ? { pointerEvents: "auto" }
@@ -62,6 +66,7 @@ export const MenuPositioner: PartComponent<
                         "data-primitives-part": "menu-positioner",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.value.side,
                             align: placed.value.align,
                             nested,

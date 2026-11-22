@@ -1,39 +1,54 @@
 import { createTypeahead } from "@fragiola/primitives/collection";
 import type { Align, Side } from "@fragiola/primitives/positioning";
-import { defineComponent, inject, provide, ref, watch } from "vue";
 import {
+    defineComponent,
+    inject,
+    type PropType,
+    provide,
+    ref,
+    watch,
+} from "vue";
+import {
+    type OverlayRootEmits,
+    type OverlayRootProps,
+    type OverlayTriggerRootProps,
     overlayRootEmits,
     overlayRootProps,
+    overlayTriggerRootProps,
     useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
-import type { ChangeDetails } from "../../utils/change-details.ts";
+import { useAttachHandle } from "../../composables/use-overlay-trigger.ts";
 import {
     type ContentSlots,
+    type OverlayRootSlots,
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
 import { type MenuContext, MenuKey } from "./menu-context.ts";
+import type { MenuHandle } from "./menu-handle.ts";
 
-/** A nested menu level's props (`v-model:open`). */
-export interface MenuSubmenuRootProps {
-    open?: boolean;
-    defaultOpen?: boolean;
+/**
+ * A nested menu level's props (`v-model:open`). A template ref on a level's Root exposes its
+ * actions, `close()` and `unmount()`.
+ */
+export interface MenuSubmenuRootProps extends OverlayRootProps {
     /** Arrow keys wrap at the ends (default `true`). */
     loopFocus?: boolean;
 }
 
-export interface MenuRootProps extends MenuSubmenuRootProps {
+export interface MenuRootProps
+    extends MenuSubmenuRootProps,
+        OverlayTriggerRootProps {
     /**
      * Locks the page's scroll and blocks the pointer outside the menu while it is open (default
      * `false`: the APG menu button is non-modal; spec/menu.md, "Modal").
      */
     modal?: boolean;
+    /** Connects Triggers rendered outside the Root (spec/menu.md, "Detached triggers"). */
+    handle?: MenuHandle;
 }
 
-export type MenuRootEmits = {
-    "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
-};
+export type MenuRootEmits = OverlayRootEmits;
 
 export const submenuProps = {
     ...overlayRootProps,
@@ -43,17 +58,18 @@ export const submenuProps = {
 
 export const menuProps = {
     ...submenuProps,
+    ...overlayTriggerRootProps,
+    handle: { type: Object as PropType<MenuHandle>, default: undefined },
     /** Locks the scroll and blocks the outside pointer while open (default `false`). */
     modal: { type: Boolean, default: false },
 };
 
 function useMenuRoot(
-    props: {
-        open?: boolean;
-        defaultOpen?: boolean;
-        loopFocus: boolean;
-        modal?: boolean;
-    },
+    props: OverlayRootProps &
+        OverlayTriggerRootProps & {
+            loopFocus: boolean;
+            modal?: boolean;
+        },
     emit: Parameters<typeof useOverlayRoot>[1],
     nested: boolean,
 ) {
@@ -73,9 +89,9 @@ function useMenuRoot(
                 ? { side: "inline-end", align: "start" }
                 : { side: "bottom", align: "start" },
         ),
-        closeAll(reason) {
-            root.setOpen(false, reason);
-            parent?.closeAll(reason);
+        closeAll(reason, event) {
+            root.setOpen(false, reason, event);
+            parent?.closeAll(reason, event);
         },
         openSubmenu: { current: null },
         safeArea: { current: null },
@@ -101,16 +117,18 @@ function useMenuRoot(
 /** Holds the state of one menu level (`v-model:open`); renders no element (spec/menu.md). */
 export const MenuRoot: PublicComponent<
     MenuRootProps,
-    ContentSlots,
+    OverlayRootSlots,
     MenuRootEmits
 > = publicComponent(
     defineComponent({
         name: "MenuRoot",
         props: menuProps,
         emits: overlayRootEmits,
-        setup(props, { emit, slots }) {
-            useMenuRoot(props, emit, false);
-            return () => slots.default?.();
+        setup(props, { emit, slots, expose }) {
+            const context = useMenuRoot(props, emit, false);
+            useAttachHandle(() => props.handle, context);
+            expose(context.actions);
+            return () => slots.default?.({ payload: context.payload.value });
         },
     }),
 );
@@ -125,8 +143,9 @@ export const MenuSubmenuRoot: PublicComponent<
         name: "MenuSubmenuRoot",
         props: submenuProps,
         emits: overlayRootEmits,
-        setup(props, { emit, slots }) {
-            useMenuRoot(props, emit, true);
+        setup(props, { emit, slots, expose }) {
+            const context = useMenuRoot(props, emit, true);
+            expose(context.actions);
             return () => slots.default?.();
         },
     }),

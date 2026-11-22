@@ -63,12 +63,13 @@ export const MenuSubmenuTrigger: PartComponent<
             const open = (
                 highlight: "first" | null,
                 reason: "trigger-press" | "list-navigation",
+                event?: Event,
             ) => {
                 if (props.disabled) {
                     return;
                 }
                 submenu.pendingHighlight.current = highlight;
-                submenu.setOpen(true, reason);
+                submenu.setOpen(true, reason, event);
             };
             return () => {
                 const isOpen = submenu.open.value;
@@ -94,7 +95,8 @@ export const MenuSubmenuTrigger: PartComponent<
                         }),
                         onFocus: item.handlers.onFocus,
                         onBlur: item.handlers.onBlur,
-                        onClick: () => open(null, "trigger-press"),
+                        onClick: (event: MouseEvent) =>
+                            open(null, "trigger-press", event),
                         onKeydown: (event: KeyboardEvent) => {
                             const node = element.value;
                             const { open: openKey } = submenuKeys(
@@ -113,6 +115,7 @@ export const MenuSubmenuTrigger: PartComponent<
                                     event.key === openKey
                                         ? "list-navigation"
                                         : "trigger-press",
+                                    event,
                                 );
                             }
                         },
