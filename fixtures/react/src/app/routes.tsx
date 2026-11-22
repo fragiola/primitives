@@ -65,6 +65,8 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
+import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
+import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
@@ -152,6 +154,8 @@ export const routes: Record<
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/navigation-menu/basic": NavigationMenuBasic,
+    "/navigation-menu/nested": NavigationMenuNested,
     "/menu/checkbox-radio": MenuCheckboxRadio,
     "/context-menu/basic": ContextMenuBasic,
     "/context-menu/rtl": ContextMenuBasic,
