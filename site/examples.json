@@ -2,7 +2,8 @@
     "levels": [
         { "id": "overlays", "title": "Overlays" },
         { "id": "navigation", "title": "Navigation" },
-        { "id": "forms", "title": "Forms and selection" }
+        { "id": "forms", "title": "Forms and selection" },
+        { "id": "dates", "title": "Dates" }
     ],
     "themes": ["light", "dark", "ide", "paper", "terminal"]
 }

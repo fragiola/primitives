@@ -27,6 +27,11 @@ import {
 // A framework's manifest (contract §5.3): every example with its files, entry first, its own
 // files then the recipes it imports (shown as `_recipes/`), stored once, verbatim.
 
+/** The recipes an example imports besides its own component's (the picker's calendar). */
+const MORE_RECIPES: Record<string, readonly string[]> = {
+    "date-picker": ["_recipes/calendar.ts"],
+};
+
 describe("the manifest", () => {
     for (const framework of FRAMEWORKS) {
         it(`of ${framework} lists every example with the files it is made of`, async () => {
@@ -43,6 +48,8 @@ describe("the manifest", () => {
                 "slider",
                 "select",
                 "combobox",
+                "date-picker",
+                "calendar",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];
@@ -52,6 +59,7 @@ describe("the manifest", () => {
                     // its component's recipe and the recipes' shared files, in name order
                     ...[
                         `_recipes/${example.id}.ts`,
+                        ...(MORE_RECIPES[example.id] ?? []),
                         "_recipes/recipe.ts",
                         "_recipes/shared.ts",
                     ].sort(),
