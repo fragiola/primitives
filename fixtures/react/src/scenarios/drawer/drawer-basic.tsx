@@ -36,7 +36,7 @@ export function DrawerBasic() {
                                 >
                                     {ROWS.map((row) => (
                                         <li key={row} className="px-2 py-1">
-                                            Notification {row}
+                                            {`Notification ${row}`}
                                         </li>
                                     ))}
                                 </ul>
