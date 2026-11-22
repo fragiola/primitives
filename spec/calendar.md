@@ -138,7 +138,7 @@ ArrowLeft in RTL:
 | PageDown / PageUp | the same day of the next / previous month (clamped to the month's last day) |
 | Shift+PageDown / Shift+PageUp | the same day of the next / previous year (clamped) |
 | Enter, Space | chooses the focused date (unless disabled, unavailable or read-only) |
-| Escape | in a RangeCalendar, cancels a started range; in a picker, closes the popup |
+| Escape | in a RangeCalendar with a started range, cancels it first, also inside a picker, a dialog or a popover (it takes the key before the enclosing layer, `@fragiola/primitives/layers` `interceptEscape`; Epic #22); otherwise, in a picker, closes the popup |
 
 - Moving the focused date outside the visible months moves them (by one month, so the focused
   date's month becomes the first or last visible month).

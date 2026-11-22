@@ -1,13 +1,16 @@
 import {
     computed,
     Directive,
+    effect,
     inject,
     input,
     numberAttribute,
+    untracked,
 } from "@angular/core";
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
-import { injectFlush } from "@fragiola/primitives-angular/internal";
+import { interceptEscape } from "@fragiola/primitives/layers";
+import { injectFlush, injectHost } from "@fragiola/primitives-angular/internal";
 import { CALENDAR } from "../utils/calendar-state.ts";
 
 /**
@@ -38,6 +41,34 @@ export class CalendarGrid {
         addMonths(this.calendar.visibleStart(), this.offset()),
     );
     private readonly flush = injectFlush();
+
+    constructor() {
+        const grid = injectHost();
+        const calendar = this.calendar;
+        // a started range takes Escape before an enclosing overlay's layer (a picker, a dialog, a
+        // popover) closes it: the next Escape closes (spec/calendar.md, "Keyboard")
+        effect((onCleanup) => {
+            if (calendar.anchor() === null) {
+                return;
+            }
+            untracked(() =>
+                onCleanup(
+                    interceptEscape(
+                        grid.ownerDocument,
+                        () => {
+                            calendar.cancelRange();
+                            this.flush();
+                        },
+                        {
+                            when: (event) =>
+                                event.target instanceof Node &&
+                                grid.contains(event.target),
+                        },
+                    ),
+                ),
+            );
+        });
+    }
 
     protected onKeyDown(event: KeyboardEvent): void {
         const calendar = this.calendar;

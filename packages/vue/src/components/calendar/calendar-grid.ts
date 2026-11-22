@@ -1,6 +1,8 @@
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
-import { computed, defineComponent, provide } from "vue";
+import { interceptEscape } from "@fragiola/primitives/layers";
+import { computed, defineComponent, provide, shallowRef, watch } from "vue";
+import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
     type PartComponent,
@@ -29,6 +31,30 @@ export const CalendarGrid: PartComponent<
                 addMonths(context.visibleStart.value, props.offset),
             );
             provide(CalendarGridKey, month);
+            const element = shallowRef<HTMLElement | null>(null);
+            const setElement = elementSetter(element);
+            // a started range takes Escape before an enclosing overlay's layer (a picker, a
+            // dialog, a popover) closes it: the next Escape closes (spec/calendar.md, "Keyboard")
+            watch(
+                () => [context.anchor.value !== null, element.value] as const,
+                ([started, grid], _, onCleanup) => {
+                    if (!started || grid === null) {
+                        return;
+                    }
+                    onCleanup(
+                        interceptEscape(
+                            grid.ownerDocument,
+                            () => context.cancelRange(),
+                            {
+                                when: (event) =>
+                                    event.target instanceof Node &&
+                                    grid.contains(event.target),
+                            },
+                        ),
+                    );
+                },
+                { immediate: true },
+            );
             const onKeydown = (event: KeyboardEvent) => {
                 if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
@@ -80,6 +106,7 @@ export const CalendarGrid: PartComponent<
                             ? "true"
                             : undefined,
                         "data-primitives-part": `${context.component}-grid`,
+                        ref: setElement,
                         onKeydown,
                     },
                 );
