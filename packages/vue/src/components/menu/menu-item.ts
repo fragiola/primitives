@@ -72,9 +72,9 @@ export const MenuItem: PartComponent<MenuItemProps, MenuItemState> =
                                 disabled: props.disabled,
                             }),
                             ...item.handlers,
-                            onClick: () => {
+                            onClick: (event: MouseEvent) => {
                                 if (!props.disabled && props.closeOnClick) {
-                                    context.closeAll("item-press");
+                                    context.closeAll("item-press", event);
                                 }
                             },
                             ref: setElement,

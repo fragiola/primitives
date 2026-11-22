@@ -42,6 +42,7 @@ export const TooltipPositioner: PartComponent<
                 context.trigger,
                 context.positioner,
                 context.arrow,
+                context.presence.mounted,
             );
             watch(placed, (value) => (context.placed.value = value), {
                 immediate: true,
@@ -55,9 +56,13 @@ export const TooltipPositioner: PartComponent<
                     { open, ...placed.value },
                     {
                         role: "presentation",
+                        hidden: context.presence.mounted.value
+                            ? undefined
+                            : true,
                         "data-primitives-part": "tooltip-positioner",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.value.side,
                             align: placed.value.align,
                         }),

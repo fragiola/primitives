@@ -41,6 +41,7 @@ export const ComboboxPopup: PartComponent<
                         "data-primitives-part": "combobox-popup",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.side,
                             align: placed.align,
                             "starting-style": status === "starting",

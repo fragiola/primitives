@@ -22,7 +22,10 @@ import {
     overlayRootProps,
     useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
-import type { ChangeDetails } from "../../utils/change-details.ts";
+import type {
+    ChangeDetails,
+    OpenChangeDetails,
+} from "../../utils/change-details.ts";
 import {
     type ContentSlots,
     type PublicComponent,
@@ -46,7 +49,8 @@ export interface SelectRootProps {
 
 export type SelectRootEmits = {
     "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
+    openChange: (open: boolean, details: OpenChangeDetails) => true;
+    openChangeComplete: (open: boolean) => true;
     "update:value": (value: string | null) => true;
     valueChange: (value: string | null, details: ChangeDetails) => true;
 };
@@ -89,8 +93,10 @@ export const SelectRoot: PublicComponent<
             valueChange: (_value: string | null, _details: ChangeDetails) =>
                 true,
         },
-        setup(props, { emit, slots }) {
+        setup(props, { emit, slots, expose }) {
             const root = useOverlayRoot(props, emit);
+            // a template ref on the Root: `close()` and `unmount()` (spec/README.md, "Lifecycle")
+            expose(root.actions);
             const state = useControllable<string | null, ChangeDetails>(
                 () => props.value,
                 props.defaultValue,
@@ -123,19 +129,21 @@ export const SelectRoot: PublicComponent<
                 required: () => props.required,
                 modal: () => props.modal,
                 highlighted,
-                openOn(entry, reason) {
-                    highlighted.value = entry;
-                    root.setOpen(true, reason);
+                openOn(entry, reason, event) {
+                    // highlighted only when the opening happened (a canceled one did not)
+                    if (root.setOpen(true, reason, event)) {
+                        highlighted.value = entry;
+                    }
                 },
-                choose(entry, reason) {
+                choose(entry, reason, event) {
                     const item = props.items.find(
                         (candidate) => candidate.value === entry,
                     );
                     if (item === undefined || item.disabled) {
                         return;
                     }
-                    state.set(entry, { reason });
-                    root.setOpen(false, reason);
+                    state.set(entry, { reason, event });
+                    root.setOpen(false, reason, event);
                 },
                 listId,
                 itemId: (entry) =>

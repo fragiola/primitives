@@ -25,7 +25,7 @@ export interface ComboboxContext extends OverlayRoot {
     inputValue: ComputedRef<string>;
     setInputValue: (value: string, reason: ChangeReason) => void;
     /** Opens or closes; closing without a choice resets the text. */
-    setOpen: (open: boolean, reason: ChangeReason) => void;
+    setOpen: (open: boolean, reason: ChangeReason, event?: Event) => boolean;
     disabled: () => boolean;
     /** The highlighted item's id. */
     highlighted: Ref<string | null>;

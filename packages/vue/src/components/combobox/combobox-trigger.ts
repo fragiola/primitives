@@ -40,11 +40,12 @@ export const ComboboxTrigger: PartComponent<
                         ...stateAttributes({ "popup-open": open, disabled }),
                         onPointerdown: (event: PointerEvent) =>
                             event.preventDefault(),
-                        onClick: () => {
+                        onClick: (event: MouseEvent) => {
                             context.pendingHighlight.current = null;
                             context.setOpen(
                                 !context.open.value,
                                 "trigger-press",
+                                event,
                             );
                             context.trigger.value?.focus();
                         },

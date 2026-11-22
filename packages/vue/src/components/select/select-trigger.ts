@@ -40,7 +40,7 @@ export const SelectTrigger: PartComponent<
             const typeahead = createTypeahead();
             let lastTyped = 0;
 
-            const typeTo = (key: string) => {
+            const typeTo = (key: string, event: Event) => {
                 const items = context.items();
                 const open = context.open.value;
                 const from = items.findIndex(
@@ -63,7 +63,7 @@ export const SelectTrigger: PartComponent<
                 if (open) {
                     context.highlighted.value = target;
                 } else {
-                    context.openOn(target, "list-navigation");
+                    context.openOn(target, "list-navigation", event);
                 }
             };
 
@@ -81,7 +81,7 @@ export const SelectTrigger: PartComponent<
                         return;
                     }
                     event.preventDefault();
-                    typeTo(event.key);
+                    typeTo(event.key, event);
                     return;
                 }
                 if (!open) {
@@ -94,6 +94,7 @@ export const SelectTrigger: PartComponent<
                             context.openOn(
                                 initialHighlight(items, context.value.value),
                                 "list-navigation",
+                                event,
                             );
                             return;
                         case "Home":
@@ -103,6 +104,7 @@ export const SelectTrigger: PartComponent<
                                 (event.key === "Home" ? items[0] : items.at(-1))
                                     ?.value ?? null,
                                 "list-navigation",
+                                event,
                             );
                             return;
                         default:
@@ -139,6 +141,7 @@ export const SelectTrigger: PartComponent<
                             context.choose(
                                 context.highlighted.value,
                                 "item-press",
+                                event,
                             );
                         }
                         return;
@@ -146,9 +149,9 @@ export const SelectTrigger: PartComponent<
                         // APG: Tab chooses the highlighted option, then focus moves on
                         const item = items[index];
                         if (item !== undefined && !item.disabled) {
-                            context.choose(item.value, "focus-out");
+                            context.choose(item.value, "focus-out", event);
                         } else {
-                            context.setOpen(false, "focus-out");
+                            context.setOpen(false, "focus-out", event);
                         }
                         return;
                     }
@@ -196,9 +199,9 @@ export const SelectTrigger: PartComponent<
                             disabled,
                             placeholder,
                         }),
-                        onClick: () => {
+                        onClick: (event: MouseEvent) => {
                             if (context.open.value) {
-                                context.setOpen(false, "trigger-press");
+                                context.setOpen(false, "trigger-press", event);
                             } else {
                                 context.openOn(
                                     initialHighlight(
@@ -206,6 +209,7 @@ export const SelectTrigger: PartComponent<
                                         context.value.value,
                                     ),
                                     "trigger-press",
+                                    event,
                                 );
                             }
                         },

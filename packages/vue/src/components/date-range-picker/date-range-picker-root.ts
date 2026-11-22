@@ -1,5 +1,8 @@
 import type { DateRange } from "@fragiola/primitives/date";
-import type { ChangeDetails } from "../../utils/change-details.ts";
+import type {
+    ChangeDetails,
+    OpenChangeDetails,
+} from "../../utils/change-details.ts";
 import {
     type ContentSlots,
     type PublicComponent,
@@ -17,7 +20,8 @@ export interface DateRangePickerRootProps extends DatePickerRootSharedProps {
 
 export type DateRangePickerRootEmits = {
     "update:open": (open: boolean) => true;
-    openChange: (open: boolean, details: ChangeDetails) => true;
+    openChange: (open: boolean, details: OpenChangeDetails) => true;
+    openChangeComplete: (open: boolean) => true;
     "update:value": (value: DateRange | null) => true;
     valueChange: (value: DateRange | null, details: ChangeDetails) => true;
 };

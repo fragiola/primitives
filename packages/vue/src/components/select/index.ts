@@ -5,11 +5,18 @@ export type {
     Align,
     Side,
 } from "@fragiola/primitives/positioning";
+export type {
+    OverlayRootEmits,
+    OverlayRootProps,
+} from "../../composables/use-overlay-root.ts";
 export type { PositionerProps } from "../../composables/use-positioner.ts";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
+    OverlayActions,
 } from "../../utils/change-details.ts";
+export type { OverlayPortalProps } from "../../utils/overlay-portal.ts";
 export type { RenderSlotProps } from "../../utils/render-part.ts";
 export { Select } from "./parts.ts";
 export type { SelectItemData, SelectItemState } from "./select-context.ts";

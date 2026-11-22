@@ -30,8 +30,8 @@ const SUBMENU_RETURNS_FOCUS = new Set(["escape-key", "list-navigation"]);
 // a modal menu's outside press reaches nothing, so focus goes back to the trigger
 const MODAL_RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
 // a root menu closed through the controlled `open` (reason `none`) returns focus left inside it,
-// as Popover does
-const RETURNS_FOCUS_UNFOCUSED = new Set(["none"]);
+// as Popover does; so does a handle's or the actions' close (`imperative-action`)
+const RETURNS_FOCUS_UNFOCUSED = new Set(["none", "imperative-action"]);
 
 function rootOf(context: MenuContext): MenuContext {
     return context.parent ? rootOf(context.parent) : context;
@@ -74,14 +74,16 @@ export const MenuPopup: PartComponent<
                     if (!open || popup === null) {
                         return;
                     }
-                    const trigger = context.trigger.value;
                     const doc = popup.ownerDocument;
                     // Escape, an item and the trigger give focus back to this level's trigger; the
                     // closing arrow of a submenu gives it back to its submenu trigger
                     const session = openOverlaySession(doc, {
                         elements: () => [positioner ?? popup],
-                        ignore: () => [trigger],
-                        dismiss: (reason) => context.setOpen(false, reason),
+                        // read when the session needs them: the active trigger may move while
+                        // it is open
+                        ignore: () => context.triggers.value,
+                        dismiss: (reason, event) =>
+                            context.setOpen(false, reason, event),
                         returnFocus: {
                             when: nested
                                 ? SUBMENU_RETURNS_FOCUS
@@ -93,9 +95,27 @@ export const MenuPopup: PartComponent<
                             reason: () =>
                                 context.lastReason.current ??
                                 (nested ? null : "none"),
-                            to: () => trigger,
+                            to: () => context.trigger.value,
                         },
                     });
+                    onCleanup(() => session.end());
+                },
+                { flush: "post", immediate: true },
+            );
+
+            // on open, and when it moves to another trigger: the keyboard's item, else the popup
+            // with no highlight (spec/menu.md, "Focus")
+            watch(
+                () =>
+                    [
+                        context.open.value,
+                        context.popup.value,
+                        context.trigger.value,
+                    ] as const,
+                ([open, popup]) => {
+                    if (!open || popup === null) {
+                        return;
+                    }
                     const items = menuItems(popup);
                     const highlight = context.pendingHighlight.current;
                     context.pendingHighlight.current = null;
@@ -106,7 +126,6 @@ export const MenuPopup: PartComponent<
                               ? items.at(-1)
                               : undefined;
                     (target ?? popup).focus({ preventScroll: true });
-                    onCleanup(() => session.end());
                 },
                 { flush: "post", immediate: true },
             );
@@ -183,14 +202,14 @@ export const MenuPopup: PartComponent<
                                 ? previousTabbableBefore(rootTrigger, skip)
                                 : nextTabbableAfter(rootTrigger, skip)
                             : null;
-                        context.closeAll("focus-out");
+                        context.closeAll("focus-out", event);
                         target?.focus();
                         return;
                     }
                     default:
                         if (nested && event.key === closeKey) {
                             event.preventDefault();
-                            context.setOpen(false, "list-navigation");
+                            context.setOpen(false, "list-navigation", event);
                             return;
                         }
                         if (
@@ -230,12 +249,15 @@ export const MenuPopup: PartComponent<
                     {
                         id: context.popupId,
                         role: "menu",
-                        "aria-labelledby": context.triggerId,
+                        // the active trigger names the menu (a submenu's: its SubmenuTrigger)
+                        "aria-labelledby":
+                            context.activeTriggerId.value ?? context.triggerId,
                         "aria-orientation": "vertical",
                         tabindex: -1,
                         "data-primitives-part": "menu-popup",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.side,
                             align: placed.align,
                             nested,

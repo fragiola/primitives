@@ -40,9 +40,9 @@ export const ComboboxInput: PartComponent<
             const direction = useProvidedDirection();
             const context = useRequiredContext(ComboboxKey, "Combobox.Input");
             const setInput = elementSetter(context.trigger);
-            const openWith = (highlight: PendingHighlight) => {
+            const openWith = (highlight: PendingHighlight, event?: Event) => {
                 context.pendingHighlight.current = highlight;
-                context.setOpen(true, "list-navigation");
+                context.setOpen(true, "list-navigation", event);
             };
             const move = (delta: 1 | -1) => {
                 // past an end, the visual focus goes back to the input; from the input, to the near end
@@ -64,15 +64,20 @@ export const ComboboxInput: PartComponent<
                         event.preventDefault();
                         if (event.altKey) {
                             if (event.key === "ArrowDown" && !open) {
-                                openWith(null);
+                                openWith(null, event);
                             } else if (event.key === "ArrowUp" && open) {
-                                context.setOpen(false, "list-navigation");
+                                context.setOpen(
+                                    false,
+                                    "list-navigation",
+                                    event,
+                                );
                             }
                             return;
                         }
                         if (!open) {
                             openWith(
                                 event.key === "ArrowDown" ? "first" : "last",
+                                event,
                             );
                             return;
                         }
@@ -101,7 +106,7 @@ export const ComboboxInput: PartComponent<
                         return;
                     case "Tab":
                         if (open) {
-                            context.setOpen(false, "focus-out");
+                            context.setOpen(false, "focus-out", event);
                         }
                         return;
                     case "Backspace":
@@ -150,7 +155,7 @@ export const ComboboxInput: PartComponent<
                 context.markTyped();
                 context.pendingHighlight.current = null;
                 if (!context.open.value) {
-                    context.setOpen(true, "input-change");
+                    context.setOpen(true, "input-change", event);
                 }
             };
 

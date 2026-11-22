@@ -90,9 +90,13 @@ export const SelectItem: PartComponent<SelectItemProps, SelectItemState> =
                             // the trigger keeps DOM focus
                             onPointerdown: (event: PointerEvent) =>
                                 event.preventDefault(),
-                            onClick: () => {
+                            onClick: (event: MouseEvent) => {
                                 if (!state.value.disabled) {
-                                    context.choose(props.value, "item-press");
+                                    context.choose(
+                                        props.value,
+                                        "item-press",
+                                        event,
+                                    );
                                 }
                             },
                             ref: setElement,

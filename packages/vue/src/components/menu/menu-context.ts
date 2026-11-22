@@ -19,7 +19,10 @@ export interface MenuContext extends OverlayRoot {
     typeahead: ReturnType<typeof createTypeahead>;
     labels: Map<Element, string>;
     placed: Ref<{ side: Side; align: Align }>;
-    closeAll: (reason: "item-press" | "focus-out" | "outside-press") => void;
+    closeAll: (
+        reason: "item-press" | "focus-out" | "outside-press",
+        event?: Event,
+    ) => void;
     openSubmenu: { current: MenuContext | null };
     safeArea: { current: SafeArea | null };
 }

@@ -45,6 +45,7 @@ export const TooltipPopup: PartComponent<
                         "data-primitives-part": "tooltip-popup",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.side,
                             align: placed.align,
                             instant,

@@ -10,11 +10,18 @@ export type {
     Align,
     Side,
 } from "@fragiola/primitives/positioning";
+export type {
+    OverlayRootEmits,
+    OverlayRootProps,
+} from "../../composables/use-overlay-root.ts";
 export type { PositionerProps } from "../../composables/use-positioner.ts";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
+    OverlayActions,
 } from "../../utils/change-details.ts";
+export type { OverlayPortalProps } from "../../utils/overlay-portal.ts";
 export type { RenderSlotProps } from "../../utils/render-part.ts";
 export type { ComboboxDisabledState } from "./combobox-clear.ts";
 export type { ComboboxItemState } from "./combobox-context.ts";

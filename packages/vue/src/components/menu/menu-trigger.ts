@@ -1,6 +1,11 @@
-import { defineComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
-import { useRequiredContext } from "../../composables/use-required-context.ts";
+import {
+    type OverlayTriggerProps,
+    overlayTriggerProps,
+    useOverlayTrigger,
+} from "../../composables/use-overlay-trigger.ts";
+import type { ChangeReason } from "../../utils/change-details.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -8,14 +13,19 @@ import {
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { MenuKey } from "./menu-context.ts";
+import type { MenuHandle } from "./menu-handle.ts";
 
-/** Opens the root menu (spec/menu.md, "Keyboard": on the Trigger). */
+/**
+ * Opens the root menu (spec/menu.md, "Keyboard": on the Trigger); with a `handle`, from anywhere
+ * in the page.
+ */
 export interface MenuTriggerState {
     open: boolean;
     disabled: boolean;
 }
 
-export interface MenuTriggerProps {
+export interface MenuTriggerProps
+    extends OverlayTriggerProps<MenuHandle, unknown> {
     disabled?: boolean;
 }
 
@@ -24,62 +34,95 @@ export const MenuTrigger: PartComponent<MenuTriggerProps, MenuTriggerState> =
         defineComponent({
             name: "MenuTrigger",
             inheritAttrs: false,
-            props: { ...asProp, disabled: { type: Boolean, default: false } },
+            props: {
+                ...asProp,
+                ...overlayTriggerProps,
+                handle: {
+                    type: Object as PropType<MenuHandle>,
+                    default: undefined,
+                },
+                disabled: { type: Boolean, default: false },
+            },
             setup(props, { attrs, slots }) {
-                const context = useRequiredContext(MenuKey, "Menu.Trigger");
-                const setTrigger = elementSetter(context.trigger);
+                const trigger = useOverlayTrigger(
+                    MenuKey,
+                    "Menu.Trigger",
+                    props,
+                );
+                const setTrigger = elementSetter(trigger.element);
                 const openWith = (
                     highlight: "first" | "last",
-                    reason: "trigger-press" | "list-navigation",
+                    reason: ChangeReason,
+                    event: KeyboardEvent,
                 ) => {
-                    // already open: nothing to open, and no highlight left for a later open
-                    if (context.open.value) {
+                    const root = trigger.root.value;
+                    // already open from this trigger: nothing to open, and no highlight left for a
+                    // later open (spec/menu.md)
+                    if (root === null || trigger.active.value) {
                         return;
                     }
-                    context.pendingHighlight.current = highlight;
-                    context.setOpen(true, reason);
+                    root.pendingHighlight.current = highlight;
+                    if (
+                        !root.setOpen(
+                            true,
+                            reason,
+                            event,
+                            event.currentTarget as HTMLElement,
+                        )
+                    ) {
+                        root.pendingHighlight.current = null;
+                    }
                 };
                 return () => {
-                    const open = context.open.value;
+                    const root = trigger.root.value;
+                    const active = trigger.active.value;
                     return renderPart(
                         "button",
                         { attrs, slots },
                         props.as,
-                        { open, disabled: props.disabled },
+                        { open: active, disabled: props.disabled },
                         {
                             type: "button",
-                            id: context.triggerId,
+                            id: trigger.id.value,
                             disabled: props.disabled,
                             "aria-haspopup": "menu",
-                            "aria-expanded": open ? "true" : "false",
-                            "aria-controls": open ? context.popupId : undefined,
+                            "aria-expanded": active ? "true" : "false",
+                            "aria-controls": active ? root?.popupId : undefined,
                             "data-primitives-part": "menu-trigger",
-                            // a modal menu blocks the pointer outside; its trigger still toggles
+                            // a modal menu blocks the pointer outside; its triggers still toggle
                             style:
-                                context.modal() && open
+                                root?.modal() && root.open.value
                                     ? { pointerEvents: "auto" }
                                     : undefined,
                             ...stateAttributes({
-                                "popup-open": open,
+                                "popup-open": active,
                                 disabled: props.disabled,
                             }),
-                            onClick: () => {
-                                context.pendingHighlight.current = null;
-                                context.setOpen(!open, "trigger-press");
+                            onClick: (event: MouseEvent) => {
+                                if (root === null) {
+                                    return;
+                                }
+                                root.pendingHighlight.current = null;
+                                root.setOpen(
+                                    !active,
+                                    "trigger-press",
+                                    event,
+                                    event.currentTarget as HTMLElement,
+                                );
                             },
                             onKeydown: (event: KeyboardEvent) => {
                                 if (event.key === "ArrowDown") {
                                     event.preventDefault();
-                                    openWith("first", "list-navigation");
+                                    openWith("first", "list-navigation", event);
                                 } else if (event.key === "ArrowUp") {
                                     event.preventDefault();
-                                    openWith("last", "list-navigation");
+                                    openWith("last", "list-navigation", event);
                                 } else if (
                                     event.key === "Enter" ||
                                     event.key === " "
                                 ) {
                                     event.preventDefault();
-                                    openWith("first", "trigger-press");
+                                    openWith("first", "trigger-press", event);
                                 }
                             },
                             onKeyup: (event: KeyboardEvent) => {

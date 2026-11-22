@@ -41,6 +41,7 @@ export const SelectPopup: PartComponent<
                         "data-primitives-part": "select-popup",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.side,
                             align: placed.align,
                             "starting-style": status === "starting",

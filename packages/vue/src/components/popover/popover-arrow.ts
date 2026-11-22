@@ -33,6 +33,8 @@ export const PopoverArrow: PartComponent<
                     "aria-hidden": "true",
                     "data-primitives-part": "popover-arrow",
                     ...stateAttributes({
+                        open: context.open.value,
+                        closed: !context.open.value,
                         side: placed.side,
                         align: placed.align,
                     }),

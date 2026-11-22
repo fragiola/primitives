@@ -1,6 +1,10 @@
-import { defineComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
-import { useRequiredContext } from "../../composables/use-required-context.ts";
+import {
+    type OverlayTriggerProps,
+    overlayTriggerProps,
+    useOverlayTrigger,
+} from "../../composables/use-overlay-trigger.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -8,13 +12,16 @@ import {
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { DialogKey } from "./dialog-context.ts";
+import type { DialogHandle } from "./dialog-handle.ts";
 
 export interface DialogTriggerState {
     open: boolean;
     disabled: boolean;
 }
 
-export interface DialogTriggerProps {
+/** Opens the dialog; with a `handle`, from anywhere in the page (spec/dialog.md). */
+export interface DialogTriggerProps
+    extends OverlayTriggerProps<DialogHandle, unknown> {
     disabled?: boolean;
 }
 
@@ -25,30 +32,49 @@ export const DialogTrigger: PartComponent<
     defineComponent({
         name: "DialogTrigger",
         inheritAttrs: false,
-        props: { ...asProp, disabled: { type: Boolean, default: false } },
+        props: {
+            ...asProp,
+            ...overlayTriggerProps,
+            handle: {
+                type: Object as PropType<DialogHandle>,
+                default: undefined,
+            },
+            disabled: { type: Boolean, default: false },
+        },
         setup(props, { attrs, slots }) {
-            const context = useRequiredContext(DialogKey, "Dialog.Trigger");
-            const setTrigger = elementSetter(context.trigger);
+            const trigger = useOverlayTrigger(
+                DialogKey,
+                "Dialog.Trigger",
+                props,
+            );
+            const setTrigger = elementSetter(trigger.element);
             return () => {
-                const open = context.open.value;
+                const root = trigger.root.value;
+                const active = trigger.active.value;
                 return renderPart(
                     "button",
                     { attrs, slots },
                     props.as,
-                    { open, disabled: props.disabled },
+                    { open: active, disabled: props.disabled },
                     {
                         type: "button",
-                        id: context.triggerId,
+                        id: trigger.id.value,
                         disabled: props.disabled,
                         "aria-haspopup": "dialog",
-                        "aria-expanded": open ? "true" : "false",
-                        "aria-controls": open ? context.popupId : undefined,
+                        "aria-expanded": active ? "true" : "false",
+                        "aria-controls": active ? root?.popupId : undefined,
                         "data-primitives-part": "dialog-trigger",
                         ...stateAttributes({
-                            "popup-open": open,
+                            "popup-open": active,
                             disabled: props.disabled,
                         }),
-                        onClick: () => context.setOpen(!open, "trigger-press"),
+                        onClick: (event: MouseEvent) =>
+                            root?.setOpen(
+                                !active,
+                                "trigger-press",
+                                event,
+                                event.currentTarget as HTMLElement,
+                            ),
                         ref: setTrigger,
                     },
                 );

@@ -54,6 +54,7 @@ export const SelectPositioner: PartComponent<
                 context.trigger,
                 context.positioner,
                 null,
+                context.presence.mounted,
             );
             watch(placed, (value) => (context.placed.value = value), {
                 immediate: true,
@@ -69,7 +70,8 @@ export const SelectPositioner: PartComponent<
                         {
                             elements: () => [positioner],
                             ignore: () => [context.trigger.value],
-                            dismiss: (reason) => context.setOpen(false, reason),
+                            dismiss: (reason, event) =>
+                                context.setOpen(false, reason, event),
                             returnFocus: {
                                 when: NEVER,
                                 whenUnfocused: () =>
@@ -117,6 +119,9 @@ export const SelectPositioner: PartComponent<
                     { open, ...placed.value },
                     {
                         role: "presentation",
+                        hidden: context.presence.mounted.value
+                            ? undefined
+                            : true,
                         // a modal select blocks the pointer outside; its list takes it back
                         // (spec/select.md)
                         style: context.modal()
@@ -125,6 +130,7 @@ export const SelectPositioner: PartComponent<
                         "data-primitives-part": "select-positioner",
                         ...stateAttributes({
                             open,
+                            closed: !open,
                             side: placed.value.side,
                             align: placed.value.align,
                         }),
