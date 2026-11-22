@@ -1,8 +1,10 @@
 import {
     DestroyRef,
+    DOCUMENT,
     type EmbeddedViewRef,
     effect,
     inject,
+    PLATFORM_ID,
     type Signal,
     TemplateRef,
     untracked,
@@ -12,7 +14,7 @@ import {
 /**
  * The structural portal (spec/README.md, API mapping: Angular): renders the directive's template
  * while `mounted()` is true, and moves its nodes to the end of `container()` (default:
- * `document.body`), as React's `createPortal`. The view stays in its declaration's change
+ * the document's `body`), as React's `createPortal`. The view stays in its declaration's change
  * detection and injectors; Angular inserts later nodes next to their anchors, which moved with it,
  * and removes the nodes wherever they are when it clears the view. When the portal itself is
  * destroyed with an enclosing view (a submenu's portal inside its parent's popup), Angular only
@@ -22,6 +24,11 @@ export function mountPortal(
     mounted: Signal<boolean>,
     container: Signal<Element | null>,
 ): void {
+    // `"browser"` or `"server"` (`isPlatformServer` lives in @angular/common, not a peer)
+    if (inject(PLATFORM_ID) !== "browser") {
+        return;
+    }
+    const doc = inject(DOCUMENT);
     const template = inject(TemplateRef);
     const viewContainer = inject(ViewContainerRef);
     let view: EmbeddedViewRef<unknown> | null = null;
@@ -44,7 +51,7 @@ export function mountPortal(
     });
     effect(() => {
         const show = mounted();
-        const target = container() ?? document.body;
+        const target = container() ?? doc.body;
         untracked(() => {
             if (show && view === null) {
                 view = viewContainer.createEmbeddedView(template);

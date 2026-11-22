@@ -28,6 +28,10 @@ import {
         "data-primitives-part": "combobox-input",
         "[attr.disabled]": "data().disabled",
         "[value]": "root.inputValue()",
+        // the attribute follows the value, as React's controlled input: a server render writes
+        // it, so the page rendered in the browser alone has it too (spec/README.md, "Server
+        // rendering")
+        "[attr.value]": "root.inputValue()",
         "[attr.aria-expanded]": "String(state().open)",
         "[attr.aria-controls]": "root.listId",
         "[attr.aria-activedescendant]": "activeId()",
