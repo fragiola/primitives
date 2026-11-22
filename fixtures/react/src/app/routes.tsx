@@ -43,6 +43,11 @@ import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.t
 import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.tsx";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.tsx";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.tsx";
+import { DrawerBasic } from "../scenarios/drawer/drawer-basic.tsx";
+import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.tsx";
+import { DrawerNested } from "../scenarios/drawer/drawer-nested.tsx";
+import { DrawerSide } from "../scenarios/drawer/drawer-side.tsx";
+import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.tsx";
 import { FieldAsync } from "../scenarios/field/field-async.tsx";
 import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
@@ -109,6 +114,11 @@ export const routes: Record<
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/drawer/basic": DrawerBasic,
+    "/drawer/side": DrawerSide,
+    "/drawer/snap-points": DrawerSnapPoints,
+    "/drawer/nested": DrawerNested,
+    "/drawer/lifecycle": DrawerLifecycle,
     "/alert-dialog/basic": AlertDialogBasic,
     "/alert-dialog/detached": AlertDialogDetached,
     "/alert-dialog/lifecycle": AlertDialogLifecycle,

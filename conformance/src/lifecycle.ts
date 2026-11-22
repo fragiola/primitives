@@ -16,7 +16,7 @@ export interface LifecycleOverlay {
     open: (page: Page) => Promise<void>;
     /** The trigger focus returns to. */
     trigger: (page: Page) => ReturnType<Page["getByRole"]>;
-    /** The fixture renders "Close with actions" (Dialog, Popover). */
+    /** The fixture renders "Close with actions" (Dialog, AlertDialog, Drawer, Popover). */
     actions?: boolean;
     /**
      * What a press outside does: closes it (`true`); nothing at all (`"never"`: an AlertDialog,
@@ -57,6 +57,20 @@ export const LIFECYCLE_OVERLAYS: Record<string, LifecycleOverlay> = {
             }),
         actions: true,
         outsidePress: "never",
+    },
+    drawer: {
+        path: "/drawer/lifecycle",
+        kept: "drawer-popup",
+        popup: "drawer-popup",
+        role: "dialog",
+        open: async (page) => button("Open drawer")(page).click(),
+        trigger: (page) =>
+            page.getByRole("button", {
+                name: "Open drawer",
+                includeHidden: true,
+            }),
+        actions: true,
+        outsidePress: true,
     },
     popover: {
         path: "/popover/lifecycle",
