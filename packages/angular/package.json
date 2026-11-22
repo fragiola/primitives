@@ -56,6 +56,11 @@
             "types": "./dist/types/fragiola-primitives-angular-accordion.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-accordion.mjs"
         },
+        "./alert-dialog": {
+            "@fragiola/source": "./alert-dialog/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-alert-dialog.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-alert-dialog.mjs"
+        },
         "./avatar": {
             "@fragiola/source": "./avatar/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-avatar.d.ts",
@@ -90,6 +95,11 @@
             "@fragiola/source": "./combobox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-combobox.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-combobox.mjs"
+        },
+        "./context-menu": {
+            "@fragiola/source": "./context-menu/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-context-menu.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-context-menu.mjs"
         },
         "./date-picker": {
             "@fragiola/source": "./date-picker/public-api.ts",

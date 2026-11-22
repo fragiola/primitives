@@ -1,4 +1,5 @@
-import { Directive, signal } from "@angular/core";
+import { Directive, inject, signal } from "@angular/core";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 /** Groups items under its GroupLabel: `<div menuGroup>`. */
 @Directive({
@@ -6,10 +7,12 @@ import { Directive, signal } from "@angular/core";
     exportAs: "menuGroup",
     host: {
         role: "group",
-        "data-primitives-part": "menu-group",
+        "[attr.data-primitives-part]": "part",
         "[attr.aria-labelledby]": "labelId() ?? null",
     },
 })
 export class MenuGroup {
     readonly labelId = signal<string | undefined>(undefined);
+    protected readonly part =
+        inject(MenuRootBase, { optional: true })?.part("group") ?? "menu-group";
 }

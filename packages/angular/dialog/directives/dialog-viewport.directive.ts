@@ -3,7 +3,7 @@ import {
     dataValues,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { DialogRootBase } from "./dialog-root-base.ts";
 
 export interface DialogViewportState {
     open: boolean;
@@ -21,7 +21,7 @@ export interface DialogViewportState {
     exportAs: "dialogViewport",
     host: {
         role: "presentation",
-        "data-primitives-part": "dialog-viewport",
+        "[attr.data-primitives-part]": "root.part('viewport')",
         "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
         "[attr.data-closed]": "data().closed",
@@ -32,7 +32,7 @@ export interface DialogViewportState {
     },
 })
 export class DialogViewport {
-    protected readonly root = inject<DialogRoot>(DialogRoot);
+    protected readonly root = inject<DialogRootBase>(DialogRootBase);
     readonly state = computed<DialogViewportState>(() => {
         const { open, nested, nestedDialogOpen } = this.root.state();
         return { open, nested, nestedDialogOpen };

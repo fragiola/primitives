@@ -98,7 +98,7 @@ export class SelectTrigger {
             root.overlay.setOpen(false, "trigger-press", event);
         } else {
             root.openOn(
-                initialHighlight(root.items(), root.selected()),
+                initialHighlight(root.itemList(), root.selected()),
                 "trigger-press",
                 event,
             );
@@ -113,7 +113,7 @@ export class SelectTrigger {
 
     private typeTo(key: string, event: Event): void {
         const root = this.root;
-        const items = root.items();
+        const items = root.itemList();
         const open = root.overlay.open();
         const from = items.findIndex(
             (item) =>
@@ -141,7 +141,7 @@ export class SelectTrigger {
         if (root.isDisabled()) {
             return;
         }
-        const items = root.items();
+        const items = root.itemList();
         const open = root.overlay.open();
         const highlighted = root.highlighted();
         const typing =

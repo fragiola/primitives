@@ -35,6 +35,11 @@ export interface SelectItemData {
     disabled?: boolean;
 }
 
+/** An Item that registered itself (a Select without `items`: spec/select.md, "API"). */
+export interface RegisteredItem extends SelectItemData {
+    element: HTMLElement;
+}
+
 export interface SelectState {
     open: boolean;
     disabled: boolean;
@@ -54,9 +59,10 @@ export function initialHighlight(
 
 /**
  * Holds the select's state and renders its hidden form input (spec/select.md):
- * `<ng-container selectRoot [items]="items" [(value)]="value" name="fruit">`. The Root takes
- * `items`: the Value's label, the typeahead on the closed trigger and the hidden input need the
- * labels while the list is not rendered.
+ * `<ng-container selectRoot [items]="items" [(value)]="value" name="fruit">`. With `items`, the
+ * Value's label and the typeahead on the closed trigger know the labels while the list is not
+ * rendered; without it, the `[selectItem]`s register themselves while they are rendered (keep
+ * the list mounted: `*selectPortal="{ keepMounted: true }"`).
  */
 @Directive({ selector: "[selectRoot]", exportAs: "selectRoot" })
 export class SelectRoot implements OverlayActions {
@@ -71,8 +77,11 @@ export class SelectRoot implements OverlayActions {
     readonly valueChange = output<string | null>();
     readonly defaultValue = input<string | null>(null);
     readonly valueChangeDetails = output<ValueChangeEvent<string | null>>();
-    /** Every item: the Root needs their labels while the list is closed. */
-    readonly items = input.required<readonly SelectItemData[]>();
+    /**
+     * Every item: the labels known while the list is closed. Without it, the Items register
+     * themselves while rendered.
+     */
+    readonly items = input<readonly SelectItemData[] | undefined>(undefined);
     readonly name = input<string | undefined>(undefined);
     readonly required = input(false, { transform: booleanAttribute });
     readonly disabled = input(false, { transform: booleanAttribute });
@@ -115,6 +124,12 @@ export class SelectRoot implements OverlayActions {
     readonly isDisabled = computed(
         () => this.disabled() || this.field.disabled(),
     );
+    // without `items`, the Items register themselves (Base UI), in DOM order
+    private readonly registered = signal<readonly RegisteredItem[]>([]);
+    /** The Root's `items`, else the registered Items, in DOM order. */
+    readonly itemList = computed(
+        (): readonly SelectItemData[] => this.items() ?? this.registered(),
+    );
     readonly highlighted = signal<string | null>(null);
     readonly listId = `${injectId("primitives-select")}-list`;
     readonly placed = placementSignal({ side: "bottom", align: "start" });
@@ -152,9 +167,28 @@ export class SelectRoot implements OverlayActions {
         inject(DestroyRef).onDestroy(() => stop?.());
     }
 
+    /** Registers an Item rendered without the Root's `items`; returns its unregistration. */
+    registerItem(item: RegisteredItem): () => void {
+        this.registered.update((previous) =>
+            [
+                ...previous.filter((entry) => entry.element !== item.element),
+                item,
+            ].sort((a, b) =>
+                a.element.compareDocumentPosition(b.element) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+                    ? -1
+                    : 1,
+            ),
+        );
+        return () =>
+            this.registered.update((previous) =>
+                previous.filter((entry) => entry !== item),
+            );
+    }
+
     /** The id of item `value`'s option element. */
     itemId(value: string): string {
-        const index = this.items().findIndex((item) => item.value === value);
+        const index = this.itemList().findIndex((item) => item.value === value);
         return `${this.listId}-item-${index}`;
     }
 
@@ -169,7 +203,7 @@ export class SelectRoot implements OverlayActions {
 
     /** Chooses an enabled item and closes. */
     choose(value: string, reason: ChangeReason, event?: Event): void {
-        const item = this.items().find(
+        const item = this.itemList().find(
             (candidate) => candidate.value === value,
         );
         if (item === undefined || item.disabled) {

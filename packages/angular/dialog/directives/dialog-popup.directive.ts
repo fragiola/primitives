@@ -17,7 +17,7 @@ import {
     resolveFocusTarget,
 } from "@fragiola/primitives-angular/internal";
 import { DIALOG_NESTING } from "../utils/dialog-nesting.ts";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { DialogRootBase } from "./dialog-root-base.ts";
 
 export interface DialogPopupState {
     open: boolean;
@@ -27,6 +27,13 @@ export interface DialogPopupState {
 
 // a press on the backdrop or the viewport blurs the page: focus returns once the press has ended
 const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+
+/** An AlertDialog's default initial focus: its first Close (spec/alert-dialog.md, "Focus"). */
+function firstClose(popup: HTMLElement, part: string): HTMLElement | null {
+    return popup.querySelector<HTMLElement>(
+        `[data-primitives-part="${part}"]:not([disabled])`,
+    );
+}
 
 /**
  * The modal dialog (spec/dialog.md): focus trap, inert page, scroll lock, its own layer.
@@ -39,14 +46,15 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
     providers: [
         {
             provide: DIALOG_NESTING,
-            useFactory: () => inject<DialogRoot>(DialogRoot).nesting,
+            useFactory: () => inject<DialogRootBase>(DialogRootBase).nesting,
         },
     ],
     host: {
-        role: "dialog",
+        "[attr.role]":
+            "root.component === 'alert-dialog' ? 'alertdialog' : 'dialog'",
         "aria-modal": "true",
         tabindex: "-1",
-        "data-primitives-part": "dialog-popup",
+        "[attr.data-primitives-part]": "root.part('popup')",
         "[attr.id]": "root.overlay.popupId",
         "[attr.aria-labelledby]": "root.titleId() ?? null",
         "[attr.aria-describedby]": "root.descriptionId() ?? null",
@@ -61,8 +69,11 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
     },
 })
 export class DialogPopup {
-    protected readonly root = inject<DialogRoot>(DialogRoot);
-    /** Focused on open (default: the first tabbable element, else the popup). */
+    protected readonly root = inject<DialogRootBase>(DialogRootBase);
+    /**
+     * Focused on open (default: the first tabbable element, else the popup; an AlertDialog's
+     * first Close first).
+     */
     readonly initialFocus = input<FocusTarget>(undefined);
     /** Focused on close (default: the active trigger, else the element focused before opening). */
     readonly finalFocus = input<FocusTarget>(undefined);
@@ -89,6 +100,8 @@ export class DialogPopup {
         const overlay = root.overlay;
         afterRenderEffect((onCleanup) => {
             const open = overlay.open();
+            // an alert dialog is never dismissed from outside (spec/alert-dialog.md)
+            const alert = root.component === "alert-dialog";
             const backdrop = root.backdrop();
             const viewport = root.viewport();
             if (!open) {
@@ -108,8 +121,12 @@ export class DialogPopup {
                     // a press on the backdrop or the viewport is outside this dialog, inside its
                     // parent
                     backdrops: () => [backdrop, viewport],
-                    dismiss: (reason, event) =>
-                        overlay.setOpen(false, reason, event),
+                    dismiss: (reason, event) => {
+                        if (alert && reason === "outside-press") {
+                            return;
+                        }
+                        overlay.setOpen(false, reason, event);
+                    },
                     returnFocus: {
                         whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
                         reason: () => overlay.lastReason.current ?? "none",
@@ -126,8 +143,19 @@ export class DialogPopup {
                     },
                 });
                 const initial = resolveFocusTarget(this.initialFocus());
-                focusInitial(popup, initial === false ? popup : initial);
-                const release = trapFocus(popup, session.elementsAbove);
+                focusInitial(
+                    popup,
+                    initial === false
+                        ? popup
+                        : (initial ??
+                              (alert
+                                  ? firstClose(popup, root.part("close"))
+                                  : null)),
+                );
+                // an alert dialog's outside press keeps the focus where it is
+                const release = trapFocus(popup, session.elementsAbove, {
+                    holdOutsidePress: alert,
+                });
                 const unlock = lockScroll(doc);
                 const restoreInert = inertOutside(
                     backdrop ? [popup, backdrop] : [popup],

@@ -11,7 +11,7 @@ import {
     overlayTrigger,
 } from "@fragiola/primitives-angular/internal";
 import type { MenuHandle } from "../utils/menu-handle.ts";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuTriggerState {
     open: boolean;
@@ -52,7 +52,7 @@ export class MenuTrigger<Payload = unknown> {
     /** The trigger's id (generated when not given). */
     readonly id = input<string | undefined>(undefined);
     protected readonly trigger = overlayTrigger(
-        inject<MenuRoot<Payload>>(MenuRoot, { optional: true }),
+        inject(MenuRootBase, { optional: true }),
         this,
         { prefix: "primitives-menu", selector: "menuTrigger" },
     );

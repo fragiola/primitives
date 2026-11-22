@@ -9,6 +9,7 @@ import {
     type Align,
     anchorFloating,
     type Side,
+    type VirtualAnchor,
 } from "@fragiola/primitives/positioning";
 import { injectProvidedDirection } from "./provided-direction.ts";
 
@@ -46,7 +47,8 @@ export function positionOverlay(
     inputs: PositionerInputs,
     defaults: Placement,
     elements: {
-        anchor: Signal<Element | null>;
+        /** The trigger, or a point (a context menu's virtual anchor). */
+        anchor: Signal<Element | VirtualAnchor | null>;
         positioner: HTMLElement;
         arrow?: Signal<HTMLElement | null>;
         mounted?: Signal<boolean>;

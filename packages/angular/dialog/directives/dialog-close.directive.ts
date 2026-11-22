@@ -1,5 +1,5 @@
 import { Directive, inject } from "@angular/core";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { DialogRootBase } from "./dialog-root-base.ts";
 
 /** Closes the dialog (reason `close-press`): `<button dialogClose>`. */
 @Directive({
@@ -7,10 +7,10 @@ import { DialogRoot } from "./dialog-root.directive.ts";
     exportAs: "dialogClose",
     host: {
         type: "button",
-        "data-primitives-part": "dialog-close",
-        "(click)": "root.overlay.setOpen(false, 'close-press')",
+        "[attr.data-primitives-part]": "root.part('close')",
+        "(click)": "root.overlay.setOpen(false, 'close-press', $event)",
     },
 })
 export class DialogClose {
-    protected readonly root = inject<DialogRoot>(DialogRoot);
+    protected readonly root = inject<DialogRootBase>(DialogRootBase);
 }

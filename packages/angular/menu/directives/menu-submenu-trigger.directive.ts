@@ -15,7 +15,7 @@ import {
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import { menuItemBehaviour } from "./menu-item-behaviour.ts";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuSubmenuTriggerState {
     open: boolean;
@@ -34,7 +34,7 @@ export interface MenuSubmenuTriggerState {
         role: "menuitem",
         tabindex: "-1",
         "aria-haspopup": "menu",
-        "data-primitives-part": "menu-submenu-trigger",
+        "[attr.data-primitives-part]": "parent.part('submenu-trigger')",
         "[attr.id]": "submenu.overlay.triggerId",
         "[attr.aria-expanded]": "String(state().open)",
         "[attr.aria-controls]": "state().open ? submenu.overlay.popupId : null",
@@ -53,8 +53,8 @@ export interface MenuSubmenuTriggerState {
 export class MenuSubmenuTrigger {
     /** A DirectionProvider's direction, else `null` (the computed one is read). */
     private readonly direction = injectProvidedDirection();
-    protected readonly submenu = inject<MenuRoot>(MenuRoot);
-    private readonly parent = this.requireParent();
+    protected readonly submenu = inject(MenuRootBase);
+    protected readonly parent = this.requireParent();
     readonly disabled = input(false, { transform: booleanAttribute });
     readonly label = input<string | undefined>(undefined);
     /** Hovering opens the submenu (default `true`), after `delay` ms (default 100). */
@@ -80,7 +80,7 @@ export class MenuSubmenuTrigger {
         inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));
     }
 
-    private requireParent(): MenuRoot<unknown> {
+    private requireParent(): MenuRootBase {
         if (this.submenu.parent === null) {
             throw new Error(
                 "[menuSubmenuTrigger] must be inside a [menuSubmenuRoot].",

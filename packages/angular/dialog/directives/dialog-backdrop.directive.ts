@@ -10,7 +10,7 @@ import {
     untracked,
 } from "@angular/core";
 import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { DialogRootBase } from "./dialog-root-base.ts";
 
 export interface DialogBackdropState {
     open: boolean;
@@ -27,7 +27,7 @@ export interface DialogBackdropState {
     exportAs: "dialogBackdrop",
     host: {
         "aria-hidden": "true",
-        "data-primitives-part": "dialog-backdrop",
+        "[attr.data-primitives-part]": "root.part('backdrop')",
         "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
         "[attr.data-closed]": "data().closed",
@@ -38,7 +38,7 @@ export interface DialogBackdropState {
     },
 })
 export class DialogBackdrop {
-    protected readonly root = inject<DialogRoot>(DialogRoot);
+    protected readonly root = inject<DialogRootBase>(DialogRootBase);
     /** A nested dialog's Backdrop renders only with it (default `false`). */
     readonly forceRender = input(false, { transform: booleanAttribute });
     readonly state = computed<DialogBackdropState>(() => {

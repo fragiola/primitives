@@ -6,6 +6,9 @@ import { readQuery } from "../kit/query.ts";
 import { AccordionBasic } from "../scenarios/accordion/accordion-basic.ts";
 import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.ts";
 import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.ts";
+import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.ts";
+import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.ts";
+import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.ts";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
 import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -26,6 +29,8 @@ import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.ts";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.ts";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
+import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.ts";
+import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
@@ -50,6 +55,7 @@ import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
+import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
 import { MenuDetached } from "../scenarios/menu/menu-detached.ts";
 import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
@@ -69,6 +75,7 @@ import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.ts";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.ts";
 import { SelectBasic } from "../scenarios/select/select-basic.ts";
 import { SelectControlled } from "../scenarios/select/select-controlled.ts";
+import { SelectGroups } from "../scenarios/select/select-groups.ts";
 import { SelectLifecycle } from "../scenarios/select/select-lifecycle.ts";
 import { SelectModal } from "../scenarios/select/select-modal.ts";
 import { SeparatorBasic } from "../scenarios/separator/separator-basic.ts";
@@ -106,6 +113,9 @@ import { ROUTES } from "./routes.ts";
         DialogNestedDialogs,
         DialogDetached,
         DialogLifecycle,
+        AlertDialogBasic,
+        AlertDialogDetached,
+        AlertDialogLifecycle,
         SettingsTabs,
         TabsNoneSelected,
         TabsAnimated,
@@ -134,6 +144,9 @@ import { ROUTES } from "./routes.ts";
         MenuModal,
         MenuDetached,
         MenuLifecycle,
+        MenuCheckboxRadio,
+        ContextMenuBasic,
+        ContextMenuLifecycle,
         CheckboxBasic,
         CheckboxControlled,
         CheckboxGroupScenario,
@@ -154,6 +167,7 @@ import { ROUTES } from "./routes.ts";
         SelectControlled,
         SelectModal,
         SelectLifecycle,
+        SelectGroups,
         SliderBasic,
         SliderControlled,
         SliderRange,
@@ -194,6 +208,9 @@ import { ROUTES } from "./routes.ts";
             @case ("/dialog/nested-dialogs") { <main class="p-6" scenario-dialog-nested-dialogs></main> }
             @case ("/dialog/detached") { <main class="p-6" scenario-dialog-detached></main> }
             @case ("/dialog/lifecycle") { <main class="p-6" scenario-dialog-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/alert-dialog/basic") { <main class="p-6" scenario-alert-dialog-basic></main> }
+            @case ("/alert-dialog/detached") { <main class="p-6" scenario-alert-dialog-detached></main> }
+            @case ("/alert-dialog/lifecycle") { <main class="p-6" scenario-alert-dialog-lifecycle [cancel]="query.cancel"></main> }
             @case ("/tabs/automatic") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="horizontal"></main> }
             @case ("/tabs/manual") { <main class="p-6" scenario-settings-tabs activation="manual" orientation="horizontal"></main> }
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
@@ -224,6 +241,10 @@ import { ROUTES } from "./routes.ts";
             @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
             @case ("/menu/detached") { <main class="p-6" scenario-menu-detached></main> }
             @case ("/menu/lifecycle") { <main class="p-6" scenario-menu-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/menu/checkbox-radio") { <main class="p-6" scenario-menu-checkbox-radio></main> }
+            @case ("/context-menu/basic") { <main class="p-6" scenario-context-menu-basic></main> }
+            @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }
+            @case ("/context-menu/lifecycle") { <main class="p-6" scenario-context-menu-lifecycle [cancel]="query.cancel"></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }
@@ -238,6 +259,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/select/controlled") { <main class="p-6" scenario-select-controlled></main> }
             @case ("/select/modal") { <main class="p-6" scenario-select-modal></main> }
             @case ("/select/lifecycle") { <main class="p-6" scenario-select-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/select/groups") { <main class="p-6" scenario-select-groups></main> }
             @case ("/checkbox/basic") { <main class="p-6" scenario-checkbox-basic></main> }
             @case ("/checkbox/group") { <main class="p-6" scenario-checkbox-group></main> }
             @case ("/checkbox/controlled") { <main class="p-6" scenario-checkbox-controlled></main> }
