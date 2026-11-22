@@ -14,7 +14,10 @@ import {
     watch,
 } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
-import { useFieldControl } from "../../composables/use-field-control.ts";
+import {
+    type FieldControlBinding,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import {
@@ -88,14 +91,17 @@ export const CheckboxRoot: PartComponent<
             const button = shallowRef<HTMLElement | null>(null);
             const setButton = elementSetter(button);
             const input = shallowRef<HTMLInputElement | null>(null);
-            const field = useFieldControl({
-                id: () => id.value,
-                labelable: true,
-                value: () => state.value.checked,
-                filled: () => state.value.checked,
-                input: () => input.value,
-                focusTarget: () => button.value,
-            });
+            // a checkbox of a group in a field: the group is the field's control
+            const field: FieldControlBinding =
+                group?.field ??
+                useFieldControl({
+                    id: () => id.value,
+                    labelable: true,
+                    value: () => state.value.checked,
+                    filled: () => state.value.checked,
+                    input: () => input.value,
+                    focusTarget: () => button.value,
+                });
             const inGroup = computed(
                 () =>
                     group !== null &&
