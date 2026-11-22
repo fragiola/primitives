@@ -1,13 +1,4 @@
-import { createTypeahead } from "@fragiola/primitives/collection";
-import type { Align, Side } from "@fragiola/primitives/positioning";
-import {
-    defineComponent,
-    inject,
-    type PropType,
-    provide,
-    ref,
-    watch,
-} from "vue";
+import { defineComponent, type PropType } from "vue";
 import {
     type OverlayRootEmits,
     type OverlayRootProps,
@@ -15,7 +6,6 @@ import {
     overlayRootEmits,
     overlayRootProps,
     overlayTriggerRootProps,
-    useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
 import { useAttachHandle } from "../../composables/use-overlay-trigger.ts";
 import {
@@ -24,8 +14,8 @@ import {
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { type MenuContext, MenuKey } from "./menu-context.ts";
 import type { MenuHandle } from "./menu-handle.ts";
+import { useMenuRoot } from "./use-menu-root.ts";
 
 /**
  * A nested menu level's props (`v-model:open`). A template ref on a level's Root exposes its
@@ -63,56 +53,6 @@ export const menuProps = {
     /** Locks the scroll and blocks the outside pointer while open (default `false`). */
     modal: { type: Boolean, default: false },
 };
-
-function useMenuRoot(
-    props: OverlayRootProps &
-        OverlayTriggerRootProps & {
-            loopFocus: boolean;
-            modal?: boolean;
-        },
-    emit: Parameters<typeof useOverlayRoot>[1],
-    nested: boolean,
-) {
-    const parent = nested ? inject(MenuKey, null) : null;
-    const root = useOverlayRoot(props, emit);
-    const context: MenuContext = {
-        ...root,
-        parent,
-        loopFocus: () => props.loopFocus,
-        // a submenu follows its root menu
-        modal: () => (parent ? parent.modal() : (props.modal ?? false)),
-        pendingHighlight: { current: null },
-        typeahead: createTypeahead(),
-        labels: new Map(),
-        placed: ref<{ side: Side; align: Align }>(
-            nested
-                ? { side: "inline-end", align: "start" }
-                : { side: "bottom", align: "start" },
-        ),
-        closeAll(reason, event) {
-            root.setOpen(false, reason, event);
-            parent?.closeAll(reason, event);
-        },
-        openSubmenu: { current: null },
-        safeArea: { current: null },
-    };
-    // a parent level knows its open submenu, so a hovered sibling can close it
-    if (parent) {
-        watch(
-            root.open,
-            (open) => {
-                if (open) {
-                    parent.openSubmenu.current = context;
-                } else if (parent.openSubmenu.current === context) {
-                    parent.openSubmenu.current = null;
-                }
-            },
-            { immediate: true },
-        );
-    }
-    provide(MenuKey, context);
-    return context;
-}
 
 /** Holds the state of one menu level (`v-model:open`); renders no element (spec/menu.md). */
 export const MenuRoot: PublicComponent<

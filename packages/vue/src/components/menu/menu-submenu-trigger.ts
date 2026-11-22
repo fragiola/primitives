@@ -87,7 +87,7 @@ export const MenuSubmenuTrigger: PartComponent<
                         "aria-expanded": isOpen ? "true" : "false",
                         "aria-controls": isOpen ? submenu.popupId : undefined,
                         "aria-disabled": props.disabled ? "true" : undefined,
-                        "data-primitives-part": "menu-submenu-trigger",
+                        "data-primitives-part": `${parent.component}-submenu-trigger`,
                         ...stateAttributes({
                             "popup-open": isOpen,
                             highlighted,

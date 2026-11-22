@@ -66,7 +66,7 @@ export const MenuItem: PartComponent<MenuItemProps, MenuItemState> =
                             "aria-disabled": props.disabled
                                 ? "true"
                                 : undefined,
-                            "data-primitives-part": "menu-item",
+                            "data-primitives-part": `${context.component}-item`,
                             ...stateAttributes({
                                 highlighted,
                                 disabled: props.disabled,

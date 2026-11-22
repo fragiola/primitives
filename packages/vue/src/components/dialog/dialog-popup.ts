@@ -25,7 +25,10 @@ export interface DialogPopupState {
 }
 
 export interface DialogPopupProps {
-    /** Focused on open (default: the first tabbable element, else the popup). */
+    /**
+     * Focused on open (default: the first tabbable element, else the popup; an AlertDialog's
+     * first Close first).
+     */
     initialFocus?: FocusTarget;
     /** Focused on close (default: the active trigger, else the element focused before opening). */
     finalFocus?: FocusTarget;
@@ -33,6 +36,13 @@ export interface DialogPopupProps {
 
 // a press on the backdrop or the viewport blurs the page: focus returns once the press has ended
 const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
+
+/** An AlertDialog's default initial focus: its first Close (spec/alert-dialog.md, "Focus"). */
+function firstClose(popup: HTMLElement, component: string): HTMLElement | null {
+    return popup.querySelector<HTMLElement>(
+        `[data-primitives-part="${component}-close"]:not([disabled])`,
+    );
+}
 
 export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
     publicComponent(
@@ -55,6 +65,9 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
             setup(props, { attrs, slots }) {
                 const context = useRequiredContext(DialogKey, "Dialog.Popup");
                 const setPopup = elementSetter(context.popup);
+                const { component } = context;
+                // an alert dialog is never dismissed from outside (spec/alert-dialog.md)
+                const alert = component === "alert-dialog";
                 // the dialogs nested in it report their open chain here
                 provide(DialogNestingKey, context.nesting);
                 watch(
@@ -82,8 +95,12 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                             // a press on the backdrop or the viewport is outside this dialog,
                             // inside its parent
                             backdrops: () => [backdrop, viewport],
-                            dismiss: (reason, event) =>
-                                context.setOpen(false, reason, event),
+                            dismiss: (reason, event) => {
+                                if (alert && reason === "outside-press") {
+                                    return;
+                                }
+                                context.setOpen(false, reason, event);
+                            },
                             returnFocus: {
                                 whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
                                 reason: () =>
@@ -103,9 +120,19 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                         const initial = resolveFocusTarget(props.initialFocus);
                         focusInitial(
                             popup,
-                            initial === false ? popup : initial,
+                            initial === false
+                                ? popup
+                                : (initial ??
+                                      (alert
+                                          ? firstClose(popup, component)
+                                          : null)),
                         );
-                        const release = trapFocus(popup, session.elementsAbove);
+                        // an alert dialog's outside press keeps the focus where it is
+                        const release = trapFocus(
+                            popup,
+                            session.elementsAbove,
+                            { holdOutsidePress: alert },
+                        );
                         const unlock = lockScroll(doc);
                         const restoreInert = inertOutside(
                             backdrop ? [popup, backdrop] : [popup],
@@ -132,7 +159,7 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                         { open, nested, nestedDialogOpen },
                         {
                             id: context.popupId,
-                            role: "dialog",
+                            role: alert ? "alertdialog" : "dialog",
                             "aria-modal": "true",
                             "aria-labelledby": context.titleId.value,
                             "aria-describedby": context.descriptionId.value,
@@ -143,7 +170,7 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                             // the open chain of dialogs nested below it, for a recipe
                             // (spec/dialog.md, "Nested dialogs")
                             style: { "--nested-dialogs": nestedDialogs },
-                            "data-primitives-part": "dialog-popup",
+                            "data-primitives-part": `${component}-popup`,
                             ...stateAttributes({
                                 open,
                                 closed: !open,

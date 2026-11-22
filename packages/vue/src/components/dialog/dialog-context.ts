@@ -1,7 +1,12 @@
 import type { ComputedRef, InjectionKey, Ref, ShallowRef } from "vue";
 import type { OverlayRoot } from "../../composables/use-overlay-root.ts";
 
+/** The component a dialog's parts belong to: their part attribute's prefix. */
+export type DialogComponent = "dialog" | "alert-dialog";
+
 export interface DialogContext extends OverlayRoot {
+    /** `alert-dialog`: never dismissed from outside, focuses its first Close (spec/alert-dialog.md). */
+    component: DialogComponent;
     backdrop: ShallowRef<HTMLElement | null>;
     viewport: ShallowRef<HTMLElement | null>;
     titleId: Ref<string | undefined>;

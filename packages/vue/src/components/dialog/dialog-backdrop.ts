@@ -49,7 +49,7 @@ export const DialogBackdrop: PartComponent<
                         hidden: context.presence.mounted.value
                             ? undefined
                             : true,
-                        "data-primitives-part": "dialog-backdrop",
+                        "data-primitives-part": `${context.component}-backdrop`,
                         ...stateAttributes({
                             open,
                             closed: !open,

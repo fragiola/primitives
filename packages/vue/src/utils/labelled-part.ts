@@ -18,8 +18,11 @@ export function defineLabelledPart<Context extends object>(
     name: string,
     key: InjectionKey<Context>,
     tag: string,
-    /** The part attribute's value, `<component>-<part>` (`dialog-title`). */
-    part: string,
+    /**
+     * The part attribute's value, `<component>-<part>` (`dialog-title`), or a function of the
+     * context (an AlertDialog's parts are Dialog's, named by their Root).
+     */
+    part: string | ((context: Context) => string),
     idOf: (context: Context) => Ref<string | undefined>,
 ): PartComponent<Record<never, never>, Record<never, never>> {
     return publicComponent(
@@ -43,7 +46,11 @@ export function defineLabelledPart<Context extends object>(
                         { attrs, slots },
                         props.as,
                         {},
-                        { id: id(), "data-primitives-part": part },
+                        {
+                            id: id(),
+                            "data-primitives-part":
+                                typeof part === "string" ? part : part(context),
+                        },
                     );
             },
         }),
@@ -58,8 +65,8 @@ export function defineClosePart<
 >(
     name: string,
     key: InjectionKey<Context>,
-    /** The part attribute's value, `<component>-close` (`dialog-close`). */
-    part: string,
+    /** The part attribute's value, `<component>-close` (`dialog-close`), or a function of the context. */
+    part: string | ((context: Context) => string),
 ): PartComponent<Record<never, never>, Record<never, never>> {
     return publicComponent(
         defineComponent({
@@ -76,7 +83,8 @@ export function defineClosePart<
                         {},
                         {
                             type: "button",
-                            "data-primitives-part": part,
+                            "data-primitives-part":
+                                typeof part === "string" ? part : part(context),
                             onClick: (event: MouseEvent) =>
                                 context.setOpen(false, "close-press", event),
                         },

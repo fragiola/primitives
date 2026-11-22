@@ -45,7 +45,7 @@ export const DialogViewport: PartComponent<
                         hidden: context.presence.mounted.value
                             ? undefined
                             : true,
-                        "data-primitives-part": "dialog-viewport",
+                        "data-primitives-part": `${context.component}-viewport`,
                         ...stateAttributes({
                             open,
                             closed: !open,

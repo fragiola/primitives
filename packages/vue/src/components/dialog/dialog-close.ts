@@ -5,5 +5,5 @@ import { DialogKey } from "./dialog-context.ts";
 export const DialogClose = defineClosePart(
     "DialogClose",
     DialogKey,
-    "dialog-close",
+    (c) => `${c.component}-close`,
 );

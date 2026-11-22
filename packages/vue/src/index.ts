@@ -4,6 +4,7 @@
 // plugin: an app imports the components it uses.
 
 export * from "./components/accordion/index.ts";
+export * from "./components/alert-dialog/index.ts";
 export * from "./components/avatar/index.ts";
 export * from "./components/button/index.ts";
 export * from "./components/calendar/index.ts";
@@ -11,6 +12,7 @@ export * from "./components/checkbox/index.ts";
 export * from "./components/checkbox-group/index.ts";
 export * from "./components/collapsible/index.ts";
 export * from "./components/combobox/index.ts";
+export * from "./components/context-menu/index.ts";
 export * from "./components/date-picker/index.ts";
 export * from "./components/date-range-picker/index.ts";
 export * from "./components/dialog/index.ts";

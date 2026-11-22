@@ -51,6 +51,13 @@ export const DialogTrigger: PartComponent<
             return () => {
                 const root = trigger.root.value;
                 const active = trigger.active.value;
+                // named by its Root (an AlertDialog's parts are Dialog's), or its handle before
+                // one attaches
+                const component =
+                    root?.component ??
+                    (props.handle as { component?: string } | undefined)
+                        ?.component ??
+                    "dialog";
                 return renderPart(
                     "button",
                     { attrs, slots },
@@ -63,7 +70,7 @@ export const DialogTrigger: PartComponent<
                         "aria-haspopup": "dialog",
                         "aria-expanded": active ? "true" : "false",
                         "aria-controls": active ? root?.popupId : undefined,
-                        "data-primitives-part": "dialog-trigger",
+                        "data-primitives-part": `${component}-trigger`,
                         ...stateAttributes({
                             "popup-open": active,
                             disabled: props.disabled,
