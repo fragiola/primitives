@@ -1,4 +1,7 @@
 import type { Component } from "vue";
+import AccordionBasic from "../scenarios/accordion/accordion-basic.vue";
+import AccordionHorizontal from "../scenarios/accordion/accordion-horizontal.vue";
+import AccordionMultiple from "../scenarios/accordion/accordion-multiple.vue";
 import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
 import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
@@ -9,6 +12,8 @@ import CalendarUnavailable from "../scenarios/calendar/calendar-unavailable.vue"
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxGroupScenario from "../scenarios/checkbox/checkbox-group.vue";
+import CollapsibleBasic from "../scenarios/collapsible/collapsible-basic.vue";
+import CollapsibleHiddenUntilFound from "../scenarios/collapsible/collapsible-hidden-until-found.vue";
 import ComboboxBasic from "../scenarios/combobox/combobox-basic.vue";
 import ComboboxControlled from "../scenarios/combobox/combobox-controlled.vue";
 import ComboboxField from "../scenarios/combobox/combobox-field.vue";
@@ -61,6 +66,7 @@ import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
 import SwitchBasic from "../scenarios/switch/switch-basic.vue";
 import SwitchControlled from "../scenarios/switch/switch-controlled.vue";
+import TabsAnimated from "../scenarios/tabs/tabs-animated.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
 import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
@@ -80,6 +86,12 @@ export const routes: Record<string, Component> = {
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
     "/tabs/none-selected": TabsNoneSelected,
+    "/tabs/animated": TabsAnimated,
+    "/collapsible/basic": CollapsibleBasic,
+    "/collapsible/hidden-until-found": CollapsibleHiddenUntilFound,
+    "/accordion/basic": AccordionBasic,
+    "/accordion/multiple": AccordionMultiple,
+    "/accordion/horizontal": AccordionHorizontal,
     "/popover/basic": PopoverBasic,
     "/popover/initial-focus": PopoverInitialFocus,
     "/popover/placement": PopoverPlacement,
