@@ -94,3 +94,32 @@ test("select / basic: data-open, then data-closed while the exit runs", async ({
     );
     await expect(part(page, "select", "popup")).toHaveCount(0);
 });
+
+test("select / groups: groups, labels, the separator and item texts", async ({
+    page,
+}) => {
+    await openScenario(page, "/select/groups");
+    await page.getByRole("combobox", { name: "Food" }).click();
+    const groups = part(page, "select", "group");
+    await expect(groups).toHaveCount(2);
+    await expect(groups.nth(0)).toHaveAttribute("role", "group");
+    const labels = part(page, "select", "group-label");
+    await expect(labels).toHaveCount(2);
+    const labelId = await labels.nth(0).getAttribute("id");
+    expect(labelId).toBeTruthy();
+    await expect(groups.nth(0)).toHaveAttribute(
+        "aria-labelledby",
+        labelId as string,
+    );
+    const separator = part(page, "select", "separator");
+    await expect(separator).toHaveCount(1);
+    await expect(separator).toHaveAttribute("role", "presentation");
+    await expect(separator).toHaveAttribute("data-orientation", "horizontal");
+    await expect(part(page, "select", "item-text")).toHaveCount(5);
+    await expect(
+        part(page, "select", "item")
+            .nth(2)
+            .locator(part(page, "select", "item-text")),
+    ).toHaveText("Carrot");
+    await expectNoFalseStates(parts(page, "select"));
+});

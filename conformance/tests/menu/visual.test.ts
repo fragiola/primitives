@@ -38,3 +38,13 @@ test("menu / detached: open from a row", async ({ page }) => {
     ).toBeVisible();
     await expectScreen(page, "menu-detached-open");
 });
+
+test("menu / checkbox-radio: open", async ({ page }) => {
+    await openScenario(page, "/menu/checkbox-radio");
+    await page.getByRole("button", { name: "View" }).focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(
+        page.getByRole("menuitemcheckbox", { name: "Show toolbar" }),
+    ).toBeFocused();
+    await expectScreen(page, "menu-checkbox-radio-open");
+});

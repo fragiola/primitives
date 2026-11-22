@@ -12,14 +12,17 @@ export interface LifecycleOverlay {
     /** The popup: the same node across openings, `data-ending-style` during its exit. */
     popup: string;
     /** The popup's role in the accessibility tree while open. */
-    role: "dialog" | "menu" | "listbox" | "tooltip";
+    role: "dialog" | "alertdialog" | "menu" | "listbox" | "tooltip";
     open: (page: Page) => Promise<void>;
     /** The trigger focus returns to. */
     trigger: (page: Page) => ReturnType<Page["getByRole"]>;
     /** The fixture renders "Close with actions" (Dialog, Popover). */
     actions?: boolean;
-    /** An outside press closes it (a tooltip is not a layer). */
-    outsidePress?: boolean;
+    /**
+     * What a press outside does: closes it (`true`); nothing at all (`"never"`: an AlertDialog,
+     * spec/alert-dialog.md); omitted: a tooltip, which is no layer (the pointer leaving closes it).
+     */
+    outsidePress?: true | "never";
     today?: boolean;
 }
 
@@ -40,6 +43,20 @@ export const LIFECYCLE_OVERLAYS: Record<string, LifecycleOverlay> = {
             }),
         actions: true,
         outsidePress: true,
+    },
+    "alert-dialog": {
+        path: "/alert-dialog/lifecycle",
+        kept: "alert-dialog-popup",
+        popup: "alert-dialog-popup",
+        role: "alertdialog",
+        open: async (page) => button("Delete file")(page).click(),
+        trigger: (page) =>
+            page.getByRole("button", {
+                name: "Delete file",
+                includeHidden: true,
+            }),
+        actions: true,
+        outsidePress: "never",
     },
     popover: {
         path: "/popover/lifecycle",
@@ -70,6 +87,17 @@ export const LIFECYCLE_OVERLAYS: Record<string, LifecycleOverlay> = {
         role: "menu",
         open: async (page) => button("Actions")(page).click(),
         trigger: button("Actions"),
+        outsidePress: true,
+    },
+    "context-menu": {
+        path: "/context-menu/lifecycle",
+        kept: "context-menu-positioner",
+        popup: "context-menu-popup",
+        role: "menu",
+        // a right-click in the area (spec/context-menu.md)
+        open: async (page) =>
+            page.getByText("Right-click here").click({ button: "right" }),
+        trigger: (page) => page.getByText("Right-click here"),
         outsidePress: true,
     },
     select: {

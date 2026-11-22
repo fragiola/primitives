@@ -118,9 +118,16 @@ for (const [name, overlay] of Object.entries(LIFECYCLE_OVERLAYS)) {
             await expectOutput(page, "canceled", "escape-key");
             await expectOutput(page, "open", "true");
             await expect(popup(page)).toBeVisible();
-            if (overlay.outsidePress) {
+            if (overlay.outsidePress === true) {
                 await page.mouse.click(5, 5);
                 await expectOutput(page, "canceled", "outside-press");
+                await expect(popup(page)).toBeVisible();
+            } else if (overlay.outsidePress === "never") {
+                // an alert dialog: the press reports nothing (spec/alert-dialog.md)
+                await page.mouse.click(5, 5);
+                await page.waitForTimeout(200);
+                await expectOutput(page, "canceled", "escape-key");
+                await expectOutput(page, "open", "true");
                 await expect(popup(page)).toBeVisible();
             } else {
                 // a tooltip: the pointer leaving

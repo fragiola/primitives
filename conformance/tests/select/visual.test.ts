@@ -24,3 +24,10 @@ test("select / basic: open on the selection", async ({ page }) => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expectScreen(page, "select-basic-open");
 });
+
+test("select / groups: open", async ({ page }) => {
+    await openScenario(page, "/select/groups");
+    await page.getByRole("combobox", { name: "Food" }).click();
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await expectScreen(page, "select-groups-open");
+});

@@ -79,5 +79,6 @@ top-left corner.
 | `ssr-server.ts` | the ssr layer's server: `node conformance/src/ssr-server.ts <fixture dir> <port>` |
 | `form.ts` | `expectSubmitted(page, entries)`: the form scenarios' `form: ...` line |
 | `pointer.ts` | `pointAlong`, `pressAlong`, `dragFrom`: whole-pixel presses and drags along a box |
+| `touch.ts` | `holdTouch`: a touch held at a point for a time (a long press), through Chromium's input pipeline (CDP), in a `hasTouch` context |
 | `slider.ts` | `sliderState`, `expectSliderValue` |
 | `dates.ts` | `fullDate`, `monthHeading`, `shortWeekday`: the calendar's expected names, computed with `Intl` |

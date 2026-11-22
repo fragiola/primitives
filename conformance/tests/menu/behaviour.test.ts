@@ -494,3 +494,146 @@ test.describe("menu / detached", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+test.describe("menu / checkbox-radio", () => {
+    const trigger = (page: Page) => page.getByRole("button", { name: "View" });
+    const menu = (page: Page) => page.getByRole("menu", { name: "View" });
+    const checkbox = (page: Page, name: string) =>
+        page.getByRole("menuitemcheckbox", { name });
+    const radio = (page: Page, name: string) =>
+        page.getByRole("menuitemradio", { name });
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/menu/checkbox-radio");
+    });
+
+    test("checkbox and radio items announce their state; the radios are a named group", async ({
+        page,
+    }) => {
+        await expectOutput(page, "toolbar", "true");
+        await expectOutput(page, "status bar", "false");
+        await expectOutput(page, "sort", "name");
+        await trigger(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(menu(page)).toBeVisible();
+        await expect(checkbox(page, "Show toolbar")).toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(checkbox(page, "Show status bar")).toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+        const group = page.getByRole("group", { name: "Sort by" });
+        await expect(group.getByRole("menuitemradio")).toHaveCount(3);
+        await expect(radio(page, "Name")).toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(radio(page, "Date")).toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+        await expect(radio(page, "Size")).toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+        await expect(radio(page, "Size")).toHaveAttribute(
+            "aria-disabled",
+            "true",
+        );
+    });
+
+    test("Space toggles a checkbox item and keeps the menu open", async ({
+        page,
+    }) => {
+        await trigger(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await expect(checkbox(page, "Show status bar")).toBeFocused();
+        await page.keyboard.press(" ");
+        await expectOutput(page, "status bar", "true");
+        await expect(checkbox(page, "Show status bar")).toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(menu(page)).toBeVisible();
+        await expect(checkbox(page, "Show status bar")).toBeFocused();
+        await page.keyboard.press(" ");
+        await expectOutput(page, "status bar", "false");
+        await expect(menu(page)).toBeVisible();
+    });
+
+    test("Space checks a radio item across the separator and the group; a disabled one does nothing", async ({
+        page,
+    }) => {
+        await trigger(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowDown");
+        await expect(radio(page, "Name")).toBeFocused();
+        await page.keyboard.press("ArrowDown");
+        await expect(radio(page, "Date")).toBeFocused();
+        await page.keyboard.press(" ");
+        await expectOutput(page, "sort", "date");
+        await expect(radio(page, "Date")).toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(radio(page, "Name")).toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+        await expect(menu(page)).toBeVisible();
+        await page.keyboard.press("ArrowDown");
+        await expect(radio(page, "Size")).toBeFocused();
+        await page.keyboard.press(" ");
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "sort", "date");
+        await expect(menu(page)).toBeVisible();
+    });
+
+    test("Enter toggles and closes the menu, focus back on the trigger", async ({
+        page,
+    }) => {
+        await trigger(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("End");
+        await page.keyboard.press("Home");
+        await expect(checkbox(page, "Show toolbar")).toBeFocused();
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "toolbar", "false");
+        await expectOutput(page, "open", "false");
+        await expectOutput(page, "reason", "item-press");
+        await expect(menu(page)).toHaveCount(0);
+        await expect(trigger(page)).toBeFocused();
+    });
+
+    test("a click toggles and keeps the menu open (closeOnClick is false)", async ({
+        page,
+    }) => {
+        await trigger(page).click();
+        await checkbox(page, "Show status bar").click();
+        await expectOutput(page, "status bar", "true");
+        await expect(menu(page)).toBeVisible();
+        await radio(page, "Date").click();
+        await expectOutput(page, "sort", "date");
+        await radio(page, "Name").click();
+        await expectOutput(page, "sort", "name");
+        await expect(menu(page)).toBeVisible();
+        await expectOutput(page, "open", "true");
+    });
+
+    test("typeahead reaches the checkable items", async ({ page }) => {
+        await trigger(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("d");
+        await expect(radio(page, "Date")).toBeFocused();
+    });
+
+    test("has no axe violation while open", async ({ page }) => {
+        await trigger(page).click();
+        await expect(menu(page)).toBeVisible();
+        await expectNoAxeViolations(page);
+    });
+});
