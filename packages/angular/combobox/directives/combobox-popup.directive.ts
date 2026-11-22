@@ -12,6 +12,7 @@ import { ComboboxRoot } from "./combobox-root.directive.ts";
     host: {
         "data-primitives-part": "combobox-popup",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-starting-style]": "data()['starting-style']",
@@ -26,8 +27,10 @@ export class ComboboxPopup {
     }));
     protected readonly data = computed(() => {
         const status = this.root.overlay.presence.status();
+        const state = this.state();
         return dataValues({
-            ...this.state(),
+            ...state,
+            closed: !state.open,
             "starting-style": status === "starting",
             "ending-style": status === "ending",
         });

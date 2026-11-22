@@ -35,7 +35,7 @@ export interface SelectItemState {
         "(pointermove)": "onPointerMove()",
         // the trigger keeps DOM focus
         "(pointerdown)": "$event.preventDefault()",
-        "(click)": "onClick()",
+        "(click)": "onClick($event)",
     },
 })
 export class SelectItem {
@@ -76,9 +76,9 @@ export class SelectItem {
         }
     }
 
-    protected onClick(): void {
+    protected onClick(event: MouseEvent): void {
         if (!this.state().disabled) {
-            this.root.choose(this.value(), "item-press");
+            this.root.choose(this.value(), "item-press", event);
         }
     }
 }

@@ -10,6 +10,7 @@ import {
     input,
     output,
     signal,
+    untracked,
 } from "@angular/core";
 import { bridgeForm } from "@fragiola/primitives/form";
 import { fieldControl } from "@fragiola/primitives-angular/field";
@@ -21,6 +22,7 @@ import {
     createOverlayRoot,
     injectId,
     type OpenChangeEvent,
+    type OverlayActions,
     placementSignal,
     setInputAttribute,
     type ValueChangeEvent,
@@ -57,11 +59,14 @@ export function initialHighlight(
  * labels while the list is not rendered.
  */
 @Directive({ selector: "[selectRoot]", exportAs: "selectRoot" })
-export class SelectRoot {
+export class SelectRoot implements OverlayActions {
     readonly open = input<boolean | undefined>(undefined);
     readonly openChange = output<boolean>();
     readonly defaultOpen = input(false);
+    /** Every requested change with its details, before it happens (`details.cancel()` keeps it). */
     readonly openChangeDetails = output<OpenChangeEvent>();
+    /** An opening's or a closing's transition has finished (spec/README.md, "Lifecycle"). */
+    readonly openChangeComplete = output<boolean>();
     readonly value = input<string | null | undefined>(undefined);
     readonly valueChange = output<string | null>();
     readonly defaultValue = input<string | null>(null);
@@ -153,21 +158,34 @@ export class SelectRoot {
         return `${this.listId}-item-${index}`;
     }
 
-    /** Opens the list with this item highlighted. */
-    openOn(value: string | null, reason: ChangeReason): void {
+    /** Opens the list with this item highlighted (none when the opening is canceled). */
+    openOn(value: string | null, reason: ChangeReason, event?: Event): void {
+        const previous = untracked(this.highlighted);
         this.highlighted.set(value);
-        this.overlay.setOpen(true, reason);
+        if (!this.overlay.setOpen(true, reason, event)) {
+            this.highlighted.set(previous);
+        }
     }
 
     /** Chooses an enabled item and closes. */
-    choose(value: string, reason: ChangeReason): void {
+    choose(value: string, reason: ChangeReason, event?: Event): void {
         const item = this.items().find(
             (candidate) => candidate.value === value,
         );
         if (item === undefined || item.disabled) {
             return;
         }
-        this.selection.set(value, { reason });
-        this.overlay.setOpen(false, reason);
+        this.selection.set(value, { reason, event });
+        this.overlay.setOpen(false, reason, event);
+    }
+
+    /** Closes the list (reason `imperative-action`). */
+    close(): void {
+        this.overlay.close();
+    }
+
+    /** Ends a running exit now, or the exit held by `preventUnmountOnClose()`. */
+    unmount(): void {
+        this.overlay.unmount();
     }
 }

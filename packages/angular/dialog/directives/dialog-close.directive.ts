@@ -12,5 +12,5 @@ import { DialogRoot } from "./dialog-root.directive.ts";
     },
 })
 export class DialogClose {
-    protected readonly root = inject(DialogRoot);
+    protected readonly root = inject<DialogRoot>(DialogRoot);
 }

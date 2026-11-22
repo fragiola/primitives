@@ -44,6 +44,7 @@ export interface DatePickerInputs {
     open: Signal<boolean | undefined>;
     openChange: OutputEmitterRef<boolean>;
     defaultOpen: InputSignal<boolean>;
+    openChangeComplete: Pick<OutputEmitterRef<boolean>, "emit">;
     value: Signal<CalendarValue | undefined>;
     valueChange: Pick<OutputEmitterRef<CalendarValue>, "emit">;
     defaultValue: Signal<CalendarValue | undefined>;

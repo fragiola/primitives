@@ -19,7 +19,7 @@ import { ComboboxRoot } from "./combobox-root.directive.ts";
         "[attr.data-popup-open]": "data().open",
         "[attr.data-disabled]": "data().disabled",
         "(pointerdown)": "$event.preventDefault()",
-        "(click)": "onClick()",
+        "(click)": "onClick($event)",
     },
 })
 export class ComboboxTrigger {
@@ -35,10 +35,10 @@ export class ComboboxTrigger {
         registerHost(this.root.button);
     }
 
-    protected onClick(): void {
+    protected onClick(event: MouseEvent): void {
         const root = this.root;
         root.pendingHighlight.set(null);
-        root.setOpen(!root.overlay.open(), "trigger-press");
+        root.setOpen(!root.overlay.open(), "trigger-press", event);
         root.overlay.trigger()?.focus();
     }
 }

@@ -39,6 +39,7 @@ export class DatePickerRoot extends DatePickerRootBase {
             open: this.open,
             openChange: this.openChange,
             defaultOpen: this.defaultOpen,
+            openChangeComplete: this.openChangeComplete,
             value: this.value,
             valueChange: {
                 emit: (value: CalendarValue) =>

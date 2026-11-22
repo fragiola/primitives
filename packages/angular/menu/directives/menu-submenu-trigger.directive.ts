@@ -44,7 +44,7 @@ export interface MenuSubmenuTriggerState {
         "[attr.data-disabled]": "data().disabled",
         "(focus)": "item.onFocus()",
         "(blur)": "item.onBlur()",
-        "(click)": "openSubmenu(null, 'trigger-press')",
+        "(click)": "openSubmenu(null, 'trigger-press', $event)",
         "(keydown)": "onKeyDown($event)",
         "(pointermove)": "onPointerMove($event)",
         "(pointerleave)": "onPointerLeave($event)",
@@ -53,14 +53,14 @@ export interface MenuSubmenuTriggerState {
 export class MenuSubmenuTrigger {
     /** A DirectionProvider's direction, else `null` (the computed one is read). */
     private readonly direction = injectProvidedDirection();
-    protected readonly submenu = inject(MenuRoot);
+    protected readonly submenu = inject<MenuRoot>(MenuRoot);
     private readonly parent = this.requireParent();
     readonly disabled = input(false, { transform: booleanAttribute });
     readonly label = input<string | undefined>(undefined);
     /** Hovering opens the submenu (default `true`), after `delay` ms (default 100). */
     readonly openOnHover = input(true, { transform: booleanAttribute });
     readonly delay = input(100, { transform: numberAttribute });
-    private readonly host = registerHost(this.submenu.overlay.trigger);
+    private readonly host = registerHost(this.submenu.overlay.singleTrigger);
     protected readonly item = menuItemBehaviour(
         this.parent,
         this.host,
@@ -80,7 +80,7 @@ export class MenuSubmenuTrigger {
         inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));
     }
 
-    private requireParent(): MenuRoot {
+    private requireParent(): MenuRoot<unknown> {
         if (this.submenu.parent === null) {
             throw new Error(
                 "[menuSubmenuTrigger] must be inside a [menuSubmenuRoot].",
@@ -92,12 +92,13 @@ export class MenuSubmenuTrigger {
     protected openSubmenu(
         highlight: "first" | null,
         reason: "trigger-press" | "list-navigation",
+        event?: Event,
     ): void {
         if (this.disabled()) {
             return;
         }
         this.submenu.pendingHighlight = highlight;
-        this.submenu.overlay.setOpen(true, reason);
+        this.submenu.overlay.setOpen(true, reason, event);
     }
 
     protected onKeyDown(event: KeyboardEvent): void {
@@ -114,6 +115,7 @@ export class MenuSubmenuTrigger {
             this.openSubmenu(
                 "first",
                 event.key === openKey ? "list-navigation" : "trigger-press",
+                event,
             );
         }
     }

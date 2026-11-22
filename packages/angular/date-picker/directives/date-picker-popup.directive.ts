@@ -22,8 +22,13 @@ export interface DatePickerPopupState {
 // Closing by these returns focus to the trigger; focus leaving does not (spec/calendar.md, "Focus").
 const RETURNS_FOCUS = new Set(["escape-key", "item-press", "trigger-press"]);
 // an outside press returns it only when the press focused nothing (as Popover, D4 §3)
-// and a close made through the controlled `open` (reason `none`), as Popover's
-const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
+// and a close made through the controlled `open` (reason `none`), as Popover's (and the actions'
+// `imperative-action`, whose focus return is `none`'s)
+const RETURNS_FOCUS_UNFOCUSED = new Set([
+    "outside-press",
+    "none",
+    "imperative-action",
+]);
 
 /** The non-modal dialog holding the bound calendar (spec/calendar.md, pickers): `<div datePickerPopup>`. */
 @Directive({
@@ -34,6 +39,7 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press", "none"]);
         "[attr.data-primitives-part]": "picker.part('popup')",
         "[attr.id]": "picker.overlay.popupId",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-starting-style]": "data()['starting-style']",
@@ -49,8 +55,10 @@ export class DatePickerPopup {
     }));
     protected readonly data = computed(() => {
         const status = this.picker.overlay.presence.status();
+        const state = this.state();
         return dataValues({
-            ...this.state(),
+            ...state,
+            closed: !state.open,
             "starting-style": status === "starting",
             "ending-style": status === "ending",
         });
@@ -72,7 +80,8 @@ export class DatePickerPopup {
                 const session = openOverlaySession(popup.ownerDocument, {
                     elements: () => [positioner ?? popup],
                     ignore: () => [trigger],
-                    dismiss: (reason) => overlay.setOpen(false, reason),
+                    dismiss: (reason, event) =>
+                        overlay.setOpen(false, reason, event),
                     focusOut: () => [trigger],
                     returnFocus: {
                         when: RETURNS_FOCUS,
@@ -100,14 +109,14 @@ export class DatePickerPopup {
         const last = tabbables.at(-1) ?? popup;
         if (event.shiftKey && (active === first || active === popup)) {
             event.preventDefault();
-            overlay.setOpen(false, "focus-out");
+            overlay.setOpen(false, "focus-out", event);
             trigger?.focus();
         } else if (!event.shiftKey && active === last) {
             event.preventDefault();
             const next = trigger
                 ? nextTabbableAfter(trigger, [overlay.positioner(), popup])
                 : null;
-            overlay.setOpen(false, "focus-out");
+            overlay.setOpen(false, "focus-out", event);
             next?.focus();
         }
     }

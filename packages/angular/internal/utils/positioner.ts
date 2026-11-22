@@ -37,8 +37,10 @@ export function placementSignal(initial: Placement): WritableSignal<Placement> {
 
 /**
  * Positions an overlay's positioner next to its anchor while both exist, from its inputs with the
- * given defaults, after each render; reports where it ended up in `placed` (the root's). Its
- * logical sides follow a DirectionProvider's direction, else the anchor's computed one.
+ * given defaults, after each render, while `mounted()` (open, or its exit running): a kept-mounted
+ * closed overlay is not positioned (spec/README.md, "Lifecycle"). Reports where it ended up in
+ * `placed` (the root's). Its logical sides follow a DirectionProvider's direction, else the
+ * anchor's computed one.
  */
 export function positionOverlay(
     inputs: PositionerInputs,
@@ -47,6 +49,7 @@ export function positionOverlay(
         anchor: Signal<Element | null>;
         positioner: HTMLElement;
         arrow?: Signal<HTMLElement | null>;
+        mounted?: Signal<boolean>;
     },
     placed: WritableSignal<Placement>,
 ): void {
@@ -61,7 +64,7 @@ export function positionOverlay(
             collisionPadding: inputs.collisionPadding() ?? 8,
             arrow: elements.arrow?.() ?? null,
         };
-        if (anchor === null) {
+        if (anchor === null || elements.mounted?.() === false) {
             return;
         }
         untracked(() => {

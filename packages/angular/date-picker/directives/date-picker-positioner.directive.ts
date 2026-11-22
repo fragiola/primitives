@@ -20,7 +20,9 @@ export interface DatePickerPositionerState {
     host: {
         role: "presentation",
         "[attr.data-primitives-part]": "picker.part('positioner')",
+        "[attr.hidden]": "picker.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
@@ -37,7 +39,9 @@ export class DatePickerPositioner {
         open: this.picker.overlay.open(),
         ...this.picker.placed(),
     }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() =>
+        dataValues({ ...this.state(), closed: !this.state().open }),
+    );
 
     constructor() {
         const overlay = this.picker.overlay;
@@ -47,6 +51,7 @@ export class DatePickerPositioner {
             {
                 anchor: overlay.trigger,
                 positioner: registerHost(overlay.positioner),
+                mounted: overlay.presence.mounted,
             },
             this.picker.placed,
         );

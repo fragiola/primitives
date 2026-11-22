@@ -50,7 +50,7 @@ const TYPEAHEAD_SPACE = 500;
             "root.modal() && state().open ? 'auto' : null",
         "[attr.data-disabled]": "data().disabled",
         "[attr.data-placeholder]": "data().placeholder",
-        "(click)": "onClick()",
+        "(click)": "onClick($event)",
         "(keydown)": "onKeyDown($event)",
         "(focus)": "root.field.focused()",
         "(blur)": "root.field.blurred()",
@@ -76,7 +76,7 @@ export class SelectTrigger {
     private readonly flush = injectFlush();
 
     constructor() {
-        const host = registerHost(this.root.overlay.trigger);
+        const host = registerHost(this.root.overlay.singleTrigger);
         const { field } = this.root;
         writeFieldAria(field, host, {
             "aria-labelledby": field.labelledBy,
@@ -92,14 +92,15 @@ export class SelectTrigger {
         });
     }
 
-    protected onClick(): void {
+    protected onClick(event: MouseEvent): void {
         const root = this.root;
         if (root.overlay.open()) {
-            root.overlay.setOpen(false, "trigger-press");
+            root.overlay.setOpen(false, "trigger-press", event);
         } else {
             root.openOn(
                 initialHighlight(root.items(), root.selected()),
                 "trigger-press",
+                event,
             );
         }
     }
@@ -110,7 +111,7 @@ export class SelectTrigger {
         this.flush();
     }
 
-    private typeTo(key: string): void {
+    private typeTo(key: string, event: Event): void {
         const root = this.root;
         const items = root.items();
         const open = root.overlay.open();
@@ -131,7 +132,7 @@ export class SelectTrigger {
         if (open) {
             this.highlight(target);
         } else {
-            root.openOn(target, "list-navigation");
+            root.openOn(target, "list-navigation", event);
         }
     }
 
@@ -150,7 +151,7 @@ export class SelectTrigger {
                 return;
             }
             event.preventDefault();
-            this.typeTo(event.key);
+            this.typeTo(event.key, event);
             return;
         }
         if (!open) {
@@ -163,6 +164,7 @@ export class SelectTrigger {
                     root.openOn(
                         initialHighlight(items, root.selected()),
                         "list-navigation",
+                        event,
                     );
                     return;
                 case "Home":
@@ -172,6 +174,7 @@ export class SelectTrigger {
                         (event.key === "Home" ? items[0] : items.at(-1))
                             ?.value ?? null,
                         "list-navigation",
+                        event,
                     );
                     return;
                 default:
@@ -198,16 +201,16 @@ export class SelectTrigger {
             case " ":
                 event.preventDefault();
                 if (highlighted !== null) {
-                    root.choose(highlighted, "item-press");
+                    root.choose(highlighted, "item-press", event);
                 }
                 return;
             case "Tab": {
                 // APG: Tab chooses the highlighted option, then focus moves on
                 const item = items[index];
                 if (item !== undefined && !item.disabled) {
-                    root.choose(item.value, "focus-out");
+                    root.choose(item.value, "focus-out", event);
                 } else {
-                    root.overlay.setOpen(false, "focus-out");
+                    root.overlay.setOpen(false, "focus-out", event);
                 }
                 return;
             }

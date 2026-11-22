@@ -19,7 +19,10 @@ export {
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayPortalOptions,
     ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
 export { DateRangePickerRoot } from "./directives/date-range-picker-root.directive.ts";

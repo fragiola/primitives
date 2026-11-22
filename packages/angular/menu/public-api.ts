@@ -6,7 +6,11 @@ export type { Align, Side } from "@fragiola/primitives/positioning";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayHandle,
+    OverlayPortalOptions,
 } from "@fragiola/primitives-angular/internal";
 export { MenuGroup } from "./directives/menu-group.directive.ts";
 export { MenuGroupLabel } from "./directives/menu-group-label.directive.ts";
@@ -37,3 +41,4 @@ export {
     type MenuTriggerState,
 } from "./directives/menu-trigger.directive.ts";
 export { injectMenu } from "./inject/inject-menu.ts";
+export { createMenuHandle, type MenuHandle } from "./utils/menu-handle.ts";

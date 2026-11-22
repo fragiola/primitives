@@ -7,7 +7,11 @@ export type {
     ChangeDetails,
     ChangeReason,
     FocusTarget,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayHandle,
+    OverlayPortalOptions,
 } from "@fragiola/primitives-angular/internal";
 export { PopoverArrow } from "./directives/popover-arrow.directive.ts";
 export { PopoverClose } from "./directives/popover-close.directive.ts";
@@ -31,3 +35,7 @@ export {
     type PopoverTriggerState,
 } from "./directives/popover-trigger.directive.ts";
 export { injectPopover } from "./inject/inject-popover.ts";
+export {
+    createPopoverHandle,
+    type PopoverHandle,
+} from "./utils/popover-handle.ts";

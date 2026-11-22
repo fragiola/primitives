@@ -46,7 +46,7 @@ export class CollapsibleRoot {
     readonly open = input<boolean | undefined>(undefined);
     readonly openChange = output<boolean>();
     readonly defaultOpen = input(false, { transform: booleanAttribute });
-    readonly openChangeDetails = output<OpenChangeEvent>();
+    readonly openChangeDetails = output<OpenChangeEvent<ChangeDetails>>();
     /** Nothing but a bound `open` opens or closes it (default `false`). */
     readonly disabled = input(false, { transform: booleanAttribute });
 

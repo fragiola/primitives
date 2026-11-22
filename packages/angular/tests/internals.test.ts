@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { resolveFocusTarget } from "../internal/utils/change-details.ts";
 import { controllable } from "../internal/utils/controllable.ts";
 import { panelOptions } from "../internal/utils/panel-transition.ts";
-import { portalContainer } from "../internal/utils/portal.ts";
+import { portalOptions } from "../internal/utils/portal.ts";
 import {
     dataAttributes,
     dataValue,
@@ -59,11 +59,14 @@ describe("resolveFocusTarget", () => {
     });
 });
 
-describe("portalContainer", () => {
-    it("reads `*xPortal` alone as the default container", () => {
+describe("portalOptions", () => {
+    it("reads `*xPortal` alone as no option, an element as the container", () => {
         const element = document.createElement("div");
-        expect(portalContainer("")).toBeNull();
-        expect(portalContainer(element)).toBe(element);
+        expect(portalOptions("")).toEqual({});
+        expect(portalOptions(element)).toEqual({ container: element });
+        expect(portalOptions({ keepMounted: true })).toEqual({
+            keepMounted: true,
+        });
     });
 });
 

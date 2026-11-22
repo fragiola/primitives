@@ -12,14 +12,19 @@ import { TooltipRoot } from "./tooltip-root.directive.ts";
     host: {
         "aria-hidden": "true",
         "data-primitives-part": "tooltip-arrow",
+        "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
 })
 export class TooltipArrow {
-    private readonly root = inject(TooltipRoot);
+    private readonly root = inject<TooltipRoot>(TooltipRoot);
     readonly state = this.root.placed.asReadonly();
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() => {
+        const open = this.root.overlay.open();
+        return dataValues({ ...this.state(), open, closed: !open });
+    });
 
     constructor() {
         registerHost(this.root.arrow);

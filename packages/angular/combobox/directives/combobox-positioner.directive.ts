@@ -25,13 +25,15 @@ import { ComboboxRoot } from "./combobox-root.directive.ts";
     host: {
         role: "presentation",
         "data-primitives-part": "combobox-positioner",
+        "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
 })
 export class ComboboxPositioner {
-    private readonly root = inject(ComboboxRoot);
+    protected readonly root = inject(ComboboxRoot);
     readonly side = input<Side | undefined>(undefined);
     readonly align = input<Align | undefined>(undefined);
     readonly sideOffset = input<number | undefined>(undefined);
@@ -42,7 +44,9 @@ export class ComboboxPositioner {
         open: this.root.overlay.open(),
         ...this.root.placed(),
     }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() =>
+        dataValues({ ...this.state(), closed: !this.state().open }),
+    );
 
     constructor() {
         const root = this.root;
@@ -57,6 +61,7 @@ export class ComboboxPositioner {
                         root.inputGroup() ?? root.chips() ?? overlay.trigger(),
                 ),
                 positioner,
+                mounted: overlay.presence.mounted,
             },
             root.placed,
         );
@@ -76,7 +81,8 @@ export class ComboboxPositioner {
                 const session = openOverlaySession(positioner.ownerDocument, {
                     elements: () => [positioner],
                     ignore: () => ignored,
-                    dismiss: (reason) => root.setOpen(false, reason),
+                    dismiss: (reason, event) =>
+                        root.setOpen(false, reason, event),
                 });
                 onCleanup(session.end);
             });

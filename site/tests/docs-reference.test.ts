@@ -143,12 +143,17 @@ function objectKeys(source: string): { keys: string[]; spreads: string[] } {
 const capitalize = (name: string) =>
     name.charAt(0).toUpperCase() + name.slice(1);
 
-/** A component's namespace: part → the component (or directive) that implements it. */
+/**
+ * A component's namespace: part → the component (or directive) that implements it. A function on
+ * the namespace (`createHandle: createDialogHandle`) is no part: it is checked as an export.
+ */
 function namespaceOf(source: string): Map<string, string> {
     const open = source.indexOf("{", source.search(/export const \w+ = \{/));
     const parts = new Map<string, string>();
     for (const match of braced(source, open).matchAll(/(\w+):\s*(\w+)/g)) {
-        if (match[1] && match[2]) parts.set(match[1], match[2]);
+        if (match[1] && match[2] && /^[A-Z]/.test(match[2])) {
+            parts.set(match[1], match[2]);
+        }
     }
     return parts;
 }
@@ -672,7 +677,11 @@ describe("the API pages", () => {
         expect(angularProps("dialog", ["Root"], disk).get("Root")).toEqual([
             "open",
             "defaultOpen",
+            "handle",
+            "triggerId",
+            "defaultTriggerId",
             "onOpenChange",
+            "onOpenChangeComplete",
         ]);
         expect(
             exportedNames(
