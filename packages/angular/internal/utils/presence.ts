@@ -4,7 +4,11 @@ import {
     linkedSignal,
     type Signal,
 } from "@angular/core";
-import { nextFrame, waitForAnimations } from "@fragiola/primitives/presence";
+import {
+    isAnimating,
+    nextFrame,
+    waitForAnimations,
+} from "@fragiola/primitives/presence";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
 
@@ -27,12 +31,19 @@ export interface Presence {
 export function createPresence(
     open: Signal<boolean>,
     element: Signal<HTMLElement | null>,
+    options: {
+        /** Whether an element open on the first render starts with `data-starting-style` (`true`). */
+        enterOnMount?: boolean;
+    } = {},
 ): Presence {
     const status = linkedSignal<boolean, TransitionStatus>({
         source: open,
         computation: (isOpen, previous) => {
             if (isOpen) {
-                return "starting";
+                // the first render's state already shows itself, unless it enters on mount
+                return previous === undefined && options.enterOnMount === false
+                    ? undefined
+                    : "starting";
             }
             const wasShown =
                 previous !== undefined &&
@@ -56,7 +67,8 @@ export function createPresence(
                 status.set(undefined);
             }
         };
-        if (node) {
+        // nothing to animate: it ends in the same render, before a paint
+        if (node && isAnimating(node)) {
             void waitForAnimations(node).then(finish);
         } else {
             finish();

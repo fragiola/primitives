@@ -11,9 +11,15 @@ export type TransitionStatus = "starting" | "ending" | undefined;
 export function usePresence(
     open: Ref<boolean>,
     element: () => HTMLElement | null,
+    options: {
+        /** Whether an element open on the first render starts with `data-starting-style` (`true`). */
+        enterOnMount?: boolean;
+    } = {},
 ) {
     const mounted = ref(open.value);
-    const status = ref<TransitionStatus>(open.value ? "starting" : undefined);
+    const status = ref<TransitionStatus>(
+        open.value && options.enterOnMount !== false ? "starting" : undefined,
+    );
     watch(
         open,
         (isOpen) => {

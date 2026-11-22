@@ -54,6 +54,8 @@ describe("the manifest", () => {
                 "tooltip",
                 "menu",
                 "tabs",
+                "collapsible",
+                "accordion",
                 "field",
                 "checkbox",
                 "slider",

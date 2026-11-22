@@ -2,8 +2,13 @@ import { ElementRef, type OutputEmitterRef, signal } from "@angular/core";
 import { describe, expect, it } from "vitest";
 import { resolveFocusTarget } from "../internal/utils/change-details.ts";
 import { controllable } from "../internal/utils/controllable.ts";
+import { panelOptions } from "../internal/utils/panel-transition.ts";
 import { portalContainer } from "../internal/utils/portal.ts";
-import { dataValue, dataValues } from "../internal/utils/state-attributes.ts";
+import {
+    dataAttributes,
+    dataValue,
+    dataValues,
+} from "../internal/utils/state-attributes.ts";
 
 describe("dataValue", () => {
     it("gives an empty attribute for true, none (null) for false, and strings as values", () => {
@@ -14,6 +19,32 @@ describe("dataValue", () => {
         expect(
             dataValues({ open: true, disabled: false, side: "top" }),
         ).toEqual({ open: "", disabled: null, side: "top" });
+    });
+});
+
+describe("dataAttributes", () => {
+    it("prefixes the values for a part a structural directive renders", () => {
+        expect(
+            dataAttributes({
+                open: true,
+                closed: false,
+                "activation-direction": "left",
+            }),
+        ).toEqual({
+            "data-open": "",
+            "data-closed": null,
+            "data-activation-direction": "left",
+        });
+    });
+});
+
+describe("panelOptions", () => {
+    it("reads `*xPanel` alone as no option, and an object as the options", () => {
+        expect(panelOptions("")).toEqual({});
+        expect(panelOptions(undefined)).toEqual({});
+        expect(panelOptions({ hiddenUntilFound: true })).toEqual({
+            hiddenUntilFound: true,
+        });
     });
 });
 

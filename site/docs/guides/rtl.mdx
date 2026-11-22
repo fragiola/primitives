@@ -93,7 +93,8 @@ floating element ([the toolkit](/docs/api/toolkit)).
 
 | component | in right to left |
 | --- | --- |
-| [Tabs](/docs/api/tabs) | ArrowLeft moves to the next tab, ArrowRight to the previous (horizontal) |
+| [Tabs](/docs/api/tabs) | ArrowLeft moves to the next tab, ArrowRight to the previous (horizontal); `data-activation-direction` stays physical, so moving to the next tab gives `left` |
+| [Accordion](/docs/api/accordion) | ArrowLeft moves to the next trigger, ArrowRight to the previous (horizontal) |
 | [Slider](/docs/api/slider) | a horizontal slider has `min` at the right; the arrows swap |
 | [RadioGroup](/docs/api/radio-group) | ArrowLeft moves to the next radio (and checks it), ArrowRight to the previous; ArrowDown and ArrowUp do not change |
 | [Progress](/docs/api/progress) | the Indicator grows from the inline start: from the right |
@@ -103,4 +104,4 @@ floating element ([the toolkit](/docs/api/toolkit)).
 | every positioned popup | `inline-start` and `inline-end` resolve to the right and the left; `left` and `right` stay physical |
 
 The Tabs Indicator is measured in the List's own box, so it follows the layout whatever the
-provider says.
+provider says: its logical inline start is `--active-tab-right` in right to left.

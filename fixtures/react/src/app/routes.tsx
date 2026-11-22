@@ -1,4 +1,7 @@
 import type { ComponentType } from "react";
+import { AccordionBasic } from "../scenarios/accordion/accordion-basic.tsx";
+import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.tsx";
+import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
@@ -9,6 +12,8 @@ import { CalendarUnavailable } from "../scenarios/calendar/calendar-unavailable.
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
+import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
+import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.tsx";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.tsx";
@@ -61,6 +66,7 @@ import { SliderRange } from "../scenarios/slider/slider-range.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.tsx";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.tsx";
+import { TabsAnimated } from "../scenarios/tabs/tabs-animated.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
 import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
@@ -80,6 +86,12 @@ export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
     "/tabs/none-selected": TabsNoneSelected,
+    "/tabs/animated": TabsAnimated,
+    "/collapsible/basic": CollapsibleBasic,
+    "/collapsible/hidden-until-found": CollapsibleHiddenUntilFound,
+    "/accordion/basic": AccordionBasic,
+    "/accordion/multiple": AccordionMultiple,
+    "/accordion/horizontal": AccordionHorizontal,
     "/popover/basic": PopoverBasic,
     "/popover/initial-focus": PopoverInitialFocus,
     "/popover/placement": PopoverPlacement,

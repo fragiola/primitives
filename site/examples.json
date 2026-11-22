@@ -2,6 +2,7 @@
     "levels": [
         { "id": "overlays", "title": "Overlays" },
         { "id": "navigation", "title": "Navigation" },
+        { "id": "disclosure", "title": "Disclosure" },
         { "id": "forms", "title": "Forms and selection" },
         { "id": "dates", "title": "Dates" },
         { "id": "display", "title": "Display" }

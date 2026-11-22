@@ -10,6 +10,8 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | --- | --- |
 | [dialog.md](dialog.md) | Dialog |
 | [tabs.md](tabs.md) | Tabs |
+| [collapsible.md](collapsible.md) | Collapsible |
+| [accordion.md](accordion.md) | Accordion |
 | [popover.md](popover.md) | Popover |
 | [tooltip.md](tooltip.md) | Tooltip |
 | [menu.md](menu.md) | Menu (with submenus) |
@@ -37,7 +39,8 @@ Every spec of the POC is here: stage 0 (`docs/handoff.md` §5) is ported, with �
 Stage 1 adds the Field layer (Epic #26: Field to production, Fieldset, Form, every form control in
 a Field, Slider's Label and Value, the pickers' form support) and the direction provider; then
 the controls and display components (Epic #29: Button, RadioGroup and Radio, Switch, Progress,
-Avatar, Separator).
+Avatar, Separator); then disclosure (Epic #32: Collapsible, Accordion, and Tabs' activation
+direction, panel enter and exit states and physical Indicator variables).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -81,7 +84,9 @@ The vocabulary is shared by every component:
 
 | attribute | meaning |
 | --- | --- |
-| `data-open` | an overlay while open |
+| `data-open` | an overlay while open; an open Collapsible, Accordion item and their panels |
+| `data-closed` | a closed Collapsible, Accordion item and their panels (with `data-open`: exactly one is present) |
+| `data-panel-open` | a Collapsible's or an Accordion's Trigger while its panel is open (Base UI's name) |
 | `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover, Select or picker trigger, a Combobox's Input, InputGroup and Trigger |
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
@@ -91,6 +96,7 @@ The vocabulary is shared by every component:
 | `data-pressed` | not used in these specs |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
 | `data-activation` | `automatic` or `manual` on Tabs (a value) |
+| `data-activation-direction` | where the newly selected tab sits from the previous one: `left`, `right`, `up`, `down` or `none` (a physical value, [tabs.md](tabs.md#state-attributes-and-aria)) |
 | `data-side` | the side an overlay ended up on (a value: `top`, `bottom`, the logical `inline-start` / `inline-end`, or the physical `left` / `right`, named as the overlay asked for it; Base UI's names, D4 §3 "Naming", [popover.md](popover.md#positioning)) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-today` | the calendar cell of today |

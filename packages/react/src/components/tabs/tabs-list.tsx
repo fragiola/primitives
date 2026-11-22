@@ -59,7 +59,10 @@ export function TabsList(props: PartProps<{ orientation: string }>) {
             role: "tablist",
             "aria-orientation": orientation,
             "data-primitives-part": "tabs-list",
-            ...stateAttributes({ orientation }),
+            ...stateAttributes({
+                orientation,
+                "activation-direction": context.activationDirection,
+            }),
             onKeyDown,
         },
         context.setList,

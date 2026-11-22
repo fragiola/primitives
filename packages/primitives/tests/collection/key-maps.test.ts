@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+    accordionKeyTarget,
     menuKeyTarget,
     radioKeyTarget,
     submenuKeys,
@@ -98,5 +99,33 @@ describe("radioKeyTarget", () => {
         for (const key of ["Home", "End", "Enter", " ", "Tab", "a"]) {
             expect(radioKeyTarget(key, 0, 4, ltr)).toBeNull();
         }
+    });
+});
+
+// spec/accordion.md, "Keyboard" (Epic #32)
+describe("accordionKeyTarget", () => {
+    const vertical = {
+        orientation: "vertical",
+        rtl: false,
+        loop: true,
+    } as const;
+    it("moves along the orientation, wraps with loop, Home and End", () => {
+        expect(accordionKeyTarget("ArrowDown", 0, 3, vertical)).toBe(1);
+        expect(accordionKeyTarget("ArrowUp", 0, 3, vertical)).toBe(2);
+        expect(accordionKeyTarget("ArrowRight", 0, 3, vertical)).toBeNull();
+        expect(accordionKeyTarget("Home", 2, 3, vertical)).toBe(0);
+        expect(accordionKeyTarget("End", 0, 3, vertical)).toBe(2);
+    });
+
+    it("mirrors the horizontal arrows in RTL and stops at the ends without loop", () => {
+        const options = {
+            orientation: "horizontal",
+            rtl: true,
+            loop: false,
+        } as const;
+        expect(accordionKeyTarget("ArrowLeft", 0, 3, options)).toBe(1);
+        expect(accordionKeyTarget("ArrowRight", 0, 3, options)).toBe(0);
+        expect(accordionKeyTarget("ArrowLeft", 2, 3, options)).toBe(2);
+        expect(accordionKeyTarget("ArrowDown", 0, 3, options)).toBeNull();
     });
 });

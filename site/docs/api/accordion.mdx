@@ -1,0 +1,163 @@
+---
+title: Accordion
+description: Stacked headers that show and hide their sections, one or several open, with arrow-key navigation, following the APG accordion pattern, in each framework.
+---
+
+Stacked headers, each showing and hiding a section of content (WAI-ARIA APG
+[accordion pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/)): one section open at a
+time, or several with `multiple`. Its panels have a [Collapsible](/docs/api/collapsible)'s
+mechanics: size variables for a height transition with no layout jump, enter and exit states,
+`keepMounted` and `hiddenUntilFound`.
+
+<Example id="accordion" />
+
+## Behaviour
+
+- **Toggle**: a click on a Trigger, Enter or Space. Without `multiple`, opening an item closes
+  the open one; an open item's Trigger closes it in both modes.
+- **Keyboard**: the arrows along the `orientation` (mirrored in RTL when horizontal), Home and
+  End move among the enabled Triggers, wrapping with `loopFocus`. Every enabled Trigger is a tab
+  stop.
+- **Value**: the values of the open items, an array of strings in every mode.
+- **Headings**: each Header is an `h3` (give another level with `render`); each Panel is a
+  `region` named by its Trigger.
+- **Animation and find in page**: as a [Collapsible's](/docs/api/collapsible#behaviour), with
+  `--accordion-panel-height` and `--accordion-panel-width`; a find-in-page match opens its item
+  (reason `none`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `accordion-root` | holds the value |
+| Item | `div` | `accordion-item` | one section |
+| Header | `h3` | `accordion-header` | the heading around the Trigger |
+| Trigger | `button` | `accordion-trigger` | the header's button |
+| Panel | `div` | `accordion-panel` | the section's `region` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Accordion } from "@fragiola/primitives-react/accordion";
+
+<Accordion.Root defaultValue={["shipping"]}>
+    <Accordion.Item value="shipping">
+        <Accordion.Header>
+            <Accordion.Trigger>Shipping</Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Panel hiddenUntilFound>Ships within two business days.</Accordion.Panel>
+    </Accordion.Item>
+</Accordion.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Accordion.Root v-model:value="open" multiple>
+        <Accordion.Item value="shipping">
+            <Accordion.Header>
+                <Accordion.Trigger>Shipping</Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>Ships within two business days.</Accordion.Panel>
+        </Accordion.Item>
+    </Accordion.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel],
+    template: `
+        <div accordionRoot [(value)]="open">
+            <div accordionItem value="shipping">
+                <h3 accordionHeader><button accordionTrigger>Shipping</button></h3>
+                <div *accordionPanel="{ hiddenUntilFound: true }">Ships within two business days.</div>
+            </div>
+        </div>
+    `,
+})
+export class Faq {
+    protected readonly open = signal(["shipping"]);
+}
+```
+
+The Panel is structural; its options are an object, as Collapsible's.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them as `v-model:value` and `@value-change`, Angular as
+`[(value)]` and `(valueChangeDetails)`.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | | the open items, controlled |
+| `defaultValue` | `string[]` | `[]` | the initially open items, uncontrolled |
+| `onValueChange` | `(value: string[], details: { reason }) => void` | | every change (`trigger-press`, or `none` for a find-in-page match) |
+| `multiple` | `boolean` | `false` | several items may be open |
+| `disabled` | `boolean` | `false` | every item is disabled |
+| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | which arrow keys move between the Triggers |
+| `loopFocus` | `boolean` | `true` | whether the arrow keys wrap around |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the item's value |
+| `disabled` | `boolean` | `false` | its Trigger is disabled and skipped by the arrows |
+
+### Header
+
+No props of its own.
+
+### Trigger
+
+No props of its own.
+
+### Panel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep a closed panel in the DOM, `hidden` |
+| `hiddenUntilFound` (react, vue) | `boolean` | `false` | keep a closed panel in the DOM, `hidden="until-found"`, searchable |
+| `options` (angular) | `{ keepMounted?, hiddenUntilFound? }` | `{}` | the same two options: `*accordionPanel="{ keepMounted: true }"` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-orientation`, `data-disabled` |
+| Item | `data-open` / `data-closed`, `data-disabled`, `data-orientation` |
+| Header | `data-open` / `data-closed`, `data-disabled` |
+| Trigger | `id`, `aria-expanded`, `aria-controls` while open, `disabled` and `data-disabled`, `data-panel-open` |
+| Panel | `role="region"`, `id`, `aria-labelledby`, `data-open` / `data-closed`, `data-disabled`, `data-orientation`, `data-starting-style` / `data-ending-style`, `hidden` (or `hidden="until-found"`) while closed and kept, `--accordion-panel-height`, `--accordion-panel-width` |
+
+## Keyboard
+
+| key | vertical | horizontal |
+| --- | --- | --- |
+| Enter, Space | toggles the item | the same |
+| next Trigger | ArrowDown | ArrowRight (ArrowLeft in RTL) |
+| previous Trigger | ArrowUp | ArrowLeft (ArrowRight in RTL) |
+| Home, End | the first, the last Trigger | the same |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/accordion` | `Accordion`, `AccordionRootProps`, `AccordionRootState`, `AccordionItemProps`, `AccordionItemState`, `AccordionHeaderProps`, `AccordionTriggerProps`, `AccordionPanelProps`, `AccordionPanelState`, `AccordionOrientation`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/accordion` | `Accordion`, `AccordionRootProps`, `AccordionRootEmits`, `AccordionRootState`, `AccordionItemProps`, `AccordionItemState`, `AccordionPanelProps`, `AccordionPanelState`, `AccordionOrientation`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/accordion` | `AccordionRoot`, `AccordionItem`, `AccordionHeader`, `AccordionTrigger`, `AccordionPanel`, `AccordionRootState`, `AccordionItemState`, `AccordionPanelOptions`, `AccordionPanelState`, `AccordionOrientation`, `ChangeDetails`, `ChangeReason`, `TransitionStatus`, `ValueChangeEvent` |

@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
 import { expectOutput } from "../../src/output.ts";
+import { slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/tabs.md
@@ -150,4 +151,115 @@ test("tabs / automatic in RTL: ArrowLeft is next, ArrowRight is previous", async
     await expect(tab(page, "Account")).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(tab(page, "Team")).toBeFocused();
+});
+
+// spec/tabs.md, "Animation" and `data-activation-direction` (Epic #32)
+test.describe("tabs / animated", () => {
+    const panel = (page: Page, text: string) =>
+        page
+            .locator('[data-primitives-part="tabs-panel"]')
+            .filter({ hasText: text });
+    const directions = (page: Page) =>
+        page
+            .locator('[data-primitives-part^="tabs-"]')
+            .evaluateAll((elements) => [
+                ...new Set(
+                    elements.map((element) =>
+                        element.getAttribute("data-activation-direction"),
+                    ),
+                ),
+            ]);
+
+    test("the activation direction follows the newly selected tab", async ({
+        page,
+    }) => {
+        await openScenario(page, "/tabs/animated");
+        await expect(panel(page, "Overview content")).toBeVisible();
+        expect(await directions(page)).toEqual(["none"]);
+        await expect(panel(page, "Overview content")).not.toHaveAttribute(
+            "data-starting-style",
+        );
+        await tab(page, "Settings").click();
+        await expectOutput(page, "value", "settings");
+        await expect.poll(() => directions(page)).toEqual(["right"]);
+        await tab(page, "Overview").click();
+        await expect.poll(() => directions(page)).toEqual(["left"]);
+    });
+
+    test("the new panel enters and the old one exits, then is hidden", async ({
+        page,
+    }) => {
+        await openScenario(page, "/tabs/animated");
+        await slowMotion(page, 600);
+        await expect(panel(page, "Overview content")).toBeVisible();
+        const overview = panel(page, "Overview content");
+        await overview.evaluate((element) => {
+            const seen = { starting: false };
+            (window as unknown as { __seen: typeof seen }).__seen = seen;
+            new MutationObserver((records) => {
+                for (const record of records) {
+                    const target = record.target as Element;
+                    if (
+                        target.textContent?.includes("Settings content") &&
+                        target.hasAttribute("data-starting-style")
+                    ) {
+                        seen.starting = true;
+                    }
+                }
+            }).observe(element.parentElement as Element, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["data-starting-style", "hidden"],
+            });
+            (window as unknown as { __overview: Element }).__overview = element;
+        });
+        await tab(page, "Settings").click();
+        await expect(overview).toHaveAttribute("data-ending-style");
+        await expect(overview).toHaveAttribute("inert");
+        await expect(overview).not.toHaveAttribute("hidden");
+        await expect(overview).toHaveAttribute("hidden", "");
+        await expect(overview).not.toHaveAttribute("data-ending-style");
+        expect(
+            await overview.evaluate(
+                (element) =>
+                    (window as unknown as { __overview: Element })
+                        .__overview === element,
+            ),
+        ).toBe(true);
+        await expect(panel(page, "Settings content")).toBeVisible();
+        expect(
+            await page.evaluate(
+                () =>
+                    (window as unknown as { __seen: { starting: boolean } })
+                        .__seen.starting,
+            ),
+        ).toBe(true);
+    });
+
+    test("in RTL, the next tab sits on the left", async ({ page }) => {
+        await openScenario(page, "/tabs/animated", { dir: "rtl" });
+        await expect(panel(page, "Overview content")).toBeVisible();
+        await tab(page, "Projects").click();
+        await expect.poll(() => directions(page)).toEqual(["left"]);
+        await tab(page, "Overview").click();
+        await expect.poll(() => directions(page)).toEqual(["right"]);
+    });
+
+    test("has no axe violation", async ({ page }) => {
+        await openScenario(page, "/tabs/animated");
+        await tab(page, "Projects").click();
+        await expectNoAxeViolations(page);
+    });
+});
+
+test("tabs / vertical: the activation direction is up or down", async ({
+    page,
+}) => {
+    await openScenario(page, "/tabs/vertical");
+    const root = page.locator('[data-primitives-part="tabs-root"]');
+    await tab(page, "Account").focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(root).toHaveAttribute("data-activation-direction", "down");
+    await page.keyboard.press("ArrowUp");
+    await expect(root).toHaveAttribute("data-activation-direction", "up");
 });

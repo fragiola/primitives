@@ -27,12 +27,16 @@ so a consumer that mirrors the value sees it.
 **Tab**: `value` (any string, required; the tab's and its panel's ids encode it, so a value with
 spaces still gives valid `aria-controls` / `aria-labelledby`), `disabled`.
 
-**Panel**: `value` (string, required), `keepMounted` (`false`: an inactive panel is not rendered;
-`true`: it is rendered with `hidden`).
+**Panel**: `value` (string, required), `keepMounted` (`false`: an inactive panel is not rendered
+once its exit has ended; `true`: it is then rendered with `hidden`). Panels have enter and exit
+states ("Animation").
 
 **Indicator**: `renderBeforeHydration` ("Server rendering"). It exposes the selected tab's box, relative to the List, as structural
-CSS variables: `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
-`--tabs-indicator-inline-size`, `--tabs-indicator-block-size`. It is not rendered while no tab is
+CSS variables: the logical `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
+`--tabs-indicator-inline-size`, `--tabs-indicator-block-size`, and the physical ones (Base UI's
+names, Epic #32) `--active-tab-left`, `--active-tab-right`, `--active-tab-top`,
+`--active-tab-bottom` (the tab's offsets from the List's left, right, top and bottom edges),
+`--active-tab-width` and `--active-tab-height`. It is not rendered while no tab is
 selected, in every framework: Angular's is structural (`<span *tabsIndicator>`), as its panels
 are, so it leaves the DOM too (Epic #22; it was an attribute directive that stayed, with no
 variables).
@@ -41,13 +45,21 @@ variables).
 
 | part | attributes |
 | --- | --- |
-| Root | `data-orientation`, `data-activation` |
-| List | `role="tablist"`, `aria-orientation`, `data-orientation` |
-| Tab | `role="tab"`, an `id`, `aria-selected` (`"true"` / `"false"`, as ARIA requires both), `aria-controls` (its panel's id), `tabindex` (`0` on the tab that holds the roving focus, `-1` on the others), `aria-disabled="true"` and `data-disabled` when disabled, `data-selected`, `data-orientation` |
-| Indicator | `aria-hidden="true"`, `data-orientation` |
-| Panel | `role="tabpanel"`, an `id`, `aria-labelledby` (its tab's id), `tabindex="0"`, `data-selected` when its tab is selected, `hidden` when kept mounted and inactive, `data-orientation` |
+| Root | `data-orientation`, `data-activation`, `data-activation-direction` |
+| List | `role="tablist"`, `aria-orientation`, `data-orientation`, `data-activation-direction` |
+| Tab | `role="tab"`, an `id`, `aria-selected` (`"true"` / `"false"`, as ARIA requires both), `aria-controls` (its panel's id), `tabindex` (`0` on the tab that holds the roving focus, `-1` on the others), `aria-disabled="true"` and `data-disabled` when disabled, `data-selected`, `data-orientation`, `data-activation-direction` |
+| Indicator | `aria-hidden="true"`, `data-orientation`, `data-activation-direction` |
+| Panel | `role="tabpanel"`, an `id`, `aria-labelledby` (its tab's id), `tabindex="0"`, `data-selected` when its tab is selected, `hidden` when kept mounted and inactive (once its exit ended), `inert` while its exit runs, `data-starting-style` / `data-ending-style` ("Animation"), `data-orientation`, `data-activation-direction` |
 
 The tab that holds the roving focus (`tabindex="0"`) is the selected tab, else the first tab.
+
+**`data-activation-direction`** (Base UI, Epic #32): where the newly selected tab sits from the
+one selected before it, measured on the page: `left` or `right` in horizontal orientation, `up` or
+`down` in vertical orientation, `none` before the first change (and when either tab is not in the
+DOM). It is **physical**, as the Indicator's travel and Base UI's: in RTL the next tab sits on the
+left, so moving to it gives `left` (a recipe slides the new panel in from the side the Indicator
+moves toward, in either direction). It is set in the same render as the new selection, so a
+panel's first frame (`data-starting-style`) already carries it.
 
 ## Keyboard
 
@@ -84,8 +96,21 @@ Not applicable (the Indicator's variables are measurements, not positioning).
 
 ## Animation
 
-None of its own. The Indicator's variables change when the selection changes, so a CSS transition
-on them animates it.
+The Indicator's variables change when the selection changes, so a CSS transition on them animates
+it.
+
+The panels have enter and exit states, through the toolkit's presence (Epic #32; it said "no
+animation of its own" before):
+
+- a panel that becomes selected renders with `data-starting-style` for its first frame, so a
+  transition starts from it; a panel shown by the first render (or a server render) has none;
+- a panel that stops being selected stays rendered with `data-ending-style` and `inert` until
+  every animation on it has finished, then unmounts (or takes `hidden` with `keepMounted`); with
+  no transition, in the render that deselects it, before a paint (as before Epic #32);
+- selected again during its exit, it drops `data-ending-style` and is the same element.
+
+The two panels exist together while one exits: a recipe that animates both stacks them (a grid
+cell), or animates the enter only.
 
 ## RTL
 
@@ -140,7 +165,8 @@ Space selects it.
 The same content with `orientation="vertical"`.
 
 Checks: the tablist has `aria-orientation="vertical"`; ArrowDown and ArrowUp move between tabs;
-ArrowRight does nothing.
+ArrowRight does nothing; ArrowDown gives `data-activation-direction="down"` and ArrowUp `up`; the
+Indicator's `--active-tab-top` equals its `--tabs-indicator-inset-block-start`.
 
 ### `/tabs/none-selected`
 
@@ -149,6 +175,33 @@ Tabs **"Account"** and **"Password"**, both disabled, with panels "Account setti
 
 Checks: no tab is selected (`aria-selected="false"`, no `data-selected`), no panel and no
 Indicator is rendered.
+
+### `/tabs/animated`
+
+Tabs **"Overview"**, **"Projects"**, **"Settings"**, uncontrolled with `defaultValue="overview"`,
+an Indicator, and panels with `keepMounted` holding the paragraphs "Overview content", "Projects
+content", "Settings content", stacked in one grid cell; the recipe fades and slides a panel in
+and out along `data-activation-direction` over `--pr-motion`. Output: `value: ...`.
+
+Checks:
+
+1. Every part has `data-activation-direction="none"`; the "Overview"
+   panel has no `data-starting-style`.
+2. A click on "Settings": the Root, the List, the tabs, the Indicator and the panels have `data-activation-direction=
+   "right"`; the "Settings" panel carried `data-starting-style` on its first frame shown; the
+   "Overview" panel carries `data-ending-style` and `inert`, not `hidden`, while its transition
+   runs, then `hidden` (the same element, kept mounted).
+3. A click on "Overview": `data-activation-direction="left"`.
+4. The Indicator's `--active-tab-left` equals `--tabs-indicator-inset-inline-start`, and
+   `--active-tab-width` its `--tabs-indicator-inline-size`, in pixels.
+
+### `/tabs/animated?dir=rtl`
+
+The animated scenario in `dir="rtl"`.
+
+Checks: a click on "Projects" (next, on the left) gives `data-activation-direction="left"`; a
+click on "Overview" gives `right`; the Indicator's `--active-tab-right` equals its
+`--tabs-indicator-inset-inline-start`.
 
 ### `/tabs/automatic?dir=rtl`
 

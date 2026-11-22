@@ -38,7 +38,8 @@ const root = join(import.meta.dirname, "..");
 export const GUARD = {
     components: ["dialog", "tabs"],
     // Dialog: the overlay session (and the layers it pushes), focus, inert, scroll lock, presence;
-    // Tabs: the collection key maps, the direction; Angular's ids come from the toolkit
+    // Tabs: the collection key maps, the direction, presence (its panels' enter and exit, Epic
+    // #32); Angular's ids come from the toolkit
     mechanisms: [
         "collection",
         "direction",
@@ -55,7 +56,9 @@ export const GUARD = {
 /**
  * The components an entry is built on, in every framework: the form controls on Field (and
  * Fieldset and Form, whose contexts Field reads, Epic #26), a Checkbox on its group's context and
- * a Radio on its RadioGroup's (Epic #29), the pickers on the calendars. Any other component's code
+ * a Radio on its RadioGroup's (Epic #29), the pickers on the calendars. Collapsible and Accordion
+ * share their panel mechanics through each framework's hooks and the toolkit, not each other's
+ * code (Epic #32). Any other component's code
  * in an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<

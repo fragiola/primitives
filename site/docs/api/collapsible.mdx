@@ -1,0 +1,141 @@
+---
+title: Collapsible
+description: A button that shows and hides one panel, animatable in CSS with no layout jump and searchable while closed (APG disclosure), in each framework.
+---
+
+A button that shows and hides one section of content (WAI-ARIA APG
+[disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)). The panel exposes
+its content's size as CSS variables and its enter and exit states, so a height transition plays
+with no layout jump; a closed panel can stay searchable by the browser's find-in-page
+(`hiddenUntilFound`). Several sections with keyboard navigation between their headers are an
+[Accordion](/docs/api/accordion).
+
+<Example id="collapsible" />
+
+## Behaviour
+
+- **Toggle**: a click on the Trigger, Enter or Space (a native `button`). Opening and closing
+  never move focus.
+- **Disabled**: the Trigger is a disabled button; only a controlled `open` changes the state.
+- **Animation**: `--collapsible-panel-height` and `--collapsible-panel-width` are `auto` at rest
+  and the content's size in pixels while the panel opens or closes, written **before** the
+  transition starts. Transition `height: var(--collapsible-panel-height)` between
+  `data-starting-style` / `data-ending-style` at `height: 0` and it never starts from `auto`. A
+  panel open on the first render (and on a server) plays no transition.
+- **Closed panels**: not rendered; with `keepMounted`, kept with `hidden`; with
+  `hiddenUntilFound`, kept with `hidden="until-found"`.
+- **Find in page** (`hiddenUntilFound`, Chromium): a match in a closed panel opens it at once
+  (`onOpenChange(true, { reason: "none" })`, no transition). A controlled Root that keeps `open`
+  `false` gets `hidden="until-found"` back. Other browsers treat the attribute as `hidden`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `collapsible-root` | holds the open state |
+| Trigger | `button` | `collapsible-trigger` | the disclosure button |
+| Panel | `div` | `collapsible-panel` | the content shown and hidden |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Collapsible } from "@fragiola/primitives-react/collapsible";
+
+<Collapsible.Root defaultOpen>
+    <Collapsible.Trigger>Recovery keys</Collapsible.Trigger>
+    <Collapsible.Panel hiddenUntilFound>
+        <p>alpha-1234</p>
+    </Collapsible.Panel>
+</Collapsible.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Collapsible.Root v-model:open="open">
+        <Collapsible.Trigger>Recovery keys</Collapsible.Trigger>
+        <Collapsible.Panel hidden-until-found>
+            <p>alpha-1234</p>
+        </Collapsible.Panel>
+    </Collapsible.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CollapsibleRoot, CollapsibleTrigger, CollapsiblePanel],
+    template: `
+        <div collapsibleRoot [(open)]="open">
+            <button collapsibleTrigger>Recovery keys</button>
+            <div *collapsiblePanel="{ hiddenUntilFound: true }"><p>alpha-1234</p></div>
+        </div>
+    `,
+})
+export class RecoveryKeys {
+    protected readonly open = signal(false);
+}
+```
+
+The Panel is structural (rendered only in some states); its options are an object
+(`*collapsiblePanel="{ keepMounted: true }"`).
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them as `v-model:open` and `@open-change`, Angular as
+`[(open)]` and `(openChangeDetails)`.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change (`trigger-press`, or `none` for a find-in-page match) |
+| `disabled` | `boolean` | `false` | the Trigger is disabled |
+
+### Trigger
+
+No props of its own.
+
+### Panel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep a closed panel in the DOM, `hidden` |
+| `hiddenUntilFound` (react, vue) | `boolean` | `false` | keep a closed panel in the DOM, `hidden="until-found"`, searchable |
+| `options` (angular) | `{ keepMounted?, hiddenUntilFound? }` | `{}` | the same two options: `*collapsiblePanel="{ hiddenUntilFound: true }"` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-open` / `data-closed`, `data-disabled` |
+| Trigger | `aria-expanded`, `aria-controls` while open, `disabled` and `data-disabled`, `data-panel-open` |
+| Panel | `id`, `data-open` / `data-closed`, `data-disabled`, `data-starting-style` / `data-ending-style`, `hidden` (or `hidden="until-found"`) while closed and kept, `--collapsible-panel-height`, `--collapsible-panel-width` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space | toggles the panel |
+| Tab | moves on |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/collapsible` | `Collapsible`, `CollapsibleRootProps`, `CollapsibleState`, `CollapsibleTriggerProps`, `CollapsiblePanelProps`, `CollapsiblePanelState`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/collapsible` | `Collapsible`, `CollapsibleRootProps`, `CollapsibleRootEmits`, `CollapsibleState`, `CollapsiblePanelProps`, `CollapsiblePanelState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/collapsible` | `CollapsibleRoot`, `CollapsibleTrigger`, `CollapsiblePanel`, `CollapsibleState`, `CollapsiblePanelOptions`, `CollapsiblePanelState`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `TransitionStatus` |

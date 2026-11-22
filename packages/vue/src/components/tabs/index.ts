@@ -14,6 +14,7 @@ export type {
 export type { TabsListState } from "./tabs-list.ts";
 export type { TabsPanelProps, TabsPanelState } from "./tabs-panel.ts";
 export type {
+    ActivationDirection,
     TabsRootEmits,
     TabsRootProps,
     TabsRootState,

@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { placeTabsIndicator } from "../../src/collection/tabs-indicator.ts";
+import {
+    placeTabsIndicator,
+    tabsIndicatorBox,
+} from "../../src/collection/tabs-indicator.ts";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -42,6 +45,23 @@ describe("placeTabsIndicator", () => {
         expect(
             indicator.style.getPropertyValue("--tabs-indicator-block-size"),
         ).toBe("32px");
+    });
+
+    it("sets the physical variables too, as tabsIndicatorBox", () => {
+        const indicator = page();
+        const list = document.querySelector('[role="tablist"]') as Element;
+        const tab = document.querySelectorAll('[role="tab"]')[1] as Element;
+        placeTabsIndicator(indicator.querySelector("script"));
+        const box = tabsIndicatorBox(list, tab, false);
+        expect(box["--active-tab-left"]).toBe("100px");
+        expect(box["--active-tab-right"]).toBe("120px");
+        expect(box["--active-tab-top"]).toBe("4px");
+        expect(box["--active-tab-bottom"]).toBe("4px");
+        expect(box["--active-tab-width"]).toBe("80px");
+        expect(box["--active-tab-height"]).toBe("32px");
+        for (const [name, value] of Object.entries(box)) {
+            expect(indicator.style.getPropertyValue(name)).toBe(value);
+        }
     });
 
     it("measures from the list's right edge in RTL", () => {
