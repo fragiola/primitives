@@ -38,6 +38,11 @@ describe("the manifest", () => {
                 "tooltip",
                 "menu",
                 "tabs",
+                "field",
+                "checkbox",
+                "slider",
+                "select",
+                "combobox",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];
