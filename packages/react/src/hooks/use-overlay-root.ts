@@ -112,6 +112,16 @@ export function useOverlayRoot(
     }, [requestedTriggerId, registry, registryVersion]);
     const trigger = active?.element ?? singleTrigger;
     const activeTriggerId = active?.id ?? singleTrigger?.id ?? null;
+    // the payload is read from the active trigger while rendering: a new payload of that trigger
+    // renders the Root again
+    const [, rerender] = useReducer((count: number) => count + 1, 0);
+    const activeId = useRef(activeTriggerId);
+    activeId.current = activeTriggerId;
+    const refreshPayload = useCallback((id: string) => {
+        if (activeId.current === id) {
+            rerender();
+        }
+    }, []);
     // biome-ignore lint/correctness/useExhaustiveDependencies: the registry is read through its version
     const triggers = useMemo(() => {
         const all = [...registry.values()].map((entry) => entry.element);
@@ -276,6 +286,7 @@ export function useOverlayRoot(
             triggers,
             activeTriggerId,
             registerTrigger,
+            refreshPayload,
             payload,
             positioner,
             setPositioner,
@@ -295,6 +306,7 @@ export function useOverlayRoot(
             triggers,
             activeTriggerId,
             registerTrigger,
+            refreshPayload,
             payload,
             positioner,
             popup,

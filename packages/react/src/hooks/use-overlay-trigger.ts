@@ -79,6 +79,16 @@ export function useOverlayTrigger<Value extends OverlayRoot>(
         }
         return register(id, element, () => payload.current);
     }, [register, id, element]);
+    // the Root reads the payload while it renders: a new one renders it again (when active)
+    const refresh = root?.refreshPayload;
+    const reported = useRef(props.payload);
+    useLayoutEffect(() => {
+        if (Object.is(reported.current, props.payload)) {
+            return;
+        }
+        reported.current = props.payload;
+        refresh?.(id);
+    }, [props.payload, refresh, id]);
     const active = root?.open === true && root.activeTriggerId === id;
     return { root, id, element, ref: setElement, active };
 }
