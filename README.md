@@ -13,7 +13,8 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
 Today: **Dialog**, **Popover**, **Tooltip**, **Menu**, **Tabs**, **Field**, **Checkbox** and
-**CheckboxGroup**, **Slider**, **Select** and **Combobox** ([`spec/`](spec)). The first
+**CheckboxGroup**, **Slider**, **Select**, **Combobox**, **Calendar**, **RangeCalendar**,
+**DatePicker** and **DateRangePicker** ([`spec/`](spec)): stage 0 is complete. The first
 version (stage 0) ports the cross-framework POC's components to production: Dialog, Popover,
 Menu, Combobox, Select, Tooltip, Tabs, Checkbox and CheckboxGroup, Slider, Calendar,
 RangeCalendar, DatePicker and DateRangePicker. See [`docs/handoff.md`](docs/handoff.md),

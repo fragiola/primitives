@@ -262,20 +262,50 @@ function vueProps(component: string, sources: Sources) {
     return new Map(
         [...parts].map(([part, implementation]) => {
             // the part's own file, else the component file that declares it (Menu's
-            // `MenuSubmenuRoot`, beside `MenuRoot`); read from its declaration on
-            const folder = `${dir}/components/${component}`;
+            // `MenuSubmenuRoot`, beside `MenuRoot`), else the component it shares its parts with
+            // (RangeCalendar's are the Calendar's); read from its declaration on
+            const base = SHARED_PARTS[component];
+            const folders = [component, ...(base ? [base] : [])].map(
+                (name) => `${dir}/components/${name}`,
+            );
+            const folder = folders[0] ?? "";
             const declaration = `export const ${implementation}:`;
             const file =
-                [
-                    `${folder}/${kebab(implementation)}.ts`,
-                    ...sources.files(folder),
-                ].find(
-                    (path) =>
-                        sources.files(folder).includes(path) &&
-                        sources.read(path).includes(declaration),
-                ) ?? `${folder}/${kebab(implementation)}.ts`;
+                folders
+                    .flatMap((each) => [
+                        `${each}/${kebab(implementation)}.ts`,
+                        ...sources.files(each),
+                    ])
+                    .find(
+                        (path) =>
+                            folders.some((each) =>
+                                sources.files(each).includes(path),
+                            ) && sources.read(path).includes(declaration),
+                    ) ?? `${folder}/${kebab(implementation)}.ts`;
             const whole = sources.read(file);
-            const text = whole.slice(Math.max(0, whole.indexOf(declaration)));
+            let text = whole.slice(Math.max(0, whole.indexOf(declaration)));
+            // a part made by a factory its roots share (`defineCalendarRoot(...)`): the factory's
+            // options are its own
+            const factory =
+                /=\s*publicComponent[^(]*\(\s*(define\w+)\(|=\s*(define\w+)\(/.exec(
+                    text,
+                );
+            const factoryName = factory?.[1] ?? factory?.[2];
+            if (factoryName && !/\n\s+props:/.test(text)) {
+                const source = folders
+                    .flatMap((each) => sources.files(each))
+                    .find((path) =>
+                        sources
+                            .read(path)
+                            .includes(`export function ${factoryName}(`),
+                    );
+                if (source) {
+                    const body = sources.read(source);
+                    text = body.slice(
+                        body.indexOf(`export function ${factoryName}(`),
+                    );
+                }
+            }
             const props = option(text, "props").filter((p) => p !== "as");
             const events = option(text, "emits")
                 .filter((event) => !event.startsWith("update:"))
@@ -284,6 +314,15 @@ function vueProps(component: string, sources: Sources) {
         }),
     );
 }
+
+/**
+ * The components whose parts, but their Root, are another component's (spec/calendar.md): their
+ * namespace lists that component's parts, each framework implements them once, in its folder.
+ */
+const SHARED_PARTS: Record<string, string> = {
+    "range-calendar": "calendar",
+    "date-range-picker": "date-picker",
+};
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
 const NO_ANGULAR_DIRECTIVE = new Set(["combobox.Value"]);
@@ -298,12 +337,15 @@ function angularProps(
         name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
     return new Map(
         parts.map((part) => {
-            // a component that is no namespace is its one part (CheckboxGroup)
+            // a component that is no namespace is its one part (CheckboxGroup); a shared part is
+            // its base component's directive (RangeCalendar's Cell is `[calendarCell]`)
+            const owner =
+                part !== "Root" && SHARED_PARTS[component]
+                    ? SHARED_PARTS[component]
+                    : component;
             const directive =
-                part === pascal(component)
-                    ? part
-                    : `${pascal(component)}${part}`;
-            const dir = `packages/angular/${component}/directives`;
+                part === pascal(component) ? part : `${pascal(owner)}${part}`;
+            const dir = `packages/angular/${owner}/directives`;
             const own = `${dir}/${kebab(directive)}.directive.ts`;
             // a part may share another part's directive, which lists its selector too (Menu's
             // `[menuRoot], [menuSubmenuRoot]`)
@@ -327,7 +369,34 @@ function angularProps(
                 !sources.files(dir).includes(file)
             )
                 return [part, []];
-            const text = sources.read(file);
+            // a directive's inputs and outputs, and those of the classes it extends
+            // (`CalendarRoot extends CalendarRootBase`), found in its entry or its base's
+            const dirs = [
+                ...new Set(
+                    [component, owner, SHARED_PARTS[component]]
+                        .filter((name) => name !== undefined)
+                        .map((name) => `packages/angular/${name}/directives`),
+                ),
+            ];
+            let text = sources.read(file);
+            for (
+                let base = /class \w+ extends (\w+)/.exec(text)?.[1], depth = 0;
+                base !== undefined && depth < 3;
+                depth++
+            ) {
+                const name: string = base;
+                const source = dirs
+                    .flatMap((each) => sources.files(each))
+                    .find((path) =>
+                        new RegExp(String.raw`class ${name}\b`).test(
+                            sources.read(path),
+                        ),
+                    );
+                if (!source) break;
+                const added = sources.read(source);
+                text += `\n${added}`;
+                base = /class \w+ extends (\w+)/.exec(added)?.[1];
+            }
             // an input bound under an alias (`boundValue = input(…, { alias: "value" })`) is its
             // alias, but a structural directive's microsyntax inputs (`alias: "dialogPortal"`,
             // `"tabsPanelKeepMounted"`) keep their property's name
@@ -616,6 +685,38 @@ describe("the docs reference check", () => {
         );
         expect(docsReferenceProblems(PAGES, sources)).toContain(
             "api/checkbox-group: CheckboxGroup: angular declares everyValue, not documented",
+        );
+    });
+
+    it("reads a shared part in the component it shares it with, and a root's base", () => {
+        expect(reactProps("range-calendar", disk).get("Cell")).toEqual([
+            "date",
+        ]);
+        expect(vueProps("range-calendar", disk).get("Root")).toContain(
+            "visibleMonths",
+        );
+        expect(
+            angularProps("date-range-picker", ["Root", "Positioner"], disk),
+        ).toEqual(
+            new Map([
+                [
+                    "Root",
+                    expect.arrayContaining(["value", "open", "onOpenChange"]),
+                ],
+                ["Positioner", expect.arrayContaining(["side", "anchor"])],
+            ]),
+        );
+        const sources = planted(
+            "packages/angular/calendar/directives/calendar-cell.directive.ts",
+            (text) =>
+                text.replace("readonly date = input", "readonly day = input"),
+        );
+        const problems = docsReferenceProblems(PAGES, sources);
+        expect(problems).toContain(
+            "api/calendar: Cell: angular declares day, not documented",
+        );
+        expect(problems).toContain(
+            "api/range-calendar: Cell: angular declares day, not documented",
         );
     });
 

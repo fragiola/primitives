@@ -3,13 +3,17 @@ title: Known limitations
 description: What the first release does not do yet - the rest of the catalog, other frameworks, npm packages - and what stays yours by design.
 ---
 
-The first release covers the overlays, the tabs and the form controls. Here is what it leaves out, on purpose or for
-a later release.
+The first release covers the overlays, the tabs, the form controls and the date pickers. Here is what it leaves out,
+on purpose or for a later release.
 
 ## Not in this release
 
-- **Eleven components.** Dialog, Popover, Tooltip, Menu, Tabs, Field, Checkbox, CheckboxGroup,
-  Slider, Select and Combobox ship today. The date pickers come next.
+- **Fifteen components.** Dialog, Popover, Tooltip, Menu, Tabs, Field, Checkbox, CheckboxGroup,
+  Slider, Select, Combobox, Calendar, RangeCalendar, DatePicker and DateRangePicker ship today.
+- **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
+  with no time and no time zone. No date field to type a date in parts, no time field, no
+  multiple-date calendar, no month or year pickers and no presets yet; the pickers take no `name`
+  (a hidden input of yours carries the value into a form) and no Field. They come with stage 3.
 - **Field is the first version's.** It labels, describes and validates one control, with
   synchronous `validate` and three validation modes. Fieldset, Form (a form-level errors object),
   async validation, a debounce, and Field in the date pickers come with stage 1.

@@ -13,8 +13,9 @@ follows the modal dialog pattern, the [Popover](/docs/api/popover) the dialog pa
 modal parts, the [Tooltip](/docs/api/tooltip) the tooltip pattern, the [Menu](/docs/api/menu) the
 menu button pattern, the [Tabs](/docs/api/tabs) the tabs pattern, the
 [Checkbox](/docs/api/checkbox) and the [Slider](/docs/api/slider) theirs, the
-[Select](/docs/api/select) the select-only combobox and the [Combobox](/docs/api/combobox) the
-combobox pattern. Where it gives a rule, the
+[Select](/docs/api/select) the select-only combobox, the [Combobox](/docs/api/combobox) the
+combobox pattern, and the [Calendar](/docs/api/calendar) the grid of the date picker dialog
+example. Where it gives a rule, the
 primitive follows it, even when a popular library does something else. Some examples:
 
 - A modal dialog's popup sets `aria-modal="true"`, as the APG asks; Base UI relies on making the
@@ -31,6 +32,11 @@ primitive follows it, even when a popular library does something else. Some exam
   trigger with `aria-activedescendant`, chooses the highlighted option on Tab, and a printable key
   on the closed trigger opens the list on the matching option: the APG select-only combobox,
   where Base UI moves focus into the list and chooses without opening.
+
+- A calendar's Home and End go to the start and end of the week, and its weekday headers stay
+  exposed, as in the APG's date picker grid. Base UI has no calendar: the pickers are non-modal
+  popups like a Popover, where the APG's example is a modal dialog with OK and Cancel, because a
+  choice closes them and there is nothing to confirm.
 
 ## Base UI where the APG is silent
 

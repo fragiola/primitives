@@ -193,6 +193,10 @@ describe("the sidebar", () => {
             "api/slider",
             "api/select",
             "api/combobox",
+            "api/calendar",
+            "api/range-calendar",
+            "api/date-picker",
+            "api/date-range-picker",
             "api/toolkit",
             "limitations",
             "https://github.com/fragiola/primitives/issues",
@@ -212,6 +216,10 @@ describe("the sidebar", () => {
             "api/slider",
             "api/select",
             "api/combobox",
+            "api/calendar",
+            "api/range-calendar",
+            "api/date-picker",
+            "api/date-range-picker",
         ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);

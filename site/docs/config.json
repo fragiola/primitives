@@ -90,6 +90,22 @@
                 {
                     "label": "Combobox",
                     "path": "api/combobox"
+                },
+                {
+                    "label": "Calendar",
+                    "path": "api/calendar"
+                },
+                {
+                    "label": "RangeCalendar",
+                    "path": "api/range-calendar"
+                },
+                {
+                    "label": "DatePicker",
+                    "path": "api/date-picker"
+                },
+                {
+                    "label": "DateRangePicker",
+                    "path": "api/date-range-picker"
                 }
             ]
         },
