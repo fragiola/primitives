@@ -23,10 +23,12 @@ describe("overlay promotion", () => {
         expect(MODAL_TRIGGER_PARTS).toEqual([
             "dialog-trigger",
             "alert-dialog-trigger",
+            "drawer-trigger",
         ]);
         expect(MODAL_POPUP_PARTS).toEqual([
             "dialog-popup",
             "alert-dialog-popup",
+            "drawer-popup",
         ]);
         document.body.innerHTML =
             '<button data-primitives-part="dialog-trigger"><span id="label">Open</span></button><button id="other">Other</button>';

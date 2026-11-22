@@ -32,6 +32,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     // built on Dialog's and Menu's recipes, as the components are on their parts
     "alert-dialog": ["_recipes/dialog.ts"],
     "context-menu": ["_recipes/menu.ts"],
+    drawer: ["_recipes/dialog.ts"],
+    "drawer-side-panel": ["_recipes/dialog.ts"],
+    "navigation-menu": ["_recipes/popover.ts"],
     "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
@@ -44,7 +47,10 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
 };
 
 /** The examples that show a component under another id (a second Menu example). */
-const RECIPE_OF: Record<string, string> = { "menu-view-options": "menu" };
+const RECIPE_OF: Record<string, string> = {
+    "menu-view-options": "menu",
+    "drawer-side-panel": "drawer",
+};
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
 const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar"]);
@@ -62,7 +68,10 @@ describe("the manifest", () => {
                 "alert-dialog",
                 "menu-view-options",
                 "context-menu",
+                "drawer",
+                "drawer-side-panel",
                 "tabs",
+                "navigation-menu",
                 "collapsible",
                 "accordion",
                 "field",

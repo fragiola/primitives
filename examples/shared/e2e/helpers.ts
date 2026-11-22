@@ -1,6 +1,12 @@
 // Adapted from Tree (fragiola/tree, examples/shared/e2e/helpers.ts), same author and licence.
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type FrameLocator, type Page, test } from "@playwright/test";
+import {
+    expect,
+    type FrameLocator,
+    type Locator,
+    type Page,
+    test,
+} from "@playwright/test";
 import { examplesApp, listExampleIds } from "../scripts/examples-lib.ts";
 import { THEMES, type ThemeName } from "../src/themes/themes.ts";
 import { embedBase, frameworkOf, missingReason } from "./available.ts";
@@ -125,6 +131,29 @@ export async function settleAnimations(page: Page): Promise<void> {
             await frame();
             await frame();
             const running = document.getAnimations();
+            if (running.length === 0) {
+                return;
+            }
+            await Promise.all(running.map((animation) => animation.finished));
+        }
+    });
+}
+
+/**
+ * {@link settleAnimations} inside the document of `locator`'s element: an example's own frame (a
+ * drawer that slides in moves under the pointer until its transition ends).
+ */
+export async function settleAnimationsOf(locator: Locator): Promise<void> {
+    await locator.evaluate(async (element) => {
+        const view = element.ownerDocument.defaultView ?? window;
+        const frame = () =>
+            new Promise((resolve) =>
+                view.requestAnimationFrame(() => resolve(null)),
+            );
+        for (let round = 0; round < 10; round += 1) {
+            await frame();
+            await frame();
+            const running = element.ownerDocument.getAnimations();
             if (running.length === 0) {
                 return;
             }
