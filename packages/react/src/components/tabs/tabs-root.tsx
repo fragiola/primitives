@@ -1,4 +1,15 @@
-import { useCallback, useId, useLayoutEffect, useMemo, useState } from "react";
+import {
+    type ActivationDirection,
+    activationDirection,
+} from "@fragiola/primitives/collection";
+import {
+    useCallback,
+    useId,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import type {
     ChangeDetails,
@@ -6,11 +17,14 @@ import type {
 } from "../../utils/change-details.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import { type TabInfo, TabsContext } from "./tabs-context.ts";
+import { type TabInfo, TabsContext, tabId } from "./tabs-context.ts";
+
+export type { ActivationDirection };
 
 export interface TabsRootState {
     orientation: "horizontal" | "vertical";
     activation: "automatic" | "manual";
+    activationDirection: ActivationDirection;
 }
 
 export interface TabsRootProps extends PartProps<TabsRootState> {
@@ -50,6 +64,28 @@ export function TabsRoot({
     const [list, setList] = useState<HTMLElement | null>(null);
     const [version, setVersion] = useState(0);
     const bump = useCallback(() => setVersion((current) => current + 1), []);
+    // where the new tab sits from the previous one, measured in the render that selects it, so the
+    // new panel's first frame already carries it (spec/tabs.md, `data-activation-direction`)
+    const activated = useRef<{
+        value: string | undefined;
+        direction: ActivationDirection;
+    }>({ value, direction: "none" });
+    if (activated.current.value !== value) {
+        const previous = activated.current.value;
+        const tab = (current: string | undefined) =>
+            current === undefined
+                ? null
+                : list?.ownerDocument.getElementById(tabId(baseId, current));
+        activated.current = {
+            value,
+            direction: activationDirection(
+                tab(previous),
+                tab(value),
+                orientation,
+            ),
+        };
+    }
+    const direction = activated.current.direction;
     const select = useCallback(
         (next: string, reason: ChangeReason) => setValue(next, { reason }),
         [setValue],
@@ -76,6 +112,7 @@ export function TabsRoot({
             orientation,
             activation,
             loopFocus,
+            activationDirection: direction,
             baseId,
             tabs,
             list,
@@ -89,6 +126,7 @@ export function TabsRoot({
             orientation,
             activation,
             loopFocus,
+            direction,
             baseId,
             tabs,
             list,
@@ -96,12 +134,16 @@ export function TabsRoot({
             bump,
         ],
     );
-    const state = { orientation, activation };
+    const state = { orientation, activation, activationDirection: direction };
     return (
         <TabsContext.Provider value={context}>
             {renderElement("div", props, state, {
                 "data-primitives-part": "tabs-root",
-                ...stateAttributes({ orientation, activation }),
+                ...stateAttributes({
+                    orientation,
+                    activation,
+                    "activation-direction": direction,
+                }),
             })}
         </TabsContext.Provider>
     );

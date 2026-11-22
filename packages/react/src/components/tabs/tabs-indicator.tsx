@@ -1,4 +1,7 @@
-import { placeTabsIndicator } from "@fragiola/primitives/collection";
+import {
+    placeTabsIndicator,
+    tabsIndicatorBox,
+} from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import { type CSSProperties, useLayoutEffect, useState } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
@@ -42,18 +45,13 @@ export function TabsIndicator({
                 setBox(null);
                 return;
             }
-            const listRect = list.getBoundingClientRect();
-            const tabRect = tab.getBoundingClientRect();
-            const inlineStart =
-                getDirection(list) === "rtl"
-                    ? listRect.right - tabRect.right
-                    : tabRect.left - listRect.left;
-            setBox({
-                "--tabs-indicator-inset-inline-start": `${inlineStart}px`,
-                "--tabs-indicator-inset-block-start": `${tabRect.top - listRect.top}px`,
-                "--tabs-indicator-inline-size": `${tabRect.width}px`,
-                "--tabs-indicator-block-size": `${tabRect.height}px`,
-            } as CSSProperties);
+            setBox(
+                tabsIndicatorBox(
+                    list,
+                    tab,
+                    getDirection(list) === "rtl",
+                ) as CSSProperties,
+            );
         };
         measure();
         const view = list.ownerDocument.defaultView;
@@ -94,7 +92,10 @@ export function TabsIndicator({
         {
             "aria-hidden": "true",
             "data-primitives-part": "tabs-indicator",
-            ...stateAttributes({ orientation: context.orientation }),
+            ...stateAttributes({
+                orientation: context.orientation,
+                "activation-direction": context.activationDirection,
+            }),
             style: box ?? undefined,
             // the server's script set its variables, which the client's first render has not yet
             suppressHydrationWarning: renderBeforeHydration || undefined,

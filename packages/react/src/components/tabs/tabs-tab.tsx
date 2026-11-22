@@ -57,6 +57,7 @@ export function TabsTab({ value, disabled = false, ...props }: TabsTabProps) {
                 selected,
                 disabled,
                 orientation: context.orientation,
+                "activation-direction": context.activationDirection,
             }),
             onClick: () => {
                 if (!disabled) {
