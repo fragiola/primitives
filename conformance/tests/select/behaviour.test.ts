@@ -217,15 +217,16 @@ test.describe("select / basic", () => {
         await expectOutput(page, "reason", "outside-press");
     });
 
-    test("non-modal: an outside press closes and reaches the page", async ({
+    test("non-modal: the page keeps its pointer and its scroll while open", async ({
         page,
     }) => {
         await trigger(page).click();
         await expect(listbox(page)).toBeVisible();
-        const reset = page.getByRole("button", { name: "Reset" });
-        await reset.click();
-        await expect(listbox(page)).toBeHidden();
-        await expect(reset).toBeFocused();
+        const state = await page.evaluate(() => ({
+            pointer: getComputedStyle(document.body).pointerEvents,
+            overflow: getComputedStyle(document.documentElement).overflow,
+        }));
+        expect(state).toEqual({ pointer: "auto", overflow: "visible" });
     });
 
     test("Tab chooses the highlighted option and moves on", async ({

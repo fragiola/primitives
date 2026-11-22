@@ -142,7 +142,7 @@ a Select opened with `modal` is open:
 - **scroll lock**: the page does not scroll (`@fragiola/primitives/scroll-lock`);
 - **blocked outside pointer**: a press outside the Trigger and the Popup reaches no element of the
   page (no click, no focus, no hover): it only closes the list (reason `outside-press`), and focus
-  stays on the Trigger. The body stops taking pointer events (`@fragiola/primitives/inert`,
+  stays on the Trigger (the press would leave it on the body, so it goes back). The body stops taking pointer events (`@fragiola/primitives/inert`,
   `blockOutsidePointer`); the Trigger and the Positioner take them back (`pointer-events: auto`,
   structural inline style), so the Trigger still toggles and the items still work.
 - The keyboard is unchanged: the page is not inert, and Tab still chooses, closes and moves on.
@@ -198,8 +198,7 @@ Checks:
 8. On "Orange" (disabled, `aria-disabled="true"`), Enter and a click do nothing (it stays open).
 9. Escape closes without changing the value (`reason: escape-key`).
 10. Open, click "Cherry": `value: cherry`. Open, click outside: closes (`reason: outside-press`).
-    Non-modal: open, then click "Reset": the list closes and the press reaches the page ("Reset"
-    is focused).
+    Non-modal: while open, the page keeps the pointer and its scroll (nothing is blocked).
 11. Open, ArrowDown, Tab: the highlighted item is chosen and the list closes.
 12. "Submit" with no value submits nothing (`form: none`) and focuses the trigger; with Banana,
     `form: fruit=banana`.
@@ -233,8 +232,8 @@ Checks ("Modal"):
 4. Reopen; the pointer still works inside: clicking "Cherry" gives `value: cherry`.
 5. Reopen; clicking the trigger closes the list (`reason: trigger-press`).
 
-The non-modal default is checked by `/select/basic` (check 10: an outside press closes the list
-and reaches the page).
+The non-modal default is checked by `/select/basic` (check 10: while open, the page keeps the
+pointer and its scroll).
 
 ## Differences from Base UI
 
