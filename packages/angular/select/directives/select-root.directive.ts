@@ -104,6 +104,7 @@ export class SelectRoot {
         value: this.selected,
         filled: computed(() => this.selected() !== null),
         input: () => this.hidden,
+        focusTarget: () => this.overlay.trigger(),
     });
     /** Its own `disabled`, or the field's. */
     readonly isDisabled = computed(
