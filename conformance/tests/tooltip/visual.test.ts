@@ -13,3 +13,10 @@ test("tooltip / basic: open on focus", async ({ page }) => {
     ).toBeVisible();
     await expectScreen(page, "tooltip-basic-open");
 });
+
+test("tooltip / detached: open on the second trigger", async ({ page }) => {
+    await openScenario(page, "/tooltip/detached");
+    await page.getByRole("button", { name: "Call Grace" }).focus();
+    await expect(page.getByRole("tooltip")).toBeVisible();
+    await expectScreen(page, "tooltip-detached-open");
+});

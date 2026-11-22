@@ -394,3 +394,103 @@ test("menu / controlled: closed through `open` with focus inside, focus returns 
     await expectOutput(page, "open", "false");
     await expect(trigger).toBeFocused();
 });
+
+// spec/menu.md, `/menu/detached`
+test.describe("menu / detached", () => {
+    const actions = (page: Page, name: string) =>
+        page.getByRole("button", { name: `Actions for ${name}` });
+
+    async function expectAnchored(page: Page, name: string): Promise<void> {
+        const trigger = await actions(page, name).boundingBox();
+        const popup = await page
+            .getByRole("menu", { name: `Actions for ${name}` })
+            .boundingBox();
+        expect(trigger).not.toBeNull();
+        expect(popup).not.toBeNull();
+        if (trigger === null || popup === null) {
+            return;
+        }
+        expect(popup.y).toBeGreaterThanOrEqual(trigger.y + trigger.height - 1);
+        expect(Math.abs(popup.x - trigger.x)).toBeLessThanOrEqual(1);
+    }
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/menu/detached");
+    });
+
+    test("a row's trigger opens the menu with its payload, anchored to it", async ({
+        page,
+    }) => {
+        await actions(page, "Grace").click();
+        const menu = page.getByRole("menu", { name: "Actions for Grace" });
+        await expect(menu).toBeVisible();
+        await expect(
+            menu.getByRole("menuitem", { name: "Rename Grace" }),
+        ).toBeVisible();
+        await expect(
+            menu.getByRole("menuitem", { name: "Delete Grace" }),
+        ).toBeVisible();
+        await expectAnchored(page, "Grace");
+        await expect(actions(page, "Grace")).toHaveAttribute(
+            "aria-expanded",
+            "true",
+        );
+        for (const name of ["Ada", "Alan"]) {
+            await expect(actions(page, name)).toHaveAttribute(
+                "aria-expanded",
+                "false",
+            );
+        }
+    });
+
+    test("a press on another row's trigger while open moves the menu there", async ({
+        page,
+    }) => {
+        await actions(page, "Grace").click();
+        await expect(
+            page.getByRole("menu", { name: "Actions for Grace" }),
+        ).toBeVisible();
+        await actions(page, "Alan").click();
+        const menu = page.getByRole("menu", { name: "Actions for Alan" });
+        await expect(menu).toBeVisible();
+        await expectOutput(page, "open", "true");
+        await expectOutput(page, "reason", "trigger-press");
+        await expectOutput(page, "trigger", "actions-alan");
+        await expect(
+            menu.getByRole("menuitem", { name: "Rename Alan" }),
+        ).toBeVisible();
+        await expectAnchored(page, "Alan");
+        await expect(actions(page, "Grace")).toHaveAttribute(
+            "aria-expanded",
+            "false",
+        );
+        await menu.getByRole("menuitem", { name: "Delete Alan" }).click();
+        await expectOutput(page, "chosen", "Delete Alan");
+        await expectOutput(page, "reason", "item-press");
+        await expect(page.getByRole("menu")).toHaveCount(0);
+        await expect(actions(page, "Alan")).toBeFocused();
+    });
+
+    test("ArrowDown on a trigger opens it with the first item highlighted", async ({
+        page,
+    }) => {
+        await actions(page, "Ada").focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(
+            page.getByRole("menu", { name: "Actions for Ada" }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole("menuitem", { name: "Rename Ada" }),
+        ).toBeFocused();
+        await expectOutput(page, "reason", "list-navigation");
+        await expectOutput(page, "trigger", "actions-ada");
+    });
+
+    test("has no axe violation while open", async ({ page }) => {
+        await actions(page, "Ada").click();
+        await expect(
+            page.getByRole("menu", { name: "Actions for Ada" }),
+        ).toBeVisible();
+        await expectNoAxeViolations(page);
+    });
+});

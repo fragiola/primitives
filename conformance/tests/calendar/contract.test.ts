@@ -1,6 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
-import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import {
+    expectNoFalseStates,
+    expectOpenState,
+    part,
+    parts,
+} from "../../src/contract.ts";
 import { fullDate } from "../../src/dates.ts";
+import { settleAnimations, slowMotion } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/calendar.md: anatomy, state attributes, cell names. A part's attribute names its root:
@@ -276,4 +282,28 @@ test("date-picker / form: the hidden inputs and the form states", async ({
     await expect(triggers.nth(3)).toBeDisabled();
     await expect(inputs.nth(3)).toBeDisabled();
     await expectNoFalseStates(page.locator('[data-primitives-part^="date-"]'));
+});
+
+// spec/README.md, "State attributes": exactly one of data-open and data-closed, data-closed while
+// the exit runs; the trigger keeps data-popup-open only
+test("date-picker / basic: data-open, then data-closed while the exit runs", async ({
+    page,
+}) => {
+    await openScenario(page, "/date-picker/basic", { today: true });
+    await slowMotion(page, 600);
+    await page.getByRole("button", { name: "Choose date" }).click();
+    await expectOpenState(part(page, "date-picker", "positioner"), true);
+    await expectOpenState(part(page, "date-picker", "popup"), true);
+    await settleAnimations(page);
+    await page.keyboard.press("Escape");
+    await expect(part(page, "date-picker", "popup")).toHaveAttribute(
+        "data-ending-style",
+        "",
+    );
+    await expectOpenState(part(page, "date-picker", "positioner"), false);
+    await expectOpenState(part(page, "date-picker", "popup"), false);
+    await expect(
+        part(page, "date-picker", "trigger").first(),
+    ).not.toHaveAttribute("data-closed");
+    await expect(part(page, "date-picker", "popup")).toHaveCount(0);
 });

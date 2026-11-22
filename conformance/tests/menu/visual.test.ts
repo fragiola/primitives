@@ -29,3 +29,12 @@ test("menu / groups: open", async ({ page }) => {
     await expect(page.getByRole("menuitem", { name: "Name" })).toBeFocused();
     await expectScreen(page, "menu-groups-open");
 });
+
+test("menu / detached: open from a row", async ({ page }) => {
+    await openScenario(page, "/menu/detached");
+    await page.getByRole("button", { name: "Actions for Grace" }).click();
+    await expect(
+        page.getByRole("menu", { name: "Actions for Grace" }),
+    ).toBeVisible();
+    await expectScreen(page, "menu-detached-open");
+});
