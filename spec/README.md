@@ -288,8 +288,9 @@ one Trigger area and no handle):
 - A **handle** connects a Root and its Triggers: `createDialogHandle<Payload>()` (and
   `createAlertDialogHandle`, `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
   `openWithPayload(payload)`, `close()` (reason `imperative-action`) and the getter `isOpen`. A
-  call while no Root is attached does nothing (no console output). The handle belongs to one
-  framework: the open state and the payload stay in its Root.
+  call while no Root is attached does nothing (no console output). The Roots attached to one
+  handle form a stack: the newest mounted serves it, and when it unmounts the previous one serves
+  it again. The handle belongs to one framework: the open state and the payload stay in its Root.
 - **Trigger**: `handle`, `payload`, `id` (generated when not given). A Trigger with a `handle` may
   sit anywhere, outside the Root; a Trigger inside the Root needs none; a Root may have several
   Triggers. **Root**: `handle`, `triggerId` / `defaultTriggerId` (the active trigger's id,
@@ -301,7 +302,11 @@ one Trigger area and no handle):
   a Menu's popup is labelled by it. A press on **another** Trigger of the same open overlay moves
   the overlay to it: it stays open, takes that Trigger's payload, and `onOpenChange(true,
   details)` is called with `reason: "trigger-press"` and the new `trigger` (not deduplicated).
-  Hovering another Trigger of an open Tooltip moves it there at once. Every Trigger of an
+  The handle's `open(id)` moves it the same way (`imperative-action`); for a Trigger not rendered
+  yet, `details.trigger` is `undefined` and the overlay moves to it once it renders. A new
+  `payload` of the active Trigger reaches the content at once.
+  Hovering another Trigger of an open Tooltip moves it there at once (a Trigger removed while
+  hovered no longer counts: the tooltip closes as the pointer left). Every Trigger of an
   overlay is part of its layer (a press on one is not an outside press).
 
 ### The lifecycle scenarios
