@@ -8,8 +8,10 @@
         "accessibility",
         "aria",
         "dialog",
+        "drawer",
         "tabs",
         "menu",
+        "navigation-menu",
         "popover",
         "tooltip",
         "select",
@@ -116,6 +118,11 @@
             "types": "./dist/types/fragiola-primitives-angular-dialog.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-dialog.mjs"
         },
+        "./drawer": {
+            "@fragiola/source": "./drawer/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-drawer.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-drawer.mjs"
+        },
         "./field": {
             "@fragiola/source": "./field/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-field.d.ts",
@@ -135,6 +142,11 @@
             "@fragiola/source": "./menu/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-menu.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-menu.mjs"
+        },
+        "./navigation-menu": {
+            "@fragiola/source": "./navigation-menu/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-navigation-menu.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-navigation-menu.mjs"
         },
         "./popover": {
             "@fragiola/source": "./popover/public-api.ts",

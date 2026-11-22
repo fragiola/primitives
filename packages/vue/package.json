@@ -9,8 +9,10 @@
         "aria",
         "dialog",
         "alert-dialog",
+        "drawer",
         "tabs",
         "menu",
+        "navigation-menu",
         "context-menu",
         "popover",
         "tooltip",
@@ -127,6 +129,12 @@
             "import": "./dist/dialog.js",
             "default": "./dist/dialog.js"
         },
+        "./drawer": {
+            "@fragiola/source": "./src/components/drawer/index.ts",
+            "types": "./dist/drawer.d.ts",
+            "import": "./dist/drawer.js",
+            "default": "./dist/drawer.js"
+        },
         "./field": {
             "@fragiola/source": "./src/components/field/index.ts",
             "types": "./dist/field.d.ts",
@@ -150,6 +158,12 @@
             "types": "./dist/menu.d.ts",
             "import": "./dist/menu.js",
             "default": "./dist/menu.js"
+        },
+        "./navigation-menu": {
+            "@fragiola/source": "./src/components/navigation-menu/index.ts",
+            "types": "./dist/navigation-menu.d.ts",
+            "import": "./dist/navigation-menu.js",
+            "default": "./dist/navigation-menu.js"
         },
         "./popover": {
             "@fragiola/source": "./src/components/popover/index.ts",
@@ -309,6 +323,11 @@
                 "import": "./dist/dialog.js",
                 "default": "./dist/dialog.js"
             },
+            "./drawer": {
+                "types": "./dist/drawer.d.ts",
+                "import": "./dist/drawer.js",
+                "default": "./dist/drawer.js"
+            },
             "./field": {
                 "types": "./dist/field.d.ts",
                 "import": "./dist/field.js",
@@ -328,6 +347,11 @@
                 "types": "./dist/menu.d.ts",
                 "import": "./dist/menu.js",
                 "default": "./dist/menu.js"
+            },
+            "./navigation-menu": {
+                "types": "./dist/navigation-menu.d.ts",
+                "import": "./dist/navigation-menu.js",
+                "default": "./dist/navigation-menu.js"
             },
             "./popover": {
                 "types": "./dist/popover.d.ts",

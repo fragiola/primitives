@@ -21,6 +21,8 @@
         "internal",
         "dialog",
         "alert-dialog",
+        "drawer",
+        "navigation-menu",
         "context-menu",
         "tabs",
         "popover",

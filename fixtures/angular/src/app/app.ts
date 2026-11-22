@@ -45,6 +45,11 @@ import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.t
 import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.ts";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.ts";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.ts";
+import { DrawerBasic } from "../scenarios/drawer/drawer-basic.ts";
+import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.ts";
+import { DrawerNested } from "../scenarios/drawer/drawer-nested.ts";
+import { DrawerSide } from "../scenarios/drawer/drawer-side.ts";
+import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.ts";
 import { FieldAsync } from "../scenarios/field/field-async.ts";
 import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
@@ -62,6 +67,8 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
+import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
+import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
@@ -113,6 +120,11 @@ import { ROUTES } from "./routes.ts";
         DialogNestedDialogs,
         DialogDetached,
         DialogLifecycle,
+        DrawerBasic,
+        DrawerSide,
+        DrawerSnapPoints,
+        DrawerNested,
+        DrawerLifecycle,
         AlertDialogBasic,
         AlertDialogDetached,
         AlertDialogLifecycle,
@@ -144,6 +156,8 @@ import { ROUTES } from "./routes.ts";
         MenuModal,
         MenuDetached,
         MenuLifecycle,
+        NavigationMenuBasic,
+        NavigationMenuNested,
         MenuCheckboxRadio,
         ContextMenuBasic,
         ContextMenuLifecycle,
@@ -208,6 +222,11 @@ import { ROUTES } from "./routes.ts";
             @case ("/dialog/nested-dialogs") { <main class="p-6" scenario-dialog-nested-dialogs></main> }
             @case ("/dialog/detached") { <main class="p-6" scenario-dialog-detached></main> }
             @case ("/dialog/lifecycle") { <main class="p-6" scenario-dialog-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/drawer/basic") { <main class="p-6" scenario-drawer-basic></main> }
+            @case ("/drawer/side") { <main class="p-6" scenario-drawer-side></main> }
+            @case ("/drawer/snap-points") { <main class="p-6" scenario-drawer-snap-points></main> }
+            @case ("/drawer/nested") { <main class="p-6" scenario-drawer-nested></main> }
+            @case ("/drawer/lifecycle") { <main class="p-6" scenario-drawer-lifecycle [cancel]="query.cancel"></main> }
             @case ("/alert-dialog/basic") { <main class="p-6" scenario-alert-dialog-basic></main> }
             @case ("/alert-dialog/detached") { <main class="p-6" scenario-alert-dialog-detached></main> }
             @case ("/alert-dialog/lifecycle") { <main class="p-6" scenario-alert-dialog-lifecycle [cancel]="query.cancel"></main> }
@@ -241,6 +260,8 @@ import { ROUTES } from "./routes.ts";
             @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
             @case ("/menu/detached") { <main class="p-6" scenario-menu-detached></main> }
             @case ("/menu/lifecycle") { <main class="p-6" scenario-menu-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/navigation-menu/basic") { <main class="p-6" scenario-navigation-menu-basic></main> }
+            @case ("/navigation-menu/nested") { <main class="p-6" scenario-navigation-menu-nested></main> }
             @case ("/menu/checkbox-radio") { <main class="p-6" scenario-menu-checkbox-radio></main> }
             @case ("/context-menu/basic") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }

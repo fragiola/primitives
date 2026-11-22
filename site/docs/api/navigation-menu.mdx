@@ -1,0 +1,291 @@
+---
+title: NavigationMenu
+description: A site's navigation of links and disclosed panels in one shared popup that resizes between them (APG disclosure navigation), in each framework.
+---
+
+A site's navigation: a list of links and of triggers that disclose panels of more links (a mega
+menu), opened by a hover or a press, in **one shared popup** whose size moves from panel to panel.
+It follows the WAI-ARIA APG
+[disclosure navigation menu](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/):
+each trigger is a button with `aria-expanded`, the links are plain links, and nothing takes the
+`menu` role. The hover, the shared popup, the size variables, the activation direction and the
+nested levels follow Base UI's NavigationMenu. A menu of commands is a [Menu](/docs/api/menu).
+
+<Example id="navigation-menu" />
+
+## Behaviour
+
+- **Hover** (mouse and pen): entering a Trigger opens its Content after `delay` (50 ms); while
+  one is open, entering another Trigger switches at once. Leaving the Trigger and the popup closes
+  it after `closeDelay` (50 ms).
+- **Press**: a press (or Enter, Space) on a Trigger toggles its Content, and focus stays on the
+  Trigger. A pressed Content stays open when the pointer leaves; a press within 500 ms of a hover
+  opening keeps it open. Touch opens and closes with a tap.
+- **Keyboard**: every Trigger and Link of the List is in the tab order; the arrow keys along the
+  orientation move between them (mirrored in RTL), Home and End go to the ends. ArrowDown on a
+  Trigger (ArrowRight in a vertical List) opens it with focus inside. From an open Trigger, Tab
+  enters its Content; Tab from the Content's end continues after the Trigger.
+- **Close**: Escape (focus back on the Trigger when it was inside), a press outside, or focus
+  leaving the navigation.
+- **One popup**: the open Content renders into the Viewport, inside the Popup. The Popup's
+  `--popup-width` and `--popup-height` are the open Content's size: transition them, and lay the
+  Contents out absolutely, so a switch moves from one size to the next while the old Content exits
+  and the new one enters, each with `data-activation-direction`.
+- **Nested levels**: a Root inside a Content is a nested level (usually `orientation="vertical"`),
+  with its own Portal; Escape and outside presses close one level at a time
+  ([nested overlays](/docs/guides/nested-overlays)).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `nav` (nested: `div`) | `navigation-menu-root` | holds the open item; name it with `aria-label` |
+| List | `ul` | `navigation-menu-list` | the items |
+| Item | `li` | `navigation-menu-item` | a Trigger with its Content, or a Link |
+| Trigger | `button` | `navigation-menu-trigger` | discloses its item's Content |
+| Icon | `span` | `navigation-menu-icon` | a decorative chevron |
+| Content | `div` | `navigation-menu-content` | the item's panel, rendered into the Viewport while open |
+| Link | `a` | `navigation-menu-link` | a link, in the List or a Content |
+| Portal | none | | moves the Backdrop and the Positioner to the end of `body` while open |
+| Backdrop | `div` | `navigation-menu-backdrop` | covers the page (optional) |
+| Positioner | `div` | `navigation-menu-positioner` | places the popup next to the open Trigger |
+| Popup | `div` | `navigation-menu-popup` | the shared popup |
+| Viewport | `div` | `navigation-menu-viewport` | where the Contents render |
+| Arrow | `div` | `navigation-menu-arrow` | points at the Trigger (optional) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { NavigationMenu } from "@fragiola/primitives-react/navigation-menu";
+
+function SiteHeader() {
+    return (
+        <NavigationMenu.Root aria-label="Main">
+            <NavigationMenu.List>
+                <NavigationMenu.Item>
+                    <NavigationMenu.Trigger>
+                        Products
+                        <NavigationMenu.Icon />
+                    </NavigationMenu.Trigger>
+                    <NavigationMenu.Content>
+                        <NavigationMenu.Link href="/analytics">Analytics</NavigationMenu.Link>
+                        <NavigationMenu.Link href="/reports">Reports</NavigationMenu.Link>
+                    </NavigationMenu.Content>
+                </NavigationMenu.Item>
+                <NavigationMenu.Item>
+                    <NavigationMenu.Link href="/pricing" active>Pricing</NavigationMenu.Link>
+                </NavigationMenu.Item>
+            </NavigationMenu.List>
+            <NavigationMenu.Portal>
+                <NavigationMenu.Positioner sideOffset={8}>
+                    <NavigationMenu.Popup>
+                        <NavigationMenu.Viewport />
+                    </NavigationMenu.Popup>
+                </NavigationMenu.Positioner>
+            </NavigationMenu.Portal>
+        </NavigationMenu.Root>
+    );
+}
+```
+
+```css
+[data-primitives-part="navigation-menu-popup"] {
+    box-sizing: content-box;
+    width: var(--popup-width);
+    height: var(--popup-height);
+    transition: width 200ms, height 200ms;
+}
+[data-primitives-part="navigation-menu-content"] { position: absolute; width: max-content; }
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { NavigationMenu } from "@fragiola/primitives-vue/navigation-menu";
+</script>
+
+<template>
+    <NavigationMenu.Root aria-label="Main">
+        <NavigationMenu.List>
+            <NavigationMenu.Item>
+                <NavigationMenu.Trigger>Products<NavigationMenu.Icon /></NavigationMenu.Trigger>
+                <NavigationMenu.Content>
+                    <NavigationMenu.Link href="/analytics">Analytics</NavigationMenu.Link>
+                    <NavigationMenu.Link href="/reports">Reports</NavigationMenu.Link>
+                </NavigationMenu.Content>
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+                <NavigationMenu.Link href="/pricing" active>Pricing</NavigationMenu.Link>
+            </NavigationMenu.Item>
+        </NavigationMenu.List>
+        <NavigationMenu.Portal>
+            <NavigationMenu.Positioner :side-offset="8">
+                <NavigationMenu.Popup>
+                    <NavigationMenu.Viewport />
+                </NavigationMenu.Popup>
+            </NavigationMenu.Positioner>
+        </NavigationMenu.Portal>
+    </NavigationMenu.Root>
+</template>
+```
+
+`v-model:value` binds the open item.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [NavigationMenuRoot, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuIcon, NavigationMenuContent, NavigationMenuLink, NavigationMenuPortal, NavigationMenuPositioner, NavigationMenuPopup, NavigationMenuViewport],
+    template: `
+        <nav navigationMenuRoot aria-label="Main">
+            <ul navigationMenuList>
+                <li navigationMenuItem>
+                    <button navigationMenuTrigger>Products<span navigationMenuIcon></span></button>
+                    <div *navigationMenuContent>
+                        <a navigationMenuLink href="/analytics">Analytics</a>
+                        <a navigationMenuLink href="/reports">Reports</a>
+                    </div>
+                </li>
+                <li navigationMenuItem>
+                    <a navigationMenuLink href="/pricing" [active]="true">Pricing</a>
+                </li>
+            </ul>
+            <ng-container *navigationMenuPortal>
+                <div navigationMenuPositioner [sideOffset]="8">
+                    <div navigationMenuPopup>
+                        <div navigationMenuViewport></div>
+                    </div>
+                </div>
+            </ng-container>
+        </nav>
+    `,
+})
+export class SiteHeader {}
+```
+
+`*navigationMenuContent` is structural: its element moves into the Viewport while its item is
+open. `[(value)]` binds the open item.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:value`, `@value-change`), and
+Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string \| null` | | the open item's value, controlled (`null`: closed) |
+| `defaultValue` | `string \| null` | `null` | the open item, uncontrolled |
+| `onValueChange` | `(value: string \| null, details: ChangeDetails) => void` | | every change, with its reason (`trigger-hover`, `trigger-press`, `list-navigation`, `escape-key`, `outside-press`, `focus-out`, `none`) |
+| `delay` | `number` | `50` | ms before a hover opens |
+| `closeDelay` | `number` | `50` | ms before the pointer leaving closes |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the List's axis: its arrow keys and the Trigger's open key |
+| `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+
+### List
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | generated | the item's value |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+
+### Icon
+
+No props of its own.
+
+### Content
+
+No props of its own.
+
+### Link
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `active` | `boolean` | `false` | the link of the current page: `aria-current="page"` and `data-active` |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Backdrop and the Positioner go |
+| `options` (angular) | `Element \| { container? }` | `{}` | the same option: `*navigationMenuPortal="{ container: element }"` |
+
+### Backdrop
+
+No props of its own.
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `Side` | `"bottom"` | the side of the Trigger it sits on |
+| `align` | `Align` | `"center"` | its alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the Trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along the side, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges when flipping and shifting |
+| `anchor` | `Element` | the open Trigger | another element to anchor to |
+
+### Popup
+
+No props of its own.
+
+### Viewport
+
+No props of its own.
+
+### Arrow
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root, List | `data-orientation` |
+| Trigger | `aria-expanded`, `aria-controls` (its Content, while open), `data-popup-open`, `data-disabled` |
+| Icon | `aria-hidden="true"`, `data-popup-open` |
+| Content | an `id`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-activation-direction` (`left`, `right`, `up`, `down`, `none`) |
+| Link | `aria-current="page"` and `data-active` when `active` |
+| Backdrop | `aria-hidden="true"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-open` / `data-closed`, `data-side`, `data-align`, the inline `--positioner-width`, `--positioner-height` and the anchor's variables |
+| Popup | `data-open` / `data-closed`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style`, the inline `--popup-width`, `--popup-height` |
+| Arrow | `aria-hidden="true"`, `data-open` / `data-closed`, `data-side`, `data-align` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab, Shift+Tab | through the Triggers and Links; from an open Trigger into its Content, and from its end on after the Trigger |
+| Enter, Space on a Trigger | toggles its Content |
+| ArrowDown on a Trigger (ArrowRight in a vertical List, ArrowLeft in RTL) | opens its Content with focus inside |
+| ArrowRight, ArrowLeft (ArrowDown, ArrowUp when vertical) | the next or previous item, wrapping |
+| Home, End | the first, the last item |
+| Escape | closes the open Content (one level at a time) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/navigation-menu` | `NavigationMenu`, `NavigationMenuRootProps`, `NavigationMenuRootState`, `NavigationMenuOrientation`, `NavigationMenuItemProps`, `NavigationMenuTriggerProps`, `NavigationMenuTriggerState`, `NavigationMenuContentState`, `NavigationMenuLinkProps`, `NavigationMenuPortalProps`, `NavigationMenuPositionerProps`, `NavigationMenuPositionerState`, `NavigationMenuPopupState`, `PositionerProps`, `ActivationDirection`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/navigation-menu` | `NavigationMenu`, `NavigationMenuRootProps`, `NavigationMenuRootEmits`, `NavigationMenuRootState`, `NavigationMenuOrientation`, `NavigationMenuListState`, `NavigationMenuItemProps`, `NavigationMenuTriggerProps`, `NavigationMenuTriggerState`, `NavigationMenuContentState`, `NavigationMenuLinkProps`, `NavigationMenuPortalProps`, `NavigationMenuPositionerState`, `NavigationMenuPopupState`, `PositionerProps`, `ActivationDirection`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/navigation-menu` | `NavigationMenuRoot`, `NavigationMenuList`, `NavigationMenuItem`, `NavigationMenuTrigger`, `NavigationMenuIcon`, `NavigationMenuContent`, `NavigationMenuLink`, `NavigationMenuPortal`, `NavigationMenuBackdrop`, `NavigationMenuPositioner`, `NavigationMenuPopup`, `NavigationMenuViewport`, `NavigationMenuArrow`, `NavigationMenuRootState`, `NavigationMenuOrientation`, `NavigationMenuTriggerState`, `NavigationMenuContentState`, `NavigationMenuPositionerState`, `NavigationMenuPopupState`, `OverlayPortalOptions`, `ValueChangeEvent`, `ActivationDirection`, `Side`, `Align`, `ChangeDetails`, `ChangeReason` |

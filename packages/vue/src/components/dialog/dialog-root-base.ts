@@ -46,8 +46,11 @@ export function setupDialogRoot(
         slots,
         expose,
     }: Pick<SetupContext<typeof overlayRootEmits>, "emit" | "slots" | "expose">,
+    /** Reads the open state (a Drawer resets its swipe and snap point on an opening). */
+    withOpen?: (open: () => boolean) => void,
 ) {
     const root = useOverlayRoot(props, emit);
+    withOpen?.(() => root.open.value);
 
     // nested dialogs (spec/dialog.md, "Nested dialogs"): a dialog inside another's Popup reports
     // the open chain below it; this one counts the longest chain nested in it

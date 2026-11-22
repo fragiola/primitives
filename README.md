@@ -12,12 +12,19 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today: **Dialog**, **Popover**, **Tooltip**, **Menu**, **Tabs**, **Field**, **Checkbox** and
-**CheckboxGroup**, **Slider**, **Select**, **Combobox**, **Calendar**, **RangeCalendar**,
-**DatePicker** and **DateRangePicker** ([`spec/`](spec)): stage 0 is complete. The first
-version (stage 0) ports the cross-framework POC's components to production: Dialog, Popover,
-Menu, Combobox, Select, Tooltip, Tabs, Checkbox and CheckboxGroup, Slider, Calendar,
-RangeCalendar, DatePicker and DateRangePicker. See [`docs/handoff.md`](docs/handoff.md),
+Today, 30 components in React, Vue and Angular ([`spec/`](spec)), stages 0 and 1 complete:
+
+| group | components |
+| --- | --- |
+| overlays | **Dialog**, **AlertDialog**, **Drawer**, **Popover**, **Tooltip**, **Menu** (checkbox and radio items, submenus), **ContextMenu** |
+| navigation and disclosure | **Tabs**, **NavigationMenu**, **Collapsible**, **Accordion** |
+| forms | **Field**, **Fieldset**, **Form**, **Button**, **Checkbox** and **CheckboxGroup**, **RadioGroup** and **Radio**, **Switch**, **Slider**, **Select**, **Combobox** |
+| dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker** |
+| display | **Progress**, **Avatar**, **Separator** |
+
+Plus the [direction provider](spec/direction.md) and the render utilities. Stage 0 ported the
+cross-framework POC's components to production; stage 1 brought the production scope and
+Fragiola UI parity (`docs/handoff.md` §5). See [`docs/handoff.md`](docs/handoff.md),
 [`docs/catalog.md`](docs/catalog.md) and [`docs/decisions.md`](docs/decisions.md); the rules are in [`AGENTS.md`](AGENTS.md).
 
 ```sh

@@ -10,7 +10,11 @@ import {
 } from "../../utils/change-details.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import { DialogContext, DialogNestingContext } from "./dialog-context.ts";
+import {
+    DialogContext,
+    DialogNestingContext,
+    nestedName,
+} from "./dialog-context.ts";
 
 export interface DialogPopupState {
     open: boolean;
@@ -132,7 +136,7 @@ export function DialogPopup({
     const resolvedStyle = typeof style === "function" ? style(state) : style;
     // the open chain of dialogs nested below it, for a recipe (spec/dialog.md, "Nested dialogs")
     const nestedStyle = {
-        "--nested-dialogs": nestedDialogs,
+        [`--nested-${nestedName(context.component)}s`]: nestedDialogs,
         ...resolvedStyle,
     } as CSSProperties;
     return renderElement(
@@ -152,7 +156,8 @@ export function DialogPopup({
                 open,
                 closed: !open,
                 nested,
-                "nested-dialog-open": nestedDialogOpen,
+                [`nested-${nestedName(context.component)}-open`]:
+                    nestedDialogOpen,
                 "starting-style": status === "starting",
                 "ending-style": status === "ending",
             }),

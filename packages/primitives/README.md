@@ -23,6 +23,7 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/collection` | `stepIndex`, `edgeIndex`, `stepThroughNone`, `tabsKeyTarget`, `menuKeyTarget`, `submenuKeys`, `createTypeahead`, the combobox's item helpers, `chipKeyTarget` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
 | `@fragiola/primitives/pointer` | `startDrag`, `isInSafeArea`, `isInHoverBridge`, `trackHoverBridge` |
+| `@fragiola/primitives/swipe` | `watchSwipe(element, options)` → cleanup (pointer and touch swipes, scroll containment), `swipeRelease`, `swipeMovement`, `swipeProgress`, `resolveSnapPoints` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `createDelayGroup` |
 | `@fragiola/primitives/range` | range math (`snapToStep`, `valueToPercent`, thumbs) and `sliderKeyTarget` |
 | `@fragiola/primitives/form` | `bridgeForm`, `validateField`, the field's state and change rules, `onSubmitAttempt` |

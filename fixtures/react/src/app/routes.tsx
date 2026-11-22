@@ -43,6 +43,11 @@ import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.t
 import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.tsx";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.tsx";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.tsx";
+import { DrawerBasic } from "../scenarios/drawer/drawer-basic.tsx";
+import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.tsx";
+import { DrawerNested } from "../scenarios/drawer/drawer-nested.tsx";
+import { DrawerSide } from "../scenarios/drawer/drawer-side.tsx";
+import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.tsx";
 import { FieldAsync } from "../scenarios/field/field-async.tsx";
 import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
@@ -60,6 +65,8 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
+import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
+import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
@@ -109,6 +116,11 @@ export const routes: Record<
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/drawer/basic": DrawerBasic,
+    "/drawer/side": DrawerSide,
+    "/drawer/snap-points": DrawerSnapPoints,
+    "/drawer/nested": DrawerNested,
+    "/drawer/lifecycle": DrawerLifecycle,
     "/alert-dialog/basic": AlertDialogBasic,
     "/alert-dialog/detached": AlertDialogDetached,
     "/alert-dialog/lifecycle": AlertDialogLifecycle,
@@ -142,6 +154,8 @@ export const routes: Record<
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/navigation-menu/basic": NavigationMenuBasic,
+    "/navigation-menu/nested": NavigationMenuNested,
     "/menu/checkbox-radio": MenuCheckboxRadio,
     "/context-menu/basic": ContextMenuBasic,
     "/context-menu/rtl": ContextMenuBasic,

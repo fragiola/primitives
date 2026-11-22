@@ -132,6 +132,12 @@
             "import": "./dist/scroll-lock.js",
             "default": "./dist/scroll-lock.js"
         },
+        "./swipe": {
+            "@fragiola/source": "./src/swipe/index.ts",
+            "types": "./dist/swipe.d.ts",
+            "import": "./dist/swipe.js",
+            "default": "./dist/swipe.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -226,6 +232,11 @@
                 "types": "./dist/scroll-lock.d.ts",
                 "import": "./dist/scroll-lock.js",
                 "default": "./dist/scroll-lock.js"
+            },
+            "./swipe": {
+                "types": "./dist/swipe.d.ts",
+                "import": "./dist/swipe.js",
+                "default": "./dist/swipe.js"
             },
             "./package.json": "./package.json"
         }

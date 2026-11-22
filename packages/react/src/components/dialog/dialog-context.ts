@@ -2,7 +2,16 @@ import { createContext } from "react";
 import type { OverlayRoot } from "../../hooks/use-overlay-root.ts";
 
 /** The component a dialog's parts belong to: their part attribute's prefix. */
-export type DialogComponent = "dialog" | "alert-dialog";
+export type DialogComponent = "dialog" | "alert-dialog" | "drawer";
+
+/**
+ * The name of the nested attributes of a component's parts: `data-nested-<name>-open` and
+ * `--nested-<name>s` (a Drawer's are `drawer`, spec/drawer.md; a Dialog's and an AlertDialog's
+ * `dialog`).
+ */
+export function nestedName(component: DialogComponent): string {
+    return component === "drawer" ? component : "dialog";
+}
 
 export interface DialogContextValue extends OverlayRoot {
     /** `alert-dialog`: never dismissed from outside, focuses its first Close (spec/alert-dialog.md). */

@@ -7,7 +7,7 @@ import {
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import { DialogKey } from "./dialog-context.ts";
+import { DialogKey, nestedName } from "./dialog-context.ts";
 
 /**
  * The container the popup sits in, covering the page (spec/dialog.md, "Anatomy"): a press on it
@@ -50,7 +50,8 @@ export const DialogViewport: PartComponent<
                             open,
                             closed: !open,
                             nested,
-                            "nested-dialog-open": nestedDialogOpen,
+                            [`nested-${nestedName(context.component)}-open`]:
+                                nestedDialogOpen,
                             "starting-style": status === "starting",
                             "ending-style": status === "ending",
                         }),

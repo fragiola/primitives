@@ -43,6 +43,11 @@ import DialogNestedPopover from "../scenarios/dialog/dialog-nested-popover.vue";
 import DialogNestedTree from "../scenarios/dialog/dialog-nested-tree.vue";
 import DialogRejectedClose from "../scenarios/dialog/dialog-rejected-close.vue";
 import DirectionProviderScenario from "../scenarios/direction/direction-provider.vue";
+import DrawerBasic from "../scenarios/drawer/drawer-basic.vue";
+import DrawerLifecycle from "../scenarios/drawer/drawer-lifecycle.vue";
+import DrawerNested from "../scenarios/drawer/drawer-nested.vue";
+import DrawerSide from "../scenarios/drawer/drawer-side.vue";
+import DrawerSnapPoints from "../scenarios/drawer/drawer-snap-points.vue";
 import FieldAsync from "../scenarios/field/field-async.vue";
 import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
@@ -60,6 +65,8 @@ import MenuGroups from "../scenarios/menu/menu-groups.vue";
 import MenuLifecycle from "../scenarios/menu/menu-lifecycle.vue";
 import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
+import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
+import NavigationMenuNested from "../scenarios/navigation-menu/navigation-menu-nested.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
 import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
@@ -106,6 +113,11 @@ export const routes: Record<string, Component> = {
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/drawer/basic": DrawerBasic,
+    "/drawer/side": DrawerSide,
+    "/drawer/snap-points": DrawerSnapPoints,
+    "/drawer/nested": DrawerNested,
+    "/drawer/lifecycle": DrawerLifecycle,
     "/alert-dialog/basic": AlertDialogBasic,
     "/alert-dialog/detached": AlertDialogDetached,
     "/alert-dialog/lifecycle": AlertDialogLifecycle,
@@ -139,6 +151,8 @@ export const routes: Record<string, Component> = {
     "/menu/controlled": MenuControlled,
     "/menu/detached": MenuDetached,
     "/menu/lifecycle": MenuLifecycle,
+    "/navigation-menu/basic": NavigationMenuBasic,
+    "/navigation-menu/nested": NavigationMenuNested,
     "/menu/checkbox-radio": MenuCheckboxRadio,
     "/context-menu/basic": ContextMenuBasic,
     "/context-menu/rtl": ContextMenuBasic,

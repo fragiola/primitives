@@ -16,7 +16,7 @@ import {
 import { DIALOG_NESTING, type DialogNesting } from "../utils/dialog-nesting.ts";
 
 /** The component a dialog's parts belong to: their part attribute's prefix. */
-export type DialogComponent = "dialog" | "alert-dialog";
+export type DialogComponent = "dialog" | "alert-dialog" | "drawer";
 
 export interface DialogState {
     open: boolean;
@@ -110,6 +110,15 @@ export abstract class DialogRootBase<Payload = unknown>
                 onCleanup(() => parent.report(this, null));
             });
         }
+    }
+
+    /**
+     * Whether its parts name their nested attributes for a drawer (`data-nested-drawer-open`,
+     * `--nested-drawers`, spec/drawer.md) rather than a dialog (`data-nested-dialog-open`,
+     * `--nested-dialogs`).
+     */
+    get nestsDrawers(): boolean {
+        return this.component === "drawer";
     }
 
     /** The part attribute value of one of its parts (`dialog-popup`, `alert-dialog-popup`). */

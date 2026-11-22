@@ -1,0 +1,271 @@
+---
+title: Drawer
+description: A modal panel at an edge of the screen that the user swipes away, with snap points and nested drawers, in each framework.
+---
+
+A panel that slides in from an edge of the screen: a bottom sheet, a side panel. It is a
+[Dialog](/docs/api/dialog): it takes focus, traps it, makes the rest of the page inert, closes on
+Escape and on a press outside, and returns focus when it closes (the WAI-ARIA APG
+[modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)). It adds a
+**swipe to dismiss** with the mouse, a pen or a touch, **snap points** (a bottom sheet resting at
+preset heights), the CSS variables your styles move it with, and nested drawers. The APG has no
+drawer pattern: the gestures, the snap points and the names follow Base UI's Drawer.
+
+Drawer has its own entry and is built on Dialog's parts, whose part attribute names the drawer
+(`drawer-popup`), plus its own `Content`. The swipe is the toolkit's `@fragiola/primitives/swipe`
+entry, which only Drawer imports: an app with Dialog alone never bundles it.
+
+<Example id="drawer" />
+
+<Example id="drawer-side-panel" />
+
+## Behaviour
+
+- **Open and close**: as a Dialog's. Focus moves to the first tabbable element, Tab wraps inside,
+  Escape (`escape-key`), a press outside (`outside-press`), a Close part (`close-press`) or the
+  Trigger again (`trigger-press`) close it, focus returns to the trigger.
+- **Swipe**: a press on the Popup followed by a move of 6 px along the axis of `swipeDirection`
+  starts a swipe (`data-swiping`); a move along the other axis does nothing. Towards the edge the
+  popup follows the pointer; away from it, it moves less and less (damped). On release it
+  **dismisses** (reason `swipe`) when it moved more than half its size, or 10 px or more at a
+  flick's velocity (0.5 px per ms); otherwise it settles back.
+- **Where a swipe starts**: never on a text control, a range input or an element marked
+  `data-swipe-ignore`; with the mouse, never on a button, a link or a label, nor inside the
+  `Content` (where the mouse selects text). A touch swipes from anywhere else.
+- **Scroll containment**: a scrollable element under the pointer that can still scroll in the
+  direction of the move scrolls instead; the drawer moves once it reached its edge.
+- **Snap points**: with `snapPoints`, a bottom sheet rests at heights you give (fractions of the
+  viewport, px or rem); a release settles on the closest snap point to where it was let go (a
+  flick carries it further), or dismisses when closed is closer. `onSnapPointChange` reports the
+  new snap point with reason `swipe`.
+- **Nested drawers**: a Drawer inside a Drawer's popup is nested: `data-nested` on it,
+  `data-nested-drawer-open` and `--nested-drawers` on the parent; a swipe or Escape closes the
+  nested one alone ([nested overlays](/docs/guides/nested-overlays)).
+- **Detached triggers and lifecycle**: as a Dialog's, with a Drawer handle
+  (`Drawer.createHandle()`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state, the swipe direction and the snap points |
+| Trigger | `button` | `drawer-trigger` | opens the drawer |
+| Portal | none | | moves the Backdrop, the Viewport and the Popup to the end of `body` |
+| Backdrop | `div` | `drawer-backdrop` | covers the page (optional) |
+| Viewport | `div` | `drawer-viewport` | a full-page container you place the popup at its edge in (optional) |
+| Popup | `div` | `drawer-popup` | the dialog; the swipe starts on it |
+| Content | `div` | `drawer-content` | where the mouse selects text instead of swiping (optional) |
+| Title | `h2` | `drawer-title` | names it |
+| Description | `p` | `drawer-description` | describes it |
+| Close | `button` | `drawer-close` | closes it |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Drawer } from "@fragiola/primitives-react/drawer";
+
+function Filters() {
+    return (
+        <Drawer.Root swipeDirection="down" snapPoints={["240px", 1]}>
+            <Drawer.Trigger>Filters</Drawer.Trigger>
+            <Drawer.Portal>
+                <Drawer.Backdrop />
+                <Drawer.Popup>
+                    <div aria-hidden="true" className="handle" />
+                    <Drawer.Content>
+                        <Drawer.Title>Filters</Drawer.Title>
+                        <Drawer.Description>Narrow the results.</Drawer.Description>
+                        <Drawer.Close>Done</Drawer.Close>
+                    </Drawer.Content>
+                </Drawer.Popup>
+            </Drawer.Portal>
+        </Drawer.Root>
+    );
+}
+```
+
+Move the popup with the variables in your styles:
+
+```css
+[data-primitives-part="drawer-popup"][data-swipe-direction="down"] {
+    transform: translateY(calc(var(--drawer-snap-point-offset) + var(--drawer-swipe-movement-y)));
+    transition: transform 300ms;
+}
+[data-primitives-part="drawer-popup"][data-swiping] { transition: none; }
+[data-primitives-part="drawer-popup"][data-starting-style],
+[data-primitives-part="drawer-popup"][data-ending-style] { transform: translateY(100%); }
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Drawer } from "@fragiola/primitives-vue/drawer";
+import { ref } from "vue";
+
+const snapPoint = ref<string | number | null>("240px");
+</script>
+
+<template>
+    <Drawer.Root :snap-points="['240px', 1]" v-model:snap-point="snapPoint">
+        <Drawer.Trigger>Filters</Drawer.Trigger>
+        <Drawer.Portal>
+            <Drawer.Backdrop />
+            <Drawer.Popup>
+                <div aria-hidden="true" class="handle" />
+                <Drawer.Content>
+                    <Drawer.Title>Filters</Drawer.Title>
+                    <Drawer.Description>Narrow the results.</Drawer.Description>
+                    <Drawer.Close>Done</Drawer.Close>
+                </Drawer.Content>
+            </Drawer.Popup>
+        </Drawer.Portal>
+    </Drawer.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [DrawerRoot, DrawerTrigger, DrawerPortal, DrawerBackdrop, DrawerPopup, DrawerContent, DrawerTitle, DrawerDescription, DrawerClose],
+    template: `
+        <ng-container drawerRoot [snapPoints]="snapPoints" [(snapPoint)]="snapPoint">
+            <button drawerTrigger>Filters</button>
+            <ng-container *drawerPortal>
+                <div drawerBackdrop></div>
+                <div drawerPopup>
+                    <div aria-hidden="true" class="handle"></div>
+                    <div drawerContent>
+                        <h2 drawerTitle>Filters</h2>
+                        <p drawerDescription>Narrow the results.</p>
+                        <button drawerClose>Done</button>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class Filters {
+    readonly snapPoints: SnapPoint[] = ["240px", 1];
+    readonly snapPoint = signal<SnapPoint | null>("240px");
+}
+```
+
+The directives are Dialog's behaviour under the entry's own selectors (`[drawerRoot]`,
+`*drawerPortal`, `[drawerPopup]`, ...), plus `[drawerContent]`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:open`, `v-model:snap-point`,
+`@open-change`), and Angular as inputs and outputs (`[(open)]`, `[(snapPoint)]`,
+`(openChangeDetails)`). A drawer is always modal.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`swipe` for a swipe, and Dialog's); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `DrawerHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
+| `swipeDirection` | `"up" \| "down" \| "left" \| "right"` | `"down"` | the edge a swipe dismisses it towards |
+| `snapPoints` | `SnapPoint[]` | | the heights it rests at: a fraction of the viewport (`0` to `1`), px (a number above `1`, or `"148px"`), or `"30rem"`; vertical directions only |
+| `snapPoint` | `SnapPoint \| null` | | the active snap point, controlled |
+| `defaultSnapPoint` | `SnapPoint \| null` | the first snap point | the snap point it opens on, uncontrolled |
+| `onSnapPointChange` | `(snapPoint: SnapPoint \| null, details: ChangeDetails) => void` | | a swipe settled on another snap point (`swipe`), or an opening went back to the default one (`none`) |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+| `handle` | `DrawerHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Backdrop, the Viewport and the Popup go |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed, `hidden` and `data-closed` |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*drawerPortal="{ keepMounted: true }"` |
+
+### Backdrop
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `forceRender` | `boolean` | `false` | render the Backdrop of a nested drawer too |
+
+### Viewport
+
+No props of its own.
+
+### Popup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `initialFocus` | an element, a ref, or `false` | the first tabbable element | focused on open (`false`: the popup itself); Vue and Angular also take a getter |
+| `finalFocus` | an element, a ref, or `false` | the trigger | focused on close (`false`: nothing moves) |
+
+### Content
+
+No props of its own.
+
+### Title
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Description
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the popup's `aria-describedby` points at; React and Vue take it as a plain attribute |
+
+### Close
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-popup-open` (the active trigger), `data-disabled`, an `id` |
+| Backdrop | `aria-hidden="true"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-drawer-open`, `data-swiping`, the inline `--drawer-swipe-progress` |
+| Viewport | `role="presentation"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-drawer-open`, `data-swiping` |
+| Popup | `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, `tabindex="-1"`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`, `data-nested`, `data-nested-drawer-open`, `data-swipe-direction`, `data-swiping`, `data-swipe-dismiss` (exiting after a swipe), `data-expanded` (all of it shown); the inline `--nested-drawers`, `--drawer-swipe-movement-x`, `--drawer-swipe-movement-y`, `--drawer-snap-point-offset` and `--drawer-swipe-progress` |
+| Title, Description | an `id` (generated unless given) |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space on the Trigger | opens |
+| Tab, Shift+Tab | the next or previous tabbable element of the popup, wrapping |
+| Escape | closes (only the topmost layer, when one is open inside) |
+
+Snap points have no keys: the keyboard reaches all of the content and closes the drawer.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/drawer` | `Drawer`, `DrawerRootProps`, `DrawerTriggerProps`, `DrawerTriggerState`, `DrawerPortalProps`, `DrawerBackdropProps`, `DrawerBackdropState`, `DrawerViewportState`, `DrawerPopupProps`, `DrawerPopupState`, `DrawerHandle`, `createDrawerHandle`, `SnapPoint`, `ResolvedSnapPoint`, `SwipeDirection`, `OverlayRootProps`, `OverlayTriggerRootProps`, `OverlayTriggerProps`, `OverlayPortalProps`, `OverlayHandle`, `OverlayActions`, `OpenChangeDetails`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/drawer` | `Drawer`, `DrawerRootProps`, `DrawerRootEmits`, `DrawerTriggerProps`, `DrawerTriggerState`, `DrawerPortalProps`, `DrawerBackdropProps`, `DrawerBackdropState`, `DrawerViewportState`, `DrawerPopupProps`, `DrawerPopupState`, `DrawerHandle`, `createDrawerHandle`, `SnapPoint`, `ResolvedSnapPoint`, `SwipeDirection`, `OverlayRootProps`, `OverlayRootEmits`, `OverlayRootSlots`, `OverlayTriggerRootProps`, `OverlayTriggerProps`, `OverlayPortalProps`, `OverlayHandle`, `OverlayActions`, `OpenChangeDetails`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/drawer` | `DrawerRoot`, `DrawerTrigger`, `DrawerPortal`, `DrawerBackdrop`, `DrawerViewport`, `DrawerPopup`, `DrawerContent`, `DrawerTitle`, `DrawerDescription`, `DrawerClose`, `DrawerHandle`, `createDrawerHandle`, `SnapPoint`, `ResolvedSnapPoint`, `SwipeDirection`, `OverlayHandle`, `OverlayActions`, `OverlayPortalOptions`, `OpenChangeDetails`, `OpenChangeEvent`, `ValueChangeEvent`, `FocusTarget`, `ChangeDetails`, `ChangeReason`, `DrawerBackdropState`, `DrawerPopupState`, `DrawerState`, `DrawerSwipeState`, `DrawerTriggerState`, `DrawerViewportState` |
