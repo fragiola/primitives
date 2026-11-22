@@ -5,6 +5,7 @@ import {
     panelSizeVariables,
     watchBeforeMatch,
 } from "../../src/presence/panel-size.ts";
+import { isAnimating } from "../../src/presence/presence.ts";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -103,5 +104,16 @@ describe("watchBeforeMatch", () => {
         vi.runAllTimers();
         expect(onMatch).not.toHaveBeenCalled();
         expect(element.hasAttribute("hidden")).toBe(false);
+    });
+});
+
+describe("isAnimating", () => {
+    it("is false with nothing running, or without getAnimations", () => {
+        const element = panel();
+        expect(isAnimating(element)).toBe(false);
+        Object.defineProperty(element, "getAnimations", {
+            value: () => [{}],
+        });
+        expect(isAnimating(element)).toBe(true);
     });
 });

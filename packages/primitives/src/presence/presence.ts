@@ -20,3 +20,15 @@ export async function waitForAnimations(element: Element): Promise<void> {
             : [];
     await Promise.allSettled(animations.map((animation) => animation.finished));
 }
+
+/**
+ * Whether an animation or a transition runs on the element now (reading them applies its pending
+ * styles): an exit with none ends at once, in the render that started it, never a painted frame
+ * later (spec/collapsible.md and tabs.md, "Animation").
+ */
+export function isAnimating(element: Element): boolean {
+    return (
+        typeof element.getAnimations === "function" &&
+        element.getAnimations().length > 0
+    );
+}

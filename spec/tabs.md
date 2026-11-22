@@ -106,7 +106,7 @@ animation of its own" before):
   transition starts from it; a panel shown by the first render (or a server render) has none;
 - a panel that stops being selected stays rendered with `data-ending-style` and `inert` until
   every animation on it has finished, then unmounts (or takes `hidden` with `keepMounted`); with
-  no transition, at once;
+  no transition, in the render that deselects it, before a paint (as before Epic #32);
 - selected again during its exit, it drops `data-ending-style` and is the same element.
 
 The two panels exist together while one exits: a recipe that animates both stacks them (a grid

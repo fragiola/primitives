@@ -1,4 +1,8 @@
-import { nextFrame, waitForAnimations } from "@fragiola/primitives/presence";
+import {
+    isAnimating,
+    nextFrame,
+    waitForAnimations,
+} from "@fragiola/primitives/presence";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
@@ -40,6 +44,15 @@ export function usePresence(
             setStatus("ending");
         }
     }, [open]);
+
+    // an exit with nothing to animate ends in the same render, before the browser paints it
+    useLayoutEffect(() => {
+        const node = elementRef.current();
+        if (status === "ending" && node && !isAnimating(node)) {
+            setMounted(false);
+            setStatus(undefined);
+        }
+    }, [status]);
 
     useEffect(() => {
         const node = elementRef.current();

@@ -28,7 +28,8 @@ variables (D4).
   press (or Enter or Space) on the Trigger, `none` for a panel the browser's find-in-page revealed
   ("Find in page").
 - `disabled` (`false`): the Trigger is a disabled button and nothing opens or closes it but a
-  controlled `open`.
+  controlled `open` and a find-in-page match (the match is shown: the browser has already
+  revealed it, Base UI).
 
 **Collapsible.Trigger**: no props of its own (a native `button`, `type="button"`).
 
@@ -92,7 +93,9 @@ The Panel is animatable in CSS with no layout jump, through the toolkit's presen
 - **No transition on the first render**: a panel open from the start (`defaultOpen`, or `open`)
   renders with `auto` and no `data-starting-style`, so a page (and a server render) shows it at
   once.
-- A panel with no transition or animation opens and closes at once.
+- A panel with no transition or animation opens and closes at once: its exit ends in the render
+  that starts it, before a paint (`isAnimating`), so a closing and an opening panel never show
+  together for a frame.
 
 ## Find in page
 

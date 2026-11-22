@@ -4,7 +4,11 @@ import {
     linkedSignal,
     type Signal,
 } from "@angular/core";
-import { nextFrame, waitForAnimations } from "@fragiola/primitives/presence";
+import {
+    isAnimating,
+    nextFrame,
+    waitForAnimations,
+} from "@fragiola/primitives/presence";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
 
@@ -63,7 +67,8 @@ export function createPresence(
                 status.set(undefined);
             }
         };
-        if (node) {
+        // nothing to animate: it ends in the same render, before a paint
+        if (node && isAnimating(node)) {
             void waitForAnimations(node).then(finish);
         } else {
             finish();

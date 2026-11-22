@@ -9,6 +9,7 @@ import {
 } from "@angular/core";
 import {
     freezePanelSize,
+    isAnimating,
     nextFrame,
     type PanelSize,
     panelSizeVariables,
@@ -198,7 +199,8 @@ export function createPanelTransition({
                 size.set(null);
             }
         };
-        if (node === null) {
+        // nothing to animate: it ends in the same render, before a paint
+        if (node === null || !isAnimating(node)) {
             finish();
             return;
         }

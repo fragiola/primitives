@@ -8,4 +8,4 @@ export {
     panelSizeVariables,
     watchBeforeMatch,
 } from "./panel-size.ts";
-export { nextFrame, waitForAnimations } from "./presence.ts";
+export { isAnimating, nextFrame, waitForAnimations } from "./presence.ts";

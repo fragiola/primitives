@@ -1,5 +1,6 @@
 import {
     freezePanelSize,
+    isAnimating,
     nextFrame,
     type PanelSize,
     panelSizeVariables,
@@ -120,6 +121,15 @@ export function usePanelTransition({
             cancelFrame();
         };
     }, [open, status, size, element]);
+
+    // closing with nothing to animate: unmounted (or hidden) in the same render, before a paint
+    useLayoutEffect(() => {
+        if (status === "ending" && element !== null && !isAnimating(element)) {
+            setMounted(false);
+            setStatus(undefined);
+            setSize(null);
+        }
+    }, [status, element]);
 
     // closing: unmounted (or hidden) once its transition ended
     useEffect(() => {
