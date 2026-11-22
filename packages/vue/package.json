@@ -95,6 +95,18 @@
             "import": "./dist/field.js",
             "default": "./dist/field.js"
         },
+        "./fieldset": {
+            "@fragiola/source": "./src/components/fieldset/index.ts",
+            "types": "./dist/fieldset.d.ts",
+            "import": "./dist/fieldset.js",
+            "default": "./dist/fieldset.js"
+        },
+        "./form": {
+            "@fragiola/source": "./src/components/form/index.ts",
+            "types": "./dist/form.d.ts",
+            "import": "./dist/form.js",
+            "default": "./dist/form.js"
+        },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
             "types": "./dist/menu.d.ts",
@@ -136,6 +148,18 @@
             "types": "./dist/tooltip.d.ts",
             "import": "./dist/tooltip.js",
             "default": "./dist/tooltip.js"
+        },
+        "./direction": {
+            "@fragiola/source": "./src/direction/index.ts",
+            "types": "./dist/direction.d.ts",
+            "import": "./dist/direction.js",
+            "default": "./dist/direction.js"
+        },
+        "./render": {
+            "@fragiola/source": "./src/render/index.ts",
+            "types": "./dist/render.d.ts",
+            "import": "./dist/render.js",
+            "default": "./dist/render.js"
         },
         "./package.json": "./package.json"
     },
@@ -192,6 +216,16 @@
                 "import": "./dist/field.js",
                 "default": "./dist/field.js"
             },
+            "./fieldset": {
+                "types": "./dist/fieldset.d.ts",
+                "import": "./dist/fieldset.js",
+                "default": "./dist/fieldset.js"
+            },
+            "./form": {
+                "types": "./dist/form.d.ts",
+                "import": "./dist/form.js",
+                "default": "./dist/form.js"
+            },
             "./menu": {
                 "types": "./dist/menu.d.ts",
                 "import": "./dist/menu.js",
@@ -226,6 +260,16 @@
                 "types": "./dist/tooltip.d.ts",
                 "import": "./dist/tooltip.js",
                 "default": "./dist/tooltip.js"
+            },
+            "./direction": {
+                "types": "./dist/direction.d.ts",
+                "import": "./dist/direction.js",
+                "default": "./dist/direction.js"
+            },
+            "./render": {
+                "types": "./dist/render.d.ts",
+                "import": "./dist/render.js",
+                "default": "./dist/render.js"
             },
             "./package.json": "./package.json"
         }

@@ -13,6 +13,8 @@ export const COMPONENTS = [
     "date-range-picker",
     "dialog",
     "field",
+    "fieldset",
+    "form",
     "menu",
     "popover",
     "range-calendar",
@@ -23,6 +25,30 @@ export const COMPONENTS = [
 ] as const;
 
 export type ComponentName = (typeof COMPONENTS)[number];
+
+/**
+ * The entries of every framework package that are no component (Epic #26): the global providers
+ * and the utilities, each in its own entry (D8: a global provider such as the direction lives in
+ * its own entry and references no component). React and Vue keep their sources in
+ * `src/<name>/`, Angular in its secondary entry point `packages/angular/<name>/`. The bundle guard
+ * reads each alone and fails when it holds any component's code.
+ */
+export const UTILITIES = ["direction", "render"] as const;
+
+export type UtilityName = (typeof UTILITIES)[number];
+
+/** Every entry of a framework package but its root, in the manifests' order. */
+export const ENTRIES: readonly (ComponentName | UtilityName)[] = [
+    ...COMPONENTS,
+    ...UTILITIES,
+];
+
+/** An entry's source in the React and Vue packages, relative to the package. */
+export function entrySource(name: ComponentName | UtilityName): string {
+    return (UTILITIES as readonly string[]).includes(name)
+        ? `src/${name}/index.ts`
+        : `src/components/${name}/index.ts`;
+}
 
 /**
  * The toolkit's mechanisms (`@fragiola/primitives/<mechanism>`), one folder and one entry each

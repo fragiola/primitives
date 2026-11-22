@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { COMPONENTS } from "../../scripts/components.ts";
+import { ENTRIES, entrySource } from "../../scripts/components.ts";
 
 const root = join(import.meta.dirname, "../..");
 const read = (path: string) => readFileSync(join(root, path), "utf8");
@@ -13,28 +13,26 @@ const manifest = (pkg: string) =>
         publishConfig?: { exports?: Record<string, unknown> };
     };
 
-// AGENTS.md rule 6 (D8): one entry per component in every framework package, driven by the one
-// list (scripts/components.ts), and a root entry that only re-exports them.
+// AGENTS.md rule 6 (D8): one entry per component in every framework package, and one per utility
+// (the direction provider, the render utilities: Epic #26), driven by the one list
+// (scripts/components.ts), and a root entry that only re-exports them.
 describe("the framework packages' entries", () => {
     for (const pkg of ["react", "vue"]) {
-        it(`${pkg}: one subpath per component, and a root that only re-exports them`, () => {
+        it(`${pkg}: one subpath per component and utility, and a root that only re-exports them`, () => {
             const { exports, publishConfig, sideEffects } = manifest(pkg);
             expect(Object.keys(exports)).toEqual([
                 ".",
-                ...COMPONENTS.map((name) => `./${name}`),
+                ...ENTRIES.map((name) => `./${name}`),
                 "./package.json",
             ]);
             expect(Object.keys(publishConfig?.exports ?? {})).toEqual(
                 Object.keys(exports),
             );
             expect(sideEffects).toBe(false);
-            for (const name of COMPONENTS) {
+            for (const name of ENTRIES) {
                 expect(
                     existsSync(
-                        join(
-                            root,
-                            `packages/${pkg}/src/components/${name}/index.ts`,
-                        ),
+                        join(root, `packages/${pkg}/${entrySource(name)}`),
                     ),
                 ).toBe(true);
             }
@@ -42,23 +40,24 @@ describe("the framework packages' entries", () => {
                 .split("\n")
                 .filter((line) => line !== "" && !line.startsWith("//"));
             expect(entry).toEqual(
-                COMPONENTS.map(
-                    (name) => `export * from "./components/${name}/index.ts";`,
+                ENTRIES.map(
+                    (name) =>
+                        `export * from "./${entrySource(name).slice("src/".length)}";`,
                 ),
             );
         });
     }
 
-    it("angular: one secondary entry point per component, and a root that only re-exports them", () => {
+    it("angular: one secondary entry point per component and utility, and a root that only re-exports them", () => {
         const { exports, sideEffects } = manifest("angular");
         expect(Object.keys(exports)).toEqual([
             ".",
             "./internal",
-            ...COMPONENTS.map((name) => `./${name}`),
+            ...ENTRIES.map((name) => `./${name}`),
             "./package.json",
         ]);
         expect(sideEffects).toBe(false);
-        for (const name of COMPONENTS) {
+        for (const name of ENTRIES) {
             expect(
                 existsSync(
                     join(root, `packages/angular/${name}/ng-package.json`),
@@ -73,11 +72,14 @@ describe("the framework packages' entries", () => {
         const entry = read("packages/angular/src/public-api.ts")
             .split("\n")
             .filter((line) => line !== "" && !line.startsWith("//"));
+        // Biome sorts the re-exports: the utilities fall among the components
         expect(entry).toEqual(
-            COMPONENTS.map(
-                (name) =>
-                    `export * from "@fragiola/primitives-angular/${name}";`,
-            ),
+            [...ENTRIES]
+                .sort()
+                .map(
+                    (name) =>
+                        `export * from "@fragiola/primitives-angular/${name}";`,
+                ),
         );
     });
 
@@ -104,14 +106,12 @@ describe("no plugin, module or provider that references every component", () => 
     it("has no Vue app.use() plugin and no Angular NgModule", () => {
         const sources = [
             read("packages/vue/src/index.ts"),
-            ...COMPONENTS.map((name) =>
-                read(`packages/vue/src/components/${name}/index.ts`),
-            ),
+            ...ENTRIES.map((name) => read(`packages/vue/${entrySource(name)}`)),
         ]
             .join("\n")
             .replace(/\/\/[^\n]*/g, "");
         expect(sources).not.toMatch(/install\s*\(|app\.use|Plugin/);
-        for (const name of COMPONENTS) {
+        for (const name of ENTRIES) {
             expect(read(`packages/angular/${name}/public-api.ts`)).not.toMatch(
                 /NgModule/,
             );

@@ -253,3 +253,62 @@ describe("the bundle guard, entry by entry", () => {
         ]);
     });
 });
+
+// Epic #26 (#25): a global provider references no component (D8). The utility entries are read
+// alone and may hold no component's code at all; a component may read a provider's context.
+describe("the bundle guard, utility entries", () => {
+    it("knows the utilities' sources in every framework", () => {
+        expect(
+            ownerOf("packages/react/src/direction/direction-provider.tsx"),
+        ).toEqual({ kind: "utility", framework: "react", name: "direction" });
+        expect(ownerOf("packages/vue/src/render/index.ts")).toEqual({
+            kind: "utility",
+            framework: "vue",
+            name: "render",
+        });
+        expect(
+            ownerOf(
+                "packages/angular/direction/directives/direction-provider.directive.ts",
+            ),
+        ).toEqual({ kind: "utility", framework: "angular", name: "direction" });
+        // a component's folder stays a component
+        expect(
+            ownerOf("packages/react/src/components/tabs/tabs-list.tsx"),
+        ).toEqual({ kind: "component", framework: "react", name: "tabs" });
+    });
+
+    it("fails a component's code inside the direction entry", () => {
+        const provider = "packages/react/src/direction/direction-provider.tsx";
+        expect(entryLeaks("react", "direction", [provider], [], {})).toEqual(
+            [],
+        );
+        expect(
+            entryLeaks(
+                "react",
+                "direction",
+                [provider, "packages/react/src/components/tabs/tabs-list.tsx"],
+                [],
+                {},
+            ),
+        ).toEqual([
+            '/direction: the component "tabs": packages/react/src/components/tabs/tabs-list.tsx',
+        ]);
+        expect(
+            entryLeaks("angular", "direction", [], ["internal", "tabs"], {}),
+        ).toEqual(['/direction: imports the component entry "/tabs"']);
+    });
+
+    it("lets a component read a provider's context", () => {
+        expect(
+            entryLeaks(
+                "react",
+                "tabs",
+                [
+                    "packages/react/src/components/tabs/tabs-list.tsx",
+                    "packages/react/src/direction/direction-context.ts",
+                ],
+                [],
+            ),
+        ).toEqual([]);
+    });
+});

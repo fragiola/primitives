@@ -13,7 +13,9 @@
 // file, the chunks it imports and the other entries it imports (`@fragiola/primitives-<framework>/
 // <name>`), through their source maps. An entry holding another component's code fails, unless
 // that component is one it is built on (ENTRY_DEPENDENCIES): Dialog's code inside Tabs, invisible
-// to the two-component app, fails here.
+// to the two-component app, fails here. The utility entries (the direction provider, the render
+// utilities: UTILITIES) are read alone the same way and may hold no component's code at all (D8:
+// a global provider references no component).
 // Source maps against folders, never names (a shared helper named like a component is not a leak):
 // the approach of Tree's guard (fragiola/tree, scripts/check-features.ts), same author and
 // licence. Run by `pnpm build`, after the packages built; site/tests/check-bundle.test.ts plants
@@ -27,6 +29,7 @@ import {
     FRAMEWORKS,
     type FrameworkName,
     MECHANISMS,
+    UTILITIES,
 } from "./components.ts";
 
 const root = join(import.meta.dirname, "..");
@@ -50,17 +53,21 @@ export const GUARD = {
 } as const;
 
 /**
- * The components an entry is built on, in every framework: the form controls on Field, a
- * Checkbox on its group's context, the pickers on the calendars. Any other component's code in an
- * entry is a leak.
+ * The components an entry is built on, in every framework: the form controls on Field (and
+ * Fieldset and Form, whose contexts Field reads, Epic #26), a Checkbox on its group's context, the
+ * pickers on the calendars. Any other component's code in an entry is a leak; a utility entry
+ * (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
 > = {
     checkbox: ["checkbox-group", "field"],
+    "checkbox-group": ["field"],
     combobox: ["field"],
-    "date-picker": ["calendar"],
-    "date-range-picker": ["calendar", "date-picker"],
+    "date-picker": ["calendar", "field"],
+    "date-range-picker": ["calendar", "date-picker", "field"],
+    fieldset: ["field"],
+    form: ["field"],
     "range-calendar": ["calendar"],
     select: ["field"],
     slider: ["field"],
@@ -193,6 +200,7 @@ export function ownerOf(
     path: string,
 ):
     | { kind: "component"; framework: string; name: string }
+    | { kind: "utility"; framework: string; name: string }
     | { kind: "mechanism"; name: string }
     | { kind: "package"; name: string }
     | null {
@@ -200,6 +208,16 @@ export function ownerOf(
     const mechanism = /^packages\/primitives\/src\/([^/]+)\//.exec(normalized);
     if (mechanism?.[1] !== undefined) {
         return { kind: "mechanism", name: mechanism[1] };
+    }
+    const utility =
+        /^packages\/(react|vue)\/src\/([^/]+)\//.exec(normalized) ??
+        /^packages\/(angular)\/([^/]+)\//.exec(normalized);
+    if (
+        utility?.[1] !== undefined &&
+        utility[2] !== undefined &&
+        (UTILITIES as readonly string[]).includes(utility[2])
+    ) {
+        return { kind: "utility", framework: utility[1], name: utility[2] };
     }
     const component =
         /^packages\/(react|vue)\/src\/components\/([^/]+)\//.exec(normalized) ??
@@ -237,6 +255,9 @@ export function bundleLeaks(
             leaks.add(
                 `the unused toolkit mechanism "${owner.name}": ${source}`,
             );
+        }
+        if (owner.kind === "utility" && owner.framework !== rules.framework) {
+            leaks.add(`another framework's package: ${source}`);
         }
         if (owner.kind === "component") {
             if (owner.framework !== rules.framework) {
@@ -368,6 +389,18 @@ function main(): void {
                 problems.push(`${framework}: ${leak}`);
             }
         }
+        for (const utility of UTILITIES) {
+            const { sources, imports } = readEntry(framework, utility);
+            for (const leak of entryLeaks(
+                framework,
+                utility,
+                sources,
+                imports,
+                {},
+            )) {
+                problems.push(`${framework}: ${leak}`);
+            }
+        }
     }
     if (problems.length > 0) {
         console.error(
@@ -376,7 +409,7 @@ function main(): void {
         process.exit(1);
     }
     console.log(
-        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on`,
+        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on, and the ${UTILITIES.length} utility entries no component's code`,
     );
 }
 
