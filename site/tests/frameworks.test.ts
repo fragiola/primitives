@@ -116,6 +116,8 @@ describe("the embeds", () => {
             "date-picker",
             "dialog",
             "field",
+            "fieldset",
+            "form",
             "menu",
             "popover",
             "select",
@@ -139,6 +141,8 @@ describe("the embeds", () => {
                 "slider",
                 "select",
                 "combobox",
+                "fieldset",
+                "form",
                 "date-picker",
                 "calendar",
             ]);

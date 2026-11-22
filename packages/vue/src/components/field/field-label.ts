@@ -38,6 +38,16 @@ export const FieldLabel: PartComponent<FieldLabelProps, FieldState> =
                         field.labelId.value = undefined;
                     }
                 });
+                const onClick = (event: MouseEvent) => {
+                    const control = field.control.value;
+                    if (control === null || !control.labelFocuses) {
+                        return;
+                    }
+                    // no activation of the control: focus only
+                    event.preventDefault();
+                    const label = event.currentTarget as HTMLElement;
+                    label.ownerDocument.getElementById(control.id)?.focus();
+                };
                 return () => {
                     const state = field.state.value;
                     const control = field.control.value;
@@ -51,6 +61,7 @@ export const FieldLabel: PartComponent<FieldLabelProps, FieldState> =
                             for: control?.labelable ? control.id : undefined,
                             "data-primitives-part": "field-label",
                             ...stateAttributes(fieldStateAttributes(state)),
+                            onClick,
                         },
                     );
                 };

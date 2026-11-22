@@ -12,6 +12,8 @@ range in RTL writing modes and non-linear scales are out of scope.
 | part | element | `data-primitives-part` | notes |
 | --- | --- | --- | --- |
 | Root | `div` | `slider-root` | holds the state; a `group` |
+| Label | `div` | `slider-label` | names the Root and its Thumbs (`aria-labelledby`) |
+| Value | `output` | `slider-value` | shows the formatted value(s) |
 | Control | `div` | `slider-control` | the interactive area: a press here moves the nearest thumb, then drags it |
 | Track | `div` | `slider-track` | the rail |
 | Indicator | `div` | `slider-indicator` | the filled part: from `min` to the value, or between two thumbs |
@@ -31,10 +33,29 @@ range in RTL writing modes and non-linear scales are out of scope.
   Shift+Arrow).
 - `minStepsBetweenValues` (`0`): the smallest distance between two thumbs, in steps.
 - `orientation` (`"horizontal"`), `disabled`, `name`.
+- `format` (`Intl.NumberFormatOptions`): how the Value shows the values, and each Thumb's
+  `aria-valuetext` (Base UI). Without it, the Value shows the plain numbers (`String(value)`) and
+  the Thumbs have no `aria-valuetext` of their own.
+- `locale` (BCP 47): the locale of `format`. Without it, the runtime's default
+  (`Intl.NumberFormat(undefined, …)`: the browser's language). A page rendered on a server passes
+  `locale`, so the server's formatting is the browser's.
+
+**Label**: `id` (generated unless the consumer gives one). Its children are its text. It names the
+Root (`aria-labelledby`) and every Thumb that has no `aria-label` or `aria-labelledby` of its own.
+A press on it focuses the first Thumb (Base UI; a `div` has no native `for`). Inside a
+[Field](field.md) the `Field.Label` names the slider instead: use one or the other.
+
+**Value**: its default content is the formatted values (with `format`; else the numbers), joined
+with `" – "` (an en dash between spaces, Base UI's separator: punctuation, not copy) for several
+thumbs. Children: a function `(formattedValues, values)` returning its content (React; Vue: the
+default scoped slot `{ formattedValues, values }`; Angular: the directive's `formattedValues()`
+and `values()` signals through `exportAs`). `aria-live` (`"off"`, Base UI: it would announce every
+step of a drag).
 
 **Thumb**: `index` (its value's index; default: its order among the thumbs), `getAriaValueText(value,
-index)` (a string for `aria-valuetext`), `disabled`. Its accessible name comes from the consumer
-(`aria-label` or `aria-labelledby`).
+index)` (a string for `aria-valuetext`; it wins over `format`), `disabled`. Its accessible name
+comes from the consumer (`aria-label` or `aria-labelledby`), or the Label. Its `id` is generated
+unless the consumer gives one (the Value's `for` lists them).
 
 **Control**, **Track**, **Indicator**: no props.
 
@@ -48,10 +69,12 @@ Control away from the thumb), `drag` (pointer moves after a press).
 
 | part | attributes |
 | --- | --- |
-| Root | `role="group"`, `data-orientation`, `data-disabled`, `data-dragging` while a pointer drags |
+| Root | `role="group"`, `aria-labelledby` (the Label's `id`, while a Label is rendered), `data-orientation`, `data-disabled`, `data-dragging` while a pointer drags |
+| Label | `id`, `data-orientation`, `data-disabled` |
+| Value | `for` (the Thumbs' `id`s, in value order), `aria-live="off"`, `data-orientation`, `data-disabled` |
 | Control, Track | `data-orientation`, `data-disabled`, `data-dragging` |
 | Indicator | `data-orientation`; structural inline style: `inset-inline-start` and `inline-size` in % (horizontal), `inset-block-end` and `block-size` (vertical) |
-| Thumb | `role="slider"`, `tabindex="0"` (none when disabled), `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext` (from `getAriaValueText`), `aria-orientation`, `aria-disabled="true"` and `data-disabled` when disabled, `data-orientation`, `data-index`, `data-dragging` while dragged; structural inline style placing it (`inset-inline-start: <percent>%` with a `translate`, or `inset-block-end` when vertical) |
+| Thumb | `role="slider"`, `id`, `tabindex="0"` (none when disabled), `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext` (from `getAriaValueText`, else the formatted value with `format`), `aria-labelledby` (the Label's `id`, when it has no name of its own), `aria-orientation`, `aria-disabled="true"` and `data-disabled` when disabled, `data-orientation`, `data-index`, `data-dragging` while dragged; structural inline style placing it (`inset-inline-start: <percent>%` with a `translate`, or `inset-block-end` when vertical) |
 | hidden input | `type="hidden"`, `name`, `value` (one per thumb, in order) |
 
 With several thumbs, each thumb's `aria-valuemin` / `aria-valuemax` are the bounds it can reach
@@ -84,7 +107,7 @@ Every thumb is a tab stop, in value order. A press on the Control focuses the th
 ## RTL
 
 Horizontal sliders run right to left: `min` at the right, the arrows swap. Vertical sliders do not
-change.
+change. The direction is a [DirectionProvider](direction.md)'s, else the computed one.
 
 ## Server rendering
 
@@ -141,6 +164,28 @@ The slider of `/slider/basic` ("Volume", 50) in a document with `dir="rtl"`.
 
 Checks: ArrowRight → 49, ArrowLeft → 50; a press at 25% from the **left** edge → 75.
 
+### `/slider/label-value`
+
+Two sliders:
+
+- a Slider with a Label **"Volume"**, a Value, one Thumb with no name of its own; `min` `0`, `max`
+  `1`, `step` `0.01`, `defaultValue` `0.5`, `format` `{ style: "percent" }`, `locale` `"en-US"`;
+- a Slider with a Label **"Price"**, a Value, Thumbs **"Minimum price"** and **"Maximum price"**
+  (`aria-label`); `defaultValue` `[20, 80]`, `format`
+  `{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }`, `locale` `"de-DE"`.
+
+Checks:
+
+1. A `group` named "Volume" holding a `slider` named "Volume" (by the Label), `aria-valuenow`
+   `0.5`, `aria-valuetext` `"50%"`; the Value reads "50%".
+2. Focused, ArrowRight: `aria-valuenow` `0.51`, `aria-valuetext` `"51%"`, the Value "51%".
+3. A press on the Label "Volume" focuses its thumb.
+4. A `group` named "Price"; "Minimum price" has `aria-valuetext` `"20 €"`, "Maximum price"
+   `"80 €"` (the de-DE format: a no-break space before the sign); the Value reads
+   "20 € – 80 €".
+5. The Value is an `output` whose `for` lists both thumbs' `id`s, in order; `aria-live="off"`.
+6. Axe finds no violation.
+
 ### `/slider/controlled`
 
 A slider (`aria-label` **"Limited"**) whose value the fixture holds, starting at `70`, refusing
@@ -150,6 +195,12 @@ any value above `80` (spec/README.md, "A controlled value the consumer rejects")
 Checks: End reports `requested: 100` and the slider stays at 70; ArrowRight → 71.
 
 ## Differences from Base UI
+
+- **`aria-valuetext` of a range with `format`**: the formatted value alone. Base UI appends
+  `" start range"` / `" end range"`, English copy, which this library never renders (spec/README.md,
+  "No text"); the Thumbs' own names say which end they are.
+- **The default `locale`** is the runtime's (as Base UI); the calendars' document-`lang` rule is
+  not applied to a number format.
 
 Measured by the POC against Base UI 1.9 (`Slider`): no behaviour difference. Base UI's thumbs hold
 a native `<input type="range">`, which gives the `slider` role, the value and the bounds natively;

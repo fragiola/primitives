@@ -7,6 +7,7 @@ import {
 } from "@fragiola/primitives/range";
 import { defineComponent, onBeforeUnmount } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -29,6 +30,7 @@ export const SliderControl: PartComponent<
         inheritAttrs: false,
         props: asProp,
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(SliderKey, "Slider.Control");
             let endDrag: (() => void) | null = null;
             onBeforeUnmount(() => endDrag?.());
@@ -38,7 +40,7 @@ export const SliderControl: PartComponent<
                     element.getBoundingClientRect(),
                     { x, y },
                     context.orientation(),
-                    getDirection(element) === "rtl",
+                    getDirection(element, direction()) === "rtl",
                 );
                 return valueAtFraction(fraction, {
                     min: context.min(),

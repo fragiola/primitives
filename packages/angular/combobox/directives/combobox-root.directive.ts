@@ -182,6 +182,7 @@ export class ComboboxRoot {
         value: this.value,
         filled: computed(() => this.values().length > 0),
         input: () => this.hidden,
+        focusTarget: () => this.overlay.trigger(),
     });
     /** Its own `disabled`, or the field's. */
     readonly isDisabled = computed(
@@ -494,6 +495,7 @@ export class ComboboxRoot {
     /** A form reset: the default value, and its label in the input. */
     private reset(): void {
         const fallback = this.fallbackValue();
+        this.field.reset();
         this.selection.set(fallback, { reason: "none" });
         this.text.set(this.multiple() ? "" : this.label(fallback), {
             reason: "none",

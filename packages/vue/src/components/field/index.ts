@@ -1,11 +1,13 @@
 // The entry of @fragiola/primitives-vue/field: the layer that labels, describes and validates a
-// form control (spec/field.md; the POC's Field, ported as it is).
+// form control, with async validation and a Form's server errors (spec/field.md).
 
 export type {
     FieldErrorMatch,
     FieldState,
     FieldValidate,
+    FieldValidateResult,
     FieldValidationMode,
+    FieldValidity,
 } from "@fragiola/primitives/form";
 export type {
     ChangeDetails,

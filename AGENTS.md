@@ -64,7 +64,9 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
      that **only re-exports**; importing from the root tree-shakes to the same output.
    - No registry, plugin or provider that references every component: no Vue `app.use()` plugin,
      no Angular NgModule of every directive (standalone directives, one ng-packagr secondary entry
-     point per component); global providers (direction, locale) live in their own entries.
+     point per component); global providers (direction, locale) live in their own entries. The
+     entries that are no component (`scripts/components.ts` `UTILITIES`: `/direction`, `/render`)
+     hold no component's code, which the bundle guard checks.
    - A component imports only the toolkit mechanisms it uses; heavy optional parts (time zones,
      calendar systems, virtualization) stay out of the components that do not need them.
    - The **bundle guard** (`scripts/check-bundle.ts`, run by `pnpm build` and in CI) builds a

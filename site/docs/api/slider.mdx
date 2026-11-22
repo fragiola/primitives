@@ -6,7 +6,8 @@ description: A number, or a range of numbers, chosen by dragging a thumb, pressi
 Choose a number within bounds, or a range with several thumbs (WAI-ARIA APG
 [slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) and
 [multi-thumb slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/)). It works in a
-native `<form>`: each thumb submits its value.
+native `<form>`: each thumb submits its value. A Label names it and a Value shows the value,
+formatted with `Intl.NumberFormat` when you pass `format`.
 
 <Example id="slider" />
 
@@ -20,14 +21,30 @@ native `<form>`: each thumb submits its value.
   released (reason `drag`, `data-dragging` meanwhile). `touch-action: none` keeps a touch drag
   from scrolling.
 - **Commit**: `onValueCommit` once a drag ends, or after a key changed the value.
-- **RTL**: horizontal sliders run right to left (`min` at the right, the arrows swap).
-- **Forms**: one hidden input per thumb submits `name=value`, in order.
+- **Label**: names the Root and every Thumb that has no `aria-label` or `aria-labelledby` of its
+  own; a press on it focuses the first Thumb. Inside a [Field](/docs/api/field), the Field's
+  Label names the slider instead: use one or the other.
+- **Value**: an `output` whose `for` lists the Thumbs' ids. It shows the formatted values, joined
+  with `" – "` for several thumbs, or the content you give it. `aria-live="off"`: a drag would
+  announce every step.
+- **Format**: with `format` (`Intl.NumberFormatOptions`, in `locale`), the Value and each Thumb's
+  `aria-valuetext` use the formatted value; `getAriaValueText` wins over it. Without `format`, the
+  Value shows the plain numbers and the Thumbs have no `aria-valuetext` of their own. Without
+  `locale`, the runtime's default: a page rendered on a server passes `locale`, so the server
+  formats as the browser does.
+- **RTL**: horizontal sliders run right to left (`min` at the right, the arrows swap), in the
+  direction of a [DirectionProvider](/docs/api/direction), else the computed one.
+- **Forms**: one hidden input per thumb submits `name=value`, in order. Inside a
+  [Field](/docs/api/field), its `validate` receives the number (or numbers); it cannot block a
+  native submission (the inputs are `type="hidden"`), a [Form](/docs/api/form) does.
 
 ## Anatomy
 
 | part | element | `data-primitives-part` | role |
 | --- | --- | --- | --- |
 | Root | `div` | `slider-root` | the `group`; holds the state |
+| Label | `div` | `slider-label` | names the Root and its Thumbs |
+| Value | `output` | `slider-value` | shows the formatted value(s) |
 | Control | `div` | `slider-control` | the interactive area |
 | Track | `div` | `slider-track` | the rail |
 | Indicator | `div` | `slider-indicator` | the filled part: from `min` to the value, or between two thumbs |
@@ -41,13 +58,21 @@ native `<form>`: each thumb submits its value.
 ```tsx
 import { Slider } from "@fragiola/primitives-react/slider";
 
-<Slider.Root defaultValue={[20, 80]} minStepsBetweenValues={10} name="price">
+<Slider.Root
+    defaultValue={[20, 80]}
+    minStepsBetweenValues={10}
+    name="price"
+    format={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+    locale="de-DE"
+>
+    <Slider.Label>Price</Slider.Label>
+    <Slider.Value />
     <Slider.Control>
         <Slider.Track>
             <Slider.Indicator />
         </Slider.Track>
-        <Slider.Thumb aria-label="Minimum price" getAriaValueText={(value) => `$${value}`} />
-        <Slider.Thumb aria-label="Maximum price" getAriaValueText={(value) => `$${value}`} />
+        <Slider.Thumb aria-label="Minimum price" />
+        <Slider.Thumb aria-label="Maximum price" />
     </Slider.Control>
 </Slider.Root>;
 ```
@@ -58,10 +83,12 @@ import { Slider } from "@fragiola/primitives-react/slider";
 
 ```vue
 <template>
-    <Slider.Root v-model:value="volume">
+    <Slider.Root v-model:value="volume" :min="0" :max="1" :step="0.01" :format="{ style: 'percent' }" locale="en-US">
+        <Slider.Label>Volume</Slider.Label>
+        <Slider.Value v-slot="{ formattedValues }">{{ formattedValues[0] }}</Slider.Value>
         <Slider.Control>
             <Slider.Track><Slider.Indicator /></Slider.Track>
-            <Slider.Thumb aria-label="Volume" />
+            <Slider.Thumb />
         </Slider.Control>
     </Slider.Root>
 </template>
@@ -73,20 +100,27 @@ import { Slider } from "@fragiola/primitives-react/slider";
 
 ```ts
 @Component({
-    imports: [SliderRoot, SliderControl, SliderTrack, SliderIndicator, SliderThumb],
+    imports: [SliderRoot, SliderLabel, SliderValue, SliderControl, SliderTrack, SliderIndicator, SliderThumb],
     template: `
-        <div sliderRoot [(value)]="volume">
+        <div sliderRoot [(value)]="volume" [format]="percent" locale="en-US">
+            <div sliderLabel>Volume</div>
+            <output sliderValue></output>
             <div sliderControl>
                 <div sliderTrack><div sliderIndicator></div></div>
-                <div sliderThumb aria-label="Volume"></div>
+                <div sliderThumb></div>
             </div>
         </div>
     `,
 })
 export class Volume {
-    protected readonly volume = signal(50);
+    protected readonly percent: Intl.NumberFormatOptions = { style: "unit", unit: "percent" };
+    protected readonly volume = signal<SliderRootValue>(50);
 }
 ```
+
+The value's type is `SliderRootValue` (`number | readonly number[]`); it was named `SliderValue`
+before the Value part took that name. `<output sliderValue #value="sliderValue">` reads
+`value.formattedValues()` and `value.values()` for content of your own.
 
 </Framework>
 
@@ -112,7 +146,22 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | `minStepsBetweenValues` | `number` | `0` | the smallest distance between two thumbs, in steps |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the axis |
 | `disabled` | `boolean` | `false` | ignores the pointer and the keys |
-| `name` | `string` | | the form name of the hidden inputs |
+| `name` | `string` | | the form name of the hidden inputs (a Field's wins) |
+| `format` | `Intl.NumberFormatOptions` | | how the Value and each Thumb's `aria-valuetext` write the values |
+| `locale` | `string` | the runtime's | the locale of `format` (a BCP 47 tag) |
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the id the Root's and the Thumbs' `aria-labelledby` point at |
+
+### Value
+
+No props of its own. Its children replace the formatted values: a function
+`(formattedValues, values) => ReactNode` in React, the default scoped slot
+`{ formattedValues, values }` in Vue, the directive's `formattedValues()` and `values()` signals
+in Angular.
 
 ### Control
 
@@ -131,19 +180,23 @@ No props of its own.
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `index` | `number` | its order | the index of its value |
-| `getAriaValueText` | `(value: number, index: number) => string` | | the `aria-valuetext` |
+| `getAriaValueText` | `(value: number, index: number) => string` | | the `aria-valuetext`; it wins over `format` |
 | `disabled` | `boolean` | `false` | this thumb only |
+| `id` | `string` | generated | the thumb's id, in the Value's `for` |
 
-A thumb's accessible name comes from the consumer (`aria-label`, `aria-labelledby`).
+A thumb's accessible name comes from the consumer (`aria-label`, `aria-labelledby`), or the
+Label.
 
 ## State and part attributes
 
 | part | attributes |
 | --- | --- |
-| Root | `role="group"`, `data-orientation`, `data-disabled`, `data-dragging`; in a Field, the field's states |
+| Root | `role="group"`, `aria-labelledby` (the Label, while one is rendered), `data-orientation`, `data-disabled`, `data-dragging`; in a Field, the field's states |
+| Label | `id`, `data-orientation`, `data-disabled` |
+| Value | `for` (the Thumbs' ids, in value order), `aria-live="off"`, `data-orientation`, `data-disabled` |
 | Control, Track | `data-orientation`, `data-disabled`, `data-dragging` |
 | Indicator | `data-orientation`; structural inline style (`inset-inline-start` and `inline-size` in %, or the block ones) |
-| Thumb | `role="slider"`, `tabindex="0"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` (the bounds it can reach), `aria-valuetext`, `aria-orientation`, `aria-disabled`, `data-orientation`, `data-index`, `data-dragging`, `data-disabled`; structural inline style placing it |
+| Thumb | `role="slider"`, `id`, `tabindex="0"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` (the bounds it can reach), `aria-valuetext`, `aria-labelledby` (the Label, without a name of its own), `aria-orientation`, `aria-disabled`, `data-orientation`, `data-index`, `data-dragging`, `data-disabled`; structural inline style placing it |
 
 ## Keyboard
 
@@ -159,6 +212,6 @@ A thumb's accessible name comes from the consumer (`aria-label`, `aria-labelledb
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/slider` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `Slider`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState` |
-| `@fragiola/primitives-vue/slider` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `Slider`, `SliderRootEmits`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState` |
-| `@fragiola/primitives-angular/slider` | `ChangeDetails`, `ChangeReason`, `SliderControl`, `SliderIndicator`, `SliderRoot`, `SliderState`, `SliderThumb`, `SliderThumbState`, `SliderTrack`, `SliderValue`, `ValueChangeEvent` |
+| `@fragiola/primitives-react/slider` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `Slider`, `SliderLabelProps`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState`, `SliderValueProps` |
+| `@fragiola/primitives-vue/slider` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `Slider`, `SliderLabelProps`, `SliderRootEmits`, `SliderRootProps`, `SliderState`, `SliderThumbProps`, `SliderThumbState`, `SliderValueSlotProps`, `SliderValueSlots` |
+| `@fragiola/primitives-angular/slider` | `ChangeDetails`, `ChangeReason`, `SliderControl`, `SliderIndicator`, `SliderLabel`, `SliderRoot`, `SliderRootValue`, `SliderState`, `SliderThumb`, `SliderThumbState`, `SliderTrack`, `SliderValue`, `ValueChangeEvent` |

@@ -10,7 +10,12 @@ if (root === null) {
 }
 const { pathname, search } = window.location;
 const query = readQuery(search);
-document.documentElement.dir = query.dir;
+// a document with no `?dir=` has no `dir` (the direction provider's scenario reads none)
+if (query.dir === "rtl") {
+    document.documentElement.dir = "rtl";
+} else {
+    document.documentElement.removeAttribute("dir");
+}
 if (query.lang === undefined) {
     document.documentElement.removeAttribute("lang");
 } else {

@@ -1,7 +1,8 @@
 import { chipKeyTarget } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
-import { type KeyboardEvent, useRef } from "react";
+import { type KeyboardEvent, useContext, useRef } from "react";
 import { flushSync } from "react-dom";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -14,6 +15,7 @@ import {
 /** One value of a `multiple` combobox; the arrows move between chips (spec/combobox.md). */
 export function ComboboxChip(props: PartProps<{ disabled: boolean }>) {
     const context = useRequiredContext(ComboboxContext, "Combobox.Chip");
+    const direction = useContext(DirectionContext);
     const element = useRef<HTMLElement | null>(null);
     const { disabled } = context;
 
@@ -27,7 +29,7 @@ export function ComboboxChip(props: PartProps<{ disabled: boolean }>) {
             event.key,
             index,
             chips.length,
-            getDirection(event.currentTarget) === "rtl",
+            getDirection(event.currentTarget, direction) === "rtl",
         );
         if (action === null) {
             return;

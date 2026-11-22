@@ -4,6 +4,7 @@ import { interceptEscape } from "@fragiola/primitives/layers";
 import { computed, defineComponent, provide, shallowRef, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
+import { useProvidedDirection } from "../../direction/direction-context.ts";
 import {
     type PartComponent,
     publicComponent,
@@ -26,6 +27,7 @@ export const CalendarGrid: PartComponent<
         inheritAttrs: false,
         props: { ...asProp, offset: { type: Number, default: 0 } },
         setup(props, { attrs, slots }) {
+            const direction = useProvidedDirection();
             const context = useRequiredContext(CalendarKey, "Calendar.Grid");
             const month = computed(() =>
                 addMonths(context.visibleStart.value, props.offset),
@@ -75,8 +77,10 @@ export const CalendarGrid: PartComponent<
                     context.focusedDate.value,
                     {
                         rtl:
-                            getDirection(event.currentTarget as Element) ===
-                            "rtl",
+                            getDirection(
+                                event.currentTarget as Element,
+                                direction(),
+                            ) === "rtl",
                         firstDayOfWeek: context.firstDay(),
                         shiftKey: event.shiftKey,
                     },

@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
-import { expectSubmitted } from "../../src/form.ts";
+import { expectSubmitted, resetForm } from "../../src/form.ts";
 import { expectOutput } from "../../src/output.ts";
 import { openScenario } from "../../src/scenario.ts";
 
@@ -598,6 +598,15 @@ test.describe("combobox / field", () => {
         await expect(combobox(page)).not.toHaveAttribute("aria-invalid");
         await submit(page).click();
         await expectSubmitted(page, "fruit=banana");
+    });
+
+    test("a form reset empties the input and the value", async ({ page }) => {
+        await choose(page, "ban", "Banana");
+        await expect(combobox(page)).toHaveValue("Banana");
+        await resetForm(page);
+        await expect(combobox(page)).toHaveValue("");
+        await submit(page).click();
+        await expectSubmitted(page, "none");
     });
 
     test("has no axe violation", async ({ page }) => {

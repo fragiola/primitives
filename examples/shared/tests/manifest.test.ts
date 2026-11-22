@@ -29,7 +29,9 @@ import {
 
 /** The recipes an example imports besides its own component's (the picker's calendar). */
 const MORE_RECIPES: Record<string, readonly string[]> = {
-    "date-picker": ["_recipes/calendar.ts"],
+    "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
+    fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
+    form: ["_recipes/field.ts"],
 };
 
 describe("the manifest", () => {
@@ -48,6 +50,8 @@ describe("the manifest", () => {
                 "slider",
                 "select",
                 "combobox",
+                "fieldset",
+                "form",
                 "date-picker",
                 "calendar",
             ]);

@@ -91,6 +91,16 @@
             "types": "./dist/types/fragiola-primitives-angular-field.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-field.mjs"
         },
+        "./fieldset": {
+            "@fragiola/source": "./fieldset/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-fieldset.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-fieldset.mjs"
+        },
+        "./form": {
+            "@fragiola/source": "./form/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-form.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-form.mjs"
+        },
         "./menu": {
             "@fragiola/source": "./menu/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-menu.d.ts",
@@ -125,6 +135,16 @@
             "@fragiola/source": "./tooltip/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tooltip.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tooltip.mjs"
+        },
+        "./direction": {
+            "@fragiola/source": "./direction/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-direction.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-direction.mjs"
+        },
+        "./render": {
+            "@fragiola/source": "./render/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-render.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-render.mjs"
         },
         "./package.json": "./package.json"
     },

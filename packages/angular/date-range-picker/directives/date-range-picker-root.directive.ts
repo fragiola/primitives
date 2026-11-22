@@ -51,6 +51,10 @@ export class DateRangePickerRoot extends DatePickerRootBase {
             },
             defaultValue: this.defaultValue,
             options: this.options,
+            name: this.name,
+            required: this.required,
+            disabled: this.disabled,
+            readOnly: this.readOnly,
         },
         (event) => this.openChangeDetails.emit(event),
         (value, details) =>

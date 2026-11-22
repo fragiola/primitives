@@ -23,3 +23,11 @@ test("slider / vertical", async ({ page }) => {
     ).toBeVisible();
     await expectScreen(page, "slider-vertical");
 });
+
+test("slider / label-value", async ({ page }) => {
+    await openScenario(page, "/slider/label-value");
+    await expect(
+        page.locator('[data-primitives-part="slider-value"]').first(),
+    ).toHaveText("50%");
+    await expectScreen(page, "slider-label-value");
+});

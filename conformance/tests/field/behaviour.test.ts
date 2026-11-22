@@ -1,7 +1,10 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
-import { expectSubmitted } from "../../src/form.ts";
+import { fullDate } from "../../src/dates.ts";
+import { expectSubmitted, resetForm } from "../../src/form.ts";
+import { expectOutput } from "../../src/output.ts";
 import { openScenario } from "../../src/scenario.ts";
+import { sliderState } from "../../src/slider.ts";
 
 // spec/field.md
 const textbox = (page: Page, name: string) =>
@@ -243,12 +246,230 @@ test.describe("field / controls", () => {
         await expectSubmitted(page, "terms=on&fruit=banana&volume=50");
     });
 
+    test("a form reset returns every control to its default", async ({
+        page,
+    }) => {
+        await terms(page).click();
+        await fruit(page).click();
+        await page.getByRole("option", { name: "Banana", exact: true }).click();
+        const slider = page.getByRole("slider", {
+            name: "Volume",
+            exact: true,
+        });
+        await slider.focus();
+        await page.keyboard.press("End");
+        await expect(slider).toHaveAttribute("aria-valuenow", "100");
+        await resetForm(page);
+        await expect(terms(page)).toHaveAttribute("aria-checked", "false");
+        await expect(fruit(page)).toHaveText("Choose a fruit");
+        await expect.poll(async () => (await sliderState(slider)).now).toBe(50);
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+    });
+
     test("has no axe violation, before and after a failed submission", async ({
         page,
     }) => {
         await expectNoAxeViolations(page);
         await submit(page).click();
         await shown(page, "Choose a fruit.");
+        await expectNoAxeViolations(page);
+    });
+});
+
+test.describe("field / async", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/field/async");
+    });
+
+    test("an async validate shows its answer once it resolves", async ({
+        page,
+    }) => {
+        const username = textbox(page, "Username");
+        await username.fill("ada");
+        await hidden(page, "This username is taken.");
+        await expectOutput(page, "resolved", "ada");
+        await shown(page, "This username is taken.");
+        await expect(username).toHaveAttribute("aria-invalid", "true");
+        await expect(username).toHaveAccessibleDescription(
+            "This username is taken.",
+        );
+    });
+
+    test("latest wins: an older answer that resolves last is dropped", async ({
+        page,
+    }) => {
+        const username = textbox(page, "Username");
+        await username.fill("ada");
+        await username.fill("adb");
+        await expectOutput(page, "resolved", "adb");
+        // the slow answer for `ada` resolves after the one for `adb`
+        await expectOutput(page, "resolved", "ada");
+        await hidden(page, "This username is taken.");
+        await expect(username).not.toHaveAttribute("aria-invalid");
+    });
+
+    test("a resolved answer blocks a submission of the same value", async ({
+        page,
+    }) => {
+        const username = textbox(page, "Username");
+        await username.fill("ada");
+        await shown(page, "This username is taken.");
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+        await expect(username).toBeFocused();
+        await shown(page, "This username is taken.");
+        await username.fill("grace");
+        await expectOutput(page, "resolved", "grace");
+        await hidden(page, "This username is taken.");
+        await submit(page).click();
+        await expectSubmitted(page, "username=grace");
+    });
+
+    test("has no axe violation with the error shown", async ({ page }) => {
+        await textbox(page, "Username").fill("ada");
+        await shown(page, "This username is taken.");
+        await expectNoAxeViolations(page);
+    });
+});
+
+test.describe("field / match", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/field/match");
+    });
+
+    const range = "Enter an age from 18 to 120.";
+
+    test("a key and a function each match their own error", async ({
+        page,
+    }) => {
+        const age = page.getByRole("spinbutton", { name: "Age", exact: true });
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+        await shown(page, "Enter your age.");
+        await hidden(page, range);
+        await age.fill("12");
+        await shown(page, range);
+        await hidden(page, "Enter your age.");
+        await age.fill("130");
+        await shown(page, range);
+        await age.fill("30");
+        await hidden(page, range);
+        await hidden(page, "Enter your age.");
+        await expect(age).not.toHaveAttribute("aria-invalid");
+        await submit(page).click();
+        await expectSubmitted(page, "age=30");
+    });
+
+    test("has no axe violation with an error shown", async ({ page }) => {
+        await page.getByRole("spinbutton", { name: "Age" }).fill("12");
+        await submit(page).click();
+        await shown(page, range);
+        await expectNoAxeViolations(page);
+    });
+});
+
+test.describe("field / more-controls", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/field/more-controls", { today: true });
+    });
+
+    const toppings = (page: Page) =>
+        page.getByRole("group", { name: "Toppings", exact: true });
+    // named by the field's label, then by its own content (the value): "Arrival none"
+    const arrival = (page: Page) =>
+        page.getByRole("button", { name: /^Arrival / });
+    const stay = (page: Page) => page.getByRole("button", { name: /^Stay / });
+    const day = (page: Page, value: number) =>
+        page.getByRole("gridcell", {
+            name: fullDate("en-US", 2026, 11, value),
+            exact: true,
+        });
+
+    test("the group and the pickers are labelled and described by their fields", async ({
+        page,
+    }) => {
+        await expect(toppings(page)).toHaveAccessibleDescription(
+            "Pick at least one.",
+        );
+        await expect(arrival(page)).toHaveAccessibleDescription(
+            "The day you arrive.",
+        );
+        await expect(stay(page)).toHaveAccessibleDescription(
+            "From check-in to check-out.",
+        );
+        await page.getByText("Arrival", { exact: true }).click();
+        await expect(arrival(page)).toBeFocused();
+    });
+
+    test("a failed submission marks every field and focuses the first", async ({
+        page,
+    }) => {
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+        await expect(
+            page.getByRole("checkbox", { name: "Cheese", exact: true }),
+        ).toBeFocused();
+        await expect(toppings(page)).toHaveAttribute("aria-invalid", "true");
+        await expect(arrival(page)).toHaveAttribute("aria-invalid", "true");
+        await expect(stay(page)).toHaveAttribute("aria-invalid", "true");
+        await shown(page, "Choose a topping.");
+        await shown(page, "Choose a date.");
+        await shown(page, "Choose your dates.");
+        await expect(toppings(page)).toHaveAccessibleDescription(
+            "Pick at least one. Choose a topping.",
+        );
+    });
+
+    test("each choice clears its error; the Form submits every value", async ({
+        page,
+    }) => {
+        await submit(page).click();
+        await shown(page, "Choose a topping.");
+        await page.getByRole("checkbox", { name: "Ham", exact: true }).click();
+        await hidden(page, "Choose a topping.");
+        await expect(toppings(page)).not.toHaveAttribute("aria-invalid");
+        await arrival(page).click();
+        await day(page, 24).click();
+        await expect(arrival(page)).toHaveText("2026-11-24");
+        await expect(arrival(page)).toHaveAccessibleName("Arrival 2026-11-24");
+        await hidden(page, "Choose a date.");
+        await expect(arrival(page)).not.toHaveAttribute("aria-invalid");
+        await stay(page).click();
+        await day(page, 25).click();
+        await day(page, 27).click();
+        await expect(stay(page)).toHaveText("2026-11-25..2026-11-27");
+        await hidden(page, "Choose your dates.");
+        await submit(page).click();
+        await expectSubmitted(
+            page,
+            "toppings=ham&arrival=2026-11-24&stay=2026-11-25/2026-11-27",
+        );
+    });
+
+    test("a form reset returns every control to its default", async ({
+        page,
+    }) => {
+        await page.getByRole("checkbox", { name: "Ham", exact: true }).click();
+        await arrival(page).click();
+        await day(page, 24).click();
+        await expect(arrival(page)).toHaveText("2026-11-24");
+        await resetForm(page);
+        await expect(
+            page.getByRole("checkbox", { name: "Ham", exact: true }),
+        ).toHaveAttribute("aria-checked", "false");
+        await expect(arrival(page)).toHaveText("none");
+        await expect(stay(page)).toHaveText("none");
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+    });
+
+    test("has no axe violation, before and after a failed submission", async ({
+        page,
+    }) => {
+        await expectNoAxeViolations(page);
+        await submit(page).click();
+        await shown(page, "Choose a topping.");
         await expectNoAxeViolations(page);
     });
 });

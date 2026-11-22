@@ -223,6 +223,7 @@ export const ComboboxRoot: PublicComponent<
                 value: () => value.value,
                 filled: () => values.value.length > 0,
                 input: () => hidden.value,
+                focusTarget: () => root.trigger.value,
             });
             const disabled = () => props.disabled || field.disabled();
             const highlighted = ref<string | null>(null);
@@ -358,6 +359,7 @@ export const ComboboxRoot: PublicComponent<
                         bridgeForm(element, {
                             reset: () => {
                                 const initial = defaultValue();
+                                field.reset();
                                 valueState.set(initial, { reason: "none" });
                                 inputState.set(
                                     props.multiple ? "" : label(initial),

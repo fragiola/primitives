@@ -11,7 +11,11 @@ import {
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
-import { injectFlush, injectHost } from "@fragiola/primitives-angular/internal";
+import {
+    injectFlush,
+    injectHost,
+    injectProvidedDirection,
+} from "@fragiola/primitives-angular/internal";
 import { CALENDAR } from "../utils/calendar-state.ts";
 
 /**
@@ -34,6 +38,8 @@ import { CALENDAR } from "../utils/calendar-state.ts";
     },
 })
 export class CalendarGrid {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     protected readonly calendar = inject(CALENDAR);
     /** Which visible month it shows (default 0). */
     readonly offset = input(0, { transform: numberAttribute });
@@ -85,7 +91,11 @@ export class CalendarGrid {
             return;
         }
         const target = calendarKeyTarget(event.key, calendar.focusedDate(), {
-            rtl: getDirection(event.currentTarget as HTMLElement) === "rtl",
+            rtl:
+                getDirection(
+                    event.currentTarget as HTMLElement,
+                    this.direction(),
+                ) === "rtl",
             firstDayOfWeek: calendar.firstDay(),
             shiftKey: event.shiftKey,
         });

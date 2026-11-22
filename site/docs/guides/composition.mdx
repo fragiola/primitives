@@ -1,0 +1,187 @@
+---
+title: Composition
+description: Put a part on your own element or component with render, merge your props and handlers into it, and write parts of your own with the render utilities.
+---
+
+A part renders a default element, and you can make it yours: another tag, your own component, or
+your own markup with the part's props spread on it. The props merge the same way everywhere: your
+handlers run after the part's, classes join, and the part keeps its ARIA and `data-*` attributes.
+The same machinery is public in each framework's `/render` entry, for parts of your own. What
+stays yours: the elements, the components you compose with, and their look.
+
+## Another element: render
+
+<Framework name="react">
+
+`render` takes an element, into which the part's props merge, or a function of the props and the
+state.
+
+```tsx
+import { Menu } from "@fragiola/primitives-react/menu";
+import { Link } from "./router.tsx";
+
+<Menu.Item render={<Link to="/profile" />}>Profile</Menu.Item>;
+
+<Tabs.Tab
+    value="account"
+    render={(props, state) => (
+        <button {...props} aria-describedby={state.selected ? "account-hint" : undefined} />
+    )}
+>
+    Account
+</Tabs.Tab>;
+```
+
+Your element's own props win over the part's, but the handlers compose: the part's run first,
+then yours. `className` and `style` may be functions of the state:
+`className={(state) => (state.open ? "open" : undefined)}`.
+
+</Framework>
+
+<Framework name="vue">
+
+`as` changes the element, or renders your component; the `render` scoped slot gives you the
+part's `props` and `state` to bind on your own element, and its `children`.
+
+```vue
+<template>
+    <Menu.Item :as="RouterLink" to="/profile">Profile</Menu.Item>
+
+    <Tabs.Tab value="account">
+        <template #render="{ props, state, children }">
+            <button v-bind="props" :aria-describedby="state.selected ? 'account-hint' : undefined">
+                <component :is="children" />
+            </button>
+        </template>
+    </Tabs.Tab>
+</template>
+```
+
+The attributes you set merge with the part's through Vue's own `mergeProps`: `class` and `style`
+join, listeners run the part's first.
+
+</Framework>
+
+<Framework name="angular">
+
+The directive goes on your own element: it is the part, so there is nothing to replace.
+
+```html
+<a menuItem routerLink="/profile">Profile</a>
+
+<button tabsTab value="account" #tab="tabsTab" [attr.aria-describedby]="tab.state().selected ? 'account-hint' : null">
+    Account
+</button>
+```
+
+A part's `state()` is read through its `exportAs` name. Your own bindings and listeners stay on
+the element beside the part's host bindings; the part's handlers run first.
+
+</Framework>
+
+A part's element can change, but not its contract: a Trigger you render as an `<a>` still needs
+to be something a keyboard can reach and press. Keep the role the part expects (a `button` for a
+trigger, an `input` for a combobox's Input) unless its page says otherwise.
+
+## Parts of your own: the render utilities
+
+For a part of your own that should behave as the library's (the same `render`, the same merge,
+the same `data-*` attributes), each framework's `/render` entry exports the pieces the library
+uses ([Render utilities](/docs/api/render)).
+
+<Framework name="react">
+
+`useRender` renders your part's default element, or the consumer's `render`, with the props
+merged in and the state as `data-*` attributes; `mergeProps` merges props as every part does.
+
+```tsx
+import { type RenderProp, type UseRenderProps, mergeProps, useRender } from "@fragiola/primitives-react/render";
+
+interface ToolbarButtonState {
+    pressed: boolean;
+}
+
+interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    pressed?: boolean;
+    render?: RenderProp<ToolbarButtonState>;
+}
+
+export function ToolbarButton({ pressed = false, render, ...props }: ToolbarButtonProps) {
+    const own: UseRenderProps<ToolbarButtonState> = {
+        type: "button",
+        "aria-pressed": pressed,
+        "data-primitives-part": "toolbar-button",
+    };
+    return useRender({
+        render,
+        state: { pressed },
+        defaultTagName: "button",
+        props: mergeProps(own, props),
+    });
+}
+
+// <button type="button" aria-pressed="true" data-primitives-part="toolbar-button" data-pressed>
+<ToolbarButton pressed>Bold</ToolbarButton>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+`renderPart` renders your part from a `setup` render function: on its tag, on `as`, or through
+the `render` slot; `asProp` is the `as` prop; `stateAttributes` gives the `data-*` attributes.
+
+```ts
+import { asProp, renderPart, stateAttributes } from "@fragiola/primitives-vue/render";
+import { defineComponent } from "vue";
+
+export const ToolbarButton = defineComponent({
+    name: "ToolbarButton",
+    inheritAttrs: false,
+    props: { ...asProp, pressed: { type: Boolean, default: false } },
+    setup(props, { attrs, slots }) {
+        return () => {
+            const state = { pressed: props.pressed };
+            return renderPart("button", { attrs, slots }, props.as, state, {
+                type: "button",
+                "aria-pressed": props.pressed,
+                "data-primitives-part": "toolbar-button",
+                ...stateAttributes(state),
+            });
+        };
+    },
+});
+```
+
+</Framework>
+
+<Framework name="angular">
+
+A directive of yours sits on the consumer's element as the library's do; `dataValues` gives the
+`data-*` host binding values (`""`, a string, or `null` to remove the attribute).
+
+```ts
+import { computed, Directive, input } from "@angular/core";
+import { dataValues } from "@fragiola/primitives-angular/render";
+
+@Directive({
+    selector: "[toolbarButton]",
+    exportAs: "toolbarButton",
+    host: {
+        type: "button",
+        "data-primitives-part": "toolbar-button",
+        "[attr.aria-pressed]": "pressed()",
+        "[attr.data-pressed]": "data().pressed",
+    },
+})
+export class ToolbarButton {
+    readonly pressed = input(false);
+    readonly state = computed(() => ({ pressed: this.pressed() }));
+    protected readonly data = computed(() => dataValues(this.state()));
+}
+```
+
+</Framework>
+
+Name your part's attribute after your own component (`data-primitives-part="toolbar-button"` is
+an example): the library's selectors and recipes only read its own parts' names.

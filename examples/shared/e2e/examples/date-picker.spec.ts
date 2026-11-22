@@ -9,7 +9,10 @@ import {
 } from "../helpers.ts";
 
 // date-picker: a booking form (spec/calendar.md). Today is fixed at Friday 2026-11-20, as in the
-// conformance suite. The picker's popup is non-modal: never promoted.
+// conformance suite. The picker's popup is non-modal: never promoted. The picker sits in a Field
+// `name="check-in"` (Label "Check-in", Description "We hold the room until noon.", Error
+// "Choose a check-in date."), `required`: it submits the day itself (no hidden input of the
+// example's own), and "Book" with no day shows the error and focuses the trigger.
 
 const TODAY = new Date(2026, 10, 20, 10, 0, 0);
 const fullDate = (month: number, day: number) =>
@@ -28,12 +31,15 @@ test("the trigger opens a calendar on today; choosing a day closes it and fills 
 }) => {
     const errors = collectErrors(page);
     const frame = await openHosted(page, { id: "date-picker" });
-    const trigger = frame.getByRole("button", { name: /^Check-in:/ });
+    const trigger = frame.getByRole("button", { name: "Check-in" });
     await expect(trigger).toHaveAttribute(
         "data-primitives-part",
         "date-picker-trigger",
     );
-    await expect(trigger).toHaveText("Check-in: choose a date");
+    await expect(trigger).toHaveText("Choose a date");
+    await expect(trigger).toHaveAccessibleDescription(
+        "We hold the room until noon.",
+    );
     await trigger.click();
     const dialog = frame.getByRole("dialog", { name: "Check-in date" });
     await expect(dialog).toBeVisible();
@@ -54,24 +60,40 @@ test("the trigger opens a calendar on today; choosing a day closes it and fills 
     await page.keyboard.press("Enter");
     await expect(dialog).toHaveCount(0);
     await expect(trigger).toBeFocused();
-    await expect(trigger).toHaveText("Check-in: Nov 24, 2026");
+    await expect(trigger).toHaveText("Nov 24, 2026");
     await frame.getByRole("button", { name: "Book" }).click();
     await expect(frame.getByRole("status")).toHaveText("Booked: 2026-11-24");
     expect(errors).toEqual([]);
+});
+
+test("booking with no day shows the error and focuses the trigger", async ({
+    page,
+}) => {
+    const frame = await openHosted(page, { id: "date-picker" });
+    const trigger = frame.getByRole("button", { name: "Check-in" });
+    await frame.getByRole("button", { name: "Book" }).click();
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-invalid", "true");
+    await expect(frame.getByText("Choose a check-in date.")).toBeVisible();
+    await expect(frame.getByRole("status")).toHaveText("");
+    await trigger.click();
+    await cell(frame, 11, 24).click();
+    await expect(frame.getByText("Choose a check-in date.")).toHaveCount(0);
+    await expect(trigger).not.toHaveAttribute("aria-invalid");
 });
 
 test("Escape closes, and reopening focuses the chosen day", async ({
     page,
 }) => {
     const frame = await openHosted(page, { id: "date-picker" });
-    const trigger = frame.getByRole("button", { name: /^Check-in:/ });
+    const trigger = frame.getByRole("button", { name: "Check-in" });
     await trigger.click();
     await frame.getByRole("button", { name: "Next month" }).click();
     await expect(
         frame.getByRole("grid", { name: "December 2026" }),
     ).toBeVisible();
     await cell(frame, 12, 3).click();
-    await expect(trigger).toHaveText("Check-in: Dec 3, 2026");
+    await expect(trigger).toHaveText("Dec 3, 2026");
     await trigger.click();
     await expect(cell(frame, 12, 3)).toBeFocused();
     await expect(cell(frame, 12, 3)).toHaveAttribute("aria-selected", "true");
@@ -83,7 +105,7 @@ test("Escape closes, and reopening focuses the chosen day", async ({
 test("axe finds no violation with the calendar open", async ({ page }) => {
     requireExamples("date-picker");
     await page.goto(`${EMBED_BASE}?id=date-picker`);
-    await page.getByRole("button", { name: /^Check-in:/ }).click();
+    await page.getByRole("button", { name: "Check-in" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     expect(await axeViolations(page)).toEqual([]);
 });

@@ -3,6 +3,7 @@ import { tabsKeyTarget } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import {
     dataValues,
+    injectProvidedDirection,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import { TabsRoot } from "./tabs-root.directive.ts";
@@ -20,6 +21,8 @@ import { TabsRoot } from "./tabs-root.directive.ts";
     },
 })
 export class TabsList {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     protected readonly root = inject(TabsRoot);
     readonly state = computed(() => ({ orientation: this.root.orientation() }));
     protected readonly data = computed(() => dataValues(this.state()));
@@ -46,7 +49,7 @@ export class TabsList {
         }
         const index = tabsKeyTarget(event.key, current, tabs.length, {
             orientation: root.orientation(),
-            rtl: getDirection(this.list) === "rtl",
+            rtl: getDirection(this.list, this.direction()) === "rtl",
             loop: root.loopFocus(),
         });
         if (index === null) {

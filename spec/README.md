@@ -13,14 +13,23 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [popover.md](popover.md) | Popover |
 | [tooltip.md](tooltip.md) | Tooltip |
 | [menu.md](menu.md) | Menu (with submenus) |
-| [field.md](field.md) | Field (the POC's, ported as it is; production scope in stage 1) |
+| [field.md](field.md) | Field |
+| [fieldset.md](fieldset.md) | Fieldset |
+| [form.md](form.md) | Form |
 | [checkbox.md](checkbox.md) | Checkbox and CheckboxGroup |
 | [slider.md](slider.md) | Slider |
 | [select.md](select.md) | Select |
 | [combobox.md](combobox.md) | Combobox (D10) |
 | [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
+| [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
+
+The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
+have no spec of their own: they are the primitive contract's `render`, made public
+([below](#render-utilities)).
 
 Every spec of the POC is here: stage 0 (`docs/handoff.md` §5) is ported, with §3's changes applied.
+Stage 1 adds the Field layer (Epic #26: Field to production, Fieldset, Form, every form control in
+a Field, Slider's Label and Value, the pickers' form support) and the direction provider.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -157,7 +166,7 @@ Checkbox, Slider and Select.
 
 ### Forms
 
-The form controls (Select, Checkbox, Slider, Combobox) take `name` and render a **hidden input** that
+The form controls (Select, Checkbox, Slider, Combobox, DatePicker, DateRangePicker) take `name` and render a **hidden input** that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
@@ -166,7 +175,8 @@ only. Each hidden input carries the component's part attribute with the value `i
 `hidden-input`, since its `input` is the visible Input).
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
-`Field.Control` (a native input), a Checkbox, a Select, a Slider or a Combobox gives the control:
+`Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Select, a Slider, a Combobox, a
+DatePicker or a DateRangePicker gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
@@ -178,6 +188,8 @@ only. Each hidden input carries the component's part attribute with the value `i
 
 Each control follows the spec's integration contract: it takes the field's ids, `name` and
 `disabled`, and reports its focus and its changes. Outside a field, it behaves as before.
+[Fieldset](fieldset.md) groups fields under a legend and disables them; [Form](form.md) validates
+every field on submission, focuses the first invalid one, and shows server errors.
 
 ## API mapping by framework
 
@@ -196,12 +208,38 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | children function (collections, calendar weeks, a combobox's List and Value) | `children={(item) => ...}` | default scoped slot (`v-slot="{ week }"`) | `@for` over the directive's signal, read through `exportAs` (`@for (week of body.weeks(); ...)`, `{{ cell.dayNumber() }}`); a part rendered only in some states is structural (`*tabsPanel="'account'"`) |
 | field context (a control inside `Field.Root`) | `useContext` of the field's context | `inject` of the field's provided state | `injectField()` (optional injection of the enclosing `[fieldRoot]`) |
 | field validation (`validate`, `validationMode`) | `validate={(value) => ...}` `validationMode="onBlur"` | `:validate="(value) => ..."` `validation-mode="onBlur"` | `[validate]="fn"` `validationMode="onBlur"` (inputs of `[fieldRoot]`) |
+| server errors (Form) | `errors={...}` `onClearErrors={(errors) => ...}` | `:errors="..."` `@clear-errors="(errors) => ..."` | `[errors]="..."` `(clearErrors)="..."` on `form[formRoot]` |
+| a submission the Form lets through | `onSubmit` | `@submit` | `(submit)` (a blocked submission stops the event in its capture phase, before any listener of the consumer) |
+| direction | `<DirectionProvider direction="rtl">`, `useDirection()` | `<DirectionProvider direction="rtl">`, `useDirection()` (a computed ref) | `[directionProvider]="'rtl'"` or `provideDirection('rtl')`, `injectDirection()` (a signal) |
+| render utilities | `useRender({ render, props, state, ref })`, `mergeProps(a, b, ...)` (`/render`) | `renderPart(tag, context, as, state, props)`, `asProp` (`/render`; Vue's own `mergeProps` merges attributes) | `dataValue`, `dataValues` (`/render`: the directive sits on the consumer's own element, Angular's `render`) |
 | part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()`, `injectCombobox()` → `{ state, ... }` of the enclosing root; `injectField()` → the enclosing `[fieldRoot]` or `null` (the parts are the directives themselves) |
 | a menu item's activation | `onClick` on `Menu.Item` | `@click` on `Menu.Item` | `(click)` on the `[menuItem]` element |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
 and `splitter/packages/*`.
+
+## Render utilities
+
+The primitive contract's `render` is public in every framework, in its own entry (`/render`,
+D8), for an app that writes its own parts with the same contract (Base UI's `useRender` and
+`mergeProps`):
+
+- **React**: `useRender({ render, props, state, ref, defaultTagName })` renders `defaultTagName`
+  (`"div"`), or the consumer's `render` (an element its props merge into, or a function of the
+  props and the state), with `props` merged in and the state's `data-*` attributes (a boolean
+  `true` gives an empty attribute, `false` none; a string a value: the rule of "State
+  attributes"); `className` and `style` may be functions of the state. `mergeProps(...props)`
+  merges props left to right as every part does: event handlers compose (the earlier first),
+  `className` joins, `style` merges (the later wins), any other later prop wins (`undefined`
+  leaves the earlier).
+- **Vue**: `renderPart(tag, { attrs, slots }, as, state, props, children?)` renders a part from a
+  component's `setup` render function: the props merged with the attributes (Vue's own
+  `mergeProps`), on `tag`, on `as`, or through the `render` scoped slot; `asProp` is the `as` prop
+  definition; `stateAttributes(state)` gives the `data-*` attributes.
+- **Angular**: a directive sits on the consumer's element, so there is nothing to render:
+  `dataValue(value)` and `dataValues(state)` give the `data-*` host binding values (`""`, a string,
+  or `null` to remove).
 
 ## Server rendering
 

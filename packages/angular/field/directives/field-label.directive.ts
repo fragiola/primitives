@@ -7,7 +7,8 @@ import { FieldRoot } from "./field-root.directive.ts";
 
 /**
  * Names the field's control: `for` a labelable control, `aria-labelledby` on any (spec/field.md):
- * `<label fieldLabel>Email</label>`.
+ * `<label fieldLabel>Email</label>`. A press on it focuses a picker's Trigger (its click would open
+ * the popup).
  */
 @Directive({
     selector: "[fieldLabel]",
@@ -23,6 +24,7 @@ import { FieldRoot } from "./field-root.directive.ts";
         "[attr.data-filled]": "field.data().filled",
         "[attr.data-focused]": "field.data().focused",
         "[attr.data-disabled]": "field.data().disabled",
+        "(click)": "onClick($event)",
     },
 })
 export class FieldLabel {
@@ -42,4 +44,16 @@ export class FieldLabel {
         return control?.labelable ? control.id : null;
     });
     readonly state = this.field.state;
+
+    /** A control that a click would open (a picker's Trigger) is focused instead. */
+    protected onClick(event: MouseEvent): void {
+        const control = this.field.control();
+        if (control === null || !control.labelable || !control.focusOnLabel) {
+            return;
+        }
+        event.preventDefault();
+        (event.currentTarget as HTMLElement).ownerDocument
+            .getElementById(control.id)
+            ?.focus();
+    }
 }

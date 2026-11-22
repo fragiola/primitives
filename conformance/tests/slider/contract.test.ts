@@ -84,3 +84,36 @@ test("slider / vertical: orientation everywhere", async ({ page }) => {
         "60px",
     );
 });
+
+test("slider / label-value: the Label and the Value", async ({ page }) => {
+    await openScenario(page, "/slider/label-value");
+    const roots = part(page, "slider", "root");
+    await expect(roots).toHaveCount(2);
+    const volume = roots.nth(0);
+    const label = part(volume, "slider", "label");
+    const value = part(volume, "slider", "value");
+    const thumb = part(volume, "slider", "thumb");
+    await expect(label).toHaveJSProperty("tagName", "DIV");
+    await expect(value).toHaveJSProperty("tagName", "OUTPUT");
+    const labelId = await label.getAttribute("id");
+    expect(labelId).toBeTruthy();
+    await expect(volume).toHaveAttribute("aria-labelledby", labelId as string);
+    await expect(thumb).toHaveAttribute("aria-labelledby", labelId as string);
+    await expect(value).toHaveAttribute(
+        "for",
+        (await thumb.getAttribute("id")) as string,
+    );
+    for (const element of [label, value]) {
+        await expect(element).toHaveAttribute("data-orientation", "horizontal");
+    }
+    // a thumb with a name of its own keeps it
+    const price = roots.nth(1);
+    await expect(price).toHaveAttribute(
+        "aria-labelledby",
+        (await part(price, "slider", "label").getAttribute("id")) as string,
+    );
+    await expect(part(price, "slider", "thumb").nth(0)).not.toHaveAttribute(
+        "aria-labelledby",
+    );
+    await expectNoFalseStates(parts(page, "slider"));
+});

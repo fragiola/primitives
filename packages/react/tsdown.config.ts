@@ -1,14 +1,13 @@
 import { defineConfig } from "tsdown";
-import { COMPONENTS } from "../../scripts/components.ts";
+import { ENTRIES, entrySource } from "../../scripts/components.ts";
 
 export default defineConfig({
-    // the root entry (it only re-exports) and one entry per component
-    // (`@fragiola/primitives-react/<component>`, scripts/components.ts)
+    // the root entry (it only re-exports), one entry per component
+    // (`@fragiola/primitives-react/<component>`) and one per utility (`/direction`, `/render`,
+    // scripts/components.ts)
     entry: {
         index: "src/index.ts",
-        ...Object.fromEntries(
-            COMPONENTS.map((name) => [name, `src/components/${name}/index.ts`]),
-        ),
+        ...Object.fromEntries(ENTRIES.map((name) => [name, entrySource(name)])),
     },
     format: "esm",
     platform: "browser",

@@ -5,17 +5,17 @@
 The layer that turns a form control into a labelled, described and validated field: a label linked
 to the control, a description, error messages shown when the value is invalid, and the field's
 interaction states (`dirty`, `touched`, `filled`, `focused`) for styling. It wraps a native input
-(`Field.Control`) or one of the library's form controls: Checkbox, Select, Slider and Combobox
-(the [integration contract](#integration-contract)).
+(`Field.Control`) or one of the library's form controls: Checkbox, CheckboxGroup, Select, Slider,
+Combobox, DatePicker and DateRangePicker (the [integration contract](#integration-contract)).
+[Fieldset](fieldset.md) groups fields under a legend and disables them together; [Form](form.md)
+adds server errors, the submission that shows every error and focuses the first invalid field,
+and a `validationMode` for all its fields.
 
-**Scope: the POC's Field, ported as it is** (stage 0, `docs/handoff.md` §5). The form support of
-the other controls depends on it; stage 1 brings it to production scope ("Field first"), and this
-page does not extend it until then.
-
-Base UI's `Field` (1.9) is the model: the POC's decisions of 2026-11-21 follow its behaviour. Out
-of scope: `Fieldset`, `Form` (a form-level `errors` object, `onFormSubmit`), Base
-UI's `Field.Item` and `Field.Validity`, async `validate`, `validationDebounceTime`, `actionsRef`,
-and Field in the calendar pickers.
+**Scope: production** (stage 1, Epic #26, "Field first"): the POC's Field (ported in Epic #9) with
+async `validate`, `Error`'s `match` as a function, `Fieldset` and `Form`, and every form control
+integrated. The APG has no field pattern; Base UI's `Field` (1.9) is the model (D4). Out of
+scope: Base UI's `Field.Item`, `Field.Validity`, `validationDebounceTime`, `actionsRef`, the
+controlled `dirty` / `touched` props, and the Error's enter and exit animations.
 
 ## Anatomy
 
@@ -27,21 +27,26 @@ and Field in the calendar pickers.
 | Field.Description | `p` | `field-description` | describes the control |
 | Field.Error | `div` | `field-error` | rendered only while it is shown |
 
-A field has one control: a `Field.Control`, a `Checkbox.Root`, a `Select.Root`, a `Slider.Root` or
-a `Combobox.Root`.
+A field has one control: a `Field.Control`, a `Checkbox.Root`, a `CheckboxGroup`, a
+`Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
+`DateRangePicker.Root`.
 
 ## API
 
 **Field.Root**:
 
-- `name`: the control's form name. It wins over the control's own `name`.
-- `disabled` (`false`): disables the control; no error is shown.
+- `name`: the control's form name. It wins over the control's own `name`, and keys the field's
+  server errors in a [Form](form.md) (`errors`).
+- `disabled` (`false`): disables the control; no error is shown. A disabled
+  [Fieldset](fieldset.md) around the field disables it too.
 - `invalid` (`false`): forces the invalid state, for an error the app found (a server answer).
-- `validate(value)`: synchronous; returns a message, a list of messages, or `null` for none. The
-  value is the control's: the input's text, a checkbox's `checked`, a select's value (or `null`), a
-  slider's number (or numbers).
-- `validationMode` (`"onSubmit"`): when the field validates and shows the result, see
-  [Validation](#validation). The other values are `"onBlur"` and `"onChange"`.
+- `validate(value)`: returns a message, a list of messages, or `null` (or `undefined`) for none;
+  or a promise of one of these ([async validation](#async-validation)). The value is the
+  control's: the input's text, a checkbox's `checked`, a group's array of values, a select's value
+  (or `null`), a slider's number (or numbers), a picker's date or range (or `null`).
+- `validationMode`: when the field validates and shows the result, see [Validation](#validation):
+  `"onSubmit"`, `"onBlur"` or `"onChange"`. Default: the enclosing [Form](form.md)'s
+  `validationMode`, else `"onSubmit"`.
 
 **Field.Label**, **Field.Description**: no props of their own. Their `id` is generated unless the
 consumer gives one.
@@ -52,10 +57,15 @@ consumer gives one.
 
 **Field.Error**: `match`. Without it, the error is shown while the field is invalid. With a
 `ValidityState` key (`"valueMissing"`, `"typeMismatch"`, `"patternMismatch"`, ..., and
-`"customError"` for the messages of `validate`), it is shown while that key is set. With `true`, it
+`"customError"` for the messages of `validate`), it is shown while that key is set. With a
+function `(validity) => boolean`, it is shown while the function returns `true`; it receives the
+field's validity (every key, and `valid`: `null` before the first validation). With `true`, it
 is always shown: the app decides when to render it. Its children are its text. With no children,
 it shows the current messages: one as text, several as a `ul` with one `li` each. These are the
-messages of `validate`, or the browser's `validationMessage`.
+field's server errors ([Form](form.md) `errors`) when it has some, else the messages of
+`validate`, else the browser's `validationMessage`. Server errors are shown by an Error with no
+`match` (or `match={true}`) only: a key or a function matches the validity, which server errors
+are not part of (Base UI).
 
 The Root holds the state. The other parts read it, and every one of them carries its attributes.
 
@@ -80,7 +90,36 @@ or `false`.
 It sets the element's custom validity each time, whatever the mode, so a native form never submits
 a value `validate` rejects. The mode decides only when the result is **shown**.
 
-**When the result is shown:**
+### Async validation
+
+When `validate` returns a promise (a thenable), the field validates in two steps:
+
+1. **At once**, the native validity alone. When it has an error (other than the required rule's
+   `valueMissing`, which still counts as valid until the value changed), that error is the result,
+   as with a synchronous `validate`, and the promise is not awaited.
+2. **When the promise resolves**, its messages, as a synchronous `validate`'s: they are set as the
+   validated element's custom validity and make the field invalid (`customError`). A rejected
+   promise counts as no message.
+
+While the latest run is pending, the field keeps what it showed: no new error, and none cleared
+by that run. When it resolves, the result is shown if the run's event shows results (the table
+below): a run started by a change in `onChange` mode, by a blur in `onBlur` mode, or by a
+submission attempt.
+
+**Latest wins.** Every validation (a change, a blur, a submission attempt) starts a new run. A run
+that resolves after a newer run started is dropped, even when it resolves last: a slow answer for
+an old value never replaces the answer for the current one.
+
+**A value already validated is not validated again.** When the value is the one the last
+resolved run validated, the field reuses that run's messages at once instead of calling
+`validate` (so a submission attempt with an unchanged value is blocked by the custom validity
+that run set, and a Form finds the field invalid). A submission does not wait for a pending
+run (Base UI): the native submission or the Form goes on with the custom validity of the last
+resolved run.
+
+### When the result is shown
+
+
 
 | event | `onSubmit` (default) | `onBlur` | `onChange` |
 | --- | --- | --- | --- |
@@ -90,7 +129,8 @@ a value `validate` rejects. The mode decides only when the result is **shown**.
 
 **A submission attempt** is the browser's validation of the control's form. This is its
 `invalid` event on any of the form's controls (the submission is blocked), or its `submit` event.
-Every field of the form validates then. After a submission was attempted, an `onSubmit` field
+Every field of the form validates then. Inside a [Form](form.md) (`noValidate`), the Form's
+submission validates every field. After a submission was attempted, an `onSubmit` field
 validates on every change.
 
 **A change on a field that shows an error, when the field does not validate on every change**
@@ -99,7 +139,13 @@ validates. There is one exception. When the change leaves the value missing (a r
 emptied), the field validates at once, and the required error shows.
 
 When validation blocks a submission, the browser focuses the first invalid control, or the
-integrated control's primitive (spec/README.md, "Forms").
+integrated control's primitive (spec/README.md, "Forms"); a [Form](form.md) focuses the first
+invalid field's control.
+
+**Server errors.** Inside a [Form](form.md), the field's `name` keys its `errors`. While the Form
+has errors for it (a non-empty message or list), the field is invalid (`data-invalid`,
+`aria-invalid`) and its Error with no `match` shows them. The first change of the field's value
+clears them: the field asks the Form to drop its key ([form.md](form.md#api), `onClearErrors`).
 
 ## State attributes and ARIA
 
@@ -108,13 +154,13 @@ Slider.Root, Combobox.Input), carries:
 
 | attribute | when |
 | --- | --- |
-| `data-invalid` | the field shows an error: its validity is `false`, or `invalid` is set |
+| `data-invalid` | the field shows an error: its validity is `false`, `invalid` is set, or its Form has errors for it |
 | `data-valid` | the field validated and is valid |
 | `data-dirty` | the value differs from the value at mount |
 | `data-touched` | the control has lost focus once |
 | `data-filled` | the value is not empty: some text, a checked checkbox, a chosen option. A slider is always filled |
 | `data-focused` | the control has focus (a slider: one of its thumbs) |
-| `data-disabled` | the field is disabled |
+| `data-disabled` | the field is disabled (`disabled`, or a disabled Fieldset around it) |
 
 Before the first validation, neither `data-invalid` nor `data-valid` is present. A disabled field
 has neither.
@@ -145,7 +191,10 @@ A control inside a `Field.Root` reads the field from its context. It must:
    (`dirty`, `filled`, and the change for [validation](#validation)).
 4. **Expose the element the form validates:** its hidden input (or the Control's input). The field
    reads that element's native validity and sets its custom validity.
-5. **Carry the field's state attributes** on its main element.
+5. **Expose its focus target:** the element a [Form](form.md) focuses when the field is the first
+   invalid one (the table's "focus and blur from" element; a Slider's first Thumb, a group's first
+   enabled Checkbox).
+6. **Carry the field's state attributes** on its main element.
 
 Outside a `Field.Root`, a control behaves exactly as without the layer.
 
@@ -155,10 +204,18 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | Checkbox | Checkbox.Root (`button`) | Checkbox.Root | `checked` | Checkbox.Root | its hidden `checkbox` input |
 | Select | Select.Trigger (`button`) | Select.Trigger | the value, or `null` | Select.Trigger | its hidden input |
 | Combobox | Combobox.Input (`input`) | Combobox.Input | the value: an item or `null`, or the list of items with `multiple` | Combobox.Input | its visually hidden input (combobox.md, "Forms") |
-| Slider | none (a `group`) | Slider.Root gets `aria-labelledby`. Each Thumb gets `aria-describedby` and `aria-invalid`, and `aria-labelledby` when it has no `aria-label` or `aria-labelledby` of its own | the value (a number, or numbers) | its Thumbs | none: its inputs are `type="hidden"`, which the browser never validates. `validate` still runs and shows its messages, but it cannot block a native submission |
+| Slider | none (a `group`) | Slider.Root gets `aria-labelledby`. Each Thumb gets `aria-describedby` and `aria-invalid`, and `aria-labelledby` when it has no `aria-label` or `aria-labelledby` of its own | the value (a number, or numbers) | its Thumbs | none: its inputs are `type="hidden"`, which the browser never validates. `validate` still runs and shows its messages, but it cannot block a native submission (a [Form](form.md) blocks it) |
+| CheckboxGroup | none (a `group`) | the CheckboxGroup | the array of checked values | its Checkboxes (focus within the group; `touched` once focus leaves it) | none: `validate` decides, as for the Slider. Its Checkboxes take the field's `name` (each still submits its own `value`; a parent checkbox submits nothing) and `disabled`, and do not register as the field's control themselves |
+| DatePicker | DatePicker.Trigger (`button`) | DatePicker.Trigger; its `aria-labelledby` lists the label's `id` **then its own** (see below) | the date, or `null` | DatePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
+| DateRangePicker | DateRangePicker.Trigger (`button`) | DateRangePicker.Trigger, as DatePicker's | the range `{ start, end }`, or `null` | DateRangePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
 
-Select's popup is portalled. Its parts never need the field: the trigger and the hidden input
-carry everything, and both stay inside the Root.
+**A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
+date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival
+2026-11-24", and the visible text stays in it (WCAG 2.5.3, axe `label-content-name-mismatch`). A
+Select's Trigger needs no such thing: it is a `combobox`, named by its label alone.
+
+Select's and the pickers' popups are portalled. Their parts never need the field: the trigger and
+the hidden input carry everything, and both stay inside the Root.
 
 ## Keyboard
 
@@ -167,7 +224,8 @@ Nothing of its own: the control's keyboard applies.
 ## Focus
 
 Nothing of its own. A click on the Label focuses the Control, or clicks a labelable control (it
-toggles a Checkbox, as a native `<label for>` does).
+toggles a Checkbox, as a native `<label for>` does). A picker's Trigger is only focused: a click
+would open its popup, which takes the focus away from the field the label names.
 
 ## Pointer
 
@@ -274,6 +332,83 @@ Checks:
 5. After that, each change validates. Checking the checkbox hides its error and removes
    `aria-invalid`. Choosing "Banana" hides the select's. "Submit" then gives
    `form: terms=on&fruit=banana&volume=50`.
+6. A form reset (`form.reset()`) returns every control to its default: the checkbox unchecked,
+   the select's placeholder, the slider at 50; the fields keep their states (no `dirty` reset,
+   [below](#differences-from-base-ui)). "Submit" then submits nothing again.
+7. Axe finds no violation, before and after the failed submission.
+
+### `/field/async`
+
+A `<form>` with a field `name="username"`, `validationMode="onChange"`: Label **"Username"**; a
+Control; an Error with no children; a **"Submit"** button. Its `validate` returns a promise that
+resolves after 400 ms for `ada` and after 50 ms for any other value: **"This username is taken."**
+for `ada`, `null` otherwise. Output: `resolved: <the value of the last promise that resolved>`,
+`form: ...`.
+
+Checks:
+
+1. Typing `ada` shows nothing at once; once `resolved: ada`, "This username is taken." is shown
+   and the textbox is `aria-invalid="true"`.
+2. **Latest wins.** Replacing the text with `adb` right after `ada` (the `ada` promise resolves
+   after the `adb` one: `resolved: ada` comes last) shows nothing: the textbox is not
+   `aria-invalid`.
+3. With `ada` shown as taken, "Submit" submits nothing (`form: none`) and focuses the textbox:
+   the run that resolved set its custom validity, and the unchanged value is not validated again.
+4. Replacing the text with `grace` hides the error once it resolves; "Submit" gives
+   `form: username=grace`.
+5. Axe finds no violation with the error shown.
+
+### `/field/match`
+
+A `<form>` with a field `name="age"`: Label **"Age"**; a Control `type="number"`, `required`,
+`min="18"`, `max="120"`; an Error `match="valueMissing"` **"Enter your age."**; an Error whose
+`match` is a function, true for `rangeUnderflow` or `rangeOverflow`, **"Enter an age from 18 to
+120."**; a **"Submit"** button. Output: `form: ...`.
+
+Checks:
+
+1. "Submit" while empty submits nothing and shows "Enter your age." only.
+2. Typing `12` shows "Enter an age from 18 to 120." only (each change validates after the
+   submission); `130` likewise; `30` shows neither.
+3. "Submit" gives `form: age=30`.
+4. Axe finds no violation with an error shown.
+
+### `/field/more-controls`
+
+A [Form](form.md) with three fields around the controls added in stage 1; the controls have no
+`name` of their own:
+
+- `name="toppings"`: Label **"Toppings"**; a CheckboxGroup (no `aria-labelledby` of its own)
+  with **"Cheese"**, **"Ham"** and **"Pineapple"** (values `cheese`, `ham`, `pineapple`);
+  Description **"Pick at least one."**; an Error with no children. Its `validate` returns
+  **"Choose a topping."** for an empty array.
+- `name="arrival"`: Label **"Arrival"**; a DatePicker `required` (en-US) whose Trigger reads
+  the value (or "none"), its Popup (`aria-label` **"Choose date"**) holding a
+  bound Calendar with **"Previous month"** / **"Next month"**; Description
+  **"The day you arrive."**; an Error **"Choose a date."**.
+- `name="stay"`: Label **"Stay"**; a DateRangePicker `required` (en-US) whose Trigger reads
+  the range (or "none"), its Popup (`aria-label` **"Choose dates"**) holding a
+  bound RangeCalendar; Description **"From check-in to check-out."**; an Error
+  **"Choose your dates."**.
+- a **"Submit"** button.
+
+"Today" is 2026-11-20. Output: `form: ...` (the Form's submission, as a native form's).
+
+Checks:
+
+1. A `group` named "Toppings", described by "Pick at least one."; a `button` named "Arrival none"
+   (the label, then its content), described by "The day you arrive."; a `button` named
+   "Stay none", described by "From check-in to check-out.". A click on the label "Arrival"
+   focuses its trigger (and opens nothing).
+2. "Submit" submits nothing and focuses "Cheese" (the first invalid field's focus target). The
+   group and both triggers are `aria-invalid="true"`, and "Choose a topping.", "Choose a date."
+   and "Choose your dates." are shown; the group's description is "Pick at least one. Choose a
+   topping.".
+3. Checking "Ham" hides the group's error. Choosing November 24 in "Arrival" hides its error (the
+   trigger reads "2026-11-24", named "Arrival 2026-11-24"); choosing November 25 then 27 in "Stay" hides its own.
+4. "Submit" gives `form: toppings=ham&arrival=2026-11-24&stay=2026-11-25/2026-11-27`.
+5. A form reset (`form.reset()`) returns every control to its default (no topping, both triggers
+   read "none"); "Submit" then submits nothing again.
 6. Axe finds no violation, before and after the failed submission.
 
 ## Differences from Base UI
@@ -284,9 +419,16 @@ it, a native submission validates no field).
 
 Where the primitives still differ from Base UI, without a behaviour test telling them apart:
 
-- **No `Form`.** A field validates on its native form's submission attempt (the browser's
-  validation), and keeps the custom validity current so the browser blocks a rejected value. Base
-  UI needs its `Form` for `onSubmit`.
+- **A native form is enough.** A field validates on its native form's submission attempt (the
+  browser's validation), and keeps the custom validity current so the browser blocks a rejected
+  value. Base UI needs its `Form` for `onSubmit`; here [Form](form.md) adds server errors, the
+  Form-wide `validationMode` and the validation of controls the browser cannot validate.
+- **`match` as a function** (`(validity) => boolean`) is this library's addition; Base UI takes a
+  key or `true`.
+- **Async `validate`: a value already validated is not validated again**, so a submission with an
+  unchanged value is blocked by the last answer. Base UI validates again and does not wait.
+- **A disabled field shows no state of validity**, even with server errors or `invalid` (the POC's
+  rule, kept); Base UI keeps the app's invalid state on a disabled field.
 - **`match={true}`** follows Base UI: always shown. The messages of `validate` are matched with
   `match="customError"`, the `ValidityState` key for them.
 - **A form reset** does not reset the field's states (`dirty`, `touched`, the validity), as in Base

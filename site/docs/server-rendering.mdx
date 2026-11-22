@@ -14,7 +14,9 @@ ends as the browser alone renders it, with the server's ids kept.
 - **The reader's language.** A calendar with no `locale` renders `en-US` on the server and in the
   browser's hydration of it, then takes the document's `lang`, else the browser's language, once
   it is mounted. Angular reads its document's `lang` on the server too.
-  Pass `locale` to render the reader's language on the server.
+  Pass `locale` to render the reader's language on the server. A Slider's `format` uses the
+  runtime's default locale without `locale`: a server's may differ from the browser's, so pass
+  `locale` with `format`.
 - **The reader's date.** "Today" is read when the calendar renders, on the server and in the
   browser: they agree unless the server's date differs from the reader's (another time zone, near
   midnight), which the hydration repairs. Pass a `value` or `defaultValue` when the first month
@@ -76,7 +78,8 @@ keeps the server's ids and every `aria-labelledby` and `aria-controls` with them
 
 ## Forms
 
-React and Vue render the hidden inputs of the form controls (Checkbox, Select, Combobox, Slider)
+React and Vue render the hidden inputs of the form controls (Checkbox, Select, Combobox, Slider,
+DatePicker, DateRangePicker)
 on the server too. Angular adds them in the browser once the page is hydrated, since its
 directives create them outside their templates: a form posted before the page is hydrated has no
 value of theirs.

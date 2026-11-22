@@ -1,3 +1,4 @@
+import { bridgeForm } from "@fragiola/primitives/form";
 import { moveThumb } from "@fragiola/primitives/range";
 import {
     computed,
@@ -7,6 +8,7 @@ import {
     provide,
     ref,
     shallowRef,
+    watch,
 } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import { useFieldControl } from "../../composables/use-field-control.ts";
@@ -17,7 +19,7 @@ import {
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import type { SliderState } from "./slider-context.ts";
+import type { SliderState, SliderThumbId } from "./slider-context.ts";
 import { SliderKey, sliderState } from "./slider-context.ts";
 
 type SliderValue = number | readonly number[];
@@ -44,6 +46,10 @@ export interface SliderRootProps {
     orientation?: "horizontal" | "vertical";
     disabled?: boolean;
     name?: string;
+    /** How the Value shows the values, and the thumbs' `aria-valuetext`. */
+    format?: Intl.NumberFormatOptions;
+    /** The locale of `format` (default: the runtime's). */
+    locale?: string;
 }
 
 export type SliderRootEmits = {
@@ -84,6 +90,13 @@ export const SliderRoot: PartComponent<
             },
             disabled: { type: Boolean, default: false },
             name: { type: String, default: undefined },
+            /** How the Value shows the values, and the thumbs' `aria-valuetext`. */
+            format: {
+                type: Object as PropType<Intl.NumberFormatOptions>,
+                default: undefined,
+            },
+            /** The locale of `format` (default: the runtime's). */
+            locale: { type: String, default: undefined },
         },
         emits: {
             "update:value": (_value: number | number[]) => true,
@@ -117,7 +130,15 @@ export const SliderRoot: PartComponent<
                 // a slider always has a value
                 filled: () => true,
                 input: () => firstInput.value,
+                focusTarget: () => thumbs.value[0] ?? null,
             });
+            const formatter = computed(() =>
+                props.format === undefined
+                    ? null
+                    : new Intl.NumberFormat(props.locale, props.format),
+            );
+            const thumbIds = shallowRef<readonly SliderThumbId[]>([]);
+            const labelId = ref<string>();
             const dragging = ref(false);
             const activeIndex = ref(-1);
             const thumbs = shallowRef<readonly HTMLElement[]>([]);
@@ -170,8 +191,45 @@ export const SliderRoot: PartComponent<
                         );
                     };
                 },
+                thumbIds,
+                registerThumbId(entry: SliderThumbId) {
+                    thumbIds.value = [...thumbIds.value, entry];
+                    return () => {
+                        thumbIds.value = thumbIds.value.filter(
+                            (candidate) => candidate !== entry,
+                        );
+                    };
+                },
+                labelId,
+                formatValue: (entry: number) =>
+                    formatter.value?.format(entry) ?? String(entry),
+                formatted: () => formatter.value !== null,
             };
             provide(SliderKey, context);
+
+            // a form reset returns the slider to its default (spec/README.md, "Forms")
+            watch(
+                firstInput,
+                (element, _, onCleanup) => {
+                    if (element === null) {
+                        return;
+                    }
+                    onCleanup(
+                        bridgeForm(element, {
+                            reset: () => {
+                                const initial = toArray(
+                                    props.defaultValue ?? props.min,
+                                );
+                                if (!sameValues(initial, values.value)) {
+                                    field.reset();
+                                    state.set(initial, { reason: "none" });
+                                }
+                            },
+                        }),
+                    );
+                },
+                { flush: "post" },
+            );
             return () => {
                 const current = sliderState(context);
                 return renderPart(
@@ -181,7 +239,9 @@ export const SliderRoot: PartComponent<
                     current,
                     {
                         role: "group",
-                        "aria-labelledby": field.aria()["aria-labelledby"],
+                        // the Field's label, else the slider's own
+                        "aria-labelledby":
+                            field.aria()["aria-labelledby"] ?? labelId.value,
                         "data-primitives-part": "slider-root",
                         ...field.attributes(),
                         ...stateAttributes({

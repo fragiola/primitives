@@ -3,9 +3,9 @@ import {
     SliderControl,
     SliderIndicator,
     SliderRoot,
+    type SliderRootValue,
     SliderThumb,
     SliderTrack,
-    type SliderValue,
 } from "@fragiola/primitives-angular/slider";
 import { slider } from "examples-shared/recipes/slider";
 import { formEntries } from "../../kit/form-entries.ts";
@@ -40,7 +40,7 @@ export class SliderRange {
     protected readonly initial = [20, 80];
     protected readonly value = signal<readonly number[]>([20, 80]);
     protected readonly form = signal<string | undefined>(undefined);
-    protected readonly range = (value: SliderValue) =>
+    protected readonly range = (value: SliderRootValue) =>
         value as readonly number[];
     protected readonly price = (value: number) => `$${value}`;
 

@@ -70,6 +70,7 @@ export function SelectRoot({
         value,
         filled: value !== null,
         input: () => input.current,
+        focusTarget: () => root.trigger,
     });
     const disabled = disabledProp || field.disabled;
     const [highlighted, setHighlighted] = useState<string | null>(null);
@@ -104,8 +105,18 @@ export function SelectRoot({
         [items, setValue, setOpen],
     );
 
-    const latest = useRef({ defaultValue, setValue, trigger: root.trigger });
-    latest.current = { defaultValue, setValue, trigger: root.trigger };
+    const latest = useRef({
+        defaultValue,
+        setValue,
+        trigger: root.trigger,
+        reset: field.reset,
+    });
+    latest.current = {
+        defaultValue,
+        setValue,
+        trigger: root.trigger,
+        reset: field.reset,
+    };
     useEffect(() => {
         const element = input.current;
         if (element === null) {
@@ -114,6 +125,7 @@ export function SelectRoot({
         return bridgeForm(element, {
             reset: () => {
                 const current = latest.current;
+                current.reset();
                 current.setValue(current.defaultValue, { reason: "none" });
                 element.value = current.defaultValue ?? "";
             },

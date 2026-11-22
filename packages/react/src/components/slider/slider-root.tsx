@@ -1,5 +1,6 @@
+import { bridgeForm } from "@fragiola/primitives/form";
 import { moveThumb } from "@fragiola/primitives/range";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useElement } from "../../hooks/use-element.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
@@ -32,6 +33,10 @@ export interface SliderRootProps extends PartProps<SliderState> {
     orientation?: "horizontal" | "vertical";
     disabled?: boolean;
     name?: string;
+    /** How the Value shows the values, and each Thumb's `aria-valuetext` (spec/slider.md). */
+    format?: Intl.NumberFormatOptions;
+    /** The locale of `format` (BCP 47; default: the runtime's). */
+    locale?: string;
 }
 
 function toArray(value: SliderValue): readonly number[] {
@@ -58,6 +63,8 @@ export function SliderRoot({
     orientation = "horizontal",
     disabled: disabledProp = false,
     name,
+    format,
+    locale,
     children,
     ...props
 }: SliderRootProps) {
@@ -80,6 +87,8 @@ export function SliderRoot({
         // a slider always has a value
         filled: true,
         input: () => firstInput.current,
+        // the first thumb
+        focusTarget: () => thumbs[0] ?? null,
     });
     const disabled = disabledProp || field.disabled;
     const [root, rootRef] = useElement<HTMLElement>();
@@ -87,9 +96,51 @@ export function SliderRoot({
     const [thumbs, setThumbs] = useState<readonly HTMLElement[]>([]);
     const [dragging, setDragging] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
+    const [labelId, setLabelId] = useState<string>();
+    const formatter = useMemo(
+        () =>
+            format === undefined ? null : new Intl.NumberFormat(locale, format),
+        [format, locale],
+    );
+    const formatValue = useCallback(
+        (entry: number) =>
+            formatter === null ? String(entry) : formatter.format(entry),
+        [formatter],
+    );
 
     const latest = useRef({ current, onValueCommit, output });
     latest.current = { current, onValueCommit, output };
+
+    // a form reset returns the slider to its default (spec/README.md, "Forms")
+    const initial = useRef({
+        defaultValue,
+        min,
+        setCurrent,
+        reset: field.reset,
+    });
+    initial.current = { defaultValue, min, setCurrent, reset: field.reset };
+    useEffect(() => {
+        const element = firstInput.current;
+        if (element === null) {
+            return undefined;
+        }
+        return bridgeForm(element, {
+            reset: () => {
+                const {
+                    defaultValue: given,
+                    min: lowest,
+                    setCurrent: set,
+                    reset,
+                } = initial.current;
+                const next = toArray(given ?? lowest);
+                // no change reported when the slider already is at its default
+                if (!sameValues(next, latest.current.current)) {
+                    reset();
+                    set(next, { reason: "none" });
+                }
+            },
+        });
+    }, []);
 
     const setThumb = useCallback(
         (index: number, next: number, reason: ChangeReason) => {
@@ -161,6 +212,10 @@ export function SliderRoot({
             registerThumb,
             startDragging,
             stopDragging,
+            labelId,
+            setLabelId,
+            formatValue,
+            formatted: formatter !== null,
         }),
         [
             field,
@@ -182,6 +237,9 @@ export function SliderRoot({
             registerThumb,
             startDragging,
             stopDragging,
+            labelId,
+            formatValue,
+            formatter,
         ],
     );
     const state = sliderState(context);
@@ -213,7 +271,8 @@ export function SliderRoot({
                 state,
                 {
                     role: "group",
-                    "aria-labelledby": field.aria["aria-labelledby"],
+                    // the Field's label, else the slider's own Label
+                    "aria-labelledby": field.aria["aria-labelledby"] ?? labelId,
                     "data-primitives-part": "slider-root",
                     ...field.attributes,
                     ...stateAttributes({

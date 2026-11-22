@@ -1,5 +1,17 @@
-import { computed, defineComponent, type PropType, provide, ref } from "vue";
+import {
+    computed,
+    defineComponent,
+    type PropType,
+    provide,
+    ref,
+    shallowRef,
+} from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
+import {
+    OUTSIDE_FIELD,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
+import { elementSetter } from "../../composables/use-overlay-root.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import {
     type PartComponent,
@@ -66,6 +78,24 @@ export const CheckboxGroup: PartComponent<
                 },
             );
             const value = computed(() => state.value.value);
+            const element = shallowRef<HTMLElement | null>(null);
+            const setElement = elementSetter(element);
+            // inside a Field, the group is its control (spec/field.md, "Integration contract")
+            const field = useFieldControl({
+                id: () => undefined,
+                labelable: false,
+                value: () => [...value.value],
+                filled: () => value.value.length > 0,
+                // nothing the browser validates: `validate` decides
+                input: () => null,
+                element: () => element.value,
+                // the first enabled checkbox
+                focusTarget: () =>
+                    element.value?.querySelector<HTMLElement>(
+                        '[role="checkbox"]:not([disabled])',
+                    ) ?? null,
+            });
+            const disabled = () => props.disabled || field.disabled();
             const order = (values: readonly string[]) =>
                 props.allValues.length === 0
                     ? [...values]
@@ -80,7 +110,7 @@ export const CheckboxGroup: PartComponent<
             provide(CheckboxGroupKey, {
                 value,
                 allValues: () => props.allValues,
-                disabled: () => props.disabled,
+                disabled,
                 toggle(entry, checked) {
                     const current = value.value;
                     state.set(
@@ -101,22 +131,45 @@ export const CheckboxGroup: PartComponent<
                     });
                 },
                 reset() {
+                    field.reset();
                     state.set(props.defaultValue, { reason: "none" });
                 },
                 ids: ref({}),
+                field: field.inField
+                    ? {
+                          ...OUTSIDE_FIELD,
+                          name: field.name,
+                          disabled: field.disabled,
+                      }
+                    : null,
             });
-            return () =>
-                renderPart(
+            // focus within the group: touched once focus leaves it
+            const onFocusin = () => field.onFocus();
+            const onFocusout = (event: FocusEvent) => {
+                const next = event.relatedTarget as Node | null;
+                if (next === null || !element.value?.contains(next)) {
+                    field.onBlur();
+                }
+            };
+            return () => {
+                const isDisabled = disabled();
+                return renderPart(
                     "div",
                     { attrs, slots },
                     props.as,
-                    { disabled: props.disabled },
+                    { disabled: isDisabled },
                     {
                         role: "group",
+                        ...field.aria(),
                         "data-primitives-part": "checkbox-group-root",
-                        ...stateAttributes({ disabled: props.disabled }),
+                        ...field.attributes(),
+                        ...stateAttributes({ disabled: isDisabled }),
+                        onFocusin,
+                        onFocusout,
+                        ref: setElement,
                     },
                 );
+            };
         },
     }),
 );

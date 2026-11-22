@@ -1,0 +1,130 @@
+---
+title: Direction
+description: The DirectionProvider tells the components the reading direction without reading the DOM, and useDirection or injectDirection reads it back.
+---
+
+The reading direction, `ltr` or `rtl`, given to the components without reading the DOM: a
+provider around a part of the app, and a way to read it. Every component that depends on the
+direction (Tabs, Slider, Menu, Combobox's chips, the calendars, and every positioned popup through
+its `inline-start` / `inline-end` sides) takes the provider's direction when there is one, and
+the element's computed `direction` (from the document's `dir`, or CSS) otherwise. It follows Base
+UI's `DirectionProvider`; the APG only says what changes in right to left, which each component's
+page states. When to use it, and when `dir` is enough: the
+[right-to-left guide](/docs/guides/rtl).
+
+The provider sets no `dir` attribute and no style: your app still sets `dir` on its document (or
+an element) so the page's layout flows right to left. It is a global provider in its own entry,
+`/direction`, which references no component: importing it adds no component code.
+
+## Behaviour
+
+- **Provided**: a component inside a provider reads its `direction`. A nested provider wins
+  inside it.
+- **Without a provider**: a component reads the computed `direction` of its element when it needs
+  it (a key press, a placement), so a document's `dir` keeps working on its own.
+- **Measurements** that follow the layout stay with the computed direction: the Tabs Indicator's
+  position is measured in the List's own box.
+- **A Slider** maps the pointer with the direction it reads: an app that provides `rtl` sets
+  `dir="rtl"` too, so the track's layout and the mapping agree.
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { DirectionProvider, useDirection } from "@fragiola/primitives-react/direction";
+
+function Output() {
+    const direction = useDirection(); // "rtl" inside the provider, "ltr" without one
+    return <p>direction: {direction}</p>;
+}
+
+// the layout flows right to left through `dir`; the provider tells the components
+<div dir="rtl">
+    <DirectionProvider direction="rtl">
+        <Output />
+        <Tabs.Root defaultValue="account">{/* ... */}</Tabs.Root>
+    </DirectionProvider>
+</div>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { DirectionProvider, useDirection } from "@fragiola/primitives-vue/direction";
+
+// inside a component rendered under the provider: a computed ref
+const direction = useDirection();
+</script>
+
+<template>
+    <DirectionProvider direction="rtl">
+        <Tabs.Root default-value="account"><!-- ... --></Tabs.Root>
+    </DirectionProvider>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+import { DirectionProvider, injectDirection, provideDirection } from "@fragiola/primitives-angular/direction";
+
+// on your own element, for everything inside it
+@Component({
+    imports: [DirectionProvider, TabsRoot /* ... */],
+    template: `
+        <div directionProvider="rtl" dir="rtl">
+            <div tabsRoot defaultValue="account"><!-- ... --></div>
+        </div>
+    `,
+})
+export class Settings {}
+
+// or as an injector's provider: an application, a route, a component
+bootstrapApplication(App, { providers: [provideDirection("rtl")] });
+
+// read it in an injection context (a constructor or a field initializer): a signal
+export class Output {
+    protected readonly direction = injectDirection();
+}
+```
+
+</Framework>
+
+## Props
+
+### DirectionProvider
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `direction` | `"ltr" \| "rtl"` | `"ltr"` | the direction of everything inside it (Angular: the `directionProvider` input itself, `directionProvider="rtl"`) |
+
+It renders only its children: no element, no attribute (Angular: a directive on your own
+element).
+
+### Reading it
+
+| framework | name | returns |
+| --- | --- | --- |
+| React | `useDirection()` | the nearest provider's direction, or `"ltr"` without one |
+| Vue | `useDirection()` | a computed ref of the same |
+| Angular | `injectDirection()` | a signal of the same, in an injection context |
+| Angular | `provideDirection(direction)` | a provider for an injector's `providers` |
+
+`useDirection()` reads only the provider: without one it returns `"ltr"`, even in a document with
+`dir="rtl"`. The components themselves fall back to the computed direction; for an element of
+your own, the toolkit's `getDirection(element, provided)` does the same
+([the toolkit](/docs/api/toolkit)).
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/direction` | `Direction`, `DirectionProvider`, `DirectionProviderProps`, `useDirection` |
+| `@fragiola/primitives-vue/direction` | `Direction`, `DirectionProvider`, `DirectionProviderProps`, `useDirection` |
+| `@fragiola/primitives-angular/direction` | `Direction`, `DirectionProvider`, `injectDirection`, `provideDirection` |

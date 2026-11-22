@@ -12,3 +12,13 @@ export async function expectSubmitted(
 ): Promise<void> {
     await expectOutput(page, "form", entries);
 }
+
+/** Resets the page's form (`form.reset()`, spec/README.md "Forms"), as its reset button would. */
+export async function resetForm(page: Page): Promise<void> {
+    await page
+        .locator("form")
+        .first()
+        .evaluate((form) => {
+            (form as HTMLFormElement).reset();
+        });
+}

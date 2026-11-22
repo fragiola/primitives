@@ -151,6 +151,8 @@ As [popover.md](popover.md#animation), for each level.
 
 - ArrowLeft opens a submenu and ArrowRight closes it.
 - A submenu opens to the left (`side="inline-end"` is logical).
+- The direction is a [DirectionProvider](direction.md)'s, else the computed one (for the keys and
+  for every positioned popup's logical side).
 
 ## Scenarios
 

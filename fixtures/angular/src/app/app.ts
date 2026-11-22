@@ -1,6 +1,7 @@
 import { DOCUMENT } from "@angular/common";
 import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
+import { DirectionProvider } from "@fragiola/primitives-angular/direction";
 import { readQuery } from "../kit/query.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
 import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts";
@@ -18,15 +19,22 @@ import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.ts";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
+import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.ts";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.ts";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.ts";
 import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.ts";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.ts";
+import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.ts";
+import { FieldAsync } from "../scenarios/field/field-async.ts";
 import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
+import { FieldMatch } from "../scenarios/field/field-match.ts";
+import { FieldMoreControls } from "../scenarios/field/field-more-controls.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
+import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
+import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
 import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
@@ -43,6 +51,7 @@ import { SelectControlled } from "../scenarios/select/select-controlled.ts";
 import { SelectModal } from "../scenarios/select/select-modal.ts";
 import { SliderBasic } from "../scenarios/slider/slider-basic.ts";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.ts";
+import { SliderLabelValue } from "../scenarios/slider/slider-label-value.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
@@ -108,6 +117,15 @@ import { ROUTES } from "./routes.ts";
         CalendarRange,
         DatePickerBasic,
         DatePickerRange,
+        DatePickerForm,
+        SliderLabelValue,
+        FieldAsync,
+        FieldMatch,
+        FieldMoreControls,
+        FieldsetBasic,
+        FormBasic,
+        DirectionProvider,
+        DirectionProviderScenario,
     ],
     template: `
         @switch (path) {
@@ -154,9 +172,15 @@ import { ROUTES } from "./routes.ts";
             @case ("/slider/vertical") { <main class="p-6" scenario-slider-vertical></main> }
             @case ("/slider/rtl") { <main class="p-6" scenario-slider-basic></main> }
             @case ("/slider/controlled") { <main class="p-6" scenario-slider-controlled></main> }
+            @case ("/slider/label-value") { <main class="p-6" scenario-slider-label-value></main> }
             @case ("/field/basic") { <main class="p-6" scenario-field-basic></main> }
             @case ("/field/validation") { <main class="p-6" scenario-field-validation></main> }
             @case ("/field/controls") { <main class="p-6" scenario-field-controls></main> }
+            @case ("/field/async") { <main class="p-6" scenario-field-async></main> }
+            @case ("/field/match") { <main class="p-6" scenario-field-match></main> }
+            @case ("/field/more-controls") { <main class="p-6" scenario-field-more-controls></main> }
+            @case ("/fieldset/basic") { <main class="p-6" scenario-fieldset-basic></main> }
+            @case ("/form/basic") { <main class="p-6" scenario-form-basic></main> }
             @case ("/calendar/single") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
             @case ("/calendar/min-max") { <main class="p-6" scenario-single-calendar [locale]="query.locale" [min]="{ year: 2026, month: 11, day: 10 }" [max]="{ year: 2026, month: 12, day: 5 }"></main> }
             @case ("/calendar/unavailable") { <main class="p-6" scenario-single-calendar [locale]="query.locale" [isDateUnavailable]="isWeekend"></main> }
@@ -166,6 +190,8 @@ import { ROUTES } from "./routes.ts";
             @case ("/calendar/range") { <main class="p-6" scenario-calendar-range [locale]="query.locale"></main> }
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
+            @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
+            @case ("/direction/provider") { <main class="p-6" scenario-direction-provider [directionProvider]="'rtl'"></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>
@@ -194,7 +220,12 @@ export class App {
 
     constructor() {
         const html = inject(DOCUMENT).documentElement;
-        html.setAttribute("dir", this.query.dir);
+        // no `dir` unless the scenario asks for one (spec/direction.md: a document with none)
+        if (this.query.dir === "rtl") {
+            html.setAttribute("dir", "rtl");
+        } else {
+            html.removeAttribute("dir");
+        }
         if (this.query.lang === undefined) {
             html.removeAttribute("lang");
         } else {

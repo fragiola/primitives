@@ -1,0 +1,316 @@
+---
+title: Forms and validation
+description: Label, describe and validate any form control with Field, group fields with Fieldset, and let Form block a submission and show the server's errors.
+---
+
+The form layer has three pieces. [Field](/docs/api/field) labels, describes and validates one
+control: a native input, or any of the form primitives. [Fieldset](/docs/api/fieldset) groups
+fields under a legend and disables them together. [Form](/docs/api/form) validates every field on
+submission, focuses the first invalid one and shows the server's errors. What stays yours: the
+markup around them, every word (labels, descriptions, error messages), the look of each state,
+and what a submission does with its `FormData`.
+
+## A field around a native input
+
+A `Field.Root` gives its control a label, a description and its errors, and wires them:
+`for`, `aria-labelledby`, `aria-describedby` (the description and every shown error) and
+`aria-invalid`. The native validity (`required`, `type`, `pattern`, `min`, ...) is read as it is;
+each `Field.Error` picks the key it shows.
+
+<Framework name="react">
+
+```tsx
+import { Field } from "@fragiola/primitives-react/field";
+
+<form>
+    <Field.Root name="email">
+        <Field.Label>Email</Field.Label>
+        <Field.Control type="email" required />
+        <Field.Description>We never share it.</Field.Description>
+        <Field.Error match="valueMissing">Enter your email.</Field.Error>
+        <Field.Error match="typeMismatch">Enter a valid email.</Field.Error>
+    </Field.Root>
+    <button type="submit">Sign up</button>
+</form>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <form @submit.prevent="save">
+        <Field.Root name="email">
+            <Field.Label>Email</Field.Label>
+            <Field.Control type="email" required />
+            <Field.Description>We never share it.</Field.Description>
+            <Field.Error match="valueMissing">Enter your email.</Field.Error>
+            <Field.Error match="typeMismatch">Enter a valid email.</Field.Error>
+        </Field.Root>
+        <button type="submit">Sign up</button>
+    </form>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<form (submit)="save($event)">
+    <div fieldRoot [name]="'email'">
+        <label fieldLabel>Email</label>
+        <input fieldControl type="email" required />
+        <p fieldDescription>We never share it.</p>
+        <div *fieldError="'valueMissing'">Enter your email.</div>
+        <div *fieldError="'typeMismatch'">Enter a valid email.</div>
+    </div>
+    <button type="submit">Sign up</button>
+</form>
+```
+
+</Framework>
+
+A plain `<form>` is enough: a submission with an empty address is blocked by the browser, the
+field shows "Enter your email." and the input takes focus. Focusing and leaving the empty field
+shows nothing before that: a required field is not reported until its value changed or a
+submission was attempted.
+
+## Your own rules: validate
+
+`validate(value)` returns a message, a list of messages, or `null`. Its messages make the field
+invalid (the `customError` key) and are set as the control's custom validity, so a native form
+never submits a value it rejects. An Error with no children shows the current messages: one as
+text, several as a list.
+
+```tsx
+<Field.Root
+    name="password"
+    validate={(value) => {
+        const text = String(value);
+        const problems: string[] = [];
+        if (!/\d/.test(text)) problems.push("Include a number.");
+        if (text.length < 8) problems.push("At least 8 characters.");
+        return problems;
+    }}
+>
+    <Field.Label>Password</Field.Label>
+    <Field.Control type="password" />
+    <Field.Error />
+</Field.Root>
+```
+
+`match` also takes a function of the field's validity, for a message that covers several keys:
+`match={(validity) => validity.rangeUnderflow || validity.rangeOverflow}`.
+
+## When errors show: validationMode
+
+The custom validity is always current; the mode only decides when the result is **shown**.
+
+| event | `onSubmit` (default) | `onBlur` | `onChange` |
+| --- | --- | --- | --- |
+| a submission is attempted | shown | shown | shown |
+| the control loses focus | no | shown | no |
+| the value changes | after a submission was attempted | hides a shown error | shown |
+
+In `onSubmit` and `onBlur`, a change on a field that shows an error hides it until the field next
+validates, unless the change empties a required field. A [Form](/docs/api/form)'s
+`validationMode` is the default of every field inside it; a field's own wins.
+
+## Async validation
+
+`validate` may return a promise: a server check of a username, for example.
+
+```tsx
+<Field.Root
+    name="username"
+    validationMode="onChange"
+    validate={async (value) => {
+        const response = await fetch(`/api/usernames/${encodeURIComponent(String(value))}`);
+        const { taken } = (await response.json()) as { taken: boolean };
+        return taken ? "This username is taken." : null;
+    }}
+>
+    <Field.Label>Username</Field.Label>
+    <Field.Control required />
+    <Field.Error />
+</Field.Root>
+```
+
+- The native validity is checked at once; a native error shows without waiting.
+- While the latest run is pending, the field keeps what it shows.
+- **The latest run wins**: typing `ada` then `adb` never shows the answer for `ada`, even when it
+  arrives last.
+- **A value already validated is not validated again**: a submission with the same value reuses
+  the last answer at once, so a taken username blocks it. A submission does not wait for a
+  pending run.
+- A rejected promise counts as no message. Debouncing the request is yours.
+
+## Group fields: Fieldset
+
+A [Fieldset](/docs/api/fieldset) is a native `<fieldset>` named by its Legend. Its `disabled`
+disables every field inside it, nested fieldsets included: their controls are disabled, they show
+no error, and the form submits none of them.
+
+```tsx
+<Fieldset.Root disabled={sameAsShipping}>
+    <Fieldset.Legend>Billing address</Fieldset.Legend>
+    <Field.Root name="billing-street">
+        <Field.Label>Billing street</Field.Label>
+        <Field.Control />
+    </Field.Root>
+</Fieldset.Root>
+```
+
+## A Form, and the server's errors
+
+A [Form](/docs/api/form) is a native `<form>` with `novalidate`: it validates its fields itself.
+A submission validates every field, and while one is invalid it is blocked before your `submit`
+listener runs, and the first invalid field takes focus. It also blocks a submission with a
+control the browser cannot validate: a Slider or a CheckboxGroup whose `validate` rejects it.
+
+The server's answer goes in `errors`, keyed by the fields' `name`. A field with errors is invalid
+and its Error with no `match` shows them; when they arrive after a submission went on, the first
+invalid field takes focus. The first change of that field's value hides its errors, and
+`onClearErrors` gives you the errors left.
+
+<Framework name="react">
+
+```tsx
+import { Field } from "@fragiola/primitives-react/field";
+import { Form, type FormErrors } from "@fragiola/primitives-react/form";
+
+function SignUp() {
+    const [errors, setErrors] = useState<FormErrors>({});
+    return (
+        <Form
+            aria-label="Sign up"
+            errors={errors}
+            onClearErrors={setErrors}
+            onSubmit={async (event) => {
+                event.preventDefault();
+                const response = await fetch("/api/accounts", {
+                    method: "POST",
+                    body: new FormData(event.currentTarget),
+                });
+                // { "username": "This username is taken." }
+                if (!response.ok) setErrors((await response.json()) as FormErrors);
+            }}
+        >
+            <Field.Root name="username">
+                <Field.Label>Username</Field.Label>
+                <Field.Control required />
+                <Field.Error />
+            </Field.Root>
+            <button type="submit">Sign up</button>
+        </Form>
+    );
+}
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Form aria-label="Sign up" :errors="errors" @clear-errors="errors = $event" @submit="submit">
+        <Field.Root name="username">
+            <Field.Label>Username</Field.Label>
+            <Field.Control required />
+            <Field.Error />
+        </Field.Root>
+        <button type="submit">Sign up</button>
+    </Form>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<form formRoot aria-label="Sign up" [errors]="errors()" (clearErrors)="errors.set($event)" (submit)="submit($event)">
+    <div fieldRoot [name]="'username'">
+        <label fieldLabel>Username</label>
+        <input fieldControl required />
+        <div *fieldError></div>
+    </div>
+    <button type="submit">Sign up</button>
+</form>
+```
+
+</Framework>
+
+Server errors show only in an Error with no `match` (or `match={true}`): a key or a function
+matches the validity, which server errors are not part of.
+
+## Every control
+
+Inside a `Field.Root`, a form primitive takes the field's ids, `name` and `disabled`, and reports
+its focus and its changes; give it no `name` of its own. Outside a field it behaves as before.
+
+| control | what `validate` receives | what is validated natively | focused when invalid |
+| --- | --- | --- | --- |
+| `Field.Control` | the text | the input | the input |
+| [Checkbox](/docs/api/checkbox) | `checked` | its hidden input (`required`) | the checkbox |
+| [CheckboxGroup](/docs/api/checkbox-group) | the array of checked values | nothing: only a Form blocks | its first enabled checkbox |
+| [Select](/docs/api/select) | the value, or `null` | its hidden input (`required`) | its Trigger |
+| [Slider](/docs/api/slider) | the number, or numbers | nothing: only a Form blocks | its first Thumb |
+| [Combobox](/docs/api/combobox) | the item, `null`, or the items | its hidden input (`required`) | its Input |
+| [DatePicker](/docs/api/date-picker) | the date, or `null` | its hidden input (`required`) | its Trigger |
+| [DateRangePicker](/docs/api/date-range-picker) | the range, or `null` | its hidden input (`required`) | its Trigger |
+
+```tsx
+<Form aria-label="Booking">
+    <Field.Root name="toppings" validate={(value) => ((value as string[]).length ? null : "Choose a topping.")}>
+        <Field.Label>Toppings</Field.Label>
+        <CheckboxGroup>
+            <label><Checkbox.Root value="cheese" /> Cheese</label>
+            <label><Checkbox.Root value="ham" /> Ham</label>
+        </CheckboxGroup>
+        <Field.Error />
+    </Field.Root>
+    <Field.Root name="arrival">
+        <Field.Label>Arrival</Field.Label>
+        <DatePicker.Root required locale="en-US">
+            <DatePicker.Trigger>{/* the chosen date, or "none" */}</DatePicker.Trigger>
+            {/* its Portal, Positioner, Popup and Calendar */}
+        </DatePicker.Root>
+        <Field.Error>Choose a date.</Field.Error>
+    </Field.Root>
+    <button type="submit">Book</button>
+</Form>
+```
+
+- **The label**: a click on it focuses the control, or clicks a labelable one (it toggles a
+  Checkbox). A picker's Trigger is only focused: a click would open its popup.
+- **A picker's name** is the label, then the Trigger's own content: "Arrival 2026-11-24". Your
+  visible text stays in its name. A Select's Trigger is named by the label alone.
+- **A Slider** has a Label of its own; inside a Field, use the Field's instead.
+- **A form reset** returns every control to its default; the fields keep their states (`dirty`,
+  `touched`, the validity), as in Base UI.
+
+## Styling the states
+
+Every part of a field, and the control's main element, carries the field's states: style them
+with your own CSS.
+
+```css
+[data-primitives-part="field-control"][data-invalid] {
+    border-color: var(--danger);
+}
+[data-primitives-part="field-root"][data-disabled] {
+    opacity: 0.6;
+}
+```
+
+| attribute | when |
+| --- | --- |
+| `data-invalid` / `data-valid` | the field shows an error / validated and is valid (neither before its first validation) |
+| `data-dirty` | the value differs from the value at mount |
+| `data-touched` | the control lost focus once |
+| `data-filled` | the value is not empty |
+| `data-focused` | the control has focus |
+| `data-disabled` | the field, or a Fieldset around it, is disabled |

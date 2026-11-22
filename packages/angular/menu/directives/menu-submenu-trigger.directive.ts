@@ -11,6 +11,7 @@ import { submenuKeys } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import {
     dataValues,
+    injectProvidedDirection,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import { menuItemBehaviour } from "./menu-item-behaviour.ts";
@@ -50,6 +51,8 @@ export interface MenuSubmenuTriggerState {
     },
 })
 export class MenuSubmenuTrigger {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     protected readonly submenu = inject(MenuRoot);
     private readonly parent = this.requireParent();
     readonly disabled = input(false, { transform: booleanAttribute });
@@ -99,7 +102,7 @@ export class MenuSubmenuTrigger {
 
     protected onKeyDown(event: KeyboardEvent): void {
         const { open: openKey } = submenuKeys(
-            getDirection(this.host) === "rtl",
+            getDirection(this.host, this.direction()) === "rtl",
         );
         if (
             event.key === openKey ||

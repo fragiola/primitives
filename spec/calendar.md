@@ -47,6 +47,7 @@ DatePicker and DateRangePicker share their parts the same way:
 | Portal | none | | |
 | Positioner | `div` | `date-picker-positioner` / `date-range-picker-positioner` | as [popover.md](popover.md#positioning) |
 | Popup | `div` | `date-picker-popup` / `date-range-picker-popup` | a non-modal `dialog` holding a `Calendar.Root` / `RangeCalendar.Root` |
+| (hidden input) | `input` | `date-picker-input` / `date-range-picker-input` | rendered by the Root after its children, while it has a `name` (or a Field's); what the form submits ([Forms](#forms)) |
 
 A `Calendar.Root` (or `RangeCalendar.Root`) rendered inside a picker's Popup without `value` /
 `defaultValue` binds to the picker: it shows the picker's value and choosing a date sets it.
@@ -104,8 +105,9 @@ defaults to the full date (`Intl` `dateStyle: "full"`), and the consumer can rep
 
 **DatePicker.Root**: `value`, `defaultValue`, `onValueChange`, `open`, `defaultOpen`,
 `onOpenChange`, plus the calendar options (`min`, `max`, `isDateUnavailable`, `locale`,
-`firstDayOfWeek`, `visibleMonths`) passed to the bound calendar. **DateRangePicker.Root**: the
-same with a range.
+`firstDayOfWeek`, `visibleMonths`) passed to the bound calendar; and the form props
+([Forms](#forms)): `name`, `required`, `disabled`, `readOnly`. **DateRangePicker.Root**: the same
+with a range.
 
 **Positioner**: as Popover's; defaults `side="bottom" align="start"`.
 
@@ -124,7 +126,8 @@ have no name of their own: the consumer labels them; the picker's popup likewise
 | Grid | `role="grid"`, an `id`, `aria-labelledby` (the Heading with the same `offset`), `aria-readonly="true"` when read-only, `aria-disabled="true"` when disabled, `aria-multiselectable="true"` in a RangeCalendar |
 | HeaderCell | `scope="col"`, `abbr` (the long weekday name) |
 | Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused date unless the calendar is disabled, `-1` on the other dates of the shown months, absent on outside-month cells), `aria-selected="true"` when selected (absent otherwise), `aria-disabled="true"` when disabled, unavailable or outside the month, `aria-current="date"` on today; `data-today`, `data-selected`, `data-disabled`, `data-unavailable`, `data-outside-month`; in a RangeCalendar also `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` |
-| Picker Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup's id, while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming") |
+| Picker Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup's id, while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming"); `disabled` and `data-disabled` while the picker is disabled, `data-readonly` while read-only, `data-required` while required; inside a Field, its ids, `aria-*` and state attributes ([field.md](field.md#integration-contract)) |
+| Picker hidden input | `name`, `value` (ISO), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, structural inline style (visually hidden) |
 | Picker Positioner | `role="presentation"`, `data-open`, `data-side`, `data-align` |
 | Picker Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-open`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style` |
 
@@ -133,6 +136,30 @@ cannot be focused (by the keyboard, nor by a press) nor chosen. A date is **unav
 `isDateUnavailable` says so: it can be focused but not chosen. **Outside-month** cells (the
 leading and trailing days of the 6-week grid) cannot be focused nor chosen; the keyboard reaches
 those dates by moving the visible month.
+
+## Forms
+
+The pickers work in a native `<form>` (Stage 0 left them out; production scope §3.6, "essential"),
+as the other form controls do (spec/README.md, "Forms"):
+
+- **`name`**: the Root renders a hidden input after its children, which the form submits. A
+  DatePicker submits `name=<ISO date>` (`2026-11-24`), or an empty value with no date. A
+  DateRangePicker submits **one** entry, the ISO 8601 interval `name=<start>/<end>`
+  (`2026-11-25/2026-11-27`), or an empty value until both ends are chosen. Inside a
+  [Field](field.md), the field's `name` wins.
+- **`required`**: the hidden input is `required`, so a native form's validation blocks a
+  submission with no value (`valueMissing`), and focus moves to the Trigger (the form bridge,
+  spec/README.md). The hidden input is a visually hidden text input (`type="text"`,
+  `aria-hidden="true"`, `tabindex="-1"`), not `type="hidden"`, which the browser never validates.
+- **`disabled`**: the Trigger is disabled (it cannot open the popup) and the hidden input too (it
+  submits nothing). A Field's or a Fieldset's `disabled` disables it as well.
+- **`readOnly`**: the value cannot change: the Trigger still opens the popup, whose calendar is
+  read-only (it can be browsed, no date can be chosen); the hidden input still submits.
+- **A form reset** returns an uncontrolled picker to its `defaultValue` (a controlled one reports
+  it through `onValueChange`, reason `none`), as the other controls.
+- **Field**: the Trigger is the labelable element and the focus target; the value given to
+  `validate` is the date or the range (or `null`); the hidden input is the validated element
+  ([field.md](field.md#integration-contract)).
 
 ## Keyboard
 
@@ -210,7 +237,8 @@ Pickers' Popup as [popover.md](popover.md#animation). Calendars: none.
 ## RTL
 
 The grid flows right to left (from the document's `dir`); next/previous day swap ArrowRight and
-ArrowLeft. Week order still starts at the locale's first day, on the inline-start side.
+ArrowLeft. The keys follow a [DirectionProvider](direction.md)'s direction, else the grid's
+computed one. Week order still starts at the locale's first day, on the inline-start side.
 
 ## Scenarios
 
@@ -350,6 +378,34 @@ Popup's `aria-label` is **"Choose dates"**.
 Checks: open; click November 10: the popup stays open; click November 13: `value:
 2026-11-10..2026-11-13`, the popup closes and focus is on the trigger. Contract layer: the
 picker's parts carry `date-range-picker-<part>`, its calendar's `range-calendar-<part>`.
+
+### `/date-picker/form`
+
+A `<form>` with a DatePicker `name="arrival"`, `required` (Trigger **"Arrival: "** and the value,
+or "none"; Popup `aria-label` **"Choose date"**), a DateRangePicker `name="stay"`, `required`
+(Trigger **"Stay: "** and the range; Popup `aria-label` **"Choose dates"**), a DatePicker
+`name="departure"`, `readOnly`, `value` 2026-11-30 (the fixture holds it; Trigger
+**"Departure: "** and the value; Popup `aria-label` **"Departure date"**), a DatePicker `name="return"`, `disabled` (Trigger
+**"Return: "** and the value), and **"Submit"** and **"Reset"** buttons. "Today" is 2026-11-20.
+Output: `form: ...`.
+
+Checks:
+
+1. "Submit" submits nothing (`form: none`, required) and focuses "Arrival".
+2. Choosing November 24 in "Arrival", then "Submit", still submits nothing and focuses "Stay".
+3. Choosing November 25 then 27 in "Stay", then "Submit", gives
+   `form: arrival=2026-11-24&stay=2026-11-25/2026-11-27&departure=2026-11-30` (the disabled picker
+   submits nothing).
+4. "Departure" opens its popup; a click on November 26 changes nothing (read-only): the trigger
+   still reads "Departure: 2026-11-30". Its trigger carries `data-readonly`.
+5. "Return" is disabled.
+6. "Reset" returns "Arrival" and "Stay" to "none"; "Submit" submits nothing again.
+7. Axe finds no violation.
+8. Contract layer: each picker's hidden input carries `date-picker-input` /
+   `date-range-picker-input`, `aria-hidden="true"` and `tabindex="-1"`; the required triggers carry
+   `data-required`, the disabled one `data-disabled`.
+
+The pickers inside a [Field](field.md) are [`/field/more-controls`](field.md#fieldmore-controls).
 
 ## Differences from Base UI
 

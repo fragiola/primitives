@@ -85,6 +85,9 @@ export function CheckboxRoot({
         value: checked,
         filled: checked,
         input: () => input.current,
+        focusTarget: () => button,
+        // a group in a Field is the field's control, not its checkboxes
+        skip: group?.inField ?? false,
     });
     const disabled =
         disabledProp || (group?.disabled ?? false) || field.disabled;
@@ -112,8 +115,20 @@ export function CheckboxRoot({
         }
     };
 
-    const latest = useRef({ group, inGroup, defaultChecked, setOwn });
-    latest.current = { group, inGroup, defaultChecked, setOwn };
+    const latest = useRef({
+        group,
+        inGroup,
+        defaultChecked,
+        setOwn,
+        reset: field.reset,
+    });
+    latest.current = {
+        group,
+        inGroup,
+        defaultChecked,
+        setOwn,
+        reset: field.reset,
+    };
     useEffect(() => {
         const element = input.current;
         if (element === null) {
@@ -126,6 +141,7 @@ export function CheckboxRoot({
                     current.group?.reset();
                     return;
                 }
+                current.reset();
                 current.setOwn(current.defaultChecked, { reason: "none" });
                 element.checked = current.defaultChecked;
             },
@@ -179,7 +195,7 @@ export function CheckboxRoot({
                 type="checkbox"
                 aria-hidden="true"
                 tabIndex={-1}
-                name={parent ? undefined : (field.name ?? name)}
+                name={parent ? undefined : (group?.name ?? field.name ?? name)}
                 value={value ?? "on"}
                 checked={checked && !(parent && inGroup)}
                 required={required}

@@ -6,6 +6,12 @@ export const Slider = {
     Root: (props: ComponentProps<typeof Primitive.Root>) => (
         <Primitive.Root className={slider.root} {...props} />
     ),
+    Label: (props: ComponentProps<typeof Primitive.Label>) => (
+        <Primitive.Label className={slider.label} {...props} />
+    ),
+    Value: (props: ComponentProps<typeof Primitive.Value>) => (
+        <Primitive.Value className={slider.value} {...props} />
+    ),
     Control: (props: ComponentProps<typeof Primitive.Control>) => (
         <Primitive.Control className={slider.control} {...props} />
     ),

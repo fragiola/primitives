@@ -27,6 +27,25 @@ export interface SliderContext {
     /** The thumbs in document order, for the default `index` and focusing the moved one. */
     thumbs: ShallowRef<readonly HTMLElement[]>;
     registerThumb: (element: HTMLElement) => () => void;
+    /**
+     * The thumbs' ids, in the order their parts were set up (document order), with their
+     * `index` when they have one: the Value's `for`. Set up before the Value renders, on a
+     * server too.
+     */
+    thumbIds: ShallowRef<readonly SliderThumbId[]>;
+    registerThumbId: (entry: SliderThumbId) => () => void;
+    /** The rendered Label's id: it names the Root and the thumbs with no name of their own. */
+    labelId: Ref<string | undefined>;
+    /** A value as the Value shows it: formatted with `format`, else the plain number. */
+    formatValue: (value: number) => string;
+    /** Whether the Root has a `format` (the thumbs' `aria-valuetext` then follows it). */
+    formatted: () => boolean;
+}
+
+/** A thumb's id for the Value's `for`. */
+export interface SliderThumbId {
+    id: () => string;
+    index: () => number | undefined;
 }
 
 export const SliderKey: InjectionKey<SliderContext> = Symbol("Slider");

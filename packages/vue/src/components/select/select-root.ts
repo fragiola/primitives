@@ -108,6 +108,7 @@ export const SelectRoot: PublicComponent<
                 value: () => value.value,
                 filled: () => value.value !== null,
                 input: () => input.value,
+                focusTarget: () => root.trigger.value,
             });
             const disabled = () => props.disabled || field.disabled();
             const highlighted = ref<string | null>(null);
@@ -154,6 +155,7 @@ export const SelectRoot: PublicComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
+                                field.reset();
                                 state.set(props.defaultValue, {
                                     reason: "none",
                                 });

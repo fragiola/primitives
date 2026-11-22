@@ -141,6 +141,9 @@ export function useCalendar(
     const focusPending = { current: binding.value !== null };
     const baseId = useId();
 
+    // its own, else a read-only picker's (spec/calendar.md, "Forms")
+    const readOnly = () =>
+        props.readOnly ?? binding.value?.readOnly?.() ?? false;
     const isOutOfBounds = (date: PlainDate) =>
         (props.disabled ?? false) || !isWithinBounds(date, min(), max());
     const commit = (next: CalendarValue) => {
@@ -186,7 +189,7 @@ export function useCalendar(
         visibleStart,
         focusedDate,
         disabled: () => props.disabled ?? false,
-        readOnly: () => props.readOnly ?? false,
+        readOnly: () => readOnly(),
         headingId: (offset) => `${baseId}-heading-${offset}`,
         gridId: (offset) => `${baseId}-grid-${offset}`,
         cellState(date, month): CalendarCellState {
@@ -264,7 +267,7 @@ export function useCalendar(
             if (
                 isOutOfBounds(date) ||
                 option("isDateUnavailable")?.(date) ||
-                (props.readOnly ?? false)
+                readOnly()
             ) {
                 return;
             }

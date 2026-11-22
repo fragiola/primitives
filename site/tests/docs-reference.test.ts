@@ -6,6 +6,7 @@ import {
     COMPONENTS,
     FRAMEWORKS,
     MECHANISMS,
+    UTILITIES,
 } from "../../scripts/components.ts";
 import { readPages } from "../contract.ts";
 import { DOCS_DIR } from "../sources.ts";
@@ -15,13 +16,14 @@ import { DOCS_DIR } from "../sources.ts";
 //
 //   - `## Exports`: each row names an entry (`@fragiola/primitives-react/dialog`) and every name it
 //     exports. The row must list exactly what the entry's source exports, and every entry must have
-//     its row: each component's in each framework on its page, each toolkit mechanism on
+//     its row: each component's in each framework on its page, each utility entry's
+//     (`/direction`, `/render`) in each framework on its page, each toolkit mechanism on
 //     api/toolkit.
 //   - `## Props`: one `### <Part>` per part of the component's namespace, in order, each with a
 //     table whose first column names a prop (`` `open` ``), optionally only for some frameworks
 //     (`` `id` (angular) ``). Each framework's declared props of that part must be exactly the
-//     documented ones: React's `<Part>Props` interface (and the interfaces it extends, but the
-//     contract's `PartProps`), Vue's `props` (but `as`) and `emits` (`valueChange` is
+//     documented ones: React's `<Part>Props` interface (its fields and methods, and the interfaces
+//     it extends, but the contract's `PartProps`), Vue's `props` (but `as`) and `emits` (`valueChange` is
 //     `onValueChange`), Angular's `input()`s and `output()`s (`openChangeDetails` is
 //     `onOpenChange`; `openChange` is the two-way binding of the `open` input).
 
@@ -202,7 +204,8 @@ function reactProps(component: string, sources: Sources) {
                 open,
             );
             const body = braced(text, open);
-            const fields = [...body.matchAll(/^ {4}(\w+)\??:/gm)].map(
+            // a field (`open?: boolean`) or a method (`onClearErrors?(errors): void`)
+            const fields = [...body.matchAll(/^ {4}(\w+)\??[:(<]/gm)].map(
                 (field) => field[1] ?? "",
             );
             const bases = (/extends\s+([\s\S]*)$/.exec(heritage)?.[1] ?? "")
@@ -525,6 +528,15 @@ function docsReferenceProblems(
                     ] as const,
             ),
         ),
+        ...UTILITIES.flatMap((utility) =>
+            FRAMEWORKS.map(
+                (framework) =>
+                    [
+                        `@fragiola/primitives-${framework}/${utility}`,
+                        `api/${utility}`,
+                    ] as const,
+            ),
+        ),
         ...MECHANISMS.map(
             (mechanism) =>
                 [`@fragiola/primitives/${mechanism}`, "api/toolkit"] as const,
@@ -728,6 +740,35 @@ describe("the docs reference check", () => {
         expect(docsReferenceProblems(PAGES, sources)).toContain(
             "api/tabs: @fragiola/primitives-react/tabs also exports useTabs",
         );
+    });
+
+    it("fails when a utility entry exports a name its page does not list", () => {
+        const sources = planted(
+            "packages/vue/src/direction/index.ts",
+            (text) =>
+                `${text}export { useProvidedDirection } from "./use-direction.ts";\n`,
+        );
+        expect(docsReferenceProblems(PAGES, sources)).toContain(
+            "api/direction: @fragiola/primitives-vue/direction also exports useProvidedDirection",
+        );
+    });
+
+    it("fails when a utility entry has no row on its page", () => {
+        const pages = new Map(PAGES);
+        pages.set(
+            "api/render",
+            (PAGES.get("api/render") ?? "").replace(
+                /^\| `@fragiola\/primitives-angular\/render` .*$/m,
+                "",
+            ),
+        );
+        expect(docsReferenceProblems(pages)).toContain(
+            'api/render: no "## Exports" row for @fragiola/primitives-angular/render',
+        );
+    });
+
+    it("reads a method of a props interface as a prop", () => {
+        expect(reactProps("form", disk).get("Form")).toContain("onClearErrors");
     });
 
     it("fails when a documented export is gone", () => {

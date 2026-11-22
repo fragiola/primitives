@@ -164,7 +164,9 @@ describe("the sidebar", () => {
         expect(sections).toEqual([
             "Getting started",
             "Concepts",
+            "Guides",
             "API: components",
+            "API: utilities",
             "API: DOM toolkit (@fragiola/primitives)",
             "More",
         ]);
@@ -182,12 +184,17 @@ describe("the sidebar", () => {
             "concepts/attributes",
             "concepts/tree-shaking",
             "concepts/behaviour-rule",
+            "guides/forms",
+            "guides/rtl",
+            "guides/composition",
             "api/dialog",
             "api/popover",
             "api/tooltip",
             "api/menu",
             "api/tabs",
             "api/field",
+            "api/fieldset",
+            "api/form",
             "api/checkbox",
             "api/checkbox-group",
             "api/slider",
@@ -197,6 +204,8 @@ describe("the sidebar", () => {
             "api/range-calendar",
             "api/date-picker",
             "api/date-range-picker",
+            "api/direction",
+            "api/render",
             "api/toolkit",
             "server-rendering",
             "limitations",
@@ -212,6 +221,8 @@ describe("the sidebar", () => {
             "api/menu",
             "api/tabs",
             "api/field",
+            "api/fieldset",
+            "api/form",
             "api/checkbox",
             "api/checkbox-group",
             "api/slider",
@@ -233,8 +244,9 @@ describe("the sidebar", () => {
                 "Keyboard",
                 "Exports",
             ]);
-            // every component follows an APG pattern but Field, which has none (Base UI's Field)
-            if (path !== "api/field") {
+            // every component follows an APG pattern but the Field layer, which has none (Base UI's
+            // Field, Fieldset and Form)
+            if (!["api/field", "api/fieldset", "api/form"].includes(path)) {
                 expect(page, path).toMatch(
                     /https:\/\/www\.w3\.org\/WAI\/ARIA\/apg\/patterns\//,
                 );

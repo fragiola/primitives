@@ -1,10 +1,12 @@
 import { calendar } from "examples-shared/recipes/calendar";
 import { datePicker } from "examples-shared/recipes/date-picker";
+import { field } from "examples-shared/recipes/field";
 
 // The example's classes: the DatePicker recipe for the trigger and popup, the Calendar recipe
-// for the grid inside, the form, its header row and its button.
+// for the grid inside, the Field recipe around the picker, the form, its header row and its button.
 export const styles = {
     picker: datePicker,
+    field,
     calendar: {
         ...calendar,
         prevButton: calendar["prev-button"],
