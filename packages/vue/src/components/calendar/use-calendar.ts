@@ -14,7 +14,14 @@ import {
     startOfMonth,
     today,
 } from "@fragiola/primitives/date";
-import { computed, inject, shallowRef, useId, watch } from "vue";
+import {
+    type ComputedRef,
+    computed,
+    inject,
+    shallowRef,
+    useId,
+    watch,
+} from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import type {
@@ -28,7 +35,10 @@ import {
     type CalendarValue,
     isRange,
 } from "./calendar-value.ts";
-import { PickerBindingKey } from "./picker-binding-context.ts";
+import {
+    type PickerBinding,
+    PickerBindingKey,
+} from "./picker-binding-context.ts";
 
 export interface CalendarStateProps extends CalendarOptions {
     value?: CalendarValue;
@@ -57,31 +67,35 @@ export function useCalendar(
     onChange: (value: CalendarValue, details: ChangeDetails) => void,
 ): {
     context: CalendarContext;
-    bound: boolean;
+    /** The picker it is bound to, if any (reactive: it follows the props). */
+    bound: ComputedRef<PickerBinding | null>;
     /** Bound to a picker whose popup is open. */
     opened: () => boolean;
 } {
     const injected = inject(PickerBindingKey, null);
-    const picker =
+    // bound while it sits in a picker of its mode with no value of its own: decided from the
+    // current props, not once at setup (a calendar given a `value` later stops being bound)
+    const binding = computed(() =>
         injected !== null &&
         injected.mode === mode &&
         props.value === undefined &&
         props.defaultValue === undefined
             ? injected
-            : null;
-    const bound = picker !== null;
+            : null,
+    );
     const option = <K extends keyof CalendarOptions>(
         key: K,
     ): CalendarOptions[K] =>
-        props[key] !== undefined ? props[key] : picker?.options()[key];
+        props[key] !== undefined ? props[key] : binding.value?.options()[key];
     const own = useControllable<CalendarValue, ChangeDetails>(
         () => props.value,
         props.defaultValue ?? null,
         onChange,
     );
-    const value = computed<CalendarValue>(() =>
-        picker ? picker.value.value : own.value.value,
-    );
+    const value = computed<CalendarValue>(() => {
+        const picker = binding.value;
+        return picker ? picker.value.value : own.value.value;
+    });
     const min = () => option("min") ?? null;
     const max = () => option("max") ?? null;
     const locale = () => option("locale") ?? documentLocale();
@@ -99,12 +113,13 @@ export function useCalendar(
     const anchor = shallowRef<PlainDate | null>(null);
     const hovered = shallowRef<PlainDate | null>(null);
     // a calendar in a picker focuses its focused date when it opens (spec/calendar.md, "Focus")
-    const focusPending = { current: bound };
+    const focusPending = { current: binding.value !== null };
     const baseId = useId();
 
     const isOutOfBounds = (date: PlainDate) =>
         (props.disabled ?? false) || !isWithinBounds(date, min(), max());
     const commit = (next: CalendarValue) => {
+        const picker = binding.value;
         if (picker) {
             picker.choose(next);
         } else {
@@ -113,27 +128,27 @@ export function useCalendar(
     };
     // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels a
     // started range, and reopening starts again from the value, as a fresh calendar would
-    if (picker !== null) {
-        watch(
-            picker.open,
-            (open) => {
-                anchor.value = null;
-                hovered.value = null;
-                if (open) {
-                    const current = value.value;
-                    const start = clampDate(
-                        (isRange(current) ? current.start : current) ??
-                            todayDate,
-                        min(),
-                        max(),
-                    );
-                    focusedDate.value = start;
-                    visibleStart.value = startOfMonth(start);
-                }
-            },
-            { flush: "sync" },
-        );
-    }
+    watch(
+        () => binding.value?.open() ?? null,
+        (open) => {
+            if (open === null) {
+                return;
+            }
+            anchor.value = null;
+            hovered.value = null;
+            if (open) {
+                const current = value.value;
+                const start = clampDate(
+                    (isRange(current) ? current.start : current) ?? todayDate,
+                    min(),
+                    max(),
+                );
+                focusedDate.value = start;
+                visibleStart.value = startOfMonth(start);
+            }
+        },
+        { flush: "sync" },
+    );
     const rangeValue = (): DateRange | null =>
         isRange(value.value) ? value.value : null;
 
@@ -258,6 +273,7 @@ export function useCalendar(
         requestFocus() {
             // a calendar inside a closing picker takes no focus: the picker returns it to its
             // trigger
+            const picker = binding.value;
             if (picker === null || picker.open()) {
                 focusPending.current = true;
             }
@@ -266,7 +282,7 @@ export function useCalendar(
     };
     return {
         context,
-        bound,
-        opened: () => picker?.open() ?? false,
+        bound: binding,
+        opened: () => binding.value?.open() ?? false,
     };
 }
