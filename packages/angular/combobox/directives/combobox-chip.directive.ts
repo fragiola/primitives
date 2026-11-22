@@ -1,7 +1,11 @@
 import { computed, Directive, inject } from "@angular/core";
 import { chipKeyTarget } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
-import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
+import {
+    dataValues,
+    injectHost,
+    injectProvidedDirection,
+} from "@fragiola/primitives-angular/internal";
 import { ComboboxRoot } from "./combobox-root.directive.ts";
 
 /**
@@ -20,6 +24,8 @@ import { ComboboxRoot } from "./combobox-root.directive.ts";
     },
 })
 export class ComboboxChip {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     private readonly root = inject(ComboboxRoot);
     /** The chip's element, read when a key or a press removes it. */
     readonly element = injectHost();
@@ -42,7 +48,7 @@ export class ComboboxChip {
             event.key,
             index,
             chips.length,
-            getDirection(this.element) === "rtl",
+            getDirection(this.element, this.direction()) === "rtl",
         );
         if (action === null) {
             return;
