@@ -94,6 +94,7 @@ export const CheckboxRoot: PartComponent<
                 value: () => state.value.checked,
                 filled: () => state.value.checked,
                 input: () => input.value,
+                focusTarget: () => button.value,
             });
             const inGroup = computed(
                 () =>

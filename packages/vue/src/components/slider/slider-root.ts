@@ -117,6 +117,7 @@ export const SliderRoot: PartComponent<
                 // a slider always has a value
                 filled: () => true,
                 input: () => firstInput.value,
+                focusTarget: () => thumbs.value[0] ?? null,
             });
             const dragging = ref(false);
             const activeIndex = ref(-1);

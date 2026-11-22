@@ -223,6 +223,7 @@ export const ComboboxRoot: PublicComponent<
                 value: () => value.value,
                 filled: () => values.value.length > 0,
                 input: () => hidden.value,
+                focusTarget: () => root.trigger.value,
             });
             const disabled = () => props.disabled || field.disabled();
             const highlighted = ref<string | null>(null);

@@ -11,11 +11,15 @@ export interface UseFieldControlOptions {
     id: () => string | undefined;
     /** Whether `<label for>` can point at it (a native input or a `button`). */
     labelable: boolean;
+    /** A press on the Label focuses it instead of clicking it (default `false`). */
+    labelFocuses?: boolean;
     /** The control's value, given to `validate`. */
     value: () => unknown;
     filled: () => boolean;
-    /** The element the form validates (the input, or the hidden input). */
+    /** The element the form validates (the input, or the hidden input; `null` for none). */
     input: () => HTMLInputElement | null;
+    /** The element a Form focuses when the field is the first invalid one (spec/field.md, 5). */
+    focusTarget: () => HTMLElement | null;
 }
 
 /** What a control renders inside a field; each getter is read at render time. */
@@ -32,7 +36,8 @@ export interface FieldControlBinding {
     onBlur: () => void;
 }
 
-const OUTSIDE: FieldControlBinding = {
+/** Outside a field: nothing of a field's. */
+export const OUTSIDE_FIELD: FieldControlBinding = {
     inField: false,
     name: () => undefined,
     disabled: () => false,
@@ -56,7 +61,7 @@ export function useFieldControl(
 ): FieldControlBinding {
     const field = inject(FieldKey, null);
     if (field === null) {
-        return OUTSIDE;
+        return OUTSIDE_FIELD;
     }
     const { events } = field;
 
@@ -70,7 +75,11 @@ export function useFieldControl(
             unregister =
                 id === undefined
                     ? null
-                    : field.registerControl(id, options.labelable);
+                    : field.registerControl({
+                          id,
+                          labelable: options.labelable,
+                          labelFocuses: options.labelFocuses ?? false,
+                      });
         },
         { immediate: true },
     );
@@ -78,6 +87,12 @@ export function useFieldControl(
         unregister?.();
         unregister = null;
     });
+    const detach = field.attachControl({
+        input: options.input,
+        value: options.value,
+        focusTarget: options.focusTarget,
+    });
+    onBeforeUnmount(detach);
 
     let stop: (() => void)[] = [];
     // from the mount on: the control's own state may be defined after this call
@@ -85,12 +100,13 @@ export function useFieldControl(
         const initial = serialize(options.value());
         let previous = initial;
         events.mounted(options.input(), options.value(), options.filled());
-        const form = options.input()?.form;
+        // inside a Form, the Form's submission validates the field (spec/form.md)
+        const form = field.inForm ? null : options.input()?.form;
         if (form !== null && form !== undefined) {
             stop.push(
-                onSubmitAttempt(form, () =>
-                    events.submitAttempt(options.input(), options.value()),
-                ),
+                onSubmitAttempt(form, () => {
+                    events.submitAttempt(options.input(), options.value());
+                }),
             );
         }
         // after the render: the validated element holds the new value
