@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "vite --port 5330 --strictPort",
         "build": "vite build",
+        "build:ssr": "vite build --outDir dist-ssr/client && vite build --ssr src/server/entry-server.ts --outDir dist-ssr/server",
         "preview": "vite preview",
         "typecheck": "vue-tsc -p tsconfig.json --noEmit"
     },

@@ -11,7 +11,7 @@ import { RangeCalendar } from "../../kit/ui/calendar.ts";
 import { DatePicker } from "../../kit/ui/date-picker.ts";
 import MonthView from "../../kit/ui/month-view.vue";
 
-defineProps<{ locale: string }>();
+defineProps<{ locale?: string }>();
 const value = ref<DateRange | null>(null);
 </script>
 

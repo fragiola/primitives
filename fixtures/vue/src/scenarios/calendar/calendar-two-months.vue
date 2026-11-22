@@ -2,7 +2,7 @@
 import { Calendar } from "../../kit/ui/calendar.ts";
 import MonthView from "../../kit/ui/month-view.vue";
 
-defineProps<{ locale: string }>();
+defineProps<{ locale?: string }>();
 </script>
 
 <template>

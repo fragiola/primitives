@@ -18,5 +18,5 @@ import { MonthView } from "../../kit/month-view.ts";
 })
 export class CalendarTwoMonths {
     protected readonly styles = calendar;
-    readonly locale = input.required<string>();
+    readonly locale = input.required<string | undefined>();
 }

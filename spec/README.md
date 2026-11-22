@@ -203,6 +203,20 @@ Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dock
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
 and `splitter/packages/*`.
 
+## Server rendering
+
+Every component renders on the server and hydrates with no mismatch, in every framework (Epic #22;
+the conformance suite's **ssr** layer renders every scenario below on a server, hydrates it, and
+checks that the page ends as the browser alone renders it, keeps the server's ids, and logs no
+warning). A part renders on the server what it can know there: no measurement (an overlay renders
+closed; a part that follows a measurement renders without it until it is mounted) and nothing a
+server does not know about the reader (a calendar's default locale, `calendar.md` "API"). Ids are
+the framework's (`useId` in React and Vue, an application's own counter in Angular), never a
+counter of the JavaScript realm, which a server shares between pages. A part created outside its
+framework's template (Angular's hidden inputs) is added in the browser once the page is hydrated.
+Base UI's parts that need a script before hydration: the Tabs Indicator (`renderBeforeHydration`,
+`tabs.md`); the Slider thumb needs none (its position is a percentage, `slider.md`).
+
 ## Scenarios and fixtures
 
 Every scenario is a page at `/<component>/<scenario>` in every fixture (`fixtures/<framework>`).
@@ -214,7 +228,8 @@ The specs fix:
   open state and the last change reason, as `key: value` lines;
 - a `data-testid` on an element the behaviour layer must find but that has no role (a popover's
   Arrow), named in the scenario;
-- query parameters: `?locale=<tag>` and `?dir=rtl` where a scenario says so.
+- query parameters: `?locale=<tag>` and `?dir=rtl` where a scenario says so; `?locale=none`
+  passes no `locale` and leaves the document with no `lang`.
 
 The conformance suite fixes "today" with Playwright's clock: **2026-11-20** (a Friday) in every
 calendar scenario.

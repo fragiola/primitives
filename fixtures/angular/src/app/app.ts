@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation } from "@angular/core";
+import { DOCUMENT } from "@angular/common";
+import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { readQuery } from "../kit/query.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -179,8 +180,10 @@ import { ROUTES } from "./routes.ts";
     `,
 })
 export class App {
-    protected readonly query = readQuery(window.location.search);
-    protected readonly path = window.location.pathname;
+    // the document's location: the browser's, or the server render's URL (src/server)
+    private readonly location = inject(DOCUMENT).location;
+    protected readonly query = readQuery(this.location.search);
+    protected readonly path = this.location.pathname;
     protected readonly routes = ROUTES;
 
     /** The unavailable dates of `/calendar/unavailable`: weekends. */
@@ -190,7 +193,12 @@ export class App {
     };
 
     constructor() {
-        document.documentElement.dir = this.query.dir;
-        document.documentElement.lang = this.query.locale;
+        const html = inject(DOCUMENT).documentElement;
+        html.setAttribute("dir", this.query.dir);
+        if (this.query.lang === undefined) {
+            html.removeAttribute("lang");
+        } else {
+            html.setAttribute("lang", this.query.lang);
+        }
     }
 }

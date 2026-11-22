@@ -1,6 +1,6 @@
 import { SingleCalendar } from "./single-calendar.tsx";
 
-export function CalendarMinMax({ locale }: { locale: string }) {
+export function CalendarMinMax({ locale }: { locale?: string }) {
     return (
         <SingleCalendar
             locale={locale}

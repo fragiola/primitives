@@ -23,7 +23,7 @@ import { Output } from "../../kit/output.ts";
 export class SingleCalendar {
     protected readonly styles = calendar;
     protected readonly iso = iso;
-    readonly locale = input.required<string>();
+    readonly locale = input.required<string | undefined>();
     readonly min = input<PlainDate | undefined>(undefined);
     readonly max = input<PlainDate | undefined>(undefined);
     readonly isDateUnavailable = input<

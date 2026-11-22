@@ -17,8 +17,8 @@ the guidelines (`../guidelines`, the `fragiola-ecosystem` skill); this file wins
 | `packages/react` | `@fragiola/primitives-react` | the React primitives, one entry per component (`/dialog`, `/tabs`) | the toolkit (exact version); peer `react`, `react-dom` ^19 |
 | `packages/vue` | `@fragiola/primitives-vue` | the Vue primitives, one entry per component | the toolkit (exact version); peer `vue` ^3.5 |
 | `packages/angular` | `@fragiola/primitives-angular` | the Angular standalone directives, one ng-packagr secondary entry point per component | the toolkit (exact version); peer `@angular/core` ^22 |
-| `fixtures/<framework>` | private | one app per framework, rendering every spec scenario at `/<component>/<scenario>` with the recipes | the framework package, the recipes |
-| `conformance` | private | the Playwright suite: behaviour (with axe), contract and visual layers, run against every fixture | |
+| `fixtures/<framework>` | private | one app per framework, rendering every spec scenario at `/<component>/<scenario>` with the recipes, in the browser and on a server (`src/server/entry-server`, `build:ssr`) | the framework package, the recipes |
+| `conformance` | private | the Playwright suite: behaviour (with axe), contract, visual and ssr layers, run against every fixture (the ssr layer against its server render, `conformance/src/ssr-server.ts`) | |
 | `examples/shared` | `examples-shared`, private | the styling layer (recipes keyed on `data-*`, the five example themes), the examples' metadata, the embed protocol, the manifest builder, the overlay promotion, every examples Playwright spec | no framework |
 | `examples/<framework>` | private | the site's examples, one embed app per framework | the framework package |
 | `site` | private | the site export (`export.ts`, `contract.ts`, `dev.ts`, `dev-proxy.ts`), the pages of fragiola.com/primitives, the repository's script tests | |

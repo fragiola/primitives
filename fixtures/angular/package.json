@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "vite --port 5340 --strictPort",
         "build": "vite build",
+        "build:ssr": "vite build --outDir dist-ssr/client && vite build --ssr src/server/entry-server.ts --outDir dist-ssr/server",
         "preview": "vite preview",
         "typecheck": "ngc -p tsconfig.json --noEmit"
     },
@@ -22,6 +23,7 @@
         "@analogjs/vite-plugin-angular": "2.9.7",
         "@angular/build": "22.2.7",
         "@angular/compiler-cli": "22.2.6",
+        "@angular/platform-server": "22.2.6",
         "@tailwindcss/vite": "4.3.5",
         "tailwindcss": "4.3.5",
         "typescript": "6.0.3",

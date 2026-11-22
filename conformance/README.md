@@ -12,6 +12,14 @@ all pass every layer, without a test written for one framework. Moved from the P
 | behaviour | `tests/<component>/behaviour.test.ts` | roles, accessible names, ARIA states, keyboard, focus, dismissal, geometry, axe (WCAG 2.1 A/AA). Finds elements by role and name only |
 | contract | `tests/<component>/contract.test.ts` | the spec's part attributes (`data-primitives-part="<component>-<part>"`) and state attributes (present or absent, never `"false"`) |
 | visual | `tests/<component>/visual.test.ts` | screenshots against **one** golden set, made by React |
+| ssr | `tests/ssr/ssr.test.ts` | every scenario of the specs (their `### \`/path\`` headings) rendered on a server, hydrated: no console warning or error, the server's ids kept, and the same DOM as the browser's own render (`src/ssr.ts` compares the trees); the Tabs Indicator and the Slider thumb in place before hydration |
+
+The ssr layer runs against a second server per framework (`ssrPort`, `src/ssr-server.ts`), which
+serves the fixture's `build:ssr` output (`dist-ssr/`): its client build, and each page rendered by
+its server entry (`fixtures/<framework>/src/server/entry-server.ts(x)`: `react-dom/server`,
+`vue/server-renderer`, `@angular/platform-server`). The fixture hydrates a page whose `#root` has
+`data-ssr`, and marks `<html data-fixture-ready>` once rendered or hydrated. The server runs in
+German (`LANG=de_DE.UTF-8`), so a page falling back to the server's own language fails.
 
 ## Running
 
@@ -29,10 +37,11 @@ a server already running on the port is reused (`pnpm dev` starts them all).
 Add it to `IMPLEMENTATIONS` in `src/implementations.ts` (`name` is the fixture's folder):
 
 ```ts
-{ name: "react", fixture: "fixture-react", port: 5320, layers: ["behaviour", "contract", "visual"] }
+{ name: "react", fixture: "fixture-react", port: 5320, ssrPort: 5321, layers: ["behaviour", "contract", "visual", "ssr"] }
 ```
 
-The fixture must have `build` and `preview` scripts and render every scenario of the specs at
+The fixture must have `build`, `build:ssr` and `preview` scripts and a server entry
+(`src/server/entry-server`, `render(url, template)`), and render every scenario of the specs at
 `/<component>/<scenario>`, reading `?locale=` and `?dir=`.
 
 ## Golden screenshots
@@ -64,6 +73,9 @@ top-left corner.
 | `axe.ts` | `expectNoAxeViolations` |
 | `contract.ts` | `part(page, component, name)`, `parts(page, component)`, `expectNoFalseStates` |
 | `visual.ts` | `visualOnlyInCi`, `expectScreen` |
+| `presence.ts` | `settleAnimations`, `slowMotion`, `recordExit`, `markElement`, `isSameElement`: the exit transitions (`tests/presence`) |
+| `ssr.ts` | `scenarioPaths` (every spec scenario), `snapshotRoot` (the comparable `#root`) |
+| `ssr-server.ts` | the ssr layer's server: `node conformance/src/ssr-server.ts <fixture dir> <port>` |
 | `form.ts` | `expectSubmitted(page, entries)`: the form scenarios' `form: ...` line |
 | `pointer.ts` | `pointAlong`, `pressAlong`, `dragFrom`: whole-pixel presses and drags along a box |
 | `slider.ts` | `sliderState`, `expectSliderValue` |

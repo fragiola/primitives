@@ -63,7 +63,16 @@ parts, DateRangePicker's likewise. The date math and the locale data are the too
 - `value`, `defaultValue` (`null`), `onValueChange(date, details)` (reason `item-press`).
 - `min`, `max` (`PlainDate`): dates outside are disabled.
 - `isDateUnavailable(date) => boolean`: unavailable dates can be focused but not chosen.
-- `locale` (BCP 47; defaults to the document's `lang`, then the browser's).
+- `locale` (BCP 47; defaults to the document's `lang`, then the browser's). Server rendering
+  (Epic #22): a server knows neither the browser's language nor, in React and Vue, the document,
+  so without `locale` a server render, and the browser's hydration of it, use `en-US`; the
+  calendar then takes the document's `lang` (else the browser's language) once it is mounted
+  (React: at once in a page the browser renders alone); Angular reads its document's `lang` on the server too, and falls back to `en-US` there,
+  never to the server's own language. Pass `locale` for a server render in the reader's language.
+- "Today" is read when the calendar renders, on the server and in the browser alike: they agree
+  unless their dates differ (a server in another time zone near midnight), which a hydration then
+  repairs. A page rendered on a server for readers elsewhere passes a `value` or `defaultValue`
+  when the first month matters.
 - `firstDayOfWeek` (`0`–`6`, Sunday = 0; defaults to the locale's, from `Intl.Locale` week info
   with a fallback table).
 - `visibleMonths` (`1`): how many months are shown side by side; each is a Grid with an `offset`.
@@ -164,6 +173,8 @@ ArrowLeft in RTL:
   order. Tab from its last tabbable element closes (reason `focus-out`) and moves focus to the
   element after the Trigger; Shift+Tab from its first closes (reason `focus-out`) and focuses the
   Trigger.
+- **A picker closed through the controlled `open`** (reason `none`): focus left inside the popup
+  returns to the Trigger, as Popover's (Epic #22).
 - **Reopening**: a picker opens on its value as a new calendar would, even when it reopens while
   its popup's exit animation still runs (the calendar is still mounted): the focused date returns
   to the value (else today), and closing cancels a started range.
@@ -261,6 +272,14 @@ Checks (expected strings computed in the test with `Intl` for `de-DE`):
 3. The first row starts with October 26 (outside the month).
 4. Focus November 20, Home → November 16 (Monday).
 5. The cell names are German full dates ("Freitag, 20. November 2026").
+
+### `/calendar/single?locale=none`
+
+The single scenario with no `locale` and no `<html lang>` (the browser's language is
+`de-DE` in the check; the server's, in the ssr layer, German too).
+
+Checks: once mounted, the calendar speaks the browser's language (Monday's short name first); its
+server render and hydration (the ssr layer) match the browser's own render.
 
 ### `/calendar/rtl?locale=he-IL&dir=rtl`
 

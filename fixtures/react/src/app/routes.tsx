@@ -53,7 +53,7 @@ import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.tsx";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.tsx";
 
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
-export const routes: Record<string, ComponentType<{ locale: string }>> = {
+export const routes: Record<string, ComponentType<{ locale?: string }>> = {
     "/dialog/basic": DialogBasic,
     "/dialog/initial-focus": DialogInitialFocus,
     "/dialog/nested-popover": DialogNestedPopover,

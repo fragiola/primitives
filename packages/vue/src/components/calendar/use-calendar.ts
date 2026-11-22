@@ -18,6 +18,7 @@ import {
     type ComputedRef,
     computed,
     inject,
+    onMounted,
     shallowRef,
     useId,
     watch,
@@ -47,12 +48,21 @@ export interface CalendarStateProps extends CalendarOptions {
     readOnly?: boolean;
 }
 
-/** The document's `lang`, then the browser's language (spec/README.md, "Normalized API names"). */
+/** The locale of the first render with no `locale`: a server knows neither of the others. */
+const FIRST_RENDER_LOCALE = "en-US";
+
+/**
+ * The document's `lang`, then the browser's language (spec/calendar.md, "API"), read once the
+ * calendar is mounted: a server render has neither, so the first render (the server's, and the
+ * browser's hydration of it) uses `en-US` (Epic #22).
+ */
 function documentLocale(): string {
     if (typeof document !== "undefined" && document.documentElement.lang) {
         return document.documentElement.lang;
     }
-    return typeof navigator !== "undefined" ? navigator.language : "en-US";
+    return typeof navigator !== "undefined"
+        ? navigator.language
+        : FIRST_RENDER_LOCALE;
 }
 
 /**
@@ -98,7 +108,22 @@ export function useCalendar(
     });
     const min = () => option("min") ?? null;
     const max = () => option("max") ?? null;
-    const locale = () => option("locale") ?? documentLocale();
+    const mountedLocale = shallowRef<string>();
+    onMounted(() => {
+        const next = documentLocale();
+        // another first weekday remakes the rows: a picker's calendar that took the focus as it
+        // opened takes it again in its new cells
+        if (
+            next !== FIRST_RENDER_LOCALE &&
+            option("locale") === undefined &&
+            binding.value?.open()
+        ) {
+            focusPending.current = true;
+        }
+        mountedLocale.value = next;
+    });
+    const locale = () =>
+        option("locale") ?? mountedLocale.value ?? FIRST_RENDER_LOCALE;
     const firstDay = () => option("firstDayOfWeek") ?? firstDayOfWeek(locale());
     const visibleMonths = () => Math.max(1, option("visibleMonths") ?? 1);
     const todayDate = today();

@@ -1,14 +1,32 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { App } from "./app/app.tsx";
+import { readQuery } from "./kit/query.ts";
 import "./app/app.css";
 
 const root = document.getElementById("root");
 if (root === null) {
     throw new Error("missing #root");
 }
-createRoot(root).render(
+const { pathname, search } = window.location;
+const query = readQuery(search);
+document.documentElement.dir = query.dir;
+if (query.lang === undefined) {
+    document.documentElement.removeAttribute("lang");
+} else {
+    document.documentElement.lang = query.lang;
+}
+const app = (
     <StrictMode>
-        <App />
-    </StrictMode>,
+        <App path={pathname} search={search} />
+    </StrictMode>
 );
+// the server-rendered page (conformance's ssr layer) is hydrated, every other page rendered
+if (root.hasAttribute("data-ssr")) {
+    hydrateRoot(root, app, {
+        onRecoverableError: (error) =>
+            console.error("hydration: recoverable error", error),
+    });
+} else {
+    createRoot(root).render(app);
+}

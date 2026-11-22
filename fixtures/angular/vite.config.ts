@@ -1,6 +1,10 @@
 import angular from "@analogjs/vite-plugin-angular";
 import tailwindcss from "@tailwindcss/vite";
-import { defaultClientConditions, defineConfig } from "vite";
+import {
+    defaultClientConditions,
+    defaultServerConditions,
+    defineConfig,
+} from "vite";
 import { withSourceCondition } from "../../scripts/source-condition.ts";
 
 // the Angular compiler (TypeScript 6.0.x, this app's), zoneless: no zone.js anywhere. The packages
@@ -15,5 +19,12 @@ export default defineConfig({
             "@angular/common",
             "@angular/platform-browser",
         ],
+    },
+    // conformance's ssr layer (`build:ssr`): the server entry bundles everything, Angular too (its
+    // packages are partially compiled: the plugin links them), and the workspace packages from
+    // their sources
+    ssr: {
+        resolve: { conditions: withSourceCondition(defaultServerConditions) },
+        noExternal: true,
     },
 });

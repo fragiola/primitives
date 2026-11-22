@@ -4,7 +4,7 @@
  * it must pass. CI runs one job per fixture (`scripts/e2e-suites.ts` lists `fixtures/*`;
  * site/tests/conformance.test.ts keeps both lists the same).
  */
-export type Layer = "behaviour" | "contract" | "visual";
+export type Layer = "behaviour" | "contract" | "visual" | "ssr";
 
 export interface Implementation {
     /** The Playwright project name, also the fixture's folder (`fixtures/<name>`). */
@@ -12,6 +12,8 @@ export interface Implementation {
     /** The fixture's package name (`fixtures/<name>/package.json`). */
     fixture: string;
     port: number;
+    /** The port of its server-rendered pages (the ssr layer, `src/ssr-server.ts`). */
+    ssrPort: number;
     layers: readonly Layer[];
 }
 
@@ -21,21 +23,24 @@ export const IMPLEMENTATIONS: readonly Implementation[] = [
         name: "react",
         fixture: "fixture-react",
         port: 5320,
-        layers: ["behaviour", "contract", "visual"],
+        ssrPort: 5321,
+        layers: ["behaviour", "contract", "visual", "ssr"],
     },
     // @fragiola/primitives-vue: compares against React's golden screenshots
     {
         name: "vue",
         fixture: "fixture-vue",
         port: 5330,
-        layers: ["behaviour", "contract", "visual"],
+        ssrPort: 5331,
+        layers: ["behaviour", "contract", "visual", "ssr"],
     },
     // @fragiola/primitives-angular: directives on the consumer's own elements
     {
         name: "angular",
         fixture: "fixture-angular",
         port: 5340,
-        layers: ["behaviour", "contract", "visual"],
+        ssrPort: 5341,
+        layers: ["behaviour", "contract", "visual", "ssr"],
     },
 ];
 

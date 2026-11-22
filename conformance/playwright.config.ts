@@ -35,11 +35,27 @@ export default defineConfig({
             baseURL: `http://localhost:${implementation.port}`,
         },
     })),
-    webServer: served.map((implementation) => ({
-        command: `pnpm --filter ${implementation.fixture} build && pnpm --filter ${implementation.fixture} preview --port ${implementation.port} --strictPort`,
-        cwd: root,
-        url: `http://localhost:${implementation.port}`,
-        reuseExistingServer: !process.env.CI,
-        timeout: 180_000,
-    })),
+    webServer: served.flatMap((implementation) => [
+        {
+            command: `pnpm --filter ${implementation.fixture} build && pnpm --filter ${implementation.fixture} preview --port ${implementation.port} --strictPort`,
+            cwd: root,
+            url: `http://localhost:${implementation.port}`,
+            reuseExistingServer: !process.env.CI,
+            timeout: 180_000,
+        },
+        // the ssr layer's server-rendered pages (src/ssr-server.ts). Its locale is German, so a
+        // page whose locale falls back to the server's own would not match the browser's
+        {
+            command: `pnpm --filter ${implementation.fixture} build:ssr && node conformance/src/ssr-server.ts fixtures/${implementation.name} ${implementation.ssrPort}`,
+            cwd: root,
+            env: {
+                LANG: "de_DE.UTF-8",
+                LC_ALL: "de_DE.UTF-8",
+                NODE_ENV: "production",
+            },
+            url: `http://localhost:${implementation.ssrPort}`,
+            reuseExistingServer: !process.env.CI,
+            timeout: 180_000,
+        },
+    ]),
 });

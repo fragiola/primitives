@@ -244,6 +244,38 @@ test("calendar / locale de-DE: German weekday headers, Monday first", async ({
     );
 });
 
+test.describe("calendar / single, no locale and no lang", () => {
+    test.use({ locale: "de-DE" });
+
+    test("takes the browser's language once mounted", async ({ page }) => {
+        await openScenario(page, "/calendar/single", {
+            locale: "none",
+            today: true,
+        });
+        expect(
+            await page.evaluate(() =>
+                document.documentElement.hasAttribute("lang"),
+            ),
+        ).toBe(false);
+        await expect(page.getByRole("columnheader").first()).toHaveText(
+            shortWeekday("de-DE", 2026, 11, 16),
+        );
+        await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
+    });
+
+    test("a picker's calendar keeps the focus it took when it switches language", async ({
+        page,
+    }) => {
+        await openScenario(page, "/date-picker/basic", {
+            locale: "none",
+            today: true,
+        });
+        await page.getByRole("button", { name: "Choose date" }).click();
+        await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
+        await expectFocusWithin(cell(page, 11, 20, 2026, "de-DE"));
+    });
+});
+
 test("calendar / locale de-DE: German names, Monday first", async ({
     page,
 }) => {

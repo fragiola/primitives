@@ -2,10 +2,11 @@
 import { readQuery } from "../kit/query.ts";
 import { routes } from "./routes.ts";
 
-const query = readQuery(window.location.search);
-document.documentElement.dir = query.dir;
-document.documentElement.lang = query.locale;
-const scenario = routes[window.location.pathname];
+// The fixture's page for `path` and `search` (spec/README.md, "Scenarios and fixtures"). It reads
+// no `window`: the server renders it too (src/server/entry-server.ts).
+const props = defineProps<{ path: string; search: string }>();
+const query = readQuery(props.search);
+const scenario = routes[props.path];
 const paths = Object.keys(routes);
 </script>
 
@@ -16,8 +17,8 @@ const paths = Object.keys(routes);
     <main v-else class="p-6">
         <h1 class="text-lg font-semibold">Vue fixture</h1>
         <ul>
-            <li v-for="path in paths" :key="path">
-                <a :href="path">{{ path }}</a>
+            <li v-for="route in paths" :key="route">
+                <a :href="route">{{ route }}</a>
             </li>
         </ul>
     </main>

@@ -11,7 +11,7 @@ export function SingleCalendar({
     max,
     isDateUnavailable,
 }: {
-    locale: string;
+    locale?: string;
     min?: PlainDate;
     max?: PlainDate;
     isDateUnavailable?: (date: PlainDate) => boolean;

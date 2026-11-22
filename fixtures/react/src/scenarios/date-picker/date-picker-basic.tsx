@@ -9,7 +9,7 @@ import { Output } from "../../kit/output.tsx";
 import { Calendar, MonthView } from "../../kit/ui/calendar.tsx";
 import { DatePicker } from "../../kit/ui/date-picker.tsx";
 
-export function DatePickerBasic({ locale }: { locale: string }) {
+export function DatePickerBasic({ locale }: { locale?: string }) {
     const [value, setValue] = useState<PlainDate | null>(null);
     const [open, setOpen] = useState(false);
     const [reason, setReason] = useState<string>();
