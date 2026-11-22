@@ -12,6 +12,12 @@
         "menu",
         "popover",
         "tooltip",
+        "select",
+        "combobox",
+        "checkbox",
+        "slider",
+        "field",
+        "forms",
         "primitives",
         "ui"
     ],
@@ -39,11 +45,35 @@
             "import": "./dist/index.js",
             "default": "./dist/index.js"
         },
+        "./checkbox": {
+            "@fragiola/source": "./src/components/checkbox/index.ts",
+            "types": "./dist/checkbox.d.ts",
+            "import": "./dist/checkbox.js",
+            "default": "./dist/checkbox.js"
+        },
+        "./checkbox-group": {
+            "@fragiola/source": "./src/components/checkbox-group/index.ts",
+            "types": "./dist/checkbox-group.d.ts",
+            "import": "./dist/checkbox-group.js",
+            "default": "./dist/checkbox-group.js"
+        },
+        "./combobox": {
+            "@fragiola/source": "./src/components/combobox/index.ts",
+            "types": "./dist/combobox.d.ts",
+            "import": "./dist/combobox.js",
+            "default": "./dist/combobox.js"
+        },
         "./dialog": {
             "@fragiola/source": "./src/components/dialog/index.ts",
             "types": "./dist/dialog.d.ts",
             "import": "./dist/dialog.js",
             "default": "./dist/dialog.js"
+        },
+        "./field": {
+            "@fragiola/source": "./src/components/field/index.ts",
+            "types": "./dist/field.d.ts",
+            "import": "./dist/field.js",
+            "default": "./dist/field.js"
         },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
@@ -56,6 +86,18 @@
             "types": "./dist/popover.d.ts",
             "import": "./dist/popover.js",
             "default": "./dist/popover.js"
+        },
+        "./select": {
+            "@fragiola/source": "./src/components/select/index.ts",
+            "types": "./dist/select.d.ts",
+            "import": "./dist/select.js",
+            "default": "./dist/select.js"
+        },
+        "./slider": {
+            "@fragiola/source": "./src/components/slider/index.ts",
+            "types": "./dist/slider.d.ts",
+            "import": "./dist/slider.js",
+            "default": "./dist/slider.js"
         },
         "./tabs": {
             "@fragiola/source": "./src/components/tabs/index.ts",
@@ -84,10 +126,30 @@
                 "import": "./dist/index.js",
                 "default": "./dist/index.js"
             },
+            "./checkbox": {
+                "types": "./dist/checkbox.d.ts",
+                "import": "./dist/checkbox.js",
+                "default": "./dist/checkbox.js"
+            },
+            "./checkbox-group": {
+                "types": "./dist/checkbox-group.d.ts",
+                "import": "./dist/checkbox-group.js",
+                "default": "./dist/checkbox-group.js"
+            },
+            "./combobox": {
+                "types": "./dist/combobox.d.ts",
+                "import": "./dist/combobox.js",
+                "default": "./dist/combobox.js"
+            },
             "./dialog": {
                 "types": "./dist/dialog.d.ts",
                 "import": "./dist/dialog.js",
                 "default": "./dist/dialog.js"
+            },
+            "./field": {
+                "types": "./dist/field.d.ts",
+                "import": "./dist/field.js",
+                "default": "./dist/field.js"
             },
             "./menu": {
                 "types": "./dist/menu.d.ts",
@@ -98,6 +160,16 @@
                 "types": "./dist/popover.d.ts",
                 "import": "./dist/popover.js",
                 "default": "./dist/popover.js"
+            },
+            "./select": {
+                "types": "./dist/select.d.ts",
+                "import": "./dist/select.js",
+                "default": "./dist/select.js"
+            },
+            "./slider": {
+                "types": "./dist/slider.d.ts",
+                "import": "./dist/slider.js",
+                "default": "./dist/slider.js"
             },
             "./tabs": {
                 "types": "./dist/tabs.d.ts",
