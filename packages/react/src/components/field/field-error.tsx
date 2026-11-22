@@ -1,6 +1,7 @@
 import {
     type FieldErrorMatch,
     type FieldState,
+    fieldErrorMessages,
     fieldErrorShown,
     fieldStateAttributes,
 } from "@fragiola/primitives/form";
@@ -12,14 +13,17 @@ import { stateAttributes } from "../../utils/state-attributes.ts";
 import { FieldContext } from "./field-context.ts";
 
 export interface FieldErrorProps extends PartProps<FieldState> {
-    /** A `ValidityState` key (`"customError"` for `validate`'s messages), or `true` for always. */
+    /**
+     * A `ValidityState` key (`"customError"` for `validate`'s messages), a function of the
+     * field's validity, or `true` for always. Without it, shown while the field is invalid.
+     */
     match?: FieldErrorMatch;
     id?: string;
 }
 
 /**
  * An error message, rendered only while shown: its children, or the field's messages (one as
- * text, several as a list) (spec/field.md).
+ * text, several as a list): the Form's errors for the field, else its own (spec/field.md).
  */
 export function FieldError({
     match,
@@ -40,7 +44,7 @@ export function FieldError({
     if (!shown) {
         return null;
     }
-    const errors = field.shown.errors;
+    const errors = fieldErrorMessages(match, field.shown, field.formErrors);
     const content =
         children ??
         (errors.length > 1 ? (

@@ -1,5 +1,6 @@
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import { createContext } from "react";
+import type { FieldControlBinding } from "../../hooks/use-field-control.ts";
 import type { OverlayRoot } from "../../hooks/use-overlay-root.ts";
 
 /** The component a picker's parts belong to: their part attribute's prefix. */
@@ -9,6 +10,11 @@ export interface DatePickerContextValue extends OverlayRoot {
     component: DatePickerComponent;
     placed: { side: Side; align: Align };
     setPlaced: (placed: { side: Side; align: Align }) => void;
+    /** The enclosing field's binding, for the trigger (spec/field.md). */
+    field: FieldControlBinding;
+    disabled: boolean;
+    readOnly: boolean;
+    required: boolean;
 }
 
 export const DatePickerContext = createContext<DatePickerContextValue | null>(

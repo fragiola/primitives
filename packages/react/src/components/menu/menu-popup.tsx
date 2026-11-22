@@ -7,7 +7,8 @@ import {
 import { blockOutsidePointer } from "@fragiola/primitives/inert";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
 import { lockScroll } from "@fragiola/primitives/scroll-lock";
-import { type KeyboardEvent, useEffect, useRef } from "react";
+import { type KeyboardEvent, useContext, useEffect, useRef } from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -41,6 +42,7 @@ export function MenuPopup(
     props: PartProps<{ open: boolean; side: string; align: string }>,
 ) {
     const context = useRequiredContext(MenuContext, "Menu.Popup");
+    const direction = useContext(DirectionContext);
     const {
         open,
         popup,
@@ -127,7 +129,9 @@ export function MenuPopup(
         const current = active ? items.indexOf(active) : -1;
         const focusAt = (index: number) =>
             items[index]?.focus({ preventScroll: true });
-        const { close: closeKey } = submenuKeys(getDirection(popup) === "rtl");
+        const { close: closeKey } = submenuKeys(
+            getDirection(popup, direction) === "rtl",
+        );
         switch (event.key) {
             case "ArrowDown":
             case "ArrowUp":

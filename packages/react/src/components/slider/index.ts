@@ -8,5 +8,7 @@ export type {
 export type { RenderProp } from "../../utils/render-element.tsx";
 export { Slider } from "./parts.ts";
 export type { SliderState } from "./slider-context.ts";
+export type { SliderLabelProps } from "./slider-label.tsx";
 export type { SliderRootProps } from "./slider-root.tsx";
 export type { SliderThumbProps, SliderThumbState } from "./slider-thumb.tsx";
+export type { SliderValueProps } from "./slider-value.tsx";

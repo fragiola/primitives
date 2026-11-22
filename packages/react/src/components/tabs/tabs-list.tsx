@@ -1,6 +1,7 @@
 import { tabsKeyTarget } from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
-import type { KeyboardEvent } from "react";
+import { type KeyboardEvent, useContext } from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -9,6 +10,7 @@ import { TabsContext } from "./tabs-context.ts";
 /** The tablist: one tab stop, arrows move between tabs (spec/tabs.md, "Keyboard"). */
 export function TabsList(props: PartProps<{ orientation: string }>) {
     const context = useRequiredContext(TabsContext, "Tabs.List");
+    const direction = useContext(DirectionContext);
     const { orientation, list } = context;
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -31,7 +33,7 @@ export function TabsList(props: PartProps<{ orientation: string }>) {
         }
         const index = tabsKeyTarget(event.key, current, tabs.length, {
             orientation,
-            rtl: getDirection(list) === "rtl",
+            rtl: getDirection(list, direction) === "rtl",
             loop: context.loopFocus,
         });
         if (index === null) {

@@ -153,6 +153,8 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         value,
         filled: values.length > 0,
         input: () => hidden.current,
+        // the Input
+        focusTarget: () => root.trigger,
     });
     const disabled = disabledProp || field.disabled;
     const [highlighted, setHighlighted] = useState<string | null>(null);

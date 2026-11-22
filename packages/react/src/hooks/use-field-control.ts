@@ -18,11 +18,20 @@ export interface UseFieldControlOptions {
     id: string | undefined;
     /** Whether `<label for>` can point at it (a native input or a `button`). */
     labelable: boolean;
+    /** A press on the label only focuses it, instead of clicking it (a trigger that opens a popup). */
+    labelFocuses?: boolean;
     /** The control's value, given to `validate`. */
     value: unknown;
     filled: boolean;
-    /** The element the form validates (the input, or the hidden input). */
+    /** The element the form validates (the input, or the hidden input; `null` for none). */
     input: () => HTMLInputElement | null;
+    /** The element a Form focuses when the field is the first invalid one (spec/field.md). */
+    focusTarget: () => HTMLElement | null;
+    /**
+     * The control is not the field's own (a Checkbox inside a CheckboxGroup that is): it reads
+     * nothing of the field and reports nothing.
+     */
+    skip?: boolean;
 }
 
 export interface FieldControlBinding {
@@ -53,27 +62,38 @@ function serialize(value: unknown): string {
 }
 
 /**
- * A control's side of the integration contract (spec/field.md): registers its id, reports its
- * value, focus and blur, and the form's submission attempts, and returns what it renders. Outside
- * a `Field.Root`, it does nothing and returns nothing.
+ * A control's side of the integration contract (spec/field.md): registers its id and its focus
+ * target, reports its value, focus and blur, and the native form's submission attempts, and
+ * returns what it renders. Outside a `Field.Root`, it does nothing and returns nothing.
  */
 export function useFieldControl(
     options: UseFieldControlOptions,
 ): FieldControlBinding {
-    const field = useContext(FieldContext);
+    const context = useContext(FieldContext);
+    const field = options.skip ? null : context;
     const latest = useRef(options);
     latest.current = options;
     const initial = useRef<string | null>(null);
     const previous = useRef<string | null>(null);
 
-    const { id, labelable } = options;
+    const { id, labelable, labelFocuses = false } = options;
     const registerControl = field?.registerControl;
     useLayoutEffect(
         () =>
             registerControl === undefined || id === undefined
                 ? undefined
-                : registerControl(id, labelable),
-        [registerControl, id, labelable],
+                : registerControl({ id, labelable, labelFocuses }),
+        [registerControl, id, labelable, labelFocuses],
+    );
+    const attach = field?.attach;
+    useLayoutEffect(
+        () =>
+            attach?.({
+                input: () => latest.current.input(),
+                value: () => latest.current.value,
+                focusTarget: () => latest.current.focusTarget(),
+            }),
+        [attach],
     );
 
     const events = field?.events;
@@ -96,16 +116,22 @@ export function useFieldControl(
         events.changed(input(), value, serialized !== initial.current, filled);
     }, [events, serialized]);
 
+    // inside a Form, the Form runs the submission attempts (spec/form.md)
+    const inForm = field?.inForm ?? false;
     useEffect(() => {
-        const form = latest.current.input()?.form;
-        if (events === undefined || form === null || form === undefined) {
+        if (events === undefined || inForm) {
+            return undefined;
+        }
+        const { input, focusTarget } = latest.current;
+        const form = input()?.form ?? focusTarget()?.closest("form") ?? null;
+        if (form === null) {
             return undefined;
         }
         return onSubmitAttempt(form, () => {
-            const { input, value } = latest.current;
-            events.submitAttempt(input(), value);
+            const { input: current, value } = latest.current;
+            events.submitAttempt(current(), value);
         });
-    }, [events]);
+    }, [events, inForm]);
 
     const onBlur = useCallback(() => {
         const { input, value } = latest.current;

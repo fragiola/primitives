@@ -3,7 +3,8 @@ import {
     anchorFloating,
     type Side,
 } from "@fragiola/primitives/positioning";
-import { useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
+import { DirectionContext } from "../direction/direction-context.ts";
 
 export interface PositionOptions {
     side: Side;
@@ -25,6 +26,10 @@ export function useAnchorPosition(
         align: options.align,
     });
     const { side, align, sideOffset, alignOffset, collisionPadding } = options;
+    // a DirectionProvider's direction, read at every placement (spec/direction.md)
+    const provided = useContext(DirectionContext);
+    const direction = useRef(provided);
+    direction.current = provided;
     useLayoutEffect(() => {
         if (anchor === null || floating === null) {
             return undefined;
@@ -36,6 +41,7 @@ export function useAnchorPosition(
             alignOffset,
             collisionPadding,
             arrow,
+            direction: () => direction.current,
             onPlaced: (next) =>
                 setPlaced((previous) =>
                     previous.side === next.side && previous.align === next.align

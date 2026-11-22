@@ -1,7 +1,14 @@
 import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
-import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import {
+    type KeyboardEvent,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { DirectionContext } from "../../direction/direction-context.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { CalendarContext, CalendarGridContext } from "./calendar-context.ts";
@@ -14,6 +21,7 @@ export interface CalendarGridProps extends PartProps<Record<string, never>> {
 /** One month, as an ARIA grid with the APG date grid keyboard (spec/calendar.md, "Keyboard"). */
 export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
     const context = useRequiredContext(CalendarContext, "Calendar.Grid");
+    const direction = useContext(DirectionContext);
     const month = addMonths(context.visibleStart, offset);
     const [element, setElement] = useState<HTMLElement | null>(null);
     // read when the key comes, so the interception never waits for a render
@@ -55,7 +63,7 @@ export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
             return;
         }
         const target = calendarKeyTarget(event.key, context.focusedDate, {
-            rtl: getDirection(event.currentTarget) === "rtl",
+            rtl: getDirection(event.currentTarget, direction) === "rtl",
             firstDayOfWeek: context.firstDay,
             shiftKey: event.shiftKey,
         });
