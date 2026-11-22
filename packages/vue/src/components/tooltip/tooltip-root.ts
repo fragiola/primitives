@@ -149,7 +149,14 @@ export const TooltipRoot: PublicComponent<
                             inside: () => intent.cancel(),
                             outside: () => {
                                 // over another of its triggers: the tooltip is moving there
-                                if (hovered !== null && hovered !== trigger) {
+                                // (a trigger removed while hovered is none: it never reports
+                                // the pointer leaving)
+                                if (
+                                    hovered !== null &&
+                                    hovered !== trigger &&
+                                    hovered.isConnected &&
+                                    root.triggers.value.includes(hovered)
+                                ) {
                                     intent.cancel();
                                     return;
                                 }

@@ -69,6 +69,8 @@ export function TooltipRoot<Payload = unknown>({
     const hovered = useRef<HTMLElement | null>(null);
     const pendingTrigger = useRef<HTMLElement | null>(null);
     const pendingEvent = useRef<Event | undefined>(undefined);
+    const triggers = useRef(root.triggers);
+    triggers.current = root.triggers;
 
     const show = useCallback(
         (
@@ -173,8 +175,15 @@ export function TooltipRoot<Payload = unknown>({
         return trackHoverBridge(trigger, popup, {
             inside: () => intent.cancel(),
             outside: () => {
-                // over another of its triggers: the tooltip is moving there
-                if (hovered.current !== null && hovered.current !== trigger) {
+                // over another of its triggers: the tooltip is moving there (a trigger removed
+                // while hovered is none: it never reports the pointer leaving)
+                const other = hovered.current;
+                if (
+                    other !== null &&
+                    other !== trigger &&
+                    other.isConnected &&
+                    triggers.current.includes(other)
+                ) {
                     intent.cancel();
                     return;
                 }

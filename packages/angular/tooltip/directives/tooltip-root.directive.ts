@@ -137,8 +137,15 @@ export class TooltipRoot<Payload = unknown> implements OverlayActions {
                 trackHoverBridge(trigger, popup, {
                     inside: () => intent.cancel(),
                     outside: () => {
-                        // over another of its triggers: the tooltip is moving there
-                        if (this.hovered !== null && this.hovered !== trigger) {
+                        // over another of its triggers: the tooltip is moving there (a trigger
+                        // removed while hovered is none: it never reports the pointer leaving)
+                        const other = this.hovered;
+                        if (
+                            other !== null &&
+                            other !== trigger &&
+                            other.isConnected &&
+                            untracked(overlay.triggers).includes(other)
+                        ) {
                             intent.cancel();
                             return;
                         }
