@@ -86,7 +86,10 @@ element that had focus before opening when it was opened programmatically).
   the viewport, which blurs the page), focus returns once the press has ended, unless the press
   focused an element (`returnFocus.whenUnfocused`, as Popover's).
 - Everything outside the portal content is made inert (`inert`, or `aria-hidden` plus focus
-  guards where `inert` is unavailable) while open.
+  guards where `inert` is unavailable) while open, but the hidden content of a closed
+  kept-mounted overlay (a `hidden` element with a `data-primitives-part`): it takes no
+  interaction while hidden, and a Popover, Menu, Select or nested Dialog opened from the dialog
+  shows it again usable.
 
 ## Pointer
 
@@ -236,8 +239,9 @@ Content:
 
 - a Trigger **"Open settings"**; a Backdrop; the popup with Title **"Settings"**, then a Popover
   whose Trigger is **"Theme options"**, then a Close **"Close"**;
-- the popover's popup (Positioner `sideOffset` 4) has Title **"Theme"** and a Menu whose Trigger
-  is **"Pick theme"**;
+- the popover's Portal is `keepMounted` (its hidden content already sits in the page when the
+  dialog opens and makes the outside inert: it must still open usable); its popup (Positioner
+  `sideOffset` 4) has Title **"Theme"** and a Menu whose Trigger is **"Pick theme"**;
 - the menu has the items **"Light"**, **"Dark"** and a SubmenuTrigger **"More themes"**, whose
   submenu has the items **"Solarized"** and **"Nord"**.
 
@@ -268,6 +272,9 @@ Checks:
    from "Pick theme" (its last tabbable element) closes the popover (`popover: false`) and moves
    focus to "Close", inside the dialog.
 7. Axe finds no violation with every level open.
+8. The kept-mounted popover opens usable: click "Open settings", then "Theme options": the popover
+   is not inert and "Pick theme" is focused; a click on "Pick theme" opens the menu (`menu: true`,
+   `popover: true`, `dialog: true`).
 
 ### `/dialog/nested-dialogs`
 

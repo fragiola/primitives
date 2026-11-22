@@ -21,7 +21,7 @@ import { DIALOG_PARTS } from "./dialog-parts.ts";
                     <h2 dialogTitle [class]="styles.title">Settings</h2>
                     <ng-container popoverRoot (openChange)="popover.set($event)">
                         <button popoverTrigger [class]="popoverStyles.trigger">Theme options</button>
-                        <ng-container *popoverPortal>
+                        <ng-container *popoverPortal="{ keepMounted: true }">
                             <div popoverPositioner [sideOffset]="4" [class]="popoverStyles.positioner">
                                 <div popoverPopup [class]="popoverStyles.popup">
                                     <h2 popoverTitle [class]="popoverStyles.title">Theme</h2>

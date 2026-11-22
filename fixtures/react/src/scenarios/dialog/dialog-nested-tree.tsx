@@ -20,7 +20,7 @@ export function DialogNestedTree() {
                         <Dialog.Title>Settings</Dialog.Title>
                         <Popover.Root onOpenChange={setPopover}>
                             <Popover.Trigger>Theme options</Popover.Trigger>
-                            <Popover.Portal>
+                            <Popover.Portal keepMounted>
                                 <Popover.Positioner sideOffset={4}>
                                     <Popover.Popup>
                                         <Popover.Title>Theme</Popover.Title>

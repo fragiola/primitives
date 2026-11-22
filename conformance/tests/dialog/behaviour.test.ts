@@ -353,6 +353,35 @@ test.describe("dialog / nested-tree", () => {
     });
 });
 
+// spec/dialog.md, `/dialog/nested-tree`: the popover's Portal is kept mounted, so its hidden
+// content already sits in the page when the dialog makes the outside inert
+test("dialog / nested-tree: the kept-mounted popover opens usable inside the dialog", async ({
+    page,
+}) => {
+    await openScenario(page, "/dialog/nested-tree");
+    await page
+        .getByRole("button", { name: "Open settings", exact: true })
+        .click();
+    await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+    await page
+        .getByRole("button", { name: "Theme options", exact: true })
+        .click();
+    const popover = page.getByRole("dialog", { name: "Theme" });
+    await expect(popover).toBeVisible();
+    expect(
+        await popover.evaluate(
+            (element) => element.closest("[inert]") === null,
+        ),
+    ).toBe(true);
+    const pick = page.getByRole("button", { name: "Pick theme", exact: true });
+    await expect(pick).toBeFocused();
+    await pick.click();
+    await expect(page.getByRole("menu", { name: "Pick theme" })).toBeVisible();
+    await expectOutput(page, "menu", "true");
+    await expectOutput(page, "popover", "true");
+    await expectOutput(page, "dialog", "true");
+});
+
 // spec/dialog.md, `/dialog/nested-dialogs`
 test.describe("dialog / nested-dialogs", () => {
     const named = (page: Page, name: string) =>

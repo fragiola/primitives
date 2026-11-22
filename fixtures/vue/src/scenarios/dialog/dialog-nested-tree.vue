@@ -21,7 +21,7 @@ const submenu = ref(false);
                 <Dialog.Title>Settings</Dialog.Title>
                 <Popover.Root @open-change="(next: boolean) => (popover = next)">
                     <Popover.Trigger>Theme options</Popover.Trigger>
-                    <Popover.Portal>
+                    <Popover.Portal keep-mounted>
                         <Popover.Positioner :side-offset="4">
                             <Popover.Popup>
                                 <Popover.Title>Theme</Popover.Title>
