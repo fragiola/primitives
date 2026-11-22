@@ -1,0 +1,82 @@
+---
+title: Server rendering
+description: Every component renders on the server and hydrates without a mismatch, in React, Vue and Angular; what a server cannot know, and what to pass.
+---
+
+Every component renders on the server and hydrates in the browser with no hydration warning:
+`react-dom/server` and `hydrateRoot` in React, `vue/server-renderer` and `createSSRApp` in Vue,
+`@angular/platform-server` and `provideClientHydration()` in Angular. The conformance suite renders
+every scenario of the specs on a server in each framework, hydrates it, and checks that the page
+ends as the browser alone renders it, with the server's ids kept.
+
+## What a server cannot know
+
+- **The reader's language.** A calendar with no `locale` renders `en-US` on the server and in the
+  browser's hydration of it, then takes the document's `lang`, else the browser's language, once
+  it is mounted. Angular reads its document's `lang` on the server too.
+  Pass `locale` to render the reader's language on the server.
+- **The reader's date.** "Today" is read when the calendar renders, on the server and in the
+  browser: they agree unless the server's date differs from the reader's (another time zone, near
+  midnight), which the hydration repairs. Pass a `value` or `defaultValue` when the first month
+  matters.
+- **Layout.** Nothing is measured on a server. The overlays render closed, and the parts that
+  follow a measurement render without it until they are mounted.
+
+## Placed before hydration
+
+- **Slider thumbs** need nothing: their position is a percentage of their value, written in the
+  server's page.
+- **The Tabs Indicator** follows the selected tab's box, which only the browser can measure. With
+  `renderBeforeHydration` (Base UI's name; Angular: `*tabsIndicator="true"`), the server writes a
+  small inline script inside the Indicator. It measures the selected tab as the page parses, sets
+  the Indicator's variables, and removes itself, so the hydration finds the Indicator as the
+  browser renders it. A page whose Content Security Policy blocks inline scripts leaves it off.
+
+<Framework name="react">
+
+```tsx
+<Tabs.List aria-label="Settings">
+    <Tabs.Tab value="account">Account</Tabs.Tab>
+    <Tabs.Tab value="password">Password</Tabs.Tab>
+    <Tabs.Indicator renderBeforeHydration />
+</Tabs.List>
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<Tabs.List aria-label="Settings">
+    <Tabs.Tab value="account">Account</Tabs.Tab>
+    <Tabs.Tab value="password">Password</Tabs.Tab>
+    <Tabs.Indicator render-before-hydration />
+</Tabs.List>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<div tabsList aria-label="Settings">
+    <button tabsTab value="account">Account</button>
+    <button tabsTab value="password">Password</button>
+    <span *tabsIndicator="true"></span>
+</div>
+```
+
+</Framework>
+
+## Ids
+
+The ids the parts generate are the same on the server and in the browser: React's and Vue's
+`useId`, and in Angular a counter of the application's own (one per render), so a hydrated page
+keeps the server's ids and every `aria-labelledby` and `aria-controls` with them.
+
+## Forms
+
+React and Vue render the hidden inputs of the form controls (Checkbox, Select, Combobox, Slider)
+on the server too. Angular adds them in the browser once the page is hydrated, since its
+directives create them outside their templates: a form posted before the page is hydrated has no
+value of theirs.
