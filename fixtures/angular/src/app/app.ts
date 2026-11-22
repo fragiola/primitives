@@ -22,16 +22,22 @@ import { ComboboxField } from "../scenarios/combobox/combobox-field.ts";
 import { ComboboxFiltered } from "../scenarios/combobox/combobox-filtered.ts";
 import { ComboboxForm } from "../scenarios/combobox/combobox-form.ts";
 import { ComboboxGroups } from "../scenarios/combobox/combobox-groups.ts";
+import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.ts";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.ts";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
+import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.ts";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.ts";
+import { DialogDetached } from "../scenarios/dialog/dialog-detached.ts";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.ts";
+import { DialogLifecycle } from "../scenarios/dialog/dialog-lifecycle.ts";
+import { DialogNestedDialogs } from "../scenarios/dialog/dialog-nested-dialogs.ts";
 import { DialogNestedPopover } from "../scenarios/dialog/dialog-nested-popover.ts";
+import { DialogNestedTree } from "../scenarios/dialog/dialog-nested-tree.ts";
 import { DialogRejectedClose } from "../scenarios/dialog/dialog-rejected-close.ts";
 import { DirectionProviderScenario } from "../scenarios/direction/direction-provider.ts";
 import { FieldAsync } from "../scenarios/field/field-async.ts";
@@ -45,13 +51,17 @@ import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
+import { MenuDetached } from "../scenarios/menu/menu-detached.ts";
 import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
+import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
+import { PopoverDetached } from "../scenarios/popover/popover-detached.ts";
 import { PopoverInitialFocus } from "../scenarios/popover/popover-initial-focus.ts";
+import { PopoverLifecycle } from "../scenarios/popover/popover-lifecycle.ts";
 import { PopoverPlacement } from "../scenarios/popover/popover-placement.ts";
 import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.ts";
@@ -59,6 +69,7 @@ import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.ts";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.ts";
 import { SelectBasic } from "../scenarios/select/select-basic.ts";
 import { SelectControlled } from "../scenarios/select/select-controlled.ts";
+import { SelectLifecycle } from "../scenarios/select/select-lifecycle.ts";
 import { SelectModal } from "../scenarios/select/select-modal.ts";
 import { SeparatorBasic } from "../scenarios/separator/separator-basic.ts";
 import { SliderBasic } from "../scenarios/slider/slider-basic.ts";
@@ -72,8 +83,10 @@ import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
+import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.ts";
+import { TooltipLifecycle } from "../scenarios/tooltip/tooltip-lifecycle.ts";
 import { ROUTES } from "./routes.ts";
 
 /**
@@ -89,6 +102,10 @@ import { ROUTES } from "./routes.ts";
         DialogControlled,
         DialogRejectedClose,
         DialogNestedPopover,
+        DialogNestedTree,
+        DialogNestedDialogs,
+        DialogDetached,
+        DialogLifecycle,
         SettingsTabs,
         TabsNoneSelected,
         TabsAnimated,
@@ -103,14 +120,20 @@ import { ROUTES } from "./routes.ts";
         PopoverPlacement,
         PopoverRtl,
         PopoverArrow,
+        PopoverDetached,
+        PopoverLifecycle,
         TooltipBasic,
         TooltipGroup,
         TooltipInDialog,
+        TooltipDetached,
+        TooltipLifecycle,
         MenuBasic,
         MenuControlled,
         MenuSubmenu,
         MenuGroups,
         MenuModal,
+        MenuDetached,
+        MenuLifecycle,
         CheckboxBasic,
         CheckboxControlled,
         CheckboxGroupScenario,
@@ -123,12 +146,14 @@ import { ROUTES } from "./routes.ts";
         ComboboxMultiple,
         ComboboxObjects,
         ComboboxRejectedInput,
+        ComboboxLifecycle,
         FieldBasic,
         FieldControls,
         FieldValidation,
         SelectBasic,
         SelectControlled,
         SelectModal,
+        SelectLifecycle,
         SliderBasic,
         SliderControlled,
         SliderRange,
@@ -139,6 +164,7 @@ import { ROUTES } from "./routes.ts";
         DatePickerBasic,
         DatePickerRange,
         DatePickerForm,
+        DatePickerLifecycle,
         SliderLabelValue,
         FieldAsync,
         FieldMatch,
@@ -164,6 +190,10 @@ import { ROUTES } from "./routes.ts";
             @case ("/dialog/nested-popover") { <main class="p-6" scenario-dialog-nested-popover></main> }
             @case ("/dialog/controlled") { <main class="p-6" scenario-dialog-controlled></main> }
             @case ("/dialog/rejected-close") { <main class="p-6" scenario-dialog-rejected-close></main> }
+            @case ("/dialog/nested-tree") { <main class="p-6" scenario-dialog-nested-tree></main> }
+            @case ("/dialog/nested-dialogs") { <main class="p-6" scenario-dialog-nested-dialogs></main> }
+            @case ("/dialog/detached") { <main class="p-6" scenario-dialog-detached></main> }
+            @case ("/dialog/lifecycle") { <main class="p-6" scenario-dialog-lifecycle [cancel]="query.cancel"></main> }
             @case ("/tabs/automatic") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="horizontal"></main> }
             @case ("/tabs/manual") { <main class="p-6" scenario-settings-tabs activation="manual" orientation="horizontal"></main> }
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
@@ -180,14 +210,20 @@ import { ROUTES } from "./routes.ts";
             @case ("/popover/rtl") { <main class="p-6" scenario-popover-rtl></main> }
             @case ("/popover/arrow") { <main class="p-6" scenario-popover-arrow></main> }
             @case ("/popover/controlled") { <main class="p-6" scenario-popover-controlled></main> }
+            @case ("/popover/detached") { <main class="p-6" scenario-popover-detached></main> }
+            @case ("/popover/lifecycle") { <main class="p-6" scenario-popover-lifecycle [cancel]="query.cancel"></main> }
             @case ("/tooltip/basic") { <main class="p-6" scenario-tooltip-basic></main> }
             @case ("/tooltip/group") { <main class="p-6" scenario-tooltip-group></main> }
             @case ("/tooltip/in-dialog") { <main class="p-6" scenario-tooltip-in-dialog></main> }
+            @case ("/tooltip/detached") { <main class="p-6" scenario-tooltip-detached></main> }
+            @case ("/tooltip/lifecycle") { <main class="p-6" scenario-tooltip-lifecycle [cancel]="query.cancel"></main> }
             @case ("/menu/basic") { <main class="p-6" scenario-menu-basic></main> }
             @case ("/menu/submenu") { <main class="p-6" scenario-menu-submenu></main> }
             @case ("/menu/groups") { <main class="p-6" scenario-menu-groups></main> }
             @case ("/menu/modal") { <main class="p-6" scenario-menu-modal></main> }
             @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
+            @case ("/menu/detached") { <main class="p-6" scenario-menu-detached></main> }
+            @case ("/menu/lifecycle") { <main class="p-6" scenario-menu-lifecycle [cancel]="query.cancel"></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }
@@ -197,9 +233,11 @@ import { ROUTES } from "./routes.ts";
             @case ("/combobox/groups") { <main class="p-6" scenario-combobox-groups></main> }
             @case ("/combobox/form") { <main class="p-6" scenario-combobox-form></main> }
             @case ("/combobox/field") { <main class="p-6" scenario-combobox-field></main> }
+            @case ("/combobox/lifecycle") { <main class="p-6" scenario-combobox-lifecycle [cancel]="query.cancel"></main> }
             @case ("/select/basic") { <main class="p-6" scenario-select-basic></main> }
             @case ("/select/controlled") { <main class="p-6" scenario-select-controlled></main> }
             @case ("/select/modal") { <main class="p-6" scenario-select-modal></main> }
+            @case ("/select/lifecycle") { <main class="p-6" scenario-select-lifecycle [cancel]="query.cancel"></main> }
             @case ("/checkbox/basic") { <main class="p-6" scenario-checkbox-basic></main> }
             @case ("/checkbox/group") { <main class="p-6" scenario-checkbox-group></main> }
             @case ("/checkbox/controlled") { <main class="p-6" scenario-checkbox-controlled></main> }
@@ -233,6 +271,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
+            @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }
             @case ("/avatar/basic") { <main class="p-6" scenario-avatar-basic></main> }
             @case ("/separator/basic") { <main class="p-6" scenario-separator-basic></main> }
