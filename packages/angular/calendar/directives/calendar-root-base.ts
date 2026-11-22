@@ -47,7 +47,10 @@ export abstract class CalendarRootBase {
     /** The root's state, for its parts and `exportAs`. */
     abstract readonly calendar: CalendarState;
     protected readonly data = computed(() =>
-        dataValues({ disabled: this.disabled(), readonly: this.readOnly() }),
+        dataValues({
+            disabled: this.disabled(),
+            readonly: this.calendar.readOnly(),
+        }),
     );
 
     /** The inputs the state reads, with the root's own value input. */

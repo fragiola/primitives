@@ -1,6 +1,8 @@
 import {
+    afterNextRender,
     booleanAttribute,
     computed,
+    DestroyRef,
     Directive,
     effect,
     inject,
@@ -10,22 +12,22 @@ import {
     signal,
     untracked,
 } from "@angular/core";
+import { bridgeForm } from "@fragiola/primitives/form";
 import { moveThumb } from "@fragiola/primitives/range";
-import {
-    fieldControl,
-    writeFieldAria,
-} from "@fragiola/primitives-angular/field";
+import { fieldControl } from "@fragiola/primitives-angular/field";
 import {
     type ChangeDetails,
     type ChangeReason,
     controllable,
     dataValues,
     injectHost,
+    injectProvidedDirection,
     type ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
+import { writeLabelledBy } from "../utils/write-labelled-by.ts";
 
 /** A number, or an array of numbers for several thumbs. */
-export type SliderValue = number | readonly number[];
+export type SliderRootValue = number | readonly number[];
 
 /** The state every slider part shares. */
 export interface SliderState {
@@ -34,7 +36,7 @@ export interface SliderState {
     dragging: boolean;
 }
 
-function toArray(value: SliderValue): readonly number[] {
+function toArray(value: SliderRootValue): readonly number[] {
     return typeof value === "number" ? [value] : value;
 }
 
@@ -46,7 +48,9 @@ function sameValues(a: readonly number[], b: readonly number[]): boolean {
 
 /**
  * Holds the slider's values; the `group` with one hidden input per value at its end
- * (spec/slider.md): `<div sliderRoot [(value)]="volume" name="volume">`.
+ * (spec/slider.md): `<div sliderRoot [(value)]="volume" name="volume">`. `format` and `locale`
+ * format the Value and each Thumb's `aria-valuetext` (`Intl.NumberFormat`); a `[sliderLabel]`
+ * names the group and its Thumbs.
  */
 @Directive({
     selector: "[sliderRoot]",
@@ -66,12 +70,12 @@ function sameValues(a: readonly number[], b: readonly number[]): boolean {
     },
 })
 export class SliderRoot {
-    readonly value = input<SliderValue | undefined>(undefined);
-    readonly valueChange = output<SliderValue>();
-    readonly defaultValue = input<SliderValue | undefined>(undefined);
-    readonly valueChangeDetails = output<ValueChangeEvent<SliderValue>>();
+    readonly value = input<SliderRootValue | undefined>(undefined);
+    readonly valueChange = output<SliderRootValue>();
+    readonly defaultValue = input<SliderRootValue | undefined>(undefined);
+    readonly valueChangeDetails = output<ValueChangeEvent<SliderRootValue>>();
     /** When a drag ends, or after a key changed the value. */
-    readonly valueCommit = output<SliderValue>();
+    readonly valueCommit = output<SliderRootValue>();
     readonly min = input(0);
     readonly max = input(100);
     readonly step = input(1);
@@ -80,6 +84,10 @@ export class SliderRoot {
     readonly orientation = input<"horizontal" | "vertical">("horizontal");
     readonly disabled = input(false, { transform: booleanAttribute });
     readonly name = input<string | undefined>(undefined);
+    /** How the Value and the Thumbs' `aria-valuetext` show the values (`Intl.NumberFormatOptions`). */
+    readonly format = input<Intl.NumberFormatOptions | undefined>(undefined);
+    /** The locale of `format` (BCP 47; default: the runtime's). */
+    readonly locale = input<string | undefined>(undefined);
 
     private readonly range = computed(() =>
         Array.isArray(this.value() ?? this.defaultValue()),
@@ -108,6 +116,7 @@ export class SliderRoot {
         // a slider always has a value
         filled: signal(true),
         input: () => this.inputs[0] ?? null,
+        focusTarget: () => untracked(this.thumbs)[0] ?? null,
     });
     /** Its own `disabled`, or the field's. */
     readonly isDisabled = computed(
@@ -118,6 +127,25 @@ export class SliderRoot {
     readonly activeIndex = signal(-1);
     /** The thumbs, in document order: the default `index`, and the one to focus. */
     readonly thumbs = signal<readonly HTMLElement[]>([]);
+    /** Each thumb's id by its value's index: the Value's `for`. */
+    readonly thumbIds = signal<Readonly<Record<number, string>>>({});
+    /** The Label's id while one is rendered. */
+    readonly labelId = signal<string | undefined>(undefined);
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    readonly providedDirection = injectProvidedDirection();
+    private readonly formatter = computed(() => {
+        const format = this.format();
+        return format === undefined
+            ? null
+            : new Intl.NumberFormat(this.locale(), format);
+    });
+    /** The values as the Value shows them: formatted with `format`, else the plain numbers. */
+    readonly formattedValues = computed(() => {
+        const formatter = this.formatter();
+        return this.values().map(
+            (value) => formatter?.format(value) ?? String(value),
+        );
+    });
     readonly state = computed<SliderState>(() => ({
         orientation: this.orientation(),
         disabled: this.isDisabled(),
@@ -127,9 +155,7 @@ export class SliderRoot {
 
     constructor() {
         const host = injectHost();
-        writeFieldAria(this.field, host, {
-            "aria-labelledby": this.field.labelledBy,
-        });
+        writeLabelledBy(host, [this.field.labelledBy, this.labelId]);
         // one `type="hidden"` input per value, after the consumer's children (as React renders);
         // in the browser only, as the other hidden inputs (a server's would be a second set once
         // the page is hydrated)
@@ -163,9 +189,30 @@ export class SliderRoot {
                 });
             });
         });
+        // a form reset: back to the default (spec/README.md, "Forms")
+        let stop: (() => void) | null = null;
+        afterNextRender(() => {
+            const first = inputs[0];
+            if (first !== undefined) {
+                stop = bridgeForm(first, {
+                    reset: () =>
+                        this.current.set(
+                            toArray(this.defaultValue() ?? this.min()),
+                            { reason: "none" },
+                        ),
+                });
+            }
+        });
+        inject(DestroyRef).onDestroy(() => stop?.());
     }
 
-    private shape(values: readonly number[]): SliderValue {
+    /** The formatted value for `aria-valuetext`, only with `format` (else none of its own). */
+    valueText(value: number): string | null {
+        const formatter = this.formatter();
+        return formatter === null ? null : formatter.format(value);
+    }
+
+    private shape(values: readonly number[]): SliderRootValue {
         return untracked(this.range) ? [...values] : (values[0] ?? 0);
     }
 

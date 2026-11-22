@@ -16,6 +16,7 @@ import { openOverlaySession } from "@fragiola/primitives/overlay";
 import { lockScroll } from "@fragiola/primitives/scroll-lock";
 import {
     dataValues,
+    injectProvidedDirection,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import { menuItems } from "./menu-items.ts";
@@ -60,6 +61,8 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["none"]);
     },
 })
 export class MenuPopup {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     protected readonly level = inject(MenuRoot);
     readonly state = computed<MenuPopupState>(() => ({
         open: this.level.overlay.open(),
@@ -149,7 +152,9 @@ export class MenuPopup {
         const current = active ? items.indexOf(active) : -1;
         const focusAt = (index: number) =>
             items[index]?.focus({ preventScroll: true });
-        const { close: closeKey } = submenuKeys(getDirection(popup) === "rtl");
+        const { close: closeKey } = submenuKeys(
+            getDirection(popup, this.direction()) === "rtl",
+        );
         switch (event.key) {
             case "ArrowDown":
             case "ArrowUp":

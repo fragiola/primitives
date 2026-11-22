@@ -79,6 +79,7 @@ export class FieldControl {
         value: this.current,
         filled: computed(() => this.current() !== ""),
         input: () => this.host,
+        focusTarget: () => this.host,
     });
     protected readonly resolvedName = computed(
         () => this.field.name() ?? this.name() ?? null,

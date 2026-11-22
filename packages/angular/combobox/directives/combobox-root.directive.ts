@@ -182,6 +182,7 @@ export class ComboboxRoot {
         value: this.value,
         filled: computed(() => this.values().length > 0),
         input: () => this.hidden,
+        focusTarget: () => this.overlay.trigger(),
     });
     /** Its own `disabled`, or the field's. */
     readonly isDisabled = computed(

@@ -10,6 +10,7 @@ import {
     anchorFloating,
     type Side,
 } from "@fragiola/primitives/positioning";
+import { injectProvidedDirection } from "./provided-direction.ts";
 
 /** The positioning inputs every Positioner directive declares (spec/popover.md, "Positioning"). */
 export interface PositionerInputs {
@@ -36,7 +37,8 @@ export function placementSignal(initial: Placement): WritableSignal<Placement> {
 
 /**
  * Positions an overlay's positioner next to its anchor while both exist, from its inputs with the
- * given defaults, after each render; reports where it ended up in `placed` (the root's).
+ * given defaults, after each render; reports where it ended up in `placed` (the root's). Its
+ * logical sides follow a DirectionProvider's direction, else the anchor's computed one.
  */
 export function positionOverlay(
     inputs: PositionerInputs,
@@ -48,6 +50,7 @@ export function positionOverlay(
     },
     placed: WritableSignal<Placement>,
 ): void {
+    const direction = injectProvidedDirection();
     afterRenderEffect((onCleanup) => {
         const anchor = inputs.anchor() ?? elements.anchor();
         const options = {
@@ -65,6 +68,7 @@ export function positionOverlay(
             onCleanup(
                 anchorFloating(anchor, elements.positioner, {
                     ...options,
+                    direction,
                     onPlaced: (next) => placed.set(next),
                 }),
             );

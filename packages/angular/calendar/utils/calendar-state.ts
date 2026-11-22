@@ -148,7 +148,12 @@ export class CalendarState {
         Math.max(1, this.options().visibleMonths ?? 1),
     );
     readonly disabled = computed(() => this.inputs.disabled());
-    readonly readOnly = computed(() => this.inputs.readOnly());
+    /** Its own `readOnly`, or its read-only picker's. */
+    readonly readOnly = computed(
+        () =>
+            this.inputs.readOnly() ||
+            (this.bound() && (this.picker?.readOnly() ?? false)),
+    );
     readonly todayDate = today();
     private seed: PlainDate | null = null;
     private readonly focusedOwn = signal<PlainDate | null>(null);

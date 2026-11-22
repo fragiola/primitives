@@ -5,6 +5,7 @@ import { writeFieldAria } from "@fragiola/primitives-angular/field";
 import {
     dataValues,
     injectFlush,
+    injectProvidedDirection,
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import {
@@ -46,6 +47,8 @@ import {
     },
 })
 export class ComboboxInput {
+    /** A DirectionProvider's direction, else `null` (the computed one is read). */
+    private readonly direction = injectProvidedDirection();
     protected readonly root = inject(ComboboxRoot);
     readonly state = computed(() => ({
         open: this.root.overlay.open(),
@@ -178,7 +181,9 @@ export class ComboboxInput {
                 if (
                     root.multiple() &&
                     event.key ===
-                        chipArrows(getDirection(input) === "rtl").previous &&
+                        chipArrows(
+                            getDirection(input, this.direction()) === "rtl",
+                        ).previous &&
                     input.selectionStart === 0 &&
                     input.selectionEnd === 0 &&
                     chips.length > 0

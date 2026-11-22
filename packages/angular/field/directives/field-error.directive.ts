@@ -13,6 +13,7 @@ import {
 } from "@angular/core";
 import {
     type FieldErrorMatch,
+    fieldErrorMessages,
     fieldErrorShown,
 } from "@fragiola/primitives/form";
 import {
@@ -46,13 +47,17 @@ function renderMessages(element: HTMLElement, errors: readonly string[]) {
 /**
  * An error message, structural so it is rendered only while shown (spec/field.md):
  * `<div *fieldError="'valueMissing'">Enter your email.</div>`; `*fieldError` alone while the field
- * is invalid, `*fieldError="true"` always. An element with no children of its own shows the
- * field's messages (one as text, several as a `ul`); `*fieldError="let errors"` gives them to the
- * template instead. The directive writes the error's attributes on the element it renders.
+ * is invalid, `*fieldError="outOfRange"` while a function of the validity returns `true`,
+ * `*fieldError="true"` always. An element with no children of its own shows the field's messages
+ * (one as text, several as a `ul`): its Form's errors for it, else `validate`'s, else the
+ * browser's; `*fieldError="let errors"` gives them to the template instead. The directive writes the error's attributes on the element it renders.
  */
 @Directive({ selector: "[fieldError]", exportAs: "fieldError" })
 export class FieldError {
-    /** A `ValidityState` key (`"customError"` for `validate`'s messages), or `true` for always. */
+    /**
+     * A `ValidityState` key (`"customError"` for `validate`'s messages), a function of the field's
+     * validity, or `true` for always.
+     */
     readonly match = input<FieldErrorMatch | undefined, unknown>(undefined, {
         alias: "fieldError",
         // `*fieldError` alone gives "": shown while the field is invalid
@@ -78,10 +83,17 @@ export class FieldError {
     readonly shown = computed(() =>
         fieldErrorShown(this.match(), this.field.shown(), {
             invalid: this.field.showsInvalid(),
-            disabled: this.field.disabled(),
+            disabled: this.field.isDisabled(),
         }),
     );
-    private readonly errors = computed(() => this.field.shown().errors);
+    /** The messages it shows with no children: the Form's errors for the field, else its own. */
+    private readonly errors = computed(() =>
+        fieldErrorMessages(
+            this.match(),
+            this.field.shown(),
+            this.field.formErrors(),
+        ),
+    );
 
     static ngTemplateContextGuard(
         _directive: FieldError,

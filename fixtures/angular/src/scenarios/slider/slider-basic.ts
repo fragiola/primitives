@@ -3,9 +3,9 @@ import {
     SliderControl,
     SliderIndicator,
     SliderRoot,
+    type SliderRootValue,
     SliderThumb,
     SliderTrack,
-    type SliderValue,
 } from "@fragiola/primitives-angular/slider";
 import { slider } from "examples-shared/recipes/slider";
 import { formEntries } from "../../kit/form-entries.ts";
@@ -38,7 +38,7 @@ export class SliderBasic {
     protected readonly value = signal<number | undefined>(undefined);
     protected readonly committed = signal<number | undefined>(undefined);
     protected readonly form = signal<string | undefined>(undefined);
-    protected readonly single = (value: SliderValue) => value as number;
+    protected readonly single = (value: SliderRootValue) => value as number;
 
     protected submit(event: SubmitEvent): void {
         event.preventDefault();

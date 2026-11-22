@@ -1,4 +1,5 @@
 import {
+    booleanAttribute,
     computed,
     Directive,
     input,
@@ -13,7 +14,10 @@ import type { DatePickerState } from "../utils/date-picker-state.ts";
 const optionalNumber = (value: unknown): number | undefined =>
     value === undefined || value === null ? undefined : numberAttribute(value);
 
-/** The open state and the calendar options both pickers share; each declares its typed value. */
+/**
+ * The open state, the calendar options and the form props both pickers share; each declares its
+ * typed value.
+ */
 @Directive()
 export abstract class DatePickerRootBase {
     readonly open = input<boolean | undefined>(undefined);
@@ -38,6 +42,14 @@ export abstract class DatePickerRootBase {
     readonly visibleMonths = input<number | undefined, unknown>(undefined, {
         transform: optionalNumber,
     });
+    /** The form name of its hidden input (a Field's `name` wins; spec/calendar.md, "Forms"). */
+    readonly name = input<string | undefined>(undefined);
+    /** A native form's validation blocks a submission with no value. */
+    readonly required = input(false, { transform: booleanAttribute });
+    /** The trigger cannot open the popup; the hidden input submits nothing. */
+    readonly disabled = input(false, { transform: booleanAttribute });
+    /** The popup opens, but its calendar chooses nothing. */
+    readonly readOnly = input(false, { transform: booleanAttribute });
     /** The picker's state, for its parts and `exportAs`. */
     abstract readonly picker: DatePickerState;
     protected readonly options = computed<CalendarOptions>(() => ({

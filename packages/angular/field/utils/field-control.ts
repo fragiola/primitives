@@ -17,11 +17,27 @@ export interface FieldControlOptions {
     id: Signal<string | undefined>;
     /** Whether `<label for>` can point at it (a native input or a `button`). */
     labelable: boolean;
+    /**
+     * A press on the field's label focuses the control instead of clicking it (a picker's Trigger:
+     * the label's click would open its popup, which takes the focus; spec/field.md, `/field/more-controls`).
+     */
+    focusOnLabel?: boolean;
     /** The control's value, given to `validate`. */
     value: Signal<unknown>;
     filled: Signal<boolean>;
-    /** The element the form validates (the input, or the hidden input). */
+    /** The element the form validates (the input, or the hidden input; `null` for none). */
     input: () => HTMLInputElement | null;
+    /**
+     * The element a Form focuses when the field is the first invalid one (spec/field.md,
+     * "Integration contract" item 5): its labelable element, a Slider's first Thumb, a group's
+     * first enabled Checkbox.
+     */
+    focusTarget: () => HTMLElement | null;
+    /**
+     * A control that is part of the field's control (a CheckboxGroup's Checkbox): it does not
+     * register as the field's control, and gets nothing from the field.
+     */
+    part?: boolean;
 }
 
 /** The field's state attributes for a control's main element, `null` outside a field. */
@@ -77,23 +93,37 @@ function serialize(value: unknown): string {
 /**
  * A control's side of the integration contract (spec/field.md), in its directive's injection
  * context: registers its id, reports its value (after the render, so the validated element holds
- * it), its focus and blur, and the form's submission attempts, and returns what it renders.
- * Outside a `[fieldRoot]`, it does nothing and returns nothing.
+ * it), its focus and blur, the form's submission attempts, its validated element and focus target
+ * (for a `form[formRoot]`), and returns what it renders. Outside a `[fieldRoot]`, it does nothing
+ * and returns nothing.
  */
 export function fieldControl(
     options: FieldControlOptions,
 ): FieldControlBinding {
     const field = injectField();
-    if (field === null) {
+    if (field === null || options.part === true) {
         return OUTSIDE;
     }
     const { events } = field;
+    inject(DestroyRef).onDestroy(
+        field.registerEntry({
+            input: options.input,
+            value: options.value,
+            focusTarget: options.focusTarget,
+        }),
+    );
 
     effect((onCleanup) => {
         const id = options.id();
         if (id !== undefined && id !== "") {
             onCleanup(
-                untracked(() => field.registerControl(id, options.labelable)),
+                untracked(() =>
+                    field.registerControl(
+                        id,
+                        options.labelable,
+                        options.focusOnLabel,
+                    ),
+                ),
             );
         }
     });
@@ -124,8 +154,12 @@ export function fieldControl(
         });
     });
 
+    // inside a `form[formRoot]`, its submission validates the field instead
     let stop: (() => void) | null = null;
     afterNextRender(() => {
+        if (field.inForm) {
+            return;
+        }
         const form = options.input()?.form;
         if (form === null || form === undefined) {
             return;
@@ -139,7 +173,7 @@ export function fieldControl(
     return {
         inField: true,
         name: field.name,
-        disabled: field.disabled,
+        disabled: field.isDisabled,
         labelledBy: computed(() => field.labelId() ?? null),
         describedBy: computed(() => field.describedBy() ?? null),
         ariaInvalid: computed(() => (field.showsInvalid() ? "true" : null)),

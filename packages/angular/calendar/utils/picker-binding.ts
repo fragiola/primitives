@@ -16,6 +16,8 @@ export interface PickerBinding {
     options: Signal<CalendarOptions>;
     /** Whether the picker's popup is open (a closing picker's calendar takes no focus). */
     open: Signal<boolean>;
+    /** A read-only picker: its calendar can be browsed, no date can be chosen. */
+    readOnly: Signal<boolean>;
     /** Sets the picker's value and closes its popup (reason `item-press`). */
     choose: (value: CalendarValue) => void;
 }
