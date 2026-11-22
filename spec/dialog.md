@@ -4,7 +4,7 @@
 
 A **modal** dialog: a window over the page that takes focus, traps it, makes the rest of the page
 inert and returns focus when it closes (APG `dialog-modal`). Non-modal floating content is
-[Popover](popover.md). Alert dialogs are AlertDialog's (Issue #34). A dialog may open from several
+[Popover](popover.md). An alert dialog, never dismissed from outside, is [AlertDialog](alert-dialog.md), built on these parts. A dialog may open from several
 triggers anywhere in the page (detached triggers, with a payload), may hold other overlays and
 other dialogs (nested dialogs), and shares the overlay mechanisms of
 [spec/README.md](README.md#overlays): the nested overlay tree, the open change details, the

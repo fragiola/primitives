@@ -2,9 +2,14 @@
 
 ## Purpose
 
-A menu of actions opened by a button (APG `menu-button` with a `menu`), with nested submenus.
-Checkbox and radio items, context menus and menubars are out of scope (later stages). A list for
-choosing a value is a Select or a Combobox (with their Epic).
+A menu of actions opened by a button (APG `menu-button` with a `menu`), with nested submenus,
+checkbox items and groups of radio items (APG `menuitemcheckbox`, `menuitemradio`, Issue #34). A
+menu opened from an area at the pointer is a [ContextMenu](context-menu.md), built on these parts.
+Menubars are out of scope. A list for choosing a form value is a Select or a Combobox.
+
+Every part's part attribute names the component it belongs to: `menu-*` inside a `Menu.Root`,
+`context-menu-*` inside a `ContextMenu.Root` (read from the Root, as the calendar family's shared
+parts are).
 
 ## Anatomy
 
@@ -19,6 +24,11 @@ choosing a value is a Select or a Combobox (with their Epic).
 | Separator | `div` | `menu-separator` | |
 | Group | `div` | `menu-group` | groups items under a label |
 | GroupLabel | `div` | `menu-group-label` | names its Group |
+| CheckboxItem | `div` | `menu-checkbox-item` | a `menuitemcheckbox` |
+| CheckboxItemIndicator | `span` | `menu-checkbox-item-indicator` | inside a CheckboxItem, rendered while it is checked |
+| RadioGroup | `div` | `menu-radio-group` | a `group` of radio items, holding their value |
+| RadioItem | `div` | `menu-radio-item` | a `menuitemradio` |
+| RadioItemIndicator | `span` | `menu-radio-item-indicator` | inside a RadioItem, rendered while it is checked |
 | SubmenuRoot | none | | a nested Root; its Trigger is a SubmenuTrigger |
 | SubmenuTrigger | `div` | `menu-submenu-trigger` | an item of the parent menu that opens the submenu |
 
@@ -55,6 +65,31 @@ opens it).
 
 **Group**, **GroupLabel**, **Separator**: nothing beyond the contract.
 
+**CheckboxItem**: `checked`, `defaultChecked` (`false`), `onCheckedChange(checked, details)`
+(`{ reason: "item-press", event }`), `disabled`, `label`, `closeOnClick` (`false`: a click toggles
+it and leaves the menu open, Base UI's default for checkable items).
+
+**CheckboxItemIndicator**: `keepMounted` (`false`: rendered only while the item is checked).
+
+**RadioGroup**: `value`, `defaultValue` (`null`), `onValueChange(value, details)` (`{ reason:
+"item-press", event }`; the value is a string, `null` for none), `disabled` (every RadioItem in it).
+
+**RadioItem**: `value` (string, required), `disabled`, `label`, `closeOnClick` (`false`).
+Checking the checked item changes nothing (no `onValueChange`).
+
+**RadioItemIndicator**: `keepMounted` (`false`).
+
+**Activating a checkable item** (CheckboxItem, RadioItem; APG menu):
+
+| how | effect |
+| --- | --- |
+| Space | toggles the CheckboxItem / checks the RadioItem, the menu **stays open** |
+| Enter | toggles / checks, then **closes every level** (reason `item-press`) and focuses the root Trigger (APG: Enter activates the item and closes the menu) |
+| a click | toggles / checks; closes every level only when `closeOnClick` |
+
+The keys fire the element's `click`, as Item's activation does; a disabled item (or one in a
+disabled RadioGroup) does nothing.
+
 ## State attributes and ARIA
 
 | part | attributes |
@@ -67,6 +102,14 @@ opens it).
 | Separator | `role="separator"`, `aria-orientation="horizontal"` |
 | Group | `role="group"`, `aria-labelledby` (its GroupLabel's id) |
 | GroupLabel | an `id` |
+| CheckboxItem | `role="menuitemcheckbox"`, `tabindex="-1"`, `aria-checked` (`"true"` / `"false"`), `data-checked` / `data-unchecked` (exactly one), `data-highlighted`, `aria-disabled="true"` and `data-disabled` when disabled |
+| CheckboxItemIndicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
+| RadioGroup | `role="group"`, `data-disabled`; named by the consumer (`aria-label`, or a Group's GroupLabel around it) |
+| RadioItem | `role="menuitemradio"`, `tabindex="-1"`, `aria-checked`, `data-checked` / `data-unchecked`, `data-highlighted`, `aria-disabled="true"` and `data-disabled` when disabled (itself or its group) |
+| RadioItemIndicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
+
+The items of a level are its `menuitem`, `menuitemcheckbox` and `menuitemradio` elements, in DOM
+order: the arrow keys, Home/End and typeahead move through all of them, across groups.
 
 **Highlight follows focus**: the highlighted item is the focused item (roving focus with
 `element.focus()`, not `aria-activedescendant`).
@@ -90,7 +133,7 @@ In the menu:
 | ArrowDown / ArrowUp | next / previous item; wraps when `loopFocus` |
 | Home / End | first / last item |
 | a printable character | typeahead: the next item whose label starts with the typed string (characters typed within 500 ms accumulate; repeating one character cycles through the items starting with it) |
-| Enter, Space | activates the highlighted item: fires its `click`, then closes every menu level (reason `item-press`) when `closeOnClick`, and focuses the root Trigger |
+| Enter, Space | activates the highlighted item: fires its `click`, then closes every menu level (reason `item-press`) when `closeOnClick`, and focuses the root Trigger; a checkable item follows "Activating a checkable item" (Space keeps the menu open, Enter closes it) |
 | ArrowRight (LTR) on a SubmenuTrigger, or Enter / Space on it | opens the submenu and highlights its first item |
 | ArrowLeft (LTR) in a submenu | closes it, highlights its SubmenuTrigger |
 | Escape | closes the current level only (reason `escape-key`): a submenu returns focus to its SubmenuTrigger, the root menu to the Trigger |
@@ -255,6 +298,40 @@ Content: Trigger **"View"**; a Group labelled by GroupLabel **"Sort by"** with i
 Checks: two `group` elements named "Sort by" and "Show"; arrow navigation crosses groups
 ("Date" → "Hidden files").
 
+### `/menu/checkbox-radio`
+
+A view-options menu. Content: a Trigger **"View"**; a Popup with a CheckboxItem **"Show
+toolbar"** (`defaultChecked`), a CheckboxItem **"Show status bar"**, a Separator, and a Group
+labelled by the GroupLabel **"Sort by"** holding a RadioGroup (`defaultValue` `"name"`) with the
+RadioItems **"Name"** (`name`), **"Date"** (`date`) and **"Size"** (`size`, disabled). Each
+checkable item renders its indicator (`✓` for the checkboxes, `•` for the radios) before its
+label. Output: `open: ...`, `reason: ...`, `toolbar: <true|false>`, `status bar: <true|false>`,
+`sort: <value>` (every state starts as its default: `toolbar: true`, `status bar: false`,
+`sort: name`).
+
+Checks:
+
+1. Open with ArrowDown: "Show toolbar" is a `menuitemcheckbox` with `aria-checked="true"`, "Show
+   status bar" one with `aria-checked="false"`; a `group` named "Sort by" holds three
+   `menuitemradio`s, "Name" `aria-checked="true"`, "Date" and "Size" `"false"`; "Size" has
+   `aria-disabled="true"`.
+2. ArrowDown to "Show status bar", Space: `status bar: true`, `aria-checked="true"`, the menu
+   stays open with "Show status bar" focused.
+3. Space again: `status bar: false`.
+4. ArrowDown to "Date" (the arrows cross the separator and the group), Space: `sort: date`, "Date"
+   `aria-checked="true"`, "Name" `"false"`; the menu stays open.
+5. ArrowDown to "Size" (disabled, still focusable), Space and Enter: nothing changes (`sort:
+   date`), the menu stays open.
+6. Home, Enter on "Show toolbar": `toolbar: false`, the menu closes (`reason: item-press`), focus
+   on "View".
+7. Click "View", click "Show status bar": `status bar: true` and the menu stays open
+   (`closeOnClick` is `false`); click "Name": `sort: name`, still open.
+8. Typeahead reaches the checkable items: open, type `d`: "Date" is focused.
+9. Contract layer: the checked items have `data-checked`, the others `data-unchecked`; an
+   indicator is rendered inside "Show toolbar" and "Name" only (with `data-checked`,
+   `aria-hidden="true"`).
+10. Axe finds no violation while open.
+
 ### `/menu/modal`
 
 Content: the page is taller than the viewport; a Trigger **"Options"** on a Root with `modal`;
@@ -311,5 +388,6 @@ Measured by the POC against Base UI 1.9: no behaviour difference, but one defaul
 | difference | decision |
 | --- | --- |
 | Base UI's Menu is modal by default | **non-modal by default**, `modal` as an option (D4 §3): the APG menu button is non-modal |
+| Enter on a CheckboxItem or RadioItem follows `closeOnClick` (the menu stays open by default) | **Enter closes the menu**, Space keeps it open (the APG menu: Enter activates the item and closes the menu; Space on a `menuitemcheckbox` toggles it without closing); a click follows `closeOnClick` (Base UI) |
 
 Base UI reads the direction from its `DirectionProvider`, not from the document.

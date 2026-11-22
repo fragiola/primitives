@@ -9,12 +9,14 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | spec | components |
 | --- | --- |
 | [dialog.md](dialog.md) | Dialog |
+| [alert-dialog.md](alert-dialog.md) | AlertDialog (on Dialog's parts) |
 | [tabs.md](tabs.md) | Tabs |
 | [collapsible.md](collapsible.md) | Collapsible |
 | [accordion.md](accordion.md) | Accordion |
 | [popover.md](popover.md) | Popover |
 | [tooltip.md](tooltip.md) | Tooltip |
-| [menu.md](menu.md) | Menu (with submenus) |
+| [menu.md](menu.md) | Menu (with submenus, checkbox and radio items) |
+| [context-menu.md](context-menu.md) | ContextMenu (on Menu's parts) |
 | [field.md](field.md) | Field |
 | [fieldset.md](fieldset.md) | Fieldset |
 | [form.md](form.md) | Form |
@@ -42,7 +44,9 @@ the controls and display components (Epic #29: Button, RadioGroup and Radio, Swi
 Avatar, Separator); then disclosure (Epic #32: Collapsible, Accordion, and Tabs' activation
 direction, panel enter and exit states and physical Indicator variables); then the overlay
 mechanisms (Epic #35, Issue #33: the nested overlay tree, detached triggers, the open change
-details, the lifecycle controls and Dialog's Viewport and nested dialogs, [below](#overlays)).
+details, the lifecycle controls and Dialog's Viewport and nested dialogs, [below](#overlays);
+Issue #34: AlertDialog, ContextMenu, Menu's checkbox and radio items, and Select's groups,
+separators, item text and optional `items`).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -93,7 +97,7 @@ The vocabulary is shared by every component:
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
-| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, combobox item) |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox item, select item) |
 | `data-selected` | a selected tab, combobox item or calendar date |
 | `data-pressed` | not used in these specs |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
@@ -110,7 +114,7 @@ The vocabulary is shared by every component:
 | `data-empty` | a combobox list with no item |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's and a radio's `data-checked` / `data-unchecked`; an indeterminate Progress |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; an indeterminate Progress |
 | `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present) |
 | `data-required` | a required form control |
 | `data-placeholder` | a Select showing its placeholder |
@@ -137,13 +141,13 @@ The reasons are shared:
 
 | reason | when |
 | --- | --- |
-| `trigger-press` | the trigger toggled the overlay |
+| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area) |
 | `close-press` | a `Close` part was pressed |
 | `escape-key` | Escape dismissed the overlay |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu or combobox item was chosen |
-| `list-navigation` | the keyboard opened a menu or combobox |
+| `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
+| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10) |
 | `input-change` | typing opened or changed a combobox |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
@@ -215,9 +219,9 @@ every field on submission, focuses the first invalid one, and shows server error
 
 ## Overlays
 
-Every overlay (Dialog, Popover, Tooltip, Menu and its submenus, Select, Combobox, DatePicker,
-DateRangePicker) shares the mechanisms of this section (Epic #35, Issue #33). Each spec says what
-it adds.
+Every overlay (Dialog, AlertDialog, Popover, Tooltip, Menu and its submenus, ContextMenu, Select,
+Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35, Issues #33
+and #34). Each spec says what it adds.
 
 ### The nested overlay tree
 
@@ -275,10 +279,11 @@ scope).
 
 ### Detached triggers
 
-Dialog, Popover, Menu and Tooltip (Base UI's detached triggers):
+Dialog, AlertDialog, Popover, Menu and Tooltip (Base UI's detached triggers; a ContextMenu has
+one Trigger area and no handle):
 
 - A **handle** connects a Root and its Triggers: `createDialogHandle<Payload>()` (and
-  `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
+  `createAlertDialogHandle`, `createPopoverHandle`, `createMenuHandle`, `createTooltipHandle`), with `open(triggerId)`,
   `openWithPayload(payload)`, `close()` (reason `imperative-action`) and the getter `isOpen`. A
   call while no Root is attached does nothing (no console output). The handle belongs to one
   framework: the open state and the payload stay in its Root.
@@ -309,8 +314,8 @@ Every overlay has a `/<component>/lifecycle` scenario of one shape (its spec giv
 - with `?cancel` in the URL, its `onOpenChange` calls `details.cancel()` for every close, and
   prints its reason as `canceled`; the overlay is uncontrolled (no `open` prop), so the cancel
   alone keeps it open;
-- Dialog and Popover also render a button **"Close with actions"** inside the popup, which calls
-  the actions' `close()`.
+- Dialog, AlertDialog and Popover also render a button **"Close with actions"** inside the popup,
+  which calls the actions' `close()`.
 
 The common checks (`conformance/tests/lifecycle`), for each overlay:
 
@@ -322,8 +327,11 @@ The common checks (`conformance/tests/lifecycle`), for each overlay:
    transition runs (`data-ending-style`), then becomes `false`; the element is still in the
    document, `hidden`, `data-closed`, the same node.
 4. With `?cancel`: Escape and an outside press each report `canceled: <reason>` and leave it open
-   and working (`open: true`, still visible, the next Escape canceled again).
-5. Dialog and Popover: "Close with actions" closes it with `reason: imperative-action`.
+   and working (`open: true`, still visible, the next Escape canceled again). A Tooltip, which is
+   no layer, reports the pointer leaving instead of the outside press; an AlertDialog, which an
+   outside press never dismisses, reports nothing for it.
+5. Dialog, AlertDialog and Popover: "Close with actions" closes it with `reason:
+   imperative-action`.
 6. Axe finds no violation, closed (kept mounted) and open.
 
 ## API mapping by framework
@@ -355,7 +363,13 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | direction | `<DirectionProvider direction="rtl">`, `useDirection()` | `<DirectionProvider direction="rtl">`, `useDirection()` (a computed ref) | `[directionProvider]="'rtl'"` or `provideDirection('rtl')`, `injectDirection()` (a signal) |
 | render utilities | `useRender({ render, props, state, ref })`, `mergeProps(a, b, ...)` (`/render`) | `renderPart(tag, context, as, state, props)`, `asProp` (`/render`; Vue's own `mergeProps` merges attributes) | `dataValue`, `dataValues` (`/render`: the directive sits on the consumer's own element, Angular's `render`) |
 | part hooks (lower layer) | not shipped yet: the parts are the API | not shipped yet: the parts are the API | `injectDialog()`, `injectTabs()`, `injectPopover()`, `injectTooltip()`, `injectMenu()`, `injectCombobox()` → `{ state, ... }` of the enclosing root; `injectField()` → the enclosing `[fieldRoot]` or `null` (the parts are the directives themselves) |
+| a handle of a component built on another's parts | `AlertDialog.createHandle<Payload>()` (also `createAlertDialogHandle`) | the same | `createAlertDialogHandle<Payload>()` |
 | a menu item's activation | `onClick` on `Menu.Item` | `@click` on `Menu.Item` | `(click)` on the `[menuItem]` element |
+| a menu checkbox item's state | `checked` + `onCheckedChange(checked, details)` (`defaultChecked`) on `Menu.CheckboxItem` | `v-model:checked` (`default-checked`, `@checked-change="(checked, details) => ..."`) | `[(checked)]` on `[menuCheckboxItem]` (`defaultChecked`; `checkedChangeDetails` output `{ checked, details }`) |
+| a menu radio group's value | `value` + `onValueChange(value, details)` (`defaultValue`) on `Menu.RadioGroup` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[menuRadioGroup]` (`defaultValue`; `valueChangeDetails` output) |
+| a part rendered only while checked (menu indicators) | rendered by the part (`keepMounted` keeps it) | rendered by the part (`keep-mounted`) | structural: `*menuCheckboxItemIndicator`, `*menuRadioItemIndicator` (`*menuCheckboxItemIndicator="{ keepMounted: true }"`) |
+| parts shared by two entries (AlertDialog on Dialog's, ContextMenu on Menu's) | `AlertDialog.Popup` is Dialog's Popup, its part attribute named by the enclosing `AlertDialog.Root` | the same (`AlertDialog.Popup`) | the entry's own selectors on the same directives' behaviour: `[alertDialogRoot]`, `[alertDialogTrigger]`, `*alertDialogPortal`, `[alertDialogBackdrop]`, `[alertDialogViewport]`, `[alertDialogPopup]`, `[alertDialogTitle]`, `[alertDialogDescription]`, `[alertDialogClose]`; `[contextMenuRoot]`, `[contextMenuTrigger]`, `*contextMenuPortal`, `[contextMenuPositioner]`, `[contextMenuPopup]`, `[contextMenuItem]`, `[contextMenuCheckboxItem]`, `[contextMenuRadioGroup]`, `[contextMenuRadioItem]`, `[contextMenuSeparator]`, `[contextMenuGroup]`, `[contextMenuGroupLabel]`, `[contextMenuSubmenuRoot]`, `[contextMenuSubmenuTrigger]`, `*contextMenuCheckboxItemIndicator`, `*contextMenuRadioItemIndicator` (each the same behaviour as Menu's directive, its part attribute `context-menu-*`) |
+| Select's new parts | `Select.Group`, `Select.GroupLabel`, `Select.Separator`, `Select.ItemText` | the same | `[selectGroup]`, `[selectGroupLabel]`, `[selectSeparator]`, `[selectItemText]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
