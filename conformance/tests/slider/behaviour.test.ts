@@ -175,3 +175,68 @@ test("slider / controlled: a value the consumer refuses is not shown", async ({
     await page.keyboard.press("ArrowRight");
     await expectSliderValue(limited, 71);
 });
+
+test.describe("slider / label-value", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/slider/label-value");
+    });
+
+    const value = (page: Page, index: number) =>
+        page.locator('[data-primitives-part="slider-value"]').nth(index);
+    // de-DE writes a no-break space before the sign
+    const euros = (amount: number) => `${amount} €`;
+
+    test("the Label names the group and the thumb; the Value and aria-valuetext are formatted", async ({
+        page,
+    }) => {
+        await expect(
+            page.getByRole("group", { name: "Volume", exact: true }),
+        ).toBeVisible();
+        const volume = slider(page, "Volume");
+        await expect(volume).toHaveAttribute("aria-valuenow", "0.5");
+        await expect(volume).toHaveAttribute("aria-valuetext", "50%");
+        await expect(value(page, 0)).toHaveText("50%");
+        await volume.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(volume).toHaveAttribute("aria-valuenow", "0.51");
+        await expect(volume).toHaveAttribute("aria-valuetext", "51%");
+        await expect(value(page, 0)).toHaveText("51%");
+    });
+
+    test("a press on the Label focuses the thumb", async ({ page }) => {
+        await page.getByText("Volume", { exact: true }).click();
+        await expect(slider(page, "Volume")).toBeFocused();
+    });
+
+    test("a formatted range in the slider's locale", async ({ page }) => {
+        await expect(
+            page.getByRole("group", { name: "Price", exact: true }),
+        ).toBeVisible();
+        await expect(slider(page, "Minimum price")).toHaveAttribute(
+            "aria-valuetext",
+            euros(20),
+        );
+        await expect(slider(page, "Maximum price")).toHaveAttribute(
+            "aria-valuetext",
+            euros(80),
+        );
+        await expect(value(page, 1)).toHaveText(`${euros(20)} – ${euros(80)}`);
+    });
+
+    test("the Value is an output for its thumbs", async ({ page }) => {
+        const output = value(page, 1);
+        await expect(output).toHaveJSProperty("tagName", "OUTPUT");
+        await expect(output).toHaveAttribute("aria-live", "off");
+        const ids = await Promise.all(
+            [slider(page, "Minimum price"), slider(page, "Maximum price")].map(
+                (thumb) => thumb.getAttribute("id"),
+            ),
+        );
+        expect(ids.every((id) => id !== null && id !== "")).toBe(true);
+        await expect(output).toHaveAttribute("for", ids.join(" "));
+    });
+
+    test("has no axe violation", async ({ page }) => {
+        await expectNoAxeViolations(page);
+    });
+});

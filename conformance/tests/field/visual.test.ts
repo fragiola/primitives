@@ -34,3 +34,28 @@ test("field / controls: invalid", async ({ page }) => {
     await page.evaluate(() => (document.activeElement as HTMLElement).blur());
     await expectScreen(page, "field-controls-invalid");
 });
+
+test("field / async: taken", async ({ page }) => {
+    await openScenario(page, "/field/async");
+    await page.getByRole("textbox", { name: "Username" }).fill("ada");
+    await expect(page.getByText("This username is taken.")).toBeVisible();
+    await page.getByRole("textbox", { name: "Username" }).blur();
+    await expectScreen(page, "field-async-taken");
+});
+
+test("field / match: out of range", async ({ page }) => {
+    await openScenario(page, "/field/match");
+    await page.getByRole("spinbutton", { name: "Age" }).fill("12");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Enter an age from 18 to 120.")).toBeVisible();
+    await page.getByRole("spinbutton", { name: "Age" }).blur();
+    await expectScreen(page, "field-match-range");
+});
+
+test("field / more-controls: invalid", async ({ page }) => {
+    await openScenario(page, "/field/more-controls", { today: true });
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Choose your dates.")).toBeVisible();
+    await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+    await expectScreen(page, "field-more-controls-invalid");
+});

@@ -557,3 +557,76 @@ test("date-picker / range: closes after the end date", async ({ page }) => {
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(trigger).toBeFocused();
 });
+
+test.describe("date-picker / form", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/date-picker/form", { today: true });
+    });
+
+    const picker = (page: Page, name: string) =>
+        page.getByRole("button", { name: new RegExp(`^${name}: `) });
+    const submit = (page: Page) =>
+        page.getByRole("button", { name: "Submit", exact: true });
+
+    test("required pickers block a submission and focus their trigger, then submit ISO values", async ({
+        page,
+    }) => {
+        await submit(page).click();
+        await expectOutput(page, "form", "none");
+        await expect(picker(page, "Arrival")).toBeFocused();
+        await picker(page, "Arrival").click();
+        await cell(page, 11, 24).click();
+        await expect(picker(page, "Arrival")).toHaveText("Arrival: 2026-11-24");
+        await submit(page).click();
+        await expectOutput(page, "form", "none");
+        await expect(picker(page, "Stay")).toBeFocused();
+        await picker(page, "Stay").click();
+        await cell(page, 11, 25).click();
+        await cell(page, 11, 27).click();
+        await expect(picker(page, "Stay")).toHaveText(
+            "Stay: 2026-11-25..2026-11-27",
+        );
+        await submit(page).click();
+        await expectOutput(
+            page,
+            "form",
+            "arrival=2026-11-24&stay=2026-11-25/2026-11-27&departure=2026-11-30",
+        );
+    });
+
+    test("a read-only picker opens, but its value does not change", async ({
+        page,
+    }) => {
+        const departure = picker(page, "Departure");
+        await departure.click();
+        await expect(
+            page.getByRole("dialog", { name: "Departure date", exact: true }),
+        ).toBeVisible();
+        await cell(page, 11, 26).click();
+        await expect(departure).toHaveText("Departure: 2026-11-30");
+    });
+
+    test("a disabled picker cannot open", async ({ page }) => {
+        await expect(picker(page, "Return")).toBeDisabled();
+    });
+
+    test("a form reset returns the pickers to their default", async ({
+        page,
+    }) => {
+        await picker(page, "Arrival").click();
+        await cell(page, 11, 24).click();
+        await expect(picker(page, "Arrival")).toHaveText("Arrival: 2026-11-24");
+        await page.getByRole("button", { name: "Reset", exact: true }).click();
+        await expect(picker(page, "Arrival")).toHaveText("Arrival: none");
+        await expect(picker(page, "Stay")).toHaveText("Stay: none");
+        await expect(picker(page, "Departure")).toHaveText(
+            "Departure: 2026-11-30",
+        );
+        await submit(page).click();
+        await expectOutput(page, "form", "none");
+    });
+
+    test("has no axe violation", async ({ page }) => {
+        await expectNoAxeViolations(page);
+    });
+});

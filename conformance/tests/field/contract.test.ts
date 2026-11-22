@@ -248,3 +248,79 @@ test("field / controls: the integrated controls take the field's ids, name and s
         ),
     );
 });
+
+test("field / more-controls: the group and the pickers take the field's ids, name and states", async ({
+    page,
+}) => {
+    await openScenario(page, "/field/more-controls", { today: true });
+    await expect(roots(page)).toHaveCount(3);
+    const [toppings, arrival, stay] = [0, 1, 2].map((index) =>
+        roots(page).nth(index),
+    ) as [Locator, Locator, Locator];
+
+    // the group is the field's control: named and described, no `for` on a group
+    const group = part(toppings, "checkbox-group", "root");
+    const toppingsLabel = part(toppings, "field", "label");
+    await expect(toppingsLabel).not.toHaveAttribute("for");
+    await expect(group).toHaveAttribute(
+        "aria-labelledby",
+        (await toppingsLabel.getAttribute("id")) as string,
+    );
+    await expect(group).toHaveAttribute(
+        "aria-describedby",
+        (await part(toppings, "field", "description").getAttribute(
+            "id",
+        )) as string,
+    );
+    // its checkboxes take the field's name, each with its own value, and stay unlabelled by it
+    const inputs = part(toppings, "checkbox", "input");
+    await expect(inputs).toHaveCount(3);
+    for (const index of [0, 1, 2]) {
+        await expect(inputs.nth(index)).toHaveAttribute("name", "toppings");
+        await expect(
+            part(toppings, "checkbox", "root").nth(index),
+        ).not.toHaveAttribute("aria-labelledby");
+    }
+
+    for (const [field, component] of [
+        [arrival, "date-picker"],
+        [stay, "date-range-picker"],
+    ] as const) {
+        const trigger = part(field, component, "trigger");
+        const label = part(field, "field", "label");
+        await expect(label).toHaveAttribute(
+            "for",
+            (await trigger.getAttribute("id")) as string,
+        );
+        await expect(trigger).toHaveAttribute(
+            "aria-labelledby",
+            (await label.getAttribute("id")) as string,
+        );
+        const input = part(field, component, "input");
+        await expect(input).toHaveAttribute(
+            "name",
+            component === "date-picker" ? "arrival" : "stay",
+        );
+        await expect(input).toHaveAttribute("required", "");
+        await expect(trigger).toHaveAttribute("data-required", "");
+    }
+
+    await expectStates([group], []);
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expectHas(
+        [toppings, group, arrival, part(arrival, "date-picker", "trigger")],
+        ["invalid"],
+        ["valid"],
+    );
+    await page.getByRole("checkbox", { name: "Ham", exact: true }).click();
+    await expectHas(
+        [toppings, group],
+        ["valid", "dirty", "filled", "focused"],
+        ["invalid"],
+    );
+    await expectNoFalseStates(
+        page.locator(
+            '[data-primitives-part^="field-"], [data-primitives-part^="checkbox-"], [data-primitives-part^="date-"]',
+        ),
+    );
+});

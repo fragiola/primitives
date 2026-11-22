@@ -244,3 +244,36 @@ test("date-picker / range: the range picker's parts and its range calendar", asy
     );
     await expectNoFalseStates(page.locator("[data-primitives-part]"));
 });
+
+test("date-picker / form: the hidden inputs and the form states", async ({
+    page,
+}) => {
+    await openScenario(page, "/date-picker/form", { today: true });
+    const inputs = page.locator(
+        '[data-primitives-part="date-picker-input"], [data-primitives-part="date-range-picker-input"]',
+    );
+    await expect(inputs).toHaveCount(4);
+    for (const index of [0, 1, 2, 3]) {
+        const input = inputs.nth(index);
+        await expect(input).toHaveJSProperty("tagName", "INPUT");
+        await expect(input).toHaveAttribute("aria-hidden", "true");
+        await expect(input).toHaveAttribute("tabindex", "-1");
+        await expect(input).not.toHaveAttribute("type", "hidden");
+    }
+    await expect(
+        page.locator('[data-primitives-part="date-range-picker-input"]'),
+    ).toHaveAttribute("name", "stay");
+    const triggers = page.locator(
+        '[data-primitives-part="date-picker-trigger"], [data-primitives-part="date-range-picker-trigger"]',
+    );
+    await expect(triggers).toHaveCount(4);
+    // in document order: Arrival, Stay, Departure, Return
+    await expect(triggers.nth(0)).toHaveAttribute("data-required", "");
+    await expect(triggers.nth(1)).toHaveAttribute("data-required", "");
+    await expect(triggers.nth(2)).toHaveAttribute("data-readonly", "");
+    await expect(triggers.nth(2)).not.toHaveAttribute("data-required");
+    await expect(triggers.nth(3)).toHaveAttribute("data-disabled", "");
+    await expect(triggers.nth(3)).toBeDisabled();
+    await expect(inputs.nth(3)).toBeDisabled();
+    await expectNoFalseStates(page.locator('[data-primitives-part^="date-"]'));
+});

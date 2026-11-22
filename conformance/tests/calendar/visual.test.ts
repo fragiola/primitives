@@ -41,3 +41,11 @@ test("date-picker / basic: open", async ({ page }) => {
     await expect(page.getByRole("dialog")).toBeVisible();
     await expectScreen(page, "date-picker-open");
 });
+
+test("date-picker / form", async ({ page }) => {
+    await openScenario(page, "/date-picker/form", { today: true });
+    await expect(page.getByRole("button", { name: /^Departure: / })).toHaveText(
+        "Departure: 2026-11-30",
+    );
+    await expectScreen(page, "date-picker-form");
+});
