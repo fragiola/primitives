@@ -20,6 +20,7 @@ export * from "./components/field/index.ts";
 export * from "./components/fieldset/index.ts";
 export * from "./components/form/index.ts";
 export * from "./components/menu/index.ts";
+export * from "./components/navigation-menu/index.ts";
 export * from "./components/popover/index.ts";
 export * from "./components/progress/index.ts";
 export * from "./components/radio/index.ts";
