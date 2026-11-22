@@ -15,7 +15,7 @@ export class PopoverDescription {
     readonly id = input<string | undefined>(undefined);
     protected readonly resolvedId = labelId(
         this.id,
-        inject(PopoverRoot).descriptionId,
+        inject<PopoverRoot>(PopoverRoot).descriptionId,
         "primitives-popover-description",
     );
 }

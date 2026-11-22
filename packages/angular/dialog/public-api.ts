@@ -4,7 +4,12 @@
 export type {
     ChangeDetails,
     ChangeReason,
+    FocusTarget,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayHandle,
+    OverlayPortalOptions,
 } from "@fragiola/primitives-angular/internal";
 export {
     DialogBackdrop,
@@ -26,4 +31,12 @@ export {
     DialogTrigger,
     type DialogTriggerState,
 } from "./directives/dialog-trigger.directive.ts";
+export {
+    DialogViewport,
+    type DialogViewportState,
+} from "./directives/dialog-viewport.directive.ts";
 export { injectDialog } from "./inject/inject-dialog.ts";
+export {
+    createDialogHandle,
+    type DialogHandle,
+} from "./utils/dialog-handle.ts";

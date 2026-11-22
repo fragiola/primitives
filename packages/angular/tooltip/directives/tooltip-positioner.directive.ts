@@ -14,13 +14,15 @@ import { TooltipRoot } from "./tooltip-root.directive.ts";
     host: {
         role: "presentation",
         "data-primitives-part": "tooltip-positioner",
+        "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
 })
 export class TooltipPositioner {
-    private readonly root = inject(TooltipRoot);
+    protected readonly root = inject<TooltipRoot>(TooltipRoot);
     readonly side = input<Side | undefined>(undefined);
     readonly align = input<Align | undefined>(undefined);
     readonly sideOffset = input<number | undefined>(undefined);
@@ -31,7 +33,9 @@ export class TooltipPositioner {
         open: this.root.overlay.open(),
         ...this.root.placed(),
     }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() =>
+        dataValues({ ...this.state(), closed: !this.state().open }),
+    );
 
     constructor() {
         const overlay = this.root.overlay;
@@ -42,6 +46,7 @@ export class TooltipPositioner {
                 anchor: overlay.trigger,
                 positioner: registerHost(overlay.positioner),
                 arrow: this.root.arrow,
+                mounted: overlay.presence.mounted,
             },
             this.root.placed,
         );

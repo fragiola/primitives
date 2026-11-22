@@ -1,23 +1,30 @@
 import { Directive, inject, input } from "@angular/core";
 import {
     mountPortal,
-    portalContainer,
+    type OverlayPortalOptions,
+    portalOptions,
 } from "@fragiola/primitives-angular/internal";
 import { PopoverRoot } from "./popover-root.directive.ts";
 
-/** Moves the positioner to the end of `body` while the popover is open or closing. */
+/**
+ * Moves the positioner to the end of `body` while the popover is open or closing (always with
+ * `keepMounted`).
+ */
 @Directive({ selector: "[popoverPortal]" })
 export class PopoverPortal {
-    /** Where the content goes (default: `document.body`). */
-    readonly container = input(null, {
-        alias: "popoverPortal",
-        transform: portalContainer,
-    });
+    /**
+     * `container` (default: `document.body`), `keepMounted` (default `false`: rendered, hidden, while
+     * closed); an element: the container alone (`*popoverPortal="element"`).
+     */
+    readonly options = input<OverlayPortalOptions, unknown>(
+        {},
+        { alias: "popoverPortal", transform: portalOptions },
+    );
 
     constructor() {
         mountPortal(
-            inject(PopoverRoot).overlay.presence.mounted,
-            this.container,
+            inject<PopoverRoot>(PopoverRoot).overlay.presence.mounted,
+            this.options,
         );
     }
 }

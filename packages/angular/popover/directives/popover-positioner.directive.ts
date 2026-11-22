@@ -20,13 +20,15 @@ export interface PopoverPositionerState {
     host: {
         role: "presentation",
         "data-primitives-part": "popover-positioner",
+        "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
     },
 })
 export class PopoverPositioner {
-    private readonly root = inject(PopoverRoot);
+    protected readonly root = inject<PopoverRoot>(PopoverRoot);
     readonly side = input<Side | undefined>(undefined);
     readonly align = input<Align | undefined>(undefined);
     readonly sideOffset = input<number | undefined>(undefined);
@@ -37,7 +39,9 @@ export class PopoverPositioner {
         open: this.root.overlay.open(),
         ...this.root.placed(),
     }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    protected readonly data = computed(() =>
+        dataValues({ ...this.state(), closed: !this.state().open }),
+    );
 
     constructor() {
         const overlay = this.root.overlay;
@@ -45,7 +49,12 @@ export class PopoverPositioner {
         positionOverlay(
             this,
             { side: "bottom", align: "center" },
-            { anchor: overlay.trigger, positioner, arrow: this.root.arrow },
+            {
+                anchor: overlay.trigger,
+                positioner,
+                arrow: this.root.arrow,
+                mounted: overlay.presence.mounted,
+            },
             this.root.placed,
         );
     }

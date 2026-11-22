@@ -71,7 +71,7 @@ export class ComboboxInput {
     protected readonly activeId = computed(() => this.active()?.id ?? null);
     protected readonly String = String;
     private readonly input = registerHost<HTMLInputElement>(
-        this.root.overlay.trigger,
+        this.root.overlay.singleTrigger,
     );
     private readonly flush = injectFlush();
 

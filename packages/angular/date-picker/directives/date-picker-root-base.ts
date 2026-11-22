@@ -8,7 +8,10 @@ import {
 } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives/date";
 import type { CalendarOptions } from "@fragiola/primitives-angular/calendar";
-import type { OpenChangeEvent } from "@fragiola/primitives-angular/internal";
+import type {
+    OpenChangeEvent,
+    OverlayActions,
+} from "@fragiola/primitives-angular/internal";
 import type { DatePickerState } from "../utils/date-picker-state.ts";
 
 const optionalNumber = (value: unknown): number | undefined =>
@@ -19,11 +22,14 @@ const optionalNumber = (value: unknown): number | undefined =>
  * typed value.
  */
 @Directive()
-export abstract class DatePickerRootBase {
+export abstract class DatePickerRootBase implements OverlayActions {
     readonly open = input<boolean | undefined>(undefined);
     readonly openChange = output<boolean>();
     readonly defaultOpen = input(false);
+    /** Every requested change with its details, before it happens (`details.cancel()` keeps it). */
     readonly openChangeDetails = output<OpenChangeEvent>();
+    /** An opening's or a closing's transition has finished (spec/README.md, "Lifecycle"). */
+    readonly openChangeComplete = output<boolean>();
     /** Dates before it are disabled. */
     readonly min = input<PlainDate | null | undefined>(undefined);
     /** Dates after it are disabled. */
@@ -52,6 +58,16 @@ export abstract class DatePickerRootBase {
     readonly readOnly = input(false, { transform: booleanAttribute });
     /** The picker's state, for its parts and `exportAs`. */
     abstract readonly picker: DatePickerState;
+    /** Closes the popup (reason `imperative-action`). */
+    close(): void {
+        this.picker.overlay.close();
+    }
+
+    /** Ends a running exit now, or the exit held by `preventUnmountOnClose()`. */
+    unmount(): void {
+        this.picker.overlay.unmount();
+    }
+
     protected readonly options = computed<CalendarOptions>(() => ({
         min: this.min(),
         max: this.max(),

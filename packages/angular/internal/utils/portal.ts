@@ -12,17 +12,35 @@ import {
 } from "@angular/core";
 
 /**
+ * The options of an overlay's structural portal (spec/README.md, API mapping: Angular):
+ * `*dialogPortal="{ keepMounted: true }"`, `*dialogPortal="{ container: element }"`, or
+ * `*dialogPortal="element"` for a container alone.
+ */
+export interface OverlayPortalOptions {
+    /** Where the content goes (default: the document's `body`). */
+    container?: Element | null;
+    /**
+     * Keeps the content rendered while the overlay is closed (hidden), before its first opening
+     * and after an exit ends (default `false`; spec/README.md, "Lifecycle").
+     */
+    keepMounted?: boolean;
+}
+
+/**
  * The structural portal (spec/README.md, API mapping: Angular): renders the directive's template
- * while `mounted()` is true, and moves its nodes to the end of `container()` (default:
- * the document's `body`), as React's `createPortal`. The view stays in its declaration's change
- * detection and injectors; Angular inserts later nodes next to their anchors, which moved with it,
- * and removes the nodes wherever they are when it clears the view. When the portal itself is
- * destroyed with an enclosing view (a submenu's portal inside its parent's popup), Angular only
- * detaches that view's own root nodes, so the portal removes the nodes it moved.
+ * while `mounted()` is true (always with `keepMounted`), and moves its nodes to the end of the
+ * container (default: the document's `body`), as React's `createPortal`. The view stays in its
+ * declaration's change detection and injectors; Angular inserts later nodes next to their anchors,
+ * which moved with it, and removes the nodes wherever they are when it clears the view. When the
+ * portal itself is destroyed with an enclosing view (a submenu's portal inside its parent's popup),
+ * Angular only detaches that view's own root nodes, so the portal removes the nodes it moved.
+ *
+ * A server render renders nothing: the content appears once the page runs in the browser
+ * (spec/README.md, "Lifecycle"), and the server never reads a `document` it does not have.
  */
 export function mountPortal(
     mounted: Signal<boolean>,
-    container: Signal<Element | null>,
+    options: Signal<OverlayPortalOptions>,
 ): void {
     // `"browser"` or `"server"` (`isPlatformServer` lives in @angular/common, not a peer)
     if (inject(PLATFORM_ID) !== "browser") {
@@ -50,8 +68,9 @@ export function mountPortal(
         moved = [];
     });
     effect(() => {
-        const show = mounted();
-        const target = container() ?? doc.body;
+        const { container, keepMounted = false } = options();
+        const show = mounted() || keepMounted;
+        const target = container ?? doc.body;
         untracked(() => {
             if (show && view === null) {
                 view = viewContainer.createEmbeddedView(template);
@@ -69,11 +88,15 @@ export function mountPortal(
 }
 
 /**
- * The portal's input transform: `*dialogPortal` alone gives `""` (the default container), and
- * `*dialogPortal="element"` that element.
+ * The portal's input transform: `*dialogPortal` alone gives `""` (the default container and no
+ * option), `*dialogPortal="element"` that element, and `*dialogPortal="{ keepMounted: true }"`
+ * the options.
  */
-export function portalContainer(
-    value: Element | string | null | undefined,
-): Element | null {
-    return value instanceof Element ? value : null;
+export function portalOptions(value: unknown): OverlayPortalOptions {
+    if (typeof Element !== "undefined" && value instanceof Element) {
+        return { container: value };
+    }
+    return typeof value === "object" && value !== null
+        ? (value as OverlayPortalOptions)
+        : {};
 }

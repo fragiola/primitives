@@ -6,7 +6,10 @@ export type { Align, Side } from "@fragiola/primitives/positioning";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayPortalOptions,
     ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
 export {

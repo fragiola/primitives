@@ -39,7 +39,7 @@ export interface DatePickerTriggerState {
         "[attr.data-disabled]": "data().disabled",
         "[attr.data-readonly]": "data().readonly",
         "[attr.data-required]": "data().required",
-        "(click)": "onClick()",
+        "(click)": "onClick($event)",
         "(focus)": "picker.field.focused()",
         "(blur)": "picker.field.blurred()",
     },
@@ -53,7 +53,7 @@ export class DatePickerTrigger {
     protected readonly String = String;
 
     constructor() {
-        const host = registerHost(this.picker.overlay.trigger);
+        const host = registerHost(this.picker.overlay.singleTrigger);
         const { field } = this.picker;
         writeFieldAria(field, host, {
             "aria-labelledby": field.labelledBy,
@@ -62,10 +62,10 @@ export class DatePickerTrigger {
         });
     }
 
-    protected onClick(): void {
+    protected onClick(event: MouseEvent): void {
         if (this.picker.disabled()) {
             return;
         }
-        this.picker.overlay.setOpen(!this.state().open, "trigger-press");
+        this.picker.overlay.setOpen(!this.state().open, "trigger-press", event);
     }
 }

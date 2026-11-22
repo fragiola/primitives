@@ -16,19 +16,32 @@ import {
     registerHost,
     resolveFocusTarget,
 } from "@fragiola/primitives-angular/internal";
+import { DIALOG_NESTING } from "../utils/dialog-nesting.ts";
 import { DialogRoot } from "./dialog-root.directive.ts";
 
 export interface DialogPopupState {
     open: boolean;
+    nested: boolean;
+    nestedDialogOpen: boolean;
 }
+
+// a press on the backdrop or the viewport blurs the page: focus returns once the press has ended
+const RETURNS_FOCUS_UNFOCUSED = new Set(["outside-press"]);
 
 /**
  * The modal dialog (spec/dialog.md): focus trap, inert page, scroll lock, its own layer.
- * `<div dialogPopup [initialFocus]="cancel">`.
+ * `<div dialogPopup [initialFocus]="cancel">`. A `[dialogRoot]` inside it is a nested dialog;
+ * its inline `--nested-dialogs` counts the open dialogs nested below it.
  */
 @Directive({
     selector: "[dialogPopup]",
     exportAs: "dialogPopup",
+    providers: [
+        {
+            provide: DIALOG_NESTING,
+            useFactory: () => inject<DialogRoot>(DialogRoot).nesting,
+        },
+    ],
     host: {
         role: "dialog",
         "aria-modal": "true",
@@ -37,24 +50,34 @@ export interface DialogPopupState {
         "[attr.id]": "root.overlay.popupId",
         "[attr.aria-labelledby]": "root.titleId() ?? null",
         "[attr.aria-describedby]": "root.descriptionId() ?? null",
+        "[attr.hidden]": "root.overlay.presence.mounted() ? null : ''",
+        "[style.--nested-dialogs]": "root.nestedDialogs()",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
+        "[attr.data-nested]": "data().nested",
+        "[attr.data-nested-dialog-open]": "data()['nested-dialog-open']",
         "[attr.data-starting-style]": "data()['starting-style']",
         "[attr.data-ending-style]": "data()['ending-style']",
     },
 })
 export class DialogPopup {
-    protected readonly root = inject(DialogRoot);
+    protected readonly root = inject<DialogRoot>(DialogRoot);
     /** Focused on open (default: the first tabbable element, else the popup). */
     readonly initialFocus = input<FocusTarget>(undefined);
-    /** Focused on close (default: the trigger, else the element focused before opening). */
+    /** Focused on close (default: the active trigger, else the element focused before opening). */
     readonly finalFocus = input<FocusTarget>(undefined);
-    readonly state = computed<DialogPopupState>(() => ({
-        open: this.root.overlay.open(),
-    }));
+    readonly state = computed<DialogPopupState>(() => {
+        const { open, nested, nestedDialogOpen } = this.root.state();
+        return { open, nested, nestedDialogOpen };
+    });
     protected readonly data = computed(() => {
         const status = this.root.overlay.presence.status();
+        const state = this.state();
         return dataValues({
-            open: this.state().open,
+            open: state.open,
+            closed: !state.open,
+            nested: state.nested,
+            "nested-dialog-open": state.nestedDialogOpen,
             "starting-style": status === "starting",
             "ending-style": status === "ending",
         });
@@ -62,11 +85,12 @@ export class DialogPopup {
 
     constructor() {
         const popup = registerHost(this.root.overlay.popup);
-        const overlay = this.root.overlay;
+        const root = this.root;
+        const overlay = root.overlay;
         afterRenderEffect((onCleanup) => {
             const open = overlay.open();
-            const backdrop = this.root.backdrop();
-            const trigger = overlay.trigger();
+            const backdrop = root.backdrop();
+            const viewport = root.viewport();
             if (!open) {
                 return;
             }
@@ -76,16 +100,28 @@ export class DialogPopup {
                     doc.activeElement instanceof HTMLElement
                         ? doc.activeElement
                         : null;
+                // the triggers are read when the session needs them: a trigger registered later,
+                // or the active one moving, never restarts it
                 const session = openOverlaySession(doc, {
                     elements: () => [popup],
-                    dismiss: (reason) => overlay.setOpen(false, reason),
+                    owner: () => untracked(overlay.triggers),
+                    // a press on the backdrop or the viewport is outside this dialog, inside its
+                    // parent
+                    backdrops: () => [backdrop, viewport],
+                    dismiss: (reason, event) =>
+                        overlay.setOpen(false, reason, event),
                     returnFocus: {
-                        reason: () => null,
+                        whenUnfocused: RETURNS_FOCUS_UNFOCUSED,
+                        reason: () => overlay.lastReason.current ?? "none",
                         to: () => {
-                            const final = resolveFocusTarget(this.finalFocus());
+                            const final = resolveFocusTarget(
+                                untracked(this.finalFocus),
+                            );
                             return final === false
                                 ? false
-                                : (final ?? trigger ?? previous);
+                                : (final ??
+                                      untracked(overlay.trigger) ??
+                                      previous);
                         },
                     },
                 });

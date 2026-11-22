@@ -15,7 +15,7 @@ export class DialogDescription {
     readonly id = input<string | undefined>(undefined);
     protected readonly resolvedId = labelId(
         this.id,
-        inject(DialogRoot).descriptionId,
+        inject<DialogRoot>(DialogRoot).descriptionId,
         "primitives-dialog-description",
     );
 }

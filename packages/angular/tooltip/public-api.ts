@@ -6,7 +6,11 @@ export type { Align, Side } from "@fragiola/primitives/positioning";
 export type {
     ChangeDetails,
     ChangeReason,
+    OpenChangeDetails,
     OpenChangeEvent,
+    OverlayActions,
+    OverlayHandle,
+    OverlayPortalOptions,
 } from "@fragiola/primitives-angular/internal";
 export { TooltipArrow } from "./directives/tooltip-arrow.directive.ts";
 export {
@@ -20,5 +24,12 @@ export {
     TooltipRoot,
     type TooltipState,
 } from "./directives/tooltip-root.directive.ts";
-export { TooltipTrigger } from "./directives/tooltip-trigger.directive.ts";
+export {
+    TooltipTrigger,
+    type TooltipTriggerState,
+} from "./directives/tooltip-trigger.directive.ts";
 export { injectTooltip } from "./inject/inject-tooltip.ts";
+export {
+    createTooltipHandle,
+    type TooltipHandle,
+} from "./utils/tooltip-handle.ts";

@@ -23,7 +23,9 @@ export interface MenuPositionerState {
     host: {
         role: "presentation",
         "data-primitives-part": "menu-positioner",
+        "[attr.hidden]": "level.overlay.presence.mounted() ? null : ''",
         "[attr.data-open]": "data().open",
+        "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
         "[attr.data-align]": "data().align",
         "[attr.data-nested]": "data().nested",
@@ -32,7 +34,7 @@ export interface MenuPositionerState {
     },
 })
 export class MenuPositioner {
-    protected readonly level = inject(MenuRoot);
+    protected readonly level = inject<MenuRoot>(MenuRoot);
     readonly side = input<Side | undefined>(undefined);
     readonly align = input<Align | undefined>(undefined);
     readonly sideOffset = input<number | undefined>(undefined);
@@ -44,7 +46,11 @@ export class MenuPositioner {
         ...this.level.placed(),
     }));
     protected readonly data = computed(() =>
-        dataValues({ ...this.state(), nested: this.level.nested }),
+        dataValues({
+            ...this.state(),
+            closed: !this.state().open,
+            nested: this.level.nested,
+        }),
     );
 
     constructor() {
@@ -55,7 +61,11 @@ export class MenuPositioner {
             this.level.nested
                 ? { side: "inline-end", align: "start" }
                 : { side: "bottom", align: "start" },
-            { anchor: overlay.trigger, positioner },
+            {
+                anchor: overlay.trigger,
+                positioner,
+                mounted: overlay.presence.mounted,
+            },
             this.level.placed,
         );
     }
