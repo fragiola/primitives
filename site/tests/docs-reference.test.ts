@@ -285,6 +285,9 @@ function vueProps(component: string, sources: Sources) {
     );
 }
 
+/** The parts Angular has no directive for: their API is another part's (`component.Part`). */
+const NO_ANGULAR_DIRECTIVE = new Set(["combobox.Value"]);
+
 /** The Angular inputs and outputs of each part's directive. */
 function angularProps(
     component: string,
@@ -318,8 +321,12 @@ function angularProps(
                     ) ??
                 own;
             // a part Angular has no directive for (Combobox's Value: the root's `value()` signal)
-            // declares nothing
-            if (!sources.files(dir).includes(file)) return [part, []];
+            // declares nothing; any other missing directive file is drift and throws below
+            if (
+                NO_ANGULAR_DIRECTIVE.has(`${component}.${part}`) &&
+                !sources.files(dir).includes(file)
+            )
+                return [part, []];
             const text = sources.read(file);
             // an input bound under an alias (`boundValue = input(…, { alias: "value" })`) is its
             // alias, but a structural directive's microsyntax inputs (`alias: "dialogPortal"`,

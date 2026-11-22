@@ -22,12 +22,14 @@ export function scrollIntoViewWithin(
             element.scrollHeight > element.clientHeight &&
             (overflow === "auto" || overflow === "scroll")
         ) {
-            const box = element.getBoundingClientRect();
+            // the visible scroll area: inside the border, above a horizontal scrollbar
+            const top = element.getBoundingClientRect().top + element.clientTop;
+            const bottom = top + element.clientHeight;
             const rect = item.getBoundingClientRect();
-            if (rect.top < box.top) {
-                element.scrollTop -= box.top - rect.top;
-            } else if (rect.bottom > box.bottom) {
-                element.scrollTop += rect.bottom - box.bottom;
+            if (rect.top < top) {
+                element.scrollTop -= top - rect.top;
+            } else if (rect.bottom > bottom) {
+                element.scrollTop += rect.bottom - bottom;
             }
         }
         if (element === boundary) {

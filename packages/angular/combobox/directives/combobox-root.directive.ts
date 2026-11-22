@@ -44,6 +44,17 @@ import {
 // `unknown` in the declarations (no `any`): a template narrows it to its own item type
 export type ComboboxItemValue = unknown;
 
+/**
+ * `filter` over the consumer's own items: `never` for the item and `unknown` for what
+ * `itemToString` takes, so a filter typed for them (`ItemFilter<Country>`, the toolkit's
+ * `containsFilter<Country>()`) binds with no `any`.
+ */
+type ConsumerFilter = (
+    item: never,
+    query: string,
+    itemToString: (item: unknown) => string,
+) => boolean;
+
 /** A rendered Item, as the Root knows it. */
 export interface ComboboxItemInfo {
     value: ComboboxItemValue;
@@ -79,7 +90,7 @@ export class ComboboxRoot {
     // The callbacks take the consumer's own items: their parameters are `never` in the
     // declarations, so a function typed for them (`(country: Country) => string`) binds with no
     // `any`; the Root calls them with the items it was given.
-    readonly filter = input<ItemFilter<never> | null | undefined>(undefined);
+    readonly filter = input<ConsumerFilter | null | undefined>(undefined);
     /** The most items the list renders; `-1` for no limit. */
     readonly limit = input(-1);
     readonly locale = input<string | undefined>(undefined);
@@ -269,7 +280,7 @@ export class ComboboxRoot {
                 }
                 let after: Node = hidden;
                 for (const item of values) {
-                    const entry = document.createElement("input");
+                    const entry = hidden.ownerDocument.createElement("input");
                     entry.type = "hidden";
                     entry.name = name;
                     entry.setAttribute("value", this.formValue(item));

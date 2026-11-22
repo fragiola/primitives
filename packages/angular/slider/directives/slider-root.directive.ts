@@ -138,7 +138,7 @@ export class SliderRoot {
                     inputs.pop()?.remove();
                 }
                 while (inputs.length < values.length) {
-                    const input = document.createElement("input");
+                    const input = host.ownerDocument.createElement("input");
                     input.type = "hidden";
                     input.setAttribute("data-primitives-part", "slider-input");
                     host.appendChild(input);

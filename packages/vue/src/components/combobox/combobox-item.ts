@@ -69,10 +69,15 @@ export const ComboboxItem: PartComponent<ComboboxItemProps, ComboboxItemState> =
                 }));
                 provide(ComboboxItemKey, state);
                 watch(
-                    () => state.value.highlighted,
-                    (highlighted) => {
-                        // within the popup only: a list that mounts before it is placed never scrolls
-                        // the page
+                    () =>
+                        [
+                            state.value.highlighted,
+                            element.value,
+                            context.positioner.value,
+                        ] as const,
+                    ([highlighted]) => {
+                        // within the popup only (a list that mounts before it is placed never
+                        // scrolls the page), and on mount: an item can mount already highlighted
                         if (highlighted && element.value) {
                             scrollIntoViewWithin(
                                 element.value,
@@ -80,7 +85,7 @@ export const ComboboxItem: PartComponent<ComboboxItemProps, ComboboxItemState> =
                             );
                         }
                     },
-                    { flush: "post" },
+                    { flush: "post", immediate: true },
                 );
                 return () => {
                     const { highlighted, selected, disabled } = state.value;

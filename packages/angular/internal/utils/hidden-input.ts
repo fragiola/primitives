@@ -12,7 +12,7 @@ export function createHiddenInput(
     anchor: Node,
     attributes: Record<string, string>,
 ): HTMLInputElement {
-    const input = document.createElement("input");
+    const input = (anchor.ownerDocument ?? document).createElement("input");
     for (const [name, value] of Object.entries(attributes)) {
         input.setAttribute(name, value);
     }
