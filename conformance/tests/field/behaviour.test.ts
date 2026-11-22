@@ -473,3 +473,81 @@ test.describe("field / more-controls", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+test.describe("field / settings", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/field/settings");
+    });
+
+    const contact = (page: Page) =>
+        page.getByRole("radiogroup", { name: "Contact by", exact: true });
+    const alerts = (page: Page) =>
+        page.getByRole("switch", { name: "Email alerts", exact: true });
+    const radio = (page: Page, name: string) =>
+        page.getByRole("radio", { name, exact: true });
+
+    test("the group and the switch are labelled and described by their fields; the label toggles the switch", async ({
+        page,
+    }) => {
+        await expect(contact(page)).toHaveAccessibleDescription(
+            "How we reach you.",
+        );
+        await expect(alerts(page)).toHaveAccessibleDescription(
+            "A weekly digest.",
+        );
+        await page.getByText("Email alerts", { exact: true }).click();
+        await expect(alerts(page)).toHaveAttribute("aria-checked", "true");
+        await page.getByText("Email alerts", { exact: true }).click();
+        await expect(alerts(page)).toHaveAttribute("aria-checked", "false");
+    });
+
+    test("a failed submission focuses the group's first radio and shows its error", async ({
+        page,
+    }) => {
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+        await expect(radio(page, "Email")).toBeFocused();
+        await expect(contact(page)).toHaveAttribute("aria-invalid", "true");
+        await shown(page, "Choose how we reach you.");
+        await expect(contact(page)).toHaveAccessibleDescription(
+            "How we reach you. Choose how we reach you.",
+        );
+    });
+
+    test("a choice clears the error; the form submits the radio and the switch", async ({
+        page,
+    }) => {
+        await submit(page).click();
+        await shown(page, "Choose how we reach you.");
+        await radio(page, "Phone").click();
+        await hidden(page, "Choose how we reach you.");
+        await expect(contact(page)).not.toHaveAttribute("aria-invalid");
+        await submit(page).click();
+        await expectSubmitted(page, "contact=phone&alerts=off");
+        await alerts(page).click();
+        await submit(page).click();
+        await expectSubmitted(page, "contact=phone&alerts=on");
+    });
+
+    test("a form reset returns both controls to their defaults", async ({
+        page,
+    }) => {
+        await radio(page, "Phone").click();
+        await alerts(page).click();
+        await expect(alerts(page)).toHaveAttribute("aria-checked", "true");
+        await page.getByRole("button", { name: "Reset" }).click();
+        await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
+        await expect(alerts(page)).toHaveAttribute("aria-checked", "false");
+        await submit(page).click();
+        await expectSubmitted(page, "none");
+    });
+
+    test("has no axe violation, before and after a failed submission", async ({
+        page,
+    }) => {
+        await expectNoAxeViolations(page);
+        await submit(page).click();
+        await shown(page, "Choose how we reach you.");
+        await expectNoAxeViolations(page);
+    });
+});

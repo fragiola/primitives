@@ -59,3 +59,11 @@ test("field / more-controls: invalid", async ({ page }) => {
     await page.evaluate(() => (document.activeElement as HTMLElement).blur());
     await expectScreen(page, "field-more-controls-invalid");
 });
+
+test("field / settings: invalid", async ({ page }) => {
+    await openScenario(page, "/field/settings");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Choose how we reach you.")).toBeVisible();
+    await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+    await expectScreen(page, "field-settings-invalid");
+});
