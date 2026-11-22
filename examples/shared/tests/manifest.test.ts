@@ -32,7 +32,16 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
+    "radio-group": [
+        "_recipes/button.ts",
+        "_recipes/field.ts",
+        "_recipes/form.ts",
+        "_recipes/switch.ts",
+    ],
 };
+
+/** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
+const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar"]);
 
 describe("the manifest", () => {
     for (const framework of FRAMEWORKS) {
@@ -52,8 +61,14 @@ describe("the manifest", () => {
                 "combobox",
                 "fieldset",
                 "form",
+                "radio-group",
+                "switch",
+                "button",
                 "date-picker",
                 "calendar",
+                "progress",
+                "avatar",
+                "separator",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];
@@ -65,7 +80,9 @@ describe("the manifest", () => {
                         `_recipes/${example.id}.ts`,
                         ...(MORE_RECIPES[example.id] ?? []),
                         "_recipes/recipe.ts",
-                        "_recipes/shared.ts",
+                        ...(WITHOUT_SHARED.has(example.id)
+                            ? []
+                            : ["_recipes/shared.ts"]),
                     ].sort(),
                 ]);
                 expect(example.packages).toEqual([

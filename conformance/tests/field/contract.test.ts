@@ -338,3 +338,80 @@ test("field / more-controls: the group and the pickers take the field's ids, nam
         ),
     );
 });
+
+test("field / settings: the radio group and the switch take the field's ids, name and states", async ({
+    page,
+}) => {
+    await openScenario(page, "/field/settings");
+    await expect(roots(page)).toHaveCount(2);
+    const [contact, alerts] = [0, 1].map((index) => roots(page).nth(index)) as [
+        Locator,
+        Locator,
+    ];
+
+    // the group is the field's control: named and described, no `for` on a group
+    const group = part(contact, "radio-group", "root");
+    const contactLabel = part(contact, "field", "label");
+    await expect(contactLabel).not.toHaveAttribute("for");
+    await expect(group).toHaveAttribute(
+        "aria-labelledby",
+        (await contactLabel.getAttribute("id")) as string,
+    );
+    await expect(group).toHaveAttribute(
+        "aria-describedby",
+        (await part(contact, "field", "description").getAttribute(
+            "id",
+        )) as string,
+    );
+    // its radios take the field's name, each with its own value, and stay unlabelled by it
+    const inputs = part(contact, "radio", "input");
+    await expect(inputs).toHaveCount(2);
+    for (const index of [0, 1]) {
+        await expect(inputs.nth(index)).toHaveAttribute("name", "contact");
+        await expect(inputs.nth(index)).toHaveAttribute("required", "");
+        await expect(
+            part(contact, "radio", "root").nth(index),
+        ).not.toHaveAttribute("aria-labelledby");
+    }
+
+    // the switch is labelable: the label points at it
+    const root = part(alerts, "switch", "root");
+    const alertsLabel = part(alerts, "field", "label");
+    await expect(alertsLabel).toHaveAttribute(
+        "for",
+        (await root.getAttribute("id")) as string,
+    );
+    await expect(root).toHaveAttribute(
+        "aria-labelledby",
+        (await alertsLabel.getAttribute("id")) as string,
+    );
+    await expect(part(alerts, "switch", "input")).toHaveAttribute(
+        "name",
+        "alerts",
+    );
+    await expect(part(alerts, "switch", "unchecked-input")).toHaveAttribute(
+        "name",
+        "alerts",
+    );
+
+    await expectStates([group, root], []);
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expectHas([contact, group], ["invalid"], ["valid"]);
+    await page.getByRole("radio", { name: "Phone", exact: true }).click();
+    await expectHas(
+        [contact, group],
+        ["valid", "dirty", "filled", "focused"],
+        ["invalid"],
+    );
+    await page.getByRole("switch", { name: "Email alerts" }).click();
+    await expectHas([alerts, root], ["dirty", "filled", "focused"], []);
+    // focus left the group: touched
+    await expectHas([contact, group], ["touched"], ["focused"]);
+    await resetForm(page);
+    await expect(part(alerts, "switch", "unchecked-input")).toHaveCount(1);
+    await expectNoFalseStates(
+        page.locator(
+            '[data-primitives-part^="field-"], [data-primitives-part^="radio"], [data-primitives-part^="switch-"]',
+        ),
+    );
+});

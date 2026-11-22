@@ -54,9 +54,9 @@ export const GUARD = {
 
 /**
  * The components an entry is built on, in every framework: the form controls on Field (and
- * Fieldset and Form, whose contexts Field reads, Epic #26), a Checkbox on its group's context, the
- * pickers on the calendars. Any other component's code in an entry is a leak; a utility entry
- * (UTILITIES) has none.
+ * Fieldset and Form, whose contexts Field reads, Epic #26), a Checkbox on its group's context and
+ * a Radio on its RadioGroup's (Epic #29), the pickers on the calendars. Any other component's code
+ * in an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
@@ -68,9 +68,12 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "date-range-picker": ["calendar", "date-picker", "field"],
     fieldset: ["field"],
     form: ["field"],
+    radio: ["radio-group", "field"],
+    "radio-group": ["field"],
     "range-calendar": ["calendar"],
     select: ["field"],
     slider: ["field"],
+    switch: ["field"],
 };
 
 /**

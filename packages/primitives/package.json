@@ -78,6 +78,12 @@
             "import": "./dist/id.js",
             "default": "./dist/id.js"
         },
+        "./image": {
+            "@fragiola/source": "./src/image/index.ts",
+            "types": "./dist/image.d.ts",
+            "import": "./dist/image.js",
+            "default": "./dist/image.js"
+        },
         "./inert": {
             "@fragiola/source": "./src/inert/index.ts",
             "types": "./dist/inert.d.ts",
@@ -175,6 +181,11 @@
                 "types": "./dist/id.d.ts",
                 "import": "./dist/id.js",
                 "default": "./dist/id.js"
+            },
+            "./image": {
+                "types": "./dist/image.d.ts",
+                "import": "./dist/image.js",
+                "default": "./dist/image.js"
             },
             "./inert": {
                 "types": "./dist/inert.d.ts",

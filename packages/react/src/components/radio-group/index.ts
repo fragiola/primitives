@@ -1,0 +1,14 @@
+// The entry of @fragiola/primitives-react/radio-group: a set of radios of which one can be
+// checked, with form support (spec/radio-group.md, the APG's radio group). Its radios come from
+// `/radio`.
+
+export type {
+    ChangeDetails,
+    ChangeReason,
+} from "../../utils/change-details.ts";
+export type { RenderProp } from "../../utils/render-element.tsx";
+export {
+    RadioGroup,
+    type RadioGroupProps,
+    type RadioGroupState,
+} from "./radio-group.tsx";

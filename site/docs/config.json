@@ -98,12 +98,28 @@
                     "path": "api/form"
                 },
                 {
+                    "label": "Button",
+                    "path": "api/button"
+                },
+                {
                     "label": "Checkbox",
                     "path": "api/checkbox"
                 },
                 {
                     "label": "CheckboxGroup",
                     "path": "api/checkbox-group"
+                },
+                {
+                    "label": "RadioGroup",
+                    "path": "api/radio-group"
+                },
+                {
+                    "label": "Radio",
+                    "path": "api/radio"
+                },
+                {
+                    "label": "Switch",
+                    "path": "api/switch"
                 },
                 {
                     "label": "Slider",
@@ -132,6 +148,18 @@
                 {
                     "label": "DateRangePicker",
                     "path": "api/date-range-picker"
+                },
+                {
+                    "label": "Progress",
+                    "path": "api/progress"
+                },
+                {
+                    "label": "Avatar",
+                    "path": "api/avatar"
+                },
+                {
+                    "label": "Separator",
+                    "path": "api/separator"
                 }
             ]
         },

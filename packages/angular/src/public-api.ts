@@ -4,6 +4,8 @@
 // the root entry only re-exports them, so importing from it tree-shakes to the same output. There
 // is no NgModule of every directive.
 
+export * from "@fragiola/primitives-angular/avatar";
+export * from "@fragiola/primitives-angular/button";
 export * from "@fragiola/primitives-angular/calendar";
 export * from "@fragiola/primitives-angular/checkbox";
 export * from "@fragiola/primitives-angular/checkbox-group";
@@ -17,9 +19,14 @@ export * from "@fragiola/primitives-angular/fieldset";
 export * from "@fragiola/primitives-angular/form";
 export * from "@fragiola/primitives-angular/menu";
 export * from "@fragiola/primitives-angular/popover";
+export * from "@fragiola/primitives-angular/progress";
+export * from "@fragiola/primitives-angular/radio";
+export * from "@fragiola/primitives-angular/radio-group";
 export * from "@fragiola/primitives-angular/range-calendar";
 export * from "@fragiola/primitives-angular/render";
 export * from "@fragiola/primitives-angular/select";
+export * from "@fragiola/primitives-angular/separator";
 export * from "@fragiola/primitives-angular/slider";
+export * from "@fragiola/primitives-angular/switch";
 export * from "@fragiola/primitives-angular/tabs";
 export * from "@fragiola/primitives-angular/tooltip";

@@ -3,14 +3,14 @@ title: Known limitations
 description: What the first release does not do yet - the rest of the catalog, other frameworks, npm packages - and what stays yours by design.
 ---
 
-The first release covers the overlays, the tabs, the form controls with their field layer, and the
-date pickers. Here is what it leaves out, on purpose or for a later release.
+The first release covers the overlays, the tabs, the form controls with their field layer, the
+date pickers, and a progress bar, an avatar and a separator. Here is what it leaves out, on purpose or for a later release.
 
 ## Not in this release
 
-- **Seventeen components.** Dialog, Popover, Tooltip, Menu, Tabs, Field, Fieldset, Form,
-  Checkbox, CheckboxGroup, Slider, Select, Combobox, Calendar, RangeCalendar, DatePicker and
-  DateRangePicker ship today, with two entries that are no component: the
+- **Twenty-four components.** Dialog, Popover, Tooltip, Menu, Tabs, Field, Fieldset, Form,
+  Button, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, Select, Combobox, Calendar,
+  RangeCalendar, DatePicker, DateRangePicker, Progress, Avatar and Separator ship today, with two entries that are no component: the
   [direction provider](/docs/api/direction) and the [render utilities](/docs/api/render).
 - **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
   with no time and no time zone. No date field to type a date in parts, no time field, no
@@ -20,8 +20,10 @@ date pickers. Here is what it leaves out, on purpose or for a later release.
   `touched`, the Error's enter and exit animations, and the Form's `onFormSubmit` (read the native
   `submit` event and its `FormData`) and `actionsRef`. A form reset does not reset a field's
   states, as in Base UI.
-- **No RadioGroup, Switch, NumberField, Listbox or Autocomplete** yet: they come with later
-  stages.
+- **No NumberField, Listbox or Autocomplete** yet: they come with later stages. Nor a toggle
+  button, a Meter, a radio outside a group or a read-only RadioGroup.
+- **Avatar leaves out** Base UI's `keepMounted` on the Image and its enter and exit transitions:
+  the image only shows once loaded.
 - **Combobox and Select**: no virtualization or async lists, no `readOnly` or `autoHighlight`, no
   input inside the popup; a Select chooses one value (no `multiple`, groups or scroll arrows), and
   a Combobox has no `modal` option.

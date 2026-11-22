@@ -256,6 +256,8 @@ its focus and its changes; give it no `name` of its own. Outside a field it beha
 | `Field.Control` | the text | the input | the input |
 | [Checkbox](/docs/api/checkbox) | `checked` | its hidden input (`required`) | the checkbox |
 | [CheckboxGroup](/docs/api/checkbox-group) | the array of checked values | nothing: only a Form blocks | its first enabled checkbox |
+| [Switch](/docs/api/switch) | `checked` | its hidden input (`required`) | the switch |
+| [RadioGroup](/docs/api/radio-group) | the value, or `null` | its first enabled radio's hidden input (`required`) | its checked radio, else its first enabled one |
 | [Select](/docs/api/select) | the value, or `null` | its hidden input (`required`) | its Trigger |
 | [Slider](/docs/api/slider) | the number, or numbers | nothing: only a Form blocks | its first Thumb |
 | [Combobox](/docs/api/combobox) | the item, `null`, or the items | its hidden input (`required`) | its Input |
@@ -285,12 +287,111 @@ its focus and its changes; give it no `name` of its own. Outside a field it beha
 ```
 
 - **The label**: a click on it focuses the control, or clicks a labelable one (it toggles a
-  Checkbox). A picker's Trigger is only focused: a click would open its popup.
+  Checkbox or a Switch). A CheckboxGroup or a RadioGroup is named by it (`aria-labelledby`). A picker's Trigger is only focused: a click would open its popup.
 - **A picker's name** is the label, then the Trigger's own content: "Arrival 2026-11-24". Your
   visible text stays in its name. A Select's Trigger is named by the label alone.
 - **A Slider** has a Label of its own; inside a Field, use the Field's instead.
 - **A form reset** returns every control to its default; the fields keep their states (`dirty`,
   `touched`, the validity), as in Base UI.
+
+## A settings form: RadioGroup and Switch
+
+A [RadioGroup](/docs/api/radio-group) and a [Switch](/docs/api/switch) are Field controls like
+the others: give them no `name`, the field gives it. The group is the field's control as a whole
+(its radios do not register themselves); a Switch, as a Checkbox, is the labelable element.
+
+<Framework name="react">
+
+```tsx
+import { Button } from "@fragiola/primitives-react/button";
+import { Field } from "@fragiola/primitives-react/field";
+import { Form } from "@fragiola/primitives-react/form";
+import { Radio } from "@fragiola/primitives-react/radio";
+import { RadioGroup } from "@fragiola/primitives-react/radio-group";
+import { Switch } from "@fragiola/primitives-react/switch";
+
+<Form aria-label="Contact settings" onSubmit={save}>
+    <Field.Root name="contact">
+        <Field.Label>Contact by</Field.Label>
+        <RadioGroup required>
+            <label><Radio.Root value="email"><Radio.Indicator /></Radio.Root> Email</label>
+            <label><Radio.Root value="phone"><Radio.Indicator /></Radio.Root> Phone</label>
+        </RadioGroup>
+        <Field.Description>How we reach you.</Field.Description>
+        <Field.Error match="valueMissing">Choose how we reach you.</Field.Error>
+    </Field.Root>
+    <Field.Root name="alerts">
+        <Switch.Root uncheckedValue="off">
+            <Switch.Thumb />
+        </Switch.Root>
+        <Field.Label>Email alerts</Field.Label>
+        <Field.Description>A weekly digest.</Field.Description>
+    </Field.Root>
+    <Button type="submit">Save</Button>
+</Form>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Form aria-label="Contact settings" @submit.prevent="save">
+        <Field.Root name="contact">
+            <Field.Label>Contact by</Field.Label>
+            <RadioGroup required>
+                <label><Radio.Root value="email"><Radio.Indicator /></Radio.Root> Email</label>
+                <label><Radio.Root value="phone"><Radio.Indicator /></Radio.Root> Phone</label>
+            </RadioGroup>
+            <Field.Description>How we reach you.</Field.Description>
+            <Field.Error match="valueMissing">Choose how we reach you.</Field.Error>
+        </Field.Root>
+        <Field.Root name="alerts">
+            <Switch.Root unchecked-value="off"><Switch.Thumb /></Switch.Root>
+            <Field.Label>Email alerts</Field.Label>
+            <Field.Description>A weekly digest.</Field.Description>
+        </Field.Root>
+        <Button type="submit">Save</Button>
+    </Form>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<form formRoot aria-label="Contact settings" (submit)="save($event)">
+    <div fieldRoot [name]="'contact'">
+        <label fieldLabel>Contact by</label>
+        <div radioGroup required>
+            <label><button radioRoot value="email"><span *radioIndicator></span></button> Email</label>
+            <label><button radioRoot value="phone"><span *radioIndicator></span></button> Phone</label>
+        </div>
+        <p fieldDescription>How we reach you.</p>
+        <div *fieldError="'valueMissing'">Choose how we reach you.</div>
+    </div>
+    <div fieldRoot [name]="'alerts'">
+        <button switchRoot uncheckedValue="off"><span switchThumb></span></button>
+        <label fieldLabel>Email alerts</label>
+        <p fieldDescription>A weekly digest.</p>
+    </div>
+    <button button type="submit">Save</button>
+</form>
+```
+
+</Framework>
+
+- **The names**: the Field's Label names the `radiogroup` ("Contact by") and the `switch`
+  ("Email alerts"); a click on "Email alerts" toggles the switch. Each Description describes its
+  control.
+- **A blocked submission**: with no radio checked, "Save" submits nothing, shows "Choose how we
+  reach you.", sets `aria-invalid` on the group and focuses "Email". The radios share their
+  validity, so the first enabled radio's hidden input blocks a plain `<form>` too.
+- **The values**: with "Phone" checked, the form submits `contact=phone&alerts=off`; with the
+  switch on, `contact=phone&alerts=on` (`uncheckedValue` gives the value while off).
+- **A reset** returns both to their defaults: no radio checked, the switch off.
 
 ## Styling the states
 

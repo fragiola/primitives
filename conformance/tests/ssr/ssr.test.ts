@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { IMPLEMENTATIONS } from "../../src/implementations.ts";
+import { expectOutput } from "../../src/output.ts";
 import { settleAnimations } from "../../src/presence.ts";
 import { scenarioPaths, snapshotRoot } from "../../src/ssr.ts";
 
@@ -33,11 +34,21 @@ function collectProblems(page: Page): string[] {
     return problems;
 }
 
-/** Waits until the fixture says it rendered (or hydrated), then for its animations and frames. */
-async function ready(page: Page): Promise<void> {
+/**
+ * Waits until the fixture says it rendered (or hydrated), then for its animations and frames. An
+ * Avatar's page also waits for its images (loaded or failed) and its Fallback's delay
+ * (spec/avatar.md): its loading is asynchronous, so both renders are compared once it settled.
+ */
+async function ready(page: Page, scenario: string): Promise<void> {
     await page
         .locator("html[data-fixture-ready]")
         .waitFor({ state: "attached" });
+    if (scenario.startsWith("/avatar/")) {
+        await page.waitForLoadState("networkidle");
+        await expectOutput(page, "ada", "loaded");
+        await expectOutput(page, "missing", "error");
+        await expect(page.getByText("KJ", { exact: true })).toBeVisible();
+    }
     await settleAnimations(page);
 }
 
@@ -62,7 +73,7 @@ for (const scenario of SCENARIOS) {
 
         const problems = collectProblems(page);
         await page.goto(url);
-        await ready(page);
+        await ready(page, scenario);
         const hydrated = await snapshotRoot(page);
         expect(problems).toEqual([]);
         // the ids the server wrote are the ones the hydrated page keeps
@@ -78,7 +89,7 @@ for (const scenario of SCENARIOS) {
         ).toEqual([]);
 
         await page.goto(scenario);
-        await ready(page);
+        await ready(page, scenario);
         expect(hydrated).toEqual(await snapshotRoot(page));
     });
 }

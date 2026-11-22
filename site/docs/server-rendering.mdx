@@ -78,8 +78,14 @@ keeps the server's ids and every `aria-labelledby` and `aria-controls` with them
 
 ## Forms
 
-React and Vue render the hidden inputs of the form controls (Checkbox, Select, Combobox, Slider,
-DatePicker, DateRangePicker)
+React and Vue render the hidden inputs of the form controls (Checkbox, Switch, Radio, Select, Combobox,
+Slider, DatePicker, DateRangePicker)
 on the server too. Angular adds them in the browser once the page is hydrated, since its
 directives create them outside their templates: a form posted before the page is hydrated has no
 value of theirs.
+
+## Images
+
+An [Avatar](/docs/api/avatar)'s status is `idle` on the server: its Image renders nothing and its
+Fallback is rendered (none with a `delay`, which has not passed). The image loads once the page
+is mounted in the browser; a cached one is shown before the browser paints.

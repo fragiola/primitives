@@ -1,0 +1,138 @@
+---
+title: Avatar
+description: An image that represents a person, shown only once it has loaded, with a fallback while it loads or when it fails, in each framework.
+---
+
+An image that represents a person, with a fallback (initials, an icon) while the image loads or
+when it fails. The image is rendered only once it has loaded, so a broken image never shows, and
+the layout does not shift between the fallback and the image (you size the Root). It needs no
+ARIA of its own: the Image is a plain `img` named by its `alt` (the APG has no pattern). A group
+of avatars and a status badge are markup and CSS, not primitives.
+
+<Example id="avatar" />
+
+## Behaviour
+
+- **The loading status** is the Root's: `idle` (no Image, or not loading yet), `loading`,
+  `loaded`, or `error` (the image failed, or the Image has no `src`). The Image loads its `src`
+  outside the document (the toolkit's [`watchImageStatus`](/docs/api/toolkit)) and renders its
+  `img` once it has loaded; a new `src` loads again. When the Image unmounts, the status returns
+  to `idle`.
+- **A cached image** is `loaded` at once, never `loading`, within the mount (before the browser
+  paints), so its fallback is never painted.
+- **Fallback**: rendered while the image is not loaded. With `delay`, only once that many
+  milliseconds have passed since it mounted, so a fast image never flashes it.
+- **On a server** the status is `idle`: the Image renders nothing and the Fallback is rendered
+  (none with a `delay`, which has not passed). The load starts once mounted in the browser.
+- **No status attribute**: the parts carry none (Base UI). Read the status through
+  `onLoadingStatusChange`, or the Root's state (`render`, the Vue slot, Angular's `state()`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `span` | `avatar-root` | holds the image's loading status |
+| Image | `img` | `avatar-image` | rendered only once its image has loaded |
+| Fallback | `span` | `avatar-fallback` | rendered while the image is not loaded (after its `delay`) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Avatar } from "@fragiola/primitives-react/avatar";
+
+<Avatar.Root>
+    <Avatar.Image src="/ada.jpg" alt="Ada Lovelace" />
+    <Avatar.Fallback delay={300}>AL</Avatar.Fallback>
+</Avatar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Avatar.Root>
+        <Avatar.Image src="/ada.jpg" alt="Ada Lovelace" @loading-status-change="log" />
+        <Avatar.Fallback :delay="300">AL</Avatar.Fallback>
+    </Avatar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [AvatarRoot, AvatarImage, AvatarFallback],
+    template: `
+        <span avatarRoot>
+            <img *avatarImage="photo" alt="Ada Lovelace" />
+            <span *avatarFallback="300">AL</span>
+        </span>
+    `,
+})
+export class Ada {
+    protected readonly photo = "/ada.jpg";
+}
+```
+
+The Image and the Fallback are structural. The Image's value is its `src`, and its other inputs
+follow the microsyntax (`*avatarImage="photo; srcSet: set; sizes: '40px'"`); the Fallback's value
+is its `delay`. `(loadingStatusChange)` needs the template's long form:
+`<ng-template [avatarImage]="photo" (loadingStatusChange)="log($event)"><img alt="Ada Lovelace" /></ng-template>`.
+Read the status through the Root (`#avatar="avatarRoot"`, `avatar.state().status`).
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards: the Image forwards `alt` and every other `img` attribute.
+
+### Root
+
+No props of its own.
+
+### Image
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `src` | `string` | | the image; none is an `error` (Angular: `*avatarImage="src"`) |
+| `srcSet` | `string` | | the `img`'s `srcset`, also used for the load |
+| `sizes` | `string` | | the `img`'s `sizes`, also used for the load |
+| `crossOrigin` | `"anonymous" \| "use-credentials" \| ""` | | the `img`'s `crossorigin`, also used for the load |
+| `referrerPolicy` | `string` | | the `img`'s `referrerpolicy`, also used for the load |
+| `onLoadingStatusChange` | `(status: ImageLoadingStatus) => void` | | each new status but `idle` (Vue: `@loading-status-change`, Angular: `(loadingStatusChange)`) |
+
+### Fallback
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `delay` | `number` | | rendered only once this many milliseconds have passed since it mounted (Angular: `*avatarFallback="300"`) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | none of its own |
+| Image | the `img` attributes you give, and the load's (`src`, `srcset`, `sizes`, `crossorigin`, `referrerpolicy`) |
+| Fallback | none of its own |
+
+The Fallback's content is yours: text, an `aria-label`, or `aria-hidden` for a decorative one.
+
+## Keyboard
+
+None: an avatar is not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/avatar` | `Avatar`, `AvatarFallbackProps`, `AvatarImageProps`, `AvatarRootProps`, `AvatarState`, `ImageLoadingStatus`, `RenderProp` |
+| `@fragiola/primitives-vue/avatar` | `Avatar`, `AvatarFallbackProps`, `AvatarImageEmits`, `AvatarImageProps`, `AvatarState`, `ImageLoadingStatus`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/avatar` | `AvatarFallback`, `AvatarImage`, `AvatarImageCrossOrigin`, `AvatarRoot`, `AvatarState`, `ImageLoadingStatus` |

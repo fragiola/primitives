@@ -1,0 +1,174 @@
+---
+title: RadioGroup
+description: A set of radios of which one is checked, one tab stop moved through with the arrows, with native form support (the APG radio group), in each framework.
+---
+
+A set of choices of which exactly one can be checked (WAI-ARIA APG
+[radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)): the group is one tab
+stop, and the arrow keys move the focus and the check together. It works in a native `<form>`: it
+submits, resets and validates as a set of `<input type="radio">` of one `name` would.
+RadioGroup is one component, not a namespace; its radios come from [`/radio`](/docs/api/radio).
+
+<Example id="radio-group" />
+
+## Behaviour
+
+- **Value**: the checked radio's `value` (a string), or `null` while none is checked (the
+  default). Checking a radio reports its value (reason `none`).
+- **Focus**: the group's tab stop is its checked radio when it is enabled, else its first
+  enabled radio; every other radio has `tabindex="-1"`. Tab enters the group there, and Tab
+  again leaves it.
+- **Arrows**: ArrowDown and ArrowRight move the focus to the next enabled radio and check it,
+  ArrowUp and ArrowLeft to the previous, whatever the `orientation` (the APG). Disabled radios
+  are skipped. With `loopFocus` (the default) they wrap at the ends; without it, an arrow at an
+  end does nothing.
+- **RTL**: ArrowLeft is the next radio and ArrowRight the previous, in the direction of a
+  [DirectionProvider](/docs/api/direction), else the group's computed one. ArrowDown and ArrowUp
+  do not change.
+- **Forms**: each radio renders a visually hidden `radio` input right after it, named by the
+  group's `name`; the form submits `name=value` for the checked one, nothing while none is.
+  `required` fails the validation while none is checked, and focuses the group's tab stop. A form
+  reset returns an uncontrolled group to `defaultValue`; a controlled one reports the default
+  through `onValueChange`.
+- **Name**: the group is a `radiogroup`; name it with `aria-labelledby` (a heading) or
+  `aria-label`, or put it in a Field, whose Label names it.
+- **In a [Field](/docs/api/field)**: the group is the field's control, as a CheckboxGroup. The
+  Field's Label names it (`aria-labelledby`), its Description and Errors describe it
+  (`aria-describedby`), `aria-invalid` and the field's state attributes are on the group, and
+  `validate` receives the value (or `null`). Its radios take the field's `name` and `disabled`.
+  The validated element is the first enabled radio's hidden input (radios of one name share their
+  validity), so `required` blocks a native submission in a Field too; the focus goes to the
+  checked radio, else the first enabled one.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| RadioGroup | `div` | `radio-group-root` | the `radiogroup`; holds the value |
+
+Its radios are [Radio.Root](/docs/api/radio)s, each with its hidden input.
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Radio } from "@fragiola/primitives-react/radio";
+import { RadioGroup } from "@fragiola/primitives-react/radio-group";
+
+<RadioGroup aria-labelledby="plan" name="plan" required onValueChange={(value) => console.log(value)}>
+    <h2 id="plan">Plan</h2>
+    <label>
+        <Radio.Root value="free">
+            <Radio.Indicator />
+        </Radio.Root>
+        Free
+    </label>
+    <label>
+        <Radio.Root value="pro">
+            <Radio.Indicator />
+        </Radio.Root>
+        Pro
+    </label>
+</RadioGroup>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <RadioGroup v-model:value="plan" name="plan" aria-label="Plan">
+        <label><Radio.Root value="free"><Radio.Indicator /></Radio.Root> Free</label>
+        <label><Radio.Root value="pro"><Radio.Indicator /></Radio.Root> Pro</label>
+    </RadioGroup>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [RadioGroup, RadioRoot, RadioIndicator],
+    template: `
+        <div radioGroup [(value)]="plan" name="plan" aria-label="Plan">
+            <label><button radioRoot value="free"><span *radioIndicator></span></button> Free</label>
+            <label><button radioRoot value="pro"><span *radioIndicator></span></button> Pro</label>
+        </div>
+    `,
+})
+export class Plan {
+    protected readonly plan = signal<string | null>(null);
+}
+```
+
+</Framework>
+
+### In a Field
+
+```tsx
+<Form>
+    <Field.Root name="contact">
+        <Field.Label>Contact by</Field.Label>
+        <RadioGroup required>
+            <label><Radio.Root value="email"><Radio.Indicator /></Radio.Root> Email</label>
+            <label><Radio.Root value="phone"><Radio.Indicator /></Radio.Root> Phone</label>
+        </RadioGroup>
+        <Field.Description>How we reach you.</Field.Description>
+        <Field.Error match="valueMissing">Choose how we reach you.</Field.Error>
+    </Field.Root>
+    <button type="submit">Save</button>
+</Form>
+```
+
+The group has no `name` of its own: the field gives it, and the form submits `contact=phone`.
+A submission with none checked is blocked, shows the error and focuses "Email".
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Vue binds them as `v-model:value` and `@value-change`; Angular as `[(value)]` and
+`(valueChangeDetails)`.
+
+### RadioGroup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string \| null` | | the checked radio's value, controlled; `null` for none |
+| `defaultValue` | `string \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value: string \| null, details: { reason }) => void` | | every change (reason `none`); `null` when a reset returns the group to none |
+| `disabled` | `boolean` | `false` | disables every radio |
+| `required` | `boolean` | `false` | the form's validation fails while no radio is checked |
+| `name` | `string` | | every radio's hidden input takes it (a Field's wins) |
+| `orientation` | `"horizontal" \| "vertical"` | | `aria-orientation` and `data-orientation`; it changes no key |
+| `loopFocus` | `boolean` | `true` | the arrows wrap from the last radio to the first and back |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| RadioGroup | `role="radiogroup"`, `aria-required="true"` when required, `aria-disabled="true"` and `data-disabled` when disabled, `aria-orientation` and `data-orientation` when given, `data-required`; in a Field, `aria-labelledby` (the Field's Label), `aria-describedby`, `aria-invalid` and the field's states |
+
+The radios' attributes are on the [Radio](/docs/api/radio) page.
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab | enters the group at the checked radio, else its first enabled one; Tab again leaves it |
+| ArrowDown, ArrowRight | the next enabled radio, focused and checked (ArrowLeft in RTL); wraps with `loopFocus` |
+| ArrowUp, ArrowLeft | the previous enabled radio, focused and checked (ArrowRight in RTL); wraps with `loopFocus` |
+| Space | checks the focused radio |
+| Enter | nothing (a native radio does not check on Enter) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/radio-group` | `ChangeDetails`, `ChangeReason`, `RadioGroup`, `RadioGroupProps`, `RadioGroupState`, `RenderProp` |
+| `@fragiola/primitives-vue/radio-group` | `ChangeDetails`, `ChangeReason`, `RadioGroup`, `RadioGroupEmits`, `RadioGroupProps`, `RadioGroupState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/radio-group` | `ChangeDetails`, `ChangeReason`, `RadioEntry`, `RadioGroup`, `RadioGroupOrientation`, `RadioGroupState`, `ValueChangeEvent` |

@@ -1,4 +1,6 @@
 import type { Component } from "vue";
+import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
+import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
 import CalendarRange from "../scenarios/calendar/calendar-range.vue";
 import CalendarSingle from "../scenarios/calendar/calendar-single.vue";
@@ -30,6 +32,7 @@ import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
 import FieldMatch from "../scenarios/field/field-match.vue";
 import FieldMoreControls from "../scenarios/field/field-more-controls.vue";
+import FieldSettings from "../scenarios/field/field-settings.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
@@ -44,14 +47,20 @@ import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
 import PopoverInitialFocus from "../scenarios/popover/popover-initial-focus.vue";
 import PopoverPlacement from "../scenarios/popover/popover-placement.vue";
 import PopoverRtl from "../scenarios/popover/popover-rtl.vue";
+import ProgressBasic from "../scenarios/progress/progress-basic.vue";
+import RadioGroupBasic from "../scenarios/radio-group/radio-group-basic.vue";
+import RadioGroupControlled from "../scenarios/radio-group/radio-group-controlled.vue";
 import SelectBasic from "../scenarios/select/select-basic.vue";
 import SelectControlled from "../scenarios/select/select-controlled.vue";
 import SelectModal from "../scenarios/select/select-modal.vue";
+import SeparatorBasic from "../scenarios/separator/separator-basic.vue";
 import SliderBasic from "../scenarios/slider/slider-basic.vue";
 import SliderControlled from "../scenarios/slider/slider-controlled.vue";
 import SliderLabelValue from "../scenarios/slider/slider-label-value.vue";
 import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
+import SwitchBasic from "../scenarios/switch/switch-basic.vue";
+import SwitchControlled from "../scenarios/switch/switch-controlled.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
 import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
@@ -100,6 +109,11 @@ export const routes: Record<string, Component> = {
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
+    "/radio-group/basic": RadioGroupBasic,
+    "/radio-group/controlled": RadioGroupControlled,
+    "/switch/basic": SwitchBasic,
+    "/switch/controlled": SwitchControlled,
+    "/button/basic": ButtonBasic,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,
@@ -112,6 +126,7 @@ export const routes: Record<string, Component> = {
     "/field/async": FieldAsync,
     "/field/match": FieldMatch,
     "/field/more-controls": FieldMoreControls,
+    "/field/settings": FieldSettings,
     "/fieldset/basic": FieldsetBasic,
     "/form/basic": FormBasic,
     "/calendar/single": CalendarSingle,
@@ -124,5 +139,8 @@ export const routes: Record<string, Component> = {
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
+    "/progress/basic": ProgressBasic,
+    "/avatar/basic": AvatarBasic,
+    "/separator/basic": SeparatorBasic,
     "/direction/provider": DirectionProviderScenario,
 };

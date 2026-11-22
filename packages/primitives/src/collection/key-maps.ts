@@ -72,3 +72,39 @@ export function submenuKeys(rtl: boolean): { open: string; close: string } {
         ? { open: "ArrowLeft", close: "ArrowRight" }
         : { open: "ArrowRight", close: "ArrowLeft" };
 }
+
+export interface RadioKeyOptions {
+    rtl: boolean;
+    /** Wrap from the last radio to the first, and back (spec/radio-group.md, `loopFocus`). */
+    loop: boolean;
+    /** The radios the arrows pass over: the disabled ones. */
+    skip?: (index: number) => boolean;
+}
+
+/**
+ * The radio an arrow key moves focus (and the check) to in a radio group (spec/radio-group.md,
+ * "Keyboard"): ArrowDown and ArrowRight the next, ArrowUp and ArrowLeft the previous, whatever the
+ * orientation (APG); in RTL, ArrowLeft is the next and ArrowRight the previous. Skipped radios are
+ * passed over. `null` when the key does not move it: another key, or an end without `loop`.
+ */
+export function radioKeyTarget(
+    key: string,
+    index: number,
+    count: number,
+    options: RadioKeyOptions,
+): number | null {
+    const forward = options.rtl
+        ? key === "ArrowDown" || key === "ArrowLeft"
+        : key === "ArrowDown" || key === "ArrowRight";
+    const backward = options.rtl
+        ? key === "ArrowUp" || key === "ArrowRight"
+        : key === "ArrowUp" || key === "ArrowLeft";
+    if (!forward && !backward) {
+        return null;
+    }
+    const target = stepIndex(count, index, forward ? 1 : -1, {
+        loop: options.loop,
+        skip: options.skip,
+    });
+    return target === index || target === -1 ? null : target;
+}

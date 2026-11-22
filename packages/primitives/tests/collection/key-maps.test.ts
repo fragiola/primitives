@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     menuKeyTarget,
+    radioKeyTarget,
     submenuKeys,
     tabsKeyTarget,
 } from "../../src/collection/key-maps.ts";
@@ -49,5 +50,53 @@ describe("menuKeyTarget and submenuKeys", () => {
             open: "ArrowLeft",
             close: "ArrowRight",
         });
+    });
+});
+
+describe("radioKeyTarget", () => {
+    const ltr = { rtl: false, loop: true };
+    it("moves to the next radio with ArrowDown and ArrowRight, the previous with ArrowUp and ArrowLeft", () => {
+        expect(radioKeyTarget("ArrowDown", 0, 4, ltr)).toBe(1);
+        expect(radioKeyTarget("ArrowRight", 0, 4, ltr)).toBe(1);
+        expect(radioKeyTarget("ArrowUp", 2, 4, ltr)).toBe(1);
+        expect(radioKeyTarget("ArrowLeft", 2, 4, ltr)).toBe(1);
+    });
+
+    it("wraps at the ends with loop, and stops there without it", () => {
+        expect(radioKeyTarget("ArrowDown", 3, 4, ltr)).toBe(0);
+        expect(radioKeyTarget("ArrowUp", 0, 4, ltr)).toBe(3);
+        expect(
+            radioKeyTarget("ArrowDown", 3, 4, { ...ltr, loop: false }),
+        ).toBeNull();
+        expect(
+            radioKeyTarget("ArrowLeft", 0, 4, { ...ltr, loop: false }),
+        ).toBeNull();
+        expect(
+            radioKeyTarget("ArrowRight", 0, 4, { ...ltr, loop: false }),
+        ).toBe(1);
+    });
+
+    it("swaps ArrowLeft and ArrowRight in RTL, not ArrowDown and ArrowUp", () => {
+        const rtl = { rtl: true, loop: true };
+        expect(radioKeyTarget("ArrowLeft", 0, 4, rtl)).toBe(1);
+        expect(radioKeyTarget("ArrowRight", 1, 4, rtl)).toBe(0);
+        expect(radioKeyTarget("ArrowDown", 0, 4, rtl)).toBe(1);
+        expect(radioKeyTarget("ArrowUp", 1, 4, rtl)).toBe(0);
+    });
+
+    it("skips the disabled radios", () => {
+        const skip = (index: number) => index === 2;
+        expect(radioKeyTarget("ArrowDown", 1, 4, { ...ltr, skip })).toBe(3);
+        expect(radioKeyTarget("ArrowUp", 3, 4, { ...ltr, skip })).toBe(1);
+        // the only enabled radio: nowhere to go
+        expect(
+            radioKeyTarget("ArrowDown", 0, 3, { ...ltr, skip: (i) => i !== 0 }),
+        ).toBeNull();
+    });
+
+    it("ignores the other keys", () => {
+        for (const key of ["Home", "End", "Enter", " ", "Tab", "a"]) {
+            expect(radioKeyTarget(key, 0, 4, ltr)).toBeNull();
+        }
     });
 });
