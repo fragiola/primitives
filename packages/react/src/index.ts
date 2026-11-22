@@ -15,6 +15,7 @@ export * from "./components/context-menu/index.ts";
 export * from "./components/date-picker/index.ts";
 export * from "./components/date-range-picker/index.ts";
 export * from "./components/dialog/index.ts";
+export * from "./components/drawer/index.ts";
 export * from "./components/field/index.ts";
 export * from "./components/fieldset/index.ts";
 export * from "./components/form/index.ts";
