@@ -50,8 +50,8 @@ export function RadioRoot({
         [register, value, disabled, button],
     );
 
-    const latest = useRef(group);
-    latest.current = group;
+    const latest = useRef({ group, checked });
+    latest.current = { group, checked };
     useEffect(() => {
         const element = input.current;
         if (element === null) {
@@ -60,9 +60,13 @@ export function RadioRoot({
         return bridgeForm(element, {
             // every radio of the group reports the reset; the group returns to its default once
             reset: () => {
-                latest.current.reset();
+                const current = latest.current;
+                current.group.reset();
+                // the browser reset the input to its mount-time default: write the rendered state
+                // back (a render that changes it patches it again; one that does not, keeps it)
+                element.checked = current.checked;
             },
-            invalid: () => latest.current.tabStopElement(),
+            invalid: () => latest.current.group.tabStopElement(),
         });
     }, []);
 

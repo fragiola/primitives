@@ -67,8 +67,18 @@ export function SwitchRoot({
     });
     const disabled = disabledProp || field.disabled;
 
-    const latest = useRef({ defaultChecked, setChecked, reset: field.reset });
-    latest.current = { defaultChecked, setChecked, reset: field.reset };
+    const latest = useRef({
+        checked,
+        defaultChecked,
+        setChecked,
+        reset: field.reset,
+    });
+    latest.current = {
+        checked,
+        defaultChecked,
+        setChecked,
+        reset: field.reset,
+    };
     useEffect(() => {
         const element = input.current;
         if (element === null) {
@@ -79,7 +89,9 @@ export function SwitchRoot({
                 const current = latest.current;
                 current.reset();
                 current.setChecked(current.defaultChecked, { reason: "none" });
-                element.checked = current.defaultChecked;
+                // the rendered state, which a render that changes it patches again (a controlled
+                // switch that refuses the reset keeps its input)
+                element.checked = current.checked;
             },
             invalid: () => button,
         });

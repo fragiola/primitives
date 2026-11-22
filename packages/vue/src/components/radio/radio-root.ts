@@ -80,7 +80,13 @@ export const RadioRoot: PartComponent<RadioRootProps, RadioState> =
                             bridgeForm(element, {
                                 // every radio of the group reports the reset; the group
                                 // returns to its default once
-                                reset: () => group.reset(),
+                                reset: () => {
+                                    const checked = state.value.checked;
+                                    group.reset();
+                                    // the browser reset the input to its default: write the
+                                    // rendered state back (a patch follows a change)
+                                    element.checked = checked;
+                                },
                                 invalid: () => group.tabStopElement(),
                             }),
                         );

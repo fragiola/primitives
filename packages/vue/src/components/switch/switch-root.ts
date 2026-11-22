@@ -115,11 +115,14 @@ export const SwitchRoot: PartComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
+                                const checked = own.value.value;
                                 field.reset();
                                 own.set(props.defaultChecked, {
                                     reason: "none",
                                 });
-                                element.checked = props.defaultChecked;
+                                // the rendered state, which a patch follows (a controlled
+                                // switch that refuses the reset keeps its input)
+                                element.checked = checked;
                             },
                             invalid: () => button.value,
                         }),

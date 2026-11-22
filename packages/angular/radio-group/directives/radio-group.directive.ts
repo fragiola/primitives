@@ -144,8 +144,8 @@ export class RadioGroup {
     readonly isDisabled = computed(
         () => this.disabled() || this.field.disabled(),
     );
-    /** The hidden inputs' name: the group's, or its Field's. */
-    readonly formName = computed(() => this.name() ?? this.field.name());
+    /** The hidden inputs' name: its Field's, which wins (spec/field.md), or the group's. */
+    readonly formName = computed(() => this.field.name() ?? this.name());
     /** The value of the radio holding the tab stop (before any radio registered, the checked one). */
     readonly tabStop = computed(() => {
         const radios = this.radios();

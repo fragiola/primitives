@@ -200,7 +200,7 @@ export const RadioGroup: PartComponent<
                 value,
                 disabled,
                 required: () => props.required,
-                name: () => props.name ?? field.name(),
+                name: () => field.name() ?? props.name,
                 tabStop,
                 select,
                 navigate,

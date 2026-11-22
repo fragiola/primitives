@@ -161,7 +161,7 @@ export function RadioGroup({
             value,
             disabled,
             required,
-            name: name ?? field.name,
+            name: field.name ?? name,
             tabStop,
             select,
             navigate,
