@@ -1,6 +1,6 @@
 import { mergeProps, useRender } from "@fragiola/primitives-react/render";
 import { cleanup, render, screen } from "@testing-library/react";
-import { createRef, type ReactNode } from "react";
+import { createRef, type ReactNode, type RefObject } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 
 afterEach(cleanup);
@@ -27,6 +27,16 @@ function Badge({
         state: { active: true, disabled: false, tone: "info" },
         defaultTagName: "span",
     });
+}
+
+function RefPart({
+    own,
+    consumer,
+}: {
+    own: RefObject<HTMLElement | null>;
+    consumer: RefObject<HTMLElement | null>;
+}) {
+    return useRender({ props: { ref: consumer, children: "x" }, ref: own });
 }
 
 describe("useRender", () => {
@@ -57,11 +67,7 @@ describe("useRender", () => {
 
     it("gives a render function the props and the state", () => {
         render(
-            <Badge
-                render={(props, state) => (
-                    <b {...props}>{state.tone}</b>
-                )}
-            />,
+            <Badge render={(props, state) => <b {...props}>{state.tone}</b>} />,
         );
         expect(screen.getByText("info").tagName).toBe("B");
     });
@@ -69,13 +75,7 @@ describe("useRender", () => {
     it("sets the part's ref and the consumer's", () => {
         const own = createRef<HTMLElement>();
         const consumer = createRef<HTMLElement>();
-        function Part() {
-            return useRender({
-                props: { ref: consumer, children: "x" },
-                ref: own,
-            });
-        }
-        render(<Part />);
+        render(<RefPart own={own} consumer={consumer} />);
         expect(own.current?.tagName).toBe("DIV");
         expect(consumer.current).toBe(own.current);
     });
@@ -91,7 +91,11 @@ describe("mergeProps", () => {
                 style: { top: 0, left: 0 },
                 title: "a",
             },
-            { onClick: () => calls.push("b"), className: "b", title: undefined },
+            {
+                onClick: () => calls.push("b"),
+                className: "b",
+                title: undefined,
+            },
             {
                 onClick: () => calls.push("c"),
                 className: "c",
