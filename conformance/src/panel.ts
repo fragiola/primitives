@@ -97,6 +97,7 @@ export function sizeVariable(
  */
 export async function findInPage(page: Page, text: string): Promise<void> {
     await page.evaluate((text) => {
-        location.hash = `:~:text=${encodeURIComponent(text)}`;
+        // a dash is the fragment's own syntax (`prefix-,`): encoded too
+        location.hash = `:~:text=${encodeURIComponent(text).replaceAll("-", "%2D")}`;
     }, text);
 }
