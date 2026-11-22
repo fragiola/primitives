@@ -1,13 +1,13 @@
 import { DestroyRef, effect, inject, type Signal, signal } from "@angular/core";
 import { isInSafeArea } from "@fragiola/primitives/pointer";
-import type { MenuRoot } from "./menu-root.directive.ts";
+import type { MenuRootBase } from "./menu-root-base.ts";
 
 /**
  * What every item of a menu level shares: highlight follows focus, the pointer highlights, the
  * typeahead label, and the safe area that protects an open submenu while the pointer travels to it.
  */
 export function menuItemBehaviour(
-    level: MenuRoot,
+    level: MenuRootBase,
     element: HTMLElement,
     label: Signal<string | undefined>,
     isSubmenuTrigger: boolean,

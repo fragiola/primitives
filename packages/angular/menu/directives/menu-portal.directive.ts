@@ -4,7 +4,7 @@ import {
     type OverlayPortalOptions,
     portalOptions,
 } from "@fragiola/primitives-angular/internal";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 /**
  * Moves a menu level's positioner to the end of `body` while it is open or closing (always with
@@ -23,7 +23,7 @@ export class MenuPortal {
 
     constructor() {
         mountPortal(
-            inject<MenuRoot>(MenuRoot).overlay.presence.mounted,
+            inject(MenuRootBase).overlay.presence.mounted,
             this.options,
         );
     }

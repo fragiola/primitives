@@ -1,6 +1,6 @@
 import type { Signal } from "@angular/core";
 import { injectEnclosing } from "@fragiola/primitives-angular/internal";
-import { MenuRoot, type MenuState } from "../directives/menu-root.directive.ts";
+import { MenuRootBase, type MenuState } from "../directives/menu-root-base.ts";
 
 /**
  * The part hook of the enclosing menu level (`[menuRoot]` or `[menuSubmenuRoot]`): its state, and
@@ -10,7 +10,7 @@ export function injectMenu(): {
     state: Signal<MenuState>;
     closeAll: () => void;
 } {
-    const level = injectEnclosing(MenuRoot, "menuRoot", "injectMenu");
+    const level = injectEnclosing(MenuRootBase, "menuRoot", "injectMenu");
     return {
         state: level.state,
         closeAll: () => level.closeAll("item-press"),

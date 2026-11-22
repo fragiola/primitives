@@ -20,7 +20,7 @@ import {
     registerHost,
 } from "@fragiola/primitives-angular/internal";
 import { menuItems } from "./menu-items.ts";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuPopupState {
     open: boolean;
@@ -48,11 +48,12 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["none", "imperative-action"]);
         role: "menu",
         "aria-orientation": "vertical",
         tabindex: "-1",
-        "data-primitives-part": "menu-popup",
+        "[attr.data-primitives-part]": "level.part('popup')",
         "[attr.id]": "level.overlay.popupId",
-        // the active trigger names the menu (a submenu's: its SubmenuTrigger)
+        // the active trigger names the menu (a submenu's: its SubmenuTrigger); no button names a
+        // context menu (spec/context-menu.md)
         "[attr.aria-labelledby]":
-            "level.overlay.activeTriggerId() ?? level.overlay.triggerId",
+            "contextMenu ? null : (level.overlay.activeTriggerId() ?? level.overlay.triggerId)",
         "[attr.data-open]": "data().open",
         "[attr.data-closed]": "data().closed",
         "[attr.data-side]": "data().side",
@@ -61,12 +62,14 @@ const RETURNS_FOCUS_UNFOCUSED = new Set(["none", "imperative-action"]);
         "[attr.data-starting-style]": "data()['starting-style']",
         "[attr.data-ending-style]": "data()['ending-style']",
         "(keydown)": "onKeyDown($event)",
+        // no browser menu over a context menu (spec/context-menu.md, "Pointer")
+        "(contextmenu)": "onContextMenu($event)",
     },
 })
 export class MenuPopup {
     /** A DirectionProvider's direction, else `null` (the computed one is read). */
     private readonly direction = injectProvidedDirection();
-    protected readonly level = inject<MenuRoot>(MenuRoot);
+    protected readonly level = inject(MenuRootBase);
     readonly state = computed<MenuPopupState>(() => ({
         open: this.level.overlay.open(),
         ...this.level.placed(),
@@ -83,6 +86,9 @@ export class MenuPopup {
         });
     });
     private readonly popup = registerHost(this.level.overlay.popup);
+    /** A context menu's root level: opened from an area, which names nothing. */
+    protected readonly contextMenu =
+        !this.level.nested && this.level.component === "context-menu";
 
     constructor() {
         const level = this.level;
@@ -99,9 +105,13 @@ export class MenuPopup {
                 // Escape, an item and the trigger give focus back to this level's trigger; the
                 // closing arrow of a submenu gives it back to its submenu trigger. The triggers are
                 // read when the session needs them: the active trigger may move while it is open
+                // a context menu's area is no trigger that toggles it: a press on it is outside the
+                // menu, but it is still what the menu was opened from (spec/context-menu.md)
+                const area = this.contextMenu;
                 const session = openOverlaySession(doc, {
                     elements: () => [positioner ?? popup],
-                    ignore: () => untracked(overlay.triggers),
+                    ignore: () => (area ? [] : untracked(overlay.triggers)),
+                    owner: () => untracked(overlay.triggers),
                     dismiss: (reason, event) =>
                         overlay.setOpen(false, reason, event),
                     returnFocus: {
@@ -115,7 +125,10 @@ export class MenuPopup {
                         reason: () =>
                             overlay.lastReason.current ??
                             (level.nested ? null : "none"),
-                        to: () => untracked(overlay.trigger),
+                        to: () =>
+                            level.nested
+                                ? untracked(overlay.trigger)
+                                : level.returnTarget(),
                     },
                 });
                 onCleanup(() => session.end());
@@ -158,6 +171,12 @@ export class MenuPopup {
         });
     }
 
+    protected onContextMenu(event: MouseEvent): void {
+        if (this.level.component === "context-menu") {
+            event.preventDefault();
+        }
+    }
+
     protected onKeyDown(event: KeyboardEvent): void {
         if (event.defaultPrevented) {
             return;
@@ -195,12 +214,14 @@ export class MenuPopup {
                 return;
             case "Tab": {
                 event.preventDefault();
-                const trigger = level.root().overlay.trigger();
+                // after the trigger (a context menu: the element focused when it opened)
+                const root = level.root();
+                const from = root.returnTarget() ?? root.overlay.trigger();
                 const skip = level.positioners();
-                const target = trigger
+                const target = from
                     ? event.shiftKey
-                        ? previousTabbableBefore(trigger, skip)
-                        : nextTabbableAfter(trigger, skip)
+                        ? previousTabbableBefore(from, skip)
+                        : nextTabbableAfter(from, skip)
                     : null;
                 level.closeAll("focus-out", event);
                 target?.focus();

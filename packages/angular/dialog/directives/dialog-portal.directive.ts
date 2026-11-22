@@ -4,7 +4,7 @@ import {
     type OverlayPortalOptions,
     portalOptions,
 } from "@fragiola/primitives-angular/internal";
-import { DialogRoot } from "./dialog-root.directive.ts";
+import { DialogRootBase } from "./dialog-root-base.ts";
 
 /**
  * Moves the backdrop, the viewport and the popup to the end of `body` while the dialog is open or
@@ -20,7 +20,7 @@ export class DialogPortal {
     );
 
     constructor() {
-        const root = inject<DialogRoot>(DialogRoot);
+        const root = inject<DialogRootBase>(DialogRootBase);
         mountPortal(root.overlay.presence.mounted, this.options);
     }
 }

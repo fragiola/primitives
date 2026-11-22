@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
 import { menuItemBehaviour } from "./menu-item-behaviour.ts";
-import { MenuRoot } from "./menu-root.directive.ts";
+import { MenuRootBase } from "./menu-root-base.ts";
 
 export interface MenuItemState {
     highlighted: boolean;
@@ -26,7 +26,7 @@ export interface MenuItemState {
     host: {
         role: "menuitem",
         tabindex: "-1",
-        "data-primitives-part": "menu-item",
+        "[attr.data-primitives-part]": "level.part('item')",
         "[attr.aria-disabled]": "state().disabled ? 'true' : null",
         "[attr.data-highlighted]": "data().highlighted",
         "[attr.data-disabled]": "data().disabled",
@@ -38,7 +38,7 @@ export interface MenuItemState {
     },
 })
 export class MenuItem {
-    private readonly level = inject<MenuRoot>(MenuRoot);
+    protected readonly level = inject(MenuRootBase);
     readonly disabled = input(false, { transform: booleanAttribute });
     /** The text typeahead matches (default: the item's text). */
     readonly label = input<string | undefined>(undefined);

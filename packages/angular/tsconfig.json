@@ -20,6 +20,8 @@
         "src",
         "internal",
         "dialog",
+        "alert-dialog",
+        "context-menu",
         "tabs",
         "popover",
         "tooltip",
