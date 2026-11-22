@@ -18,9 +18,9 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [slider.md](slider.md) | Slider |
 | [select.md](select.md) | Select |
 | [combobox.md](combobox.md) | Combobox (D10) |
+| [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
 
-The POC's other specs (Calendar, RangeCalendar, DatePicker, DateRangePicker) move here with the
-Epic that ports their component (`docs/handoff.md` §5, stage 0), with §3's changes applied.
+Every spec of the POC is here: stage 0 (`docs/handoff.md` §5) is ported, with §3's changes applied.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -65,7 +65,7 @@ The vocabulary is shared by every component:
 | attribute | meaning |
 | --- | --- |
 | `data-open` | an overlay while open |
-| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover or Select trigger, a Combobox's Input, InputGroup and Trigger |
+| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover, Select or picker trigger, a Combobox's Input, InputGroup and Trigger |
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
@@ -79,6 +79,7 @@ The vocabulary is shared by every component:
 | `data-today` | the calendar cell of today |
 | `data-outside-month` | a calendar cell of the previous or next month |
 | `data-unavailable` | a calendar date the app marked unavailable |
+| `data-readonly` | a read-only calendar |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
 | `data-empty` | a combobox list with no item |
@@ -98,7 +99,7 @@ Primitives render only their children: no UI copy and no accessible name of thei
 fixtures give every name (`aria-label`, `<label>`, text children). **The exception is locale data**
 in the calendar family: the month heading, the weekday names, the day numbers and each cell's full
 date name come from `Intl` for the given locale. They are data, not copy, and no app could provide
-them cell by cell; the consumer can still replace each one (`calendar.md`, with its Epic).
+them cell by cell; the consumer can still replace each one ([calendar.md](calendar.md#api)).
 
 ### Change details
 
