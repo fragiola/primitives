@@ -4,6 +4,7 @@ import {
     computePosition,
     flip,
     offset,
+    platform,
     shift,
     size,
 } from "@floating-ui/dom";
@@ -104,6 +105,9 @@ export function anchorFloating(
         }
         const result = await computePosition(anchor, floating, {
             strategy: "fixed",
+            // the placement is physical already (toPlacement applies the direction): Floating UI
+            // must not flip a top or bottom `-start` / `-end` again for an RTL floating element
+            platform: { ...platform, isRTL: () => false },
             placement: toPlacement(side, align, direction),
             middleware,
         });
