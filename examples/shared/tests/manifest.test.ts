@@ -29,6 +29,9 @@ import {
 
 /** The recipes an example imports besides its own component's (the picker's calendar). */
 const MORE_RECIPES: Record<string, readonly string[]> = {
+    // built on Dialog's and Menu's recipes, as the components are on their parts
+    "alert-dialog": ["_recipes/dialog.ts"],
+    "context-menu": ["_recipes/menu.ts"],
     "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
@@ -39,6 +42,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
         "_recipes/switch.ts",
     ],
 };
+
+/** The examples that show a component under another id (a second Menu example). */
+const RECIPE_OF: Record<string, string> = { "menu-view-options": "menu" };
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
 const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar"]);
@@ -53,6 +59,9 @@ describe("the manifest", () => {
                 "popover",
                 "tooltip",
                 "menu",
+                "alert-dialog",
+                "menu-view-options",
+                "context-menu",
                 "tabs",
                 "collapsible",
                 "accordion",
@@ -79,7 +88,7 @@ describe("the manifest", () => {
                     `${example.id}/styles.ts`,
                     // its component's recipe and the recipes' shared files, in name order
                     ...[
-                        `_recipes/${example.id}.ts`,
+                        `_recipes/${RECIPE_OF[example.id] ?? example.id}.ts`,
                         ...(MORE_RECIPES[example.id] ?? []),
                         "_recipes/recipe.ts",
                         ...(WITHOUT_SHARED.has(example.id)
