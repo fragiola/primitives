@@ -119,7 +119,7 @@ export function useCalendar(
     const firstDay = options.firstDayOfWeek ?? firstDayOfWeek(locale);
     const visibleMonths = Math.max(1, options.visibleMonths ?? 1);
     const disabled = props.disabled ?? false;
-    const readOnly = props.readOnly ?? false;
+    const readOnly = props.readOnly ?? (bound && picker.readOnly);
     const [todayDate] = useState(() => today());
     const [focusedDate, setFocusedDate] = useState(() =>
         clampDate(

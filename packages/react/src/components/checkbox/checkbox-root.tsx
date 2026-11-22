@@ -85,6 +85,9 @@ export function CheckboxRoot({
         value: checked,
         filled: checked,
         input: () => input.current,
+        focusTarget: () => button,
+        // a group in a Field is the field's control, not its checkboxes
+        skip: group?.inField ?? false,
     });
     const disabled =
         disabledProp || (group?.disabled ?? false) || field.disabled;
@@ -179,7 +182,7 @@ export function CheckboxRoot({
                 type="checkbox"
                 aria-hidden="true"
                 tabIndex={-1}
-                name={parent ? undefined : (field.name ?? name)}
+                name={parent ? undefined : (group?.name ?? field.name ?? name)}
                 value={value ?? "on"}
                 checked={checked && !(parent && inGroup)}
                 required={required}

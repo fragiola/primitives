@@ -5,27 +5,48 @@ import { DatePickerContext } from "./date-picker-context.ts";
 
 export interface DatePickerTriggerState {
     open: boolean;
+    disabled: boolean;
+    readOnly: boolean;
+    required: boolean;
 }
 
 export interface DatePickerTriggerProps
     extends PartProps<DatePickerTriggerState> {}
 
-/** Opens the picker; its content is the consumer's (for example the formatted value). */
+/**
+ * Opens the picker; its content is the consumer's (for example the formatted value). Inside a
+ * Field, the field's labelable element and focus target (spec/calendar.md, "Forms").
+ */
 export function DatePickerTrigger(props: DatePickerTriggerProps) {
     const context = useRequiredContext(DatePickerContext, "DatePicker.Trigger");
+    const { open, disabled, readOnly, required, field } = context;
     return renderElement(
         "button",
         props,
-        { open: context.open },
+        { open, disabled, readOnly, required },
         {
             type: "button",
             id: context.triggerId,
+            disabled,
             "aria-haspopup": "dialog",
-            "aria-expanded": context.open,
-            "aria-controls": context.open ? context.popupId : undefined,
+            "aria-expanded": open,
+            "aria-controls": open ? context.popupId : undefined,
+            ...field.aria,
             "data-primitives-part": `${context.component}-trigger`,
-            ...stateAttributes({ "popup-open": context.open }),
-            onClick: () => context.setOpen(!context.open, "trigger-press"),
+            ...field.attributes,
+            ...stateAttributes({
+                "popup-open": open,
+                disabled,
+                readonly: readOnly,
+                required,
+            }),
+            onClick: () => {
+                if (!disabled) {
+                    context.setOpen(!open, "trigger-press");
+                }
+            },
+            onFocus: field.onFocus,
+            onBlur: field.onBlur,
         },
         context.setTrigger,
     );

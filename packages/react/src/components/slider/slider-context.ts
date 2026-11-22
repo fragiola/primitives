@@ -35,6 +35,13 @@ export interface SliderContextValue {
     ) => void;
     startDragging: (index: number) => void;
     stopDragging: () => void;
+    /** The Label's id, while one is rendered. */
+    labelId: string | undefined;
+    setLabelId: (id: string | undefined) => void;
+    /** A value as the Value shows it: with `format`, `Intl.NumberFormat`'s; else `String(value)`. */
+    formatValue: (value: number) => string;
+    /** Whether the Root has a `format` (the thumbs' `aria-valuetext` then follows it). */
+    formatted: boolean;
 }
 
 export const SliderContext = createContext<SliderContextValue | null>(null);

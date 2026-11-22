@@ -13,6 +13,12 @@ export interface CheckboxGroupContextValue {
     /** The children's element ids, for the parent's `aria-controls`. */
     ids: Readonly<Record<string, string>>;
     registerId: (value: string, id: string | null) => void;
+    /**
+     * The group is its Field's control (spec/checkbox.md): its checkboxes take this `name` and do
+     * not register as the field's control themselves.
+     */
+    inField: boolean;
+    name: string | undefined;
 }
 
 export const CheckboxGroupContext =
