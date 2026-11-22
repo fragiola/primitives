@@ -3,7 +3,8 @@
         { "id": "overlays", "title": "Overlays" },
         { "id": "navigation", "title": "Navigation" },
         { "id": "forms", "title": "Forms and selection" },
-        { "id": "dates", "title": "Dates" }
+        { "id": "dates", "title": "Dates" },
+        { "id": "display", "title": "Display" }
     ],
     "themes": ["light", "dark", "ide", "paper", "terminal"]
 }
