@@ -239,6 +239,59 @@ function run(command: string, args: string[], cwd: string): void {
     execFileSync(command, args, { cwd, stdio: "inherit" });
 }
 
+/** The pnpm version the repository pins (`packageManager: "pnpm@<version>"`). */
+export function pinnedPnpm(manifest: { packageManager?: string }): string {
+    const version = /^pnpm@(\d+\.\d+\.\d+)$/.exec(
+        manifest.packageManager ?? "",
+    )?.[1];
+    if (version === undefined) {
+        throw new Error(
+            `package.json: packageManager is not an exact pnpm version (${manifest.packageManager})`,
+        );
+    }
+    return version;
+}
+
+/**
+ * How a scratch app runs the pinned pnpm (Epic #22): the machine's own pnpm when it is that
+ * version, else `pnpm dlx pnpm@<pinned>`, which fetches it. The scratch apps live outside the
+ * repository, where nothing else picks the pinned version.
+ */
+export function pnpmInvocation(
+    pinned: string,
+    found: string,
+): { command: string; prefix: string[] } {
+    return found.trim() === pinned
+        ? { command: "pnpm", prefix: [] }
+        : { command: "pnpm", prefix: ["dlx", `pnpm@${pinned}`] };
+}
+
+const PINNED_PNPM = pinnedPnpm(
+    JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+        packageManager?: string;
+    },
+);
+
+/** Runs the pinned pnpm in a scratch app, logging the version it runs. */
+function runPnpm(args: string[], cwd: string): void {
+    const found = execFileSync("pnpm", ["--version"], {
+        cwd,
+        encoding: "utf8",
+    });
+    const { command, prefix } = pnpmInvocation(PINNED_PNPM, found);
+    const used = execFileSync(command, [...prefix, "--version"], {
+        cwd,
+        encoding: "utf8",
+    }).trim();
+    if (used !== PINNED_PNPM) {
+        throw new Error(
+            `the scratch app runs pnpm ${used}, not the pinned ${PINNED_PNPM}`,
+        );
+    }
+    console.log(`check-package: pnpm ${used} (pinned) in ${cwd}`);
+    run(command, [...prefix, ...args], cwd);
+}
+
 /** `pnpm pack` of `packages/<dir>` into `packs`; returns the tarball's path. */
 function pack(dir: string, packs: string): string {
     const output = execFileSync(
@@ -515,6 +568,7 @@ function writeReactSmokeApp(
         name: "primitives-smoke-react",
         private: true,
         type: "module",
+        packageManager: `pnpm@${PINNED_PNPM}`,
         dependencies: {
             "@fragiola/primitives-react": `file:${tarballs.adapter}`,
             react: version("react"),
@@ -548,9 +602,9 @@ async function reactSmoke(
     tarballs: { toolkit: string; adapter: string },
 ): Promise<void> {
     writeReactSmokeApp(app, tarballs);
-    run("pnpm", ["install", "--no-frozen-lockfile"], app);
-    run("pnpm", ["exec", "tsc", "--noEmit"], app);
-    run("pnpm", ["exec", "vite", "build"], app);
+    runPnpm(["install", "--no-frozen-lockfile"], app);
+    runPnpm(["exec", "tsc", "--noEmit"], app);
+    runPnpm(["exec", "vite", "build"], app);
     await loadThroughDevServer(app, "/src/main.tsx");
 }
 
@@ -614,6 +668,7 @@ function writeVueSmokeApp(
         name: "primitives-smoke-vue",
         private: true,
         type: "module",
+        packageManager: `pnpm@${PINNED_PNPM}`,
         dependencies: {
             "@fragiola/primitives-vue": `file:${tarballs.adapter}`,
             vue: version("vue"),
@@ -647,9 +702,9 @@ async function vueSmoke(
     tarballs: { toolkit: string; adapter: string },
 ): Promise<void> {
     writeVueSmokeApp(app, tarballs);
-    run("pnpm", ["install", "--no-frozen-lockfile"], app);
-    run("pnpm", ["exec", "vue-tsc", "--noEmit"], app);
-    run("pnpm", ["exec", "vite", "build"], app);
+    runPnpm(["install", "--no-frozen-lockfile"], app);
+    runPnpm(["exec", "vue-tsc", "--noEmit"], app);
+    runPnpm(["exec", "vite", "build"], app);
     await loadThroughDevServer(app, "/src/main.ts");
 }
 
@@ -732,6 +787,7 @@ function writeAngularSmokeApp(
         name: "primitives-smoke-angular",
         private: true,
         type: "module",
+        packageManager: `pnpm@${PINNED_PNPM}`,
         dependencies: {
             "@angular/common": version("@angular/common"),
             "@angular/compiler": version("@angular/compiler"),
@@ -788,9 +844,9 @@ async function angularSmoke(
     tarballs: { toolkit: string; adapter: string },
 ): Promise<void> {
     writeAngularSmokeApp(app, tarballs);
-    run("pnpm", ["install", "--no-frozen-lockfile"], app);
-    run("pnpm", ["exec", "ngc", "-p", "tsconfig.json", "--noEmit"], app);
-    run("pnpm", ["exec", "vite", "build"], app);
+    runPnpm(["install", "--no-frozen-lockfile"], app);
+    runPnpm(["exec", "ngc", "-p", "tsconfig.json", "--noEmit"], app);
+    runPnpm(["exec", "vite", "build"], app);
     await loadThroughDevServer(app, "/src/main.ts");
 }
 
