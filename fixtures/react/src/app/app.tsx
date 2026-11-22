@@ -30,7 +30,7 @@ export function App({ path, search }: { path: string; search: string }) {
     }
     return (
         <main className="p-6">
-            <Scenario locale={query.locale} />
+            <Scenario locale={query.locale} cancel={query.cancel} />
         </main>
     );
 }

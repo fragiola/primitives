@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 
 export const Menu = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     SubmenuRoot: Primitive.SubmenuRoot,
     Portal: Primitive.Portal,
     Trigger: (props: ComponentProps<typeof Primitive.Trigger>) => (
