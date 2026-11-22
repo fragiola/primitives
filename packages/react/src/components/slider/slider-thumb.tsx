@@ -72,6 +72,9 @@ export function SliderThumb({
         direction !== null
             ? direction === "rtl"
             : element !== null && getDirection(element) === "rtl";
+    // the centring translate is physical: it follows the layout's (computed) direction, as the
+    // Tabs Indicator's measurement does, whatever a provider says
+    const layoutRtl = element !== null && getDirection(element) === "rtl";
     const percent = valueToPercent(value, context.min, context.max);
     // structural: the thumb's centre on its value
     const style = vertical
@@ -85,7 +88,7 @@ export function SliderThumb({
               position: "absolute" as const,
               insetInlineStart: `${percent}%`,
               top: "50%",
-              translate: rtl ? "50% -50%" : "-50% -50%",
+              translate: layoutRtl ? "50% -50%" : "-50% -50%",
           };
 
     const onKeyDown = (event: KeyboardEvent) => {
