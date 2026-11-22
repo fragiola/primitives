@@ -77,9 +77,10 @@ export function DatePickerRootBase({
         }),
         [min, max, isDateUnavailable, locale, firstDayOfWeek, visibleMonths],
     );
+    const { open } = root;
     const binding = useMemo(
-        () => ({ mode, value, choose, options }),
-        [mode, value, choose, options],
+        () => ({ mode, open, value, choose, options }),
+        [mode, open, value, choose, options],
     );
     const context = useMemo(
         () => ({ ...root, component, placed, setPlaced }),

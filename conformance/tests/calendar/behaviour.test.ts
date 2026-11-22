@@ -377,6 +377,22 @@ test.describe("date-picker / basic", () => {
         await expectFocusWithin(cell(page, 11, 24));
     });
 
+    test("reopened right after a choice, it focuses the chosen date", async ({
+        page,
+    }) => {
+        await trigger(page).click();
+        await cell(page, 11, 24).click();
+        await expectOutput(page, "value", "2026-11-24");
+        await expect(trigger(page)).toBeFocused();
+        // no wait for the exit animation: the popup may still be mounted when it reopens
+        await trigger(page).click();
+        await expectFocusWithin(cell(page, 11, 24));
+        await expect(cell(page, 11, 24)).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+    });
+
     test("Escape closes and focuses the trigger", async ({ page }) => {
         await trigger(page).click();
         await expect(page.getByRole("dialog")).toBeVisible();

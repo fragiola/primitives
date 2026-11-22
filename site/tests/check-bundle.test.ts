@@ -86,6 +86,39 @@ describe("the bundle guard", () => {
         ]);
     });
 
+    it("fails the date family in a Dialog and Tabs app: every entry, the toolkit's dates", () => {
+        // the four entries share the calendar's and the date picker's modules: a planted import of
+        // any of them brings those folders and `/date` (spec/calendar.md, "Anatomy")
+        const family = {
+            ...rules("vue"),
+            components: [
+                ...COMPONENTS,
+                "range-calendar",
+                "date-picker",
+                "date-range-picker",
+            ],
+        };
+        expect(
+            bundleLeaks(
+                [
+                    "packages/vue/src/components/dialog/dialog-popup.ts",
+                    "packages/vue/src/components/range-calendar/range-calendar-root.ts",
+                    "packages/vue/src/components/calendar/calendar-cell.ts",
+                    "packages/vue/src/components/date-picker/date-picker-popup.ts",
+                    "packages/primitives/src/date/month-grid.ts",
+                    "packages/primitives/src/overlay/overlay-session.ts",
+                ],
+                CLEAN_CODE,
+                family,
+            ),
+        ).toEqual([
+            'the component "calendar": packages/vue/src/components/calendar/calendar-cell.ts',
+            'the component "date-picker": packages/vue/src/components/date-picker/date-picker-popup.ts',
+            'the component "range-calendar": packages/vue/src/components/range-calendar/range-calendar-root.ts',
+            'the unused toolkit mechanism "date": packages/primitives/src/date/month-grid.ts',
+        ]);
+    });
+
     it("fails another framework's package", () => {
         expect(
             bundleLeaks(

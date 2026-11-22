@@ -55,7 +55,12 @@ export function useCalendar(
     mode: CalendarMode,
     props: CalendarStateProps,
     onChange: (value: CalendarValue, details: ChangeDetails) => void,
-): { context: CalendarContext; bound: boolean } {
+): {
+    context: CalendarContext;
+    bound: boolean;
+    /** Bound to a picker whose popup is open. */
+    opened: () => boolean;
+} {
     const injected = inject(PickerBindingKey, null);
     const picker =
         injected !== null &&
@@ -226,9 +231,17 @@ export function useCalendar(
         cells: new Map(),
         rangeValue,
         requestFocus() {
-            focusPending.current = true;
+            // a calendar inside a closing picker takes no focus: the picker returns it to its
+            // trigger
+            if (picker === null || picker.open()) {
+                focusPending.current = true;
+            }
         },
         focusPending,
     };
-    return { context, bound };
+    return {
+        context,
+        bound,
+        opened: () => picker?.open() ?? false,
+    };
 }

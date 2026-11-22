@@ -264,5 +264,11 @@ export function useCalendar(
             cells,
             rangeValue,
         };
-    return { context, bound, focusKey: toIsoDate(focusedDate) };
+    return {
+        context,
+        bound,
+        /** Bound to a picker whose popup is open. */
+        opened: bound && picker.open,
+        focusKey: toIsoDate(focusedDate),
+    };
 }

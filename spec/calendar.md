@@ -307,7 +307,8 @@ Checks:
    November 20.
 3. ArrowRight ×4, Enter: `value: 2026-11-24`, the popup closes (`reason: item-press`), focus on
    the trigger.
-4. Reopen: focus on November 24 (the value).
+4. Reopen: focus on November 24 (the value). Choosing a date with the pointer and reopening at
+   once (while the popup's exit animation may still run) focuses the chosen date too.
 5. Escape closes (`reason: escape-key`), focus on the trigger.
 6. Reopen, click the output (not focusable): closes (`reason: outside-press`) and focus returns
    to the trigger.

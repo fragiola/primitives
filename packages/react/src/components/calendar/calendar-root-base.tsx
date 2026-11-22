@@ -54,10 +54,17 @@ export function CalendarRootBase({
     const {
         context: state,
         bound,
+        opened,
         focusKey,
     } = useCalendar(component, mode, stateProps as CalendarStateProps);
     // a calendar in a picker focuses its focused date when it opens (spec/calendar.md, "Focus")
     const focusPending = useRef(bound);
+    // reopened while its exit animation still ran, the same calendar takes the focus again
+    useLayoutEffect(() => {
+        if (opened) {
+            focusPending.current = true;
+        }
+    }, [opened]);
     const context = useMemo(
         () => ({
             ...state,
@@ -73,6 +80,11 @@ export function CalendarRootBase({
     // this render (a new month, a picker opening; AGENTS.md "Porting", 5)
     useLayoutEffect(() => {
         if (!focusPending.current) {
+            return;
+        }
+        // a calendar inside a closing picker takes no focus: the picker returns it to its trigger
+        if (bound && !opened) {
+            focusPending.current = false;
             return;
         }
         const cell = cells.get(focusKey);

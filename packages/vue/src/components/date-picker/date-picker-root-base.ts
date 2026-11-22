@@ -72,6 +72,7 @@ export function defineDatePickerRoot(
             });
             provide(PickerBindingKey, {
                 mode,
+                open: () => root.open.value,
                 value: computed(() => value.value.value),
                 choose(next) {
                     value.set(next, { reason: "item-press" });

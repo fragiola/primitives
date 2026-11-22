@@ -65,7 +65,7 @@ export function defineCalendarRoot(
         props: calendarRootProps,
         emits: calendarRootEmits,
         setup(props, { attrs, slots, emit }) {
-            const { context } = useCalendar(
+            const { context, opened } = useCalendar(
                 component,
                 mode,
                 props,
@@ -75,6 +75,25 @@ export function defineCalendarRoot(
                 },
             );
             provide(CalendarKey, context);
+            // reopened while its exit animation still ran, the same calendar takes the focus again
+            watch(opened, (open) => {
+                if (open) {
+                    context.focusPending.current = true;
+                    void nextTick().then(focusPendingCell);
+                }
+            });
+            const focusPendingCell = () => {
+                if (!context.focusPending.current) {
+                    return;
+                }
+                const cell = context.cells.get(
+                    toIsoDate(context.focusedDate.value),
+                );
+                if (cell) {
+                    context.focusPending.current = false;
+                    cell.focus({ preventScroll: true });
+                }
+            };
             // after a render while a focus is pending: the focused date's cell may have mounted
             // in it (a new month, a picker opening; AGENTS.md "Porting", 5); a cell that mounts
             // later takes the focus itself
@@ -85,18 +104,7 @@ export function defineCalendarRoot(
                         context.visibleStart.value,
                     ] as const,
                 () => {
-                    void nextTick().then(() => {
-                        if (!context.focusPending.current) {
-                            return;
-                        }
-                        const cell = context.cells.get(
-                            toIsoDate(context.focusedDate.value),
-                        );
-                        if (cell) {
-                            context.focusPending.current = false;
-                            cell.focus({ preventScroll: true });
-                        }
-                    });
+                    void nextTick().then(focusPendingCell);
                 },
                 { flush: "post", immediate: true },
             );

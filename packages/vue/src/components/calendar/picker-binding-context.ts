@@ -12,6 +12,8 @@ import type {
  */
 export interface PickerBinding {
     mode: CalendarMode;
+    /** Whether the picker's popup is open (a closing picker's calendar takes no focus). */
+    open: () => boolean;
     value: ComputedRef<CalendarValue>;
     /** Sets the picker's value and closes its popup (reason `item-press`). */
     choose: (value: CalendarValue) => void;
