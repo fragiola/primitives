@@ -358,3 +358,27 @@ test.describe("menu / modal", () => {
         await expectOutput(page, "reason", "trigger-press");
     });
 });
+
+test("menu / controlled: a key on the open trigger leaves no highlight for a later open", async ({
+    page,
+}) => {
+    await openScenario(page, "/menu/controlled");
+    const trigger = page.getByRole("button", { name: "Actions" });
+    await trigger.click();
+    await expect(page.getByRole("menu", { name: "Actions" })).toBeVisible();
+    // focus back on the trigger (it does not close the menu), then Enter on it while open
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("menu")).toBeHidden();
+    await expectOutput(page, "open", "false");
+    // opened by the page: nothing highlighted
+    await page.getByRole("button", { name: "Open from outside" }).click();
+    await expect(page.getByRole("menu", { name: "Actions" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Edit" })).toBeVisible();
+    // a pending highlight lands with the open (in its effect): give it the frames to show
+    await page.waitForTimeout(200);
+    await expect(
+        page.locator('[data-primitives-part="menu-item"][data-highlighted]'),
+    ).toHaveCount(0);
+});

@@ -27,6 +27,7 @@ import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
+import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
 import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
@@ -75,6 +76,7 @@ import { ROUTES } from "./routes.ts";
         TooltipGroup,
         TooltipInDialog,
         MenuBasic,
+        MenuControlled,
         MenuSubmenu,
         MenuGroups,
         MenuModal,
@@ -130,6 +132,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/menu/submenu") { <main class="p-6" scenario-menu-submenu></main> }
             @case ("/menu/groups") { <main class="p-6" scenario-menu-groups></main> }
             @case ("/menu/modal") { <main class="p-6" scenario-menu-modal></main> }
+            @case ("/menu/controlled") { <main class="p-6" scenario-menu-controlled></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }

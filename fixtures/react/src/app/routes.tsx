@@ -27,6 +27,7 @@ import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
 import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
+import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
 import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
@@ -75,6 +76,7 @@ export const routes: Record<string, ComponentType<{ locale: string }>> = {
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,
     "/menu/modal": MenuModal,
+    "/menu/controlled": MenuControlled,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,

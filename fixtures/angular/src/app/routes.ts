@@ -22,6 +22,7 @@ export const ROUTES: readonly string[] = [
     "/menu/submenu",
     "/menu/groups",
     "/menu/modal",
+    "/menu/controlled",
     "/combobox/basic",
     "/combobox/controlled",
     "/combobox/rejected-input",

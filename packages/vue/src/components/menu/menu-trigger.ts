@@ -32,6 +32,10 @@ export const MenuTrigger: PartComponent<MenuTriggerProps, MenuTriggerState> =
                     highlight: "first" | "last",
                     reason: "trigger-press" | "list-navigation",
                 ) => {
+                    // already open: nothing to open, and no highlight left for a later open
+                    if (context.open.value) {
+                        return;
+                    }
                     context.pendingHighlight.current = highlight;
                     context.setOpen(true, reason);
                 };

@@ -27,6 +27,7 @@ import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
+import MenuControlled from "../scenarios/menu/menu-controlled.vue";
 import MenuGroups from "../scenarios/menu/menu-groups.vue";
 import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
@@ -75,6 +76,7 @@ export const routes: Record<string, Component> = {
     "/menu/submenu": MenuSubmenu,
     "/menu/groups": MenuGroups,
     "/menu/modal": MenuModal,
+    "/menu/controlled": MenuControlled,
     "/combobox/basic": ComboboxBasic,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,

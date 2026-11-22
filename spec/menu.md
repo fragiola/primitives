@@ -71,6 +71,9 @@ On the Trigger:
 | Enter, Space, ArrowDown | opens, highlights the first item (reason `list-navigation`; Enter and Space report `trigger-press`) |
 | ArrowUp | opens, highlights the last item |
 
+On a Trigger whose menu is already open, these keys do nothing: they leave no highlight pending
+for a later open (Epic #22: a later open through the controlled `open` highlighted the first item).
+
 In the menu:
 
 | key | action |
@@ -176,6 +179,14 @@ Checks:
 12. Non-modal: open with a click, then click "After menu": the menu closes
     (`reason: outside-press`) and the press reaches the page: "After menu" is focused.
 13. Axe finds no violation while open.
+
+### `/menu/controlled`
+
+Content: a Trigger **"Actions"** with items **"Edit"** and **"Delete"**, and a button **"Open
+from outside"** that sets the page's `open` state. Output: `open: ...`.
+
+Checks: open with a click, focus the trigger and press Enter, then Escape; "Open from outside"
+opens the menu with no item highlighted.
 
 ### `/menu/submenu`
 
