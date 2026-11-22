@@ -17,10 +17,16 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [fieldset.md](fieldset.md) | Fieldset |
 | [form.md](form.md) | Form |
 | [checkbox.md](checkbox.md) | Checkbox and CheckboxGroup |
+| [radio-group.md](radio-group.md) | RadioGroup and Radio |
+| [switch.md](switch.md) | Switch |
+| [button.md](button.md) | Button |
 | [slider.md](slider.md) | Slider |
 | [select.md](select.md) | Select |
 | [combobox.md](combobox.md) | Combobox (D10) |
 | [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
+| [progress.md](progress.md) | Progress |
+| [avatar.md](avatar.md) | Avatar |
+| [separator.md](separator.md) | Separator |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
 The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
@@ -29,7 +35,9 @@ have no spec of their own: they are the primitive contract's `render`, made publ
 
 Every spec of the POC is here: stage 0 (`docs/handoff.md` §5) is ported, with §3's changes applied.
 Stage 1 adds the Field layer (Epic #26: Field to production, Fieldset, Form, every form control in
-a Field, Slider's Label and Value, the pickers' form support) and the direction provider.
+a Field, Slider's Label and Value, the pickers' form support) and the direction provider; then
+the controls and display components (Epic #29: Button, RadioGroup and Radio, Switch, Progress,
+Avatar, Separator).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -88,12 +96,13 @@ The vocabulary is shared by every component:
 | `data-today` | the calendar cell of today |
 | `data-outside-month` | a calendar cell of the previous or next month |
 | `data-unavailable` | a calendar date the app marked unavailable |
-| `data-readonly` | a read-only calendar |
+| `data-readonly` | a read-only calendar or switch |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
 | `data-empty` | a combobox list with no item |
 | `data-nested` | a submenu's positioner and popup |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's and a radio's `data-checked` / `data-unchecked`; an indeterminate Progress |
+| `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present) |
 | `data-required` | a required form control |
 | `data-placeholder` | a Select showing its placeholder |
 | `data-instant` | a tooltip that opened with no delay |
@@ -166,7 +175,8 @@ Checkbox, Slider and Select.
 
 ### Forms
 
-The form controls (Select, Checkbox, Slider, Combobox, DatePicker, DateRangePicker) take `name` and render a **hidden input** that
+The form controls (Select, Checkbox, Switch, RadioGroup, Slider, Combobox, DatePicker,
+DateRangePicker) take `name` and render a **hidden input** that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
@@ -175,7 +185,7 @@ only. Each hidden input carries the component's part attribute with the value `i
 `hidden-input`, since its `input` is the visible Input).
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
-`Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Select, a Slider, a Combobox, a
+`Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
 DatePicker or a DateRangePicker gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);

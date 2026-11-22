@@ -5,8 +5,9 @@
 The layer that turns a form control into a labelled, described and validated field: a label linked
 to the control, a description, error messages shown when the value is invalid, and the field's
 interaction states (`dirty`, `touched`, `filled`, `focused`) for styling. It wraps a native input
-(`Field.Control`) or one of the library's form controls: Checkbox, CheckboxGroup, Select, Slider,
-Combobox, DatePicker and DateRangePicker (the [integration contract](#integration-contract)).
+(`Field.Control`) or one of the library's form controls: Checkbox, CheckboxGroup, Switch,
+RadioGroup, Select, Slider, Combobox, DatePicker and DateRangePicker (the
+[integration contract](#integration-contract)).
 [Fieldset](fieldset.md) groups fields under a legend and disables them together; [Form](form.md)
 adds server errors, the submission that shows every error and focuses the first invalid field,
 and a `validationMode` for all its fields.
@@ -28,7 +29,7 @@ controlled `dirty` / `touched` props, and the Error's enter and exit animations.
 | Field.Error | `div` | `field-error` | rendered only while it is shown |
 
 A field has one control: a `Field.Control`, a `Checkbox.Root`, a `CheckboxGroup`, a
-`Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
+`Switch.Root`, a `RadioGroup`, a `Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
 `DateRangePicker.Root`.
 
 ## API
@@ -42,7 +43,8 @@ A field has one control: a `Field.Control`, a `Checkbox.Root`, a `CheckboxGroup`
 - `invalid` (`false`): forces the invalid state, for an error the app found (a server answer).
 - `validate(value)`: returns a message, a list of messages, or `null` (or `undefined`) for none;
   or a promise of one of these ([async validation](#async-validation)). The value is the
-  control's: the input's text, a checkbox's `checked`, a group's array of values, a select's value
+  control's: the input's text, a checkbox's or a switch's `checked`, a group's array of values,
+  a radio group's value (or `null`), a select's value
   (or `null`), a slider's number (or numbers), a picker's date or range (or `null`).
 - `validationMode`: when the field validates and shows the result, see [Validation](#validation):
   `"onSubmit"`, `"onBlur"` or `"onChange"`. Default: the enclosing [Form](form.md)'s
@@ -149,8 +151,8 @@ clears them: the field asks the Form to drop its key ([form.md](form.md#api), `o
 
 ## State attributes and ARIA
 
-Every part, and the integrated control's main element (Checkbox.Root, Select.Trigger,
-Slider.Root, Combobox.Input), carries:
+Every part, and the integrated control's main element (Checkbox.Root, Switch.Root, RadioGroup,
+Select.Trigger, Slider.Root, Combobox.Input), carries:
 
 | attribute | when |
 | --- | --- |
@@ -167,7 +169,7 @@ has neither.
 
 | part | ARIA |
 | --- | --- |
-| Label | `id`; `for` the control's `id` when the control is labelable (the Control, Checkbox.Root's `button`, Select.Trigger's `button`, Combobox.Input) |
+| Label | `id`; `for` the control's `id` when the control is labelable (the Control, Checkbox.Root's `button`, Switch.Root's `button`, Select.Trigger's `button`, Combobox.Input) |
 | Control | `id` (generated, or the consumer's), `name` (the field's), `aria-labelledby` (the label), `aria-describedby`, `aria-invalid="true"` while invalid, `disabled` |
 | Description | `id` |
 | Error | `id` |
@@ -202,6 +204,8 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | --- | --- | --- | --- | --- | --- |
 | Field.Control | the `input` | the `input` | its text | the `input` | the `input` |
 | Checkbox | Checkbox.Root (`button`) | Checkbox.Root | `checked` | Checkbox.Root | its hidden `checkbox` input |
+| Switch | Switch.Root (`button`) | Switch.Root | `checked` | Switch.Root | its hidden `checkbox` input |
+| RadioGroup | none (a `radiogroup`) | the RadioGroup | the value, or `null` | its Radios (focus within the group; `touched` once focus leaves it) | its first enabled Radio's hidden `radio` input (radios of one name share their validity). Its Radios take the field's `name` and `disabled`, and do not register as the field's control themselves |
 | Select | Select.Trigger (`button`) | Select.Trigger | the value, or `null` | Select.Trigger | its hidden input |
 | Combobox | Combobox.Input (`input`) | Combobox.Input | the value: an item or `null`, or the list of items with `multiple` | Combobox.Input | its visually hidden input (combobox.md, "Forms") |
 | Slider | none (a `group`) | Slider.Root gets `aria-labelledby`. Each Thumb gets `aria-describedby` and `aria-invalid`, and `aria-labelledby` when it has no `aria-label` or `aria-labelledby` of its own | the value (a number, or numbers) | its Thumbs | none: its inputs are `type="hidden"`, which the browser never validates. `validate` still runs and shows its messages, but it cannot block a native submission (a [Form](form.md) blocks it) |
@@ -372,6 +376,35 @@ Checks:
    submission); `130` likewise; `30` shows neither.
 3. "Submit" gives `form: age=30`.
 4. Axe finds no violation with an error shown.
+
+### `/field/settings`
+
+A `<form>` with two fields around the controls of Epic #29; the controls have no `name` of their
+own:
+
+- `name="contact"`: Label **"Contact by"**; a RadioGroup `required` (no `aria-labelledby` of its
+  own) with **"Email"** and **"Phone"** (values `email`, `phone`), each a Radio.Root inside a
+  `<label>` with its text; Description **"How we reach you."**; an Error
+  **"Choose how we reach you."**;
+- `name="alerts"`: a Switch with `uncheckedValue="off"`, then the Label **"Email alerts"**;
+  Description **"A weekly digest."**;
+- buttons **"Submit"** and **"Reset"** (`type="reset"`).
+
+Output: `form: ...`.
+
+Checks:
+
+1. A `radiogroup` named "Contact by", described by "How we reach you."; a `switch` named
+   "Email alerts", described by "A weekly digest.". A click on the label "Email alerts" turns it
+   on, and another off.
+2. "Submit" submits nothing and focuses "Email". The radiogroup is `aria-invalid="true"` and
+   "Choose how we reach you." is shown; its description is "How we reach you. Choose how we reach
+   you.".
+3. Checking "Phone" hides the error and removes `aria-invalid`. "Submit" then gives
+   `form: contact=phone&alerts=off`; with the switch on, `form: contact=phone&alerts=on`.
+4. "Reset" returns both controls to their defaults (no radio checked, the switch off); "Submit"
+   then submits nothing again.
+5. Axe finds no violation, before and after the failed submission.
 
 ### `/field/more-controls`
 
