@@ -10,7 +10,8 @@ import {
 } from "../helpers.ts";
 
 // tabs: account settings in tabs (spec/tabs.md): automatic activation, a disabled tab that stays
-// focusable, an indicator that follows the selection. Tabs open no modal overlay: never promoted.
+// focusable, an indicator that follows the selection, panels that slide in and out along the
+// activation direction. Tabs open no modal overlay: never promoted.
 
 test("the arrow keys move and select; a disabled tab is focusable, never selected", async ({
     page,
@@ -79,6 +80,23 @@ test("the indicator follows the selected tab", async ({ page }) => {
             return Math.round((box?.x ?? 0) - (tab?.x ?? 0));
         })
         .toBe(0);
+});
+
+test("the panels enter and exit along the activation direction", async ({
+    page,
+}) => {
+    const frame = await openHosted(page, { id: "tabs" });
+    const root = frame.locator(part("tabs-root"));
+    await expect(root).toHaveAttribute("data-activation-direction", "none");
+    await frame.getByRole("tab", { name: "Notifications" }).click();
+    await expect(root).toHaveAttribute("data-activation-direction", "right");
+    await expect(
+        frame.getByRole("tabpanel", { name: "Notifications" }),
+    ).toBeVisible();
+    // the exited panel leaves the DOM once its transition ended
+    await expect(frame.locator(part("tabs-panel"))).toHaveCount(1);
+    await frame.getByRole("tab", { name: "Account" }).click();
+    await expect(root).toHaveAttribute("data-activation-direction", "left");
 });
 
 test("axe finds no violation", async ({ page }) => {

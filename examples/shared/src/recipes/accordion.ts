@@ -1,6 +1,5 @@
-import { PANEL_MOTION } from "./collapsible.ts";
 import type { Recipe } from "./recipe.ts";
-import { FOCUS_RING } from "./shared.ts";
+import { FOCUS_RING, PANEL_MOTION } from "./shared.ts";
 
 // spec/accordion.md, "Anatomy": a bordered stack of sections, side by side when horizontal
 export const accordion: Recipe<

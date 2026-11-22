@@ -12,6 +12,7 @@
 export const CATEGORIES = [
     "overlays",
     "navigation",
+    "disclosure",
     "forms",
     "dates",
     "display",
@@ -22,6 +23,7 @@ export type Category = (typeof CATEGORIES)[number];
 export const CATEGORY_TITLES: Record<Category, string> = {
     overlays: "Overlays",
     navigation: "Navigation",
+    disclosure: "Disclosure",
     forms: "Forms and selection",
     dates: "Dates",
     display: "Display",
@@ -57,6 +59,7 @@ export interface ExampleMeta {
 export const DEFAULT_HEIGHT: Record<Category, number> = {
     overlays: 360,
     navigation: 320,
+    disclosure: 320,
     forms: 360,
     dates: 440,
     display: 280,

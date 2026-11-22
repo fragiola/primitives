@@ -17,6 +17,14 @@ export const POPUP_MOTION =
     "transition-[opacity,scale] duration-(--pr-motion) data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95";
 
 /**
+ * A disclosure panel's height transition (spec/collapsible.md, "Animation"), with its height the
+ * size variable (a length while it opens and closes, `auto` at rest) and 0 in the starting and
+ * ending styles. No padding on the panel itself, which `height: 0` would leave showing.
+ */
+export const PANEL_MOTION =
+    "overflow-hidden transition-[height] duration-(--pr-motion) ease-out data-starting-style:h-0 data-ending-style:h-0";
+
+/**
  * A floating box (popover, menu, select, combobox list), growing from its anchor
  * (`--transform-origin`).
  */

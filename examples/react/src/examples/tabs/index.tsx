@@ -26,7 +26,9 @@ const SECTIONS = [
 ];
 
 // Settings in tabs: the arrow keys move between tabs and select (automatic activation), Home and
-// End jump, a disabled tab stays focusable but is never selected, and the indicator follows.
+// End jump, a disabled tab stays focusable but is never selected, and the indicator follows. The
+// panels stack in one grid cell and slide in and out from the side the selection moved to
+// (`data-activation-direction`, `data-starting-style`, `data-ending-style`).
 export default function SettingsTabs() {
     return (
         <Tabs.Root defaultValue="account" className={styles.root}>
@@ -43,16 +45,18 @@ export default function SettingsTabs() {
                 ))}
                 <Tabs.Indicator className={styles.indicator} />
             </Tabs.List>
-            {SECTIONS.map((section) => (
-                <Tabs.Panel
-                    key={section.value}
-                    value={section.value}
-                    className={styles.panel}
-                >
-                    <h3 className={styles.heading}>{section.label}</h3>
-                    <p className={styles.text}>{section.text}</p>
-                </Tabs.Panel>
-            ))}
+            <div className={styles.panels}>
+                {SECTIONS.map((section) => (
+                    <Tabs.Panel
+                        key={section.value}
+                        value={section.value}
+                        className={styles.panel}
+                    >
+                        <h3 className={styles.heading}>{section.label}</h3>
+                        <p className={styles.text}>{section.text}</p>
+                    </Tabs.Panel>
+                ))}
+            </div>
         </Tabs.Root>
     );
 }
