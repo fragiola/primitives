@@ -56,7 +56,7 @@ Nothing changes.
 ### `/separator/basic`
 
 - a paragraph **"Account settings"**, a Separator, a paragraph **"Danger zone"**;
-- a row of two links, **"Docs"** and **"Blog"** (`href="#"`), with a Separator
+- a row of two links, **"Docs"** (`href="#docs"`) and **"Blog"** (`href="#blog"`), with a Separator
   `orientation="vertical"` between them;
 - a Separator `decorative` under the row.
 
