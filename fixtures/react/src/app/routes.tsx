@@ -1,4 +1,9 @@
 import type { ComponentType } from "react";
+import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
+import { CalendarRange } from "../scenarios/calendar/calendar-range.tsx";
+import { CalendarSingle } from "../scenarios/calendar/calendar-single.tsx";
+import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.tsx";
+import { CalendarUnavailable } from "../scenarios/calendar/calendar-unavailable.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
@@ -11,6 +16,8 @@ import { ComboboxGroups } from "../scenarios/combobox/combobox-groups.tsx";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
+import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
+import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.tsx";
@@ -87,4 +94,13 @@ export const routes: Record<string, ComponentType<{ locale: string }>> = {
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
+    "/calendar/single": CalendarSingle,
+    "/calendar/min-max": CalendarMinMax,
+    "/calendar/unavailable": CalendarUnavailable,
+    "/calendar/locale": CalendarSingle,
+    "/calendar/rtl": CalendarSingle,
+    "/calendar/two-months": CalendarTwoMonths,
+    "/calendar/range": CalendarRange,
+    "/date-picker/basic": DatePickerBasic,
+    "/date-picker/range": DatePickerRange,
 };
