@@ -18,10 +18,12 @@ export const COMPONENTS = [
     "date-picker",
     "date-range-picker",
     "dialog",
+    "drawer",
     "field",
     "fieldset",
     "form",
     "menu",
+    "navigation-menu",
     "popover",
     "progress",
     "radio",
@@ -82,6 +84,7 @@ export const MECHANISMS = [
     "presence",
     "range",
     "scroll-lock",
+    "swipe",
 ] as const;
 
 export type MechanismName = (typeof MECHANISMS)[number];
