@@ -1,0 +1,132 @@
+---
+title: Button
+description: An element that performs an action, native or rendered as another element, that can stay focusable while disabled (the APG button), in each framework.
+---
+
+An element the user activates to perform an action (WAI-ARIA APG
+[button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)): a native `<button>`, or
+another element (`render`) that behaves as one, with the keys a native button has. A disabled
+Button can stay focusable (`focusableWhenDisabled`), for a button that is busy for a moment and
+must not lose the focus. A toggle button and a menu button are not Button's: the menu button is
+[Menu](/docs/api/menu)'s Trigger.
+
+<Example id="button" />
+
+## Behaviour
+
+- **Native**: a `<button>`, `type="button"` unless you give a `type` (a `type="submit"` Button
+  submits its form).
+- **Not native** (`nativeButton` `false`, with `render` giving a `span` or a `div`): the Button
+  adds `role="button"`, `tabindex="0"`, and the keys of a native button: Enter clicks on key
+  down, Space clicks on key up, and Space's key down does not scroll the page.
+- **Disabled**: a press, a pointer down and every key but Tab are ignored, and your click,
+  pointer down and key handlers do not run. A native one is `disabled`, a non-native one
+  `aria-disabled="true"` and out of the tab order.
+- **Focusable when disabled**: with `focusableWhenDisabled`, a disabled Button stays in the tab
+  order and focusable (`aria-disabled="true"` instead of `disabled`), and still ignores presses
+  and every key but Tab: a focusable disabled submit button does not submit on Enter.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Button | `button` | `button-root` | the `button`; or your element (`render`), with `role="button"` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Button } from "@fragiola/primitives-react/button";
+
+<Button disabled={busy} focusableWhenDisabled onClick={publish}>
+    Publish
+</Button>
+<Button nativeButton={false} render={<span />} onClick={archive}>
+    Archive
+</Button>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Button :disabled="busy" focusable-when-disabled @click="publish">Publish</Button>
+    <Button :native-button="false" as="span" @click="archive">Archive</Button>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Button],
+    template: `
+        <button button [disabled]="busy()" [focusableWhenDisabled]="true" (click)="publish()">Publish</button>
+        <span button [nativeButton]="false" (click)="archive()">Archive</span>
+    `,
+})
+export class Post {
+    protected readonly busy = signal(false);
+}
+```
+
+The directive goes on your own element: a `<button>`, or any other element with
+`[nativeButton]="false"`. While disabled, a capturing listener stops the click, the pointer down
+and every key but Tab before your `(click)` and key listeners.
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Vue binds them as props (`focusable-when-disabled`, `:native-button`); Angular as inputs
+(`[focusableWhenDisabled]`, `[nativeButton]`). Vue and Angular take the click, pointer and key
+listeners as native events (`@click`, `(click)`).
+
+### Button
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | ignores presses and keys |
+| `focusableWhenDisabled` | `boolean` | `false` | a disabled Button stays in the tab order and focusable |
+| `nativeButton` | `boolean` | `true` | whether the rendered element is a native `<button>`; `false` with a `render` that gives another element |
+| `type` | `"button" \| "submit" \| "reset"` | `"button"` (native) | forwarded |
+| `tabIndex` (react) | `number` | | a non-native Button's tab index while it is focusable (`0` without it) |
+| `onClick` (react) | `MouseEventHandler` | | a click; not while disabled |
+| `onMouseDown` (react) | `MouseEventHandler` | | not while disabled |
+| `onPointerDown` (react) | `PointerEventHandler` | | not while disabled (its default is prevented) |
+| `onKeyDown` (react) | `KeyboardEventHandler` | | runs before the non-native keys; preventing its default keeps them from clicking; not while disabled |
+| `onKeyUp` (react) | `KeyboardEventHandler` | | runs before Space's click on a non-native Button; not while disabled |
+
+## State and part attributes
+
+| case | attributes |
+| --- | --- |
+| native | `type="button"` (unless given), `data-disabled` while disabled; disabled: `disabled`; disabled and `focusableWhenDisabled`: `aria-disabled="true"` instead of `disabled` |
+| not native | `role="button"`, `tabindex="0"`, `data-disabled` while disabled; disabled: `aria-disabled="true"` and `tabindex="-1"`; disabled and `focusableWhenDisabled`: `aria-disabled="true"` and `tabindex="0"` |
+
+Its accessible name is its content, or your `aria-label`.
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter | activates (a click); a non-native Button clicks on key down |
+| Space | activates (a click); a non-native Button clicks on key up, and its key down does not scroll |
+| Tab | moves on; a disabled Button is skipped, unless `focusableWhenDisabled` |
+
+While disabled, every key but Tab does nothing.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/button` | `Button`, `ButtonProps`, `ButtonState`, `RenderProp` |
+| `@fragiola/primitives-vue/button` | `Button`, `ButtonProps`, `ButtonState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/button` | `Button`, `ButtonState`, `ButtonType` |

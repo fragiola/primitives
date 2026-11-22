@@ -1,0 +1,128 @@
+---
+title: Radio
+description: A radio of a RadioGroup and its dot, with the hidden input the form submits, following the APG's radio group pattern, in each framework.
+---
+
+One choice of a [RadioGroup](/docs/api/radio-group) (WAI-ARIA APG
+[radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)): a `button` with the
+`radio` role, its dot, and a hidden `radio` input that the form submits. A Radio.Root must be
+inside a RadioGroup, which holds the value, the tab stop and the arrow keys.
+
+<Example id="radio-group" />
+
+## Behaviour
+
+- **Check**: a click on the Root or on its `<label>` checks it and focuses it, as does Space on
+  it; Enter does nothing. A checked radio stays checked: another radio of the group clears it.
+- **Disabled**: `disabled`, or the group's, ignores the pointer and the keys, and the arrows
+  skip it.
+- **Forms**: a visually hidden `radio` input right after the Root carries the group's `name`, the
+  radio's `value` and its checked state. It is never in the accessibility tree nor the tab order.
+- **Name**: a `<label>` around the Root, `<label for>` (the Root is a `button`, which is
+  labelable), or `aria-label`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `button` | `radio-root` | a `radio` of its group |
+| Indicator | `span` | `radio-indicator` | the dot; rendered only while checked |
+| (hidden input) | `input type="radio"` | `radio-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Radio } from "@fragiola/primitives-react/radio";
+
+<label>
+    <Radio.Root value="pro">
+        <Radio.Indicator />
+    </Radio.Root>
+    Pro
+</label>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label>
+        <Radio.Root value="pro">
+            <Radio.Indicator />
+        </Radio.Root>
+        Pro
+    </label>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [RadioRoot, RadioIndicator],
+    template: `
+        <label>
+            <button radioRoot value="pro"><span *radioIndicator></span></button>
+            Pro
+        </label>
+    `,
+})
+export class ProOption {}
+```
+
+The Indicator is structural (`*radioIndicator`): it is rendered only while checked. Read the
+state through the radio (`#radio="radioRoot"`, `radio.state().checked`).
+
+</Framework>
+
+Each sits inside a [RadioGroup](/docs/api/radio-group).
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | required | its value in the group |
+| `disabled` | `boolean` | `false` | this radio only |
+| `id` | `string` | | the button's id, for a `<label for>` |
+
+### Indicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` | `boolean` | `false` | rendered in every state (Angular: `*radioIndicator="true"`) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="radio"`, `type="button"`, `aria-checked` (`"true"` or `"false"`), `tabindex` (`0` on the group's tab stop, `-1` on the others), `disabled` and `data-disabled` when disabled (itself or the group), `data-checked` / `data-unchecked` (exactly one), `data-required` |
+| Indicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
+| hidden input | `type="radio"`, `name`, `value`, `checked`, `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, visually hidden |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Space | checks the focused radio |
+| Enter | nothing |
+| Arrows | the group's: the next or previous enabled radio, focused and checked |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/radio` | `Radio`, `RadioIndicatorProps`, `RadioRootProps`, `RadioState`, `RenderProp` |
+| `@fragiola/primitives-vue/radio` | `Radio`, `RadioIndicatorProps`, `RadioRootProps`, `RadioState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/radio` | `RadioIndicator`, `RadioRoot`, `RadioState` |

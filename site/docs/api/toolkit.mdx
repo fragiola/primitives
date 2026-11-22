@@ -23,9 +23,11 @@ Each mechanism is its own entry, so a component pulls in only the ones it uses: 
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
-and Form, built on it) and Checkbox use it alone; Slider adds `/range`, `/pointer` and
+and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
+and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 `/direction`; Select and Combobox add `/collection`, `/overlay` and `/positioning` (Select's `modal` option `/inert` and
-`/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms. The root entry,
+`/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms. Progress uses
+`/range` alone, Avatar `/image` alone; Button and Separator use none. The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
@@ -65,8 +67,12 @@ and Form, built on it) and Checkbox use it alone; Slider adds `/range`, `/pointe
   (counted, so nested locks release in order), keeping the scrollbar gutter.
 - **Presence**: the next frame and the end of an element's animations, for the
   `data-starting-style` and `data-ending-style` states.
-- **Collection**: the key maps of tabs, menus and chips, list navigation, typeahead and the
-  combobox's item helpers.
+- **Collection**: the key maps of tabs, menus, radio groups and chips, list navigation,
+  typeahead and the combobox's item helpers. `radioKeyTarget(key, index, count, options)` gives
+  the radio an arrow key moves the focus and the check to: ArrowDown and ArrowRight the next,
+  ArrowUp and ArrowLeft the previous, whatever the orientation, ArrowLeft and ArrowRight swapped
+  with `rtl`; it passes over the radios `skip` returns `true` for (the disabled ones), wraps at
+  the ends with `loop`, and returns `null` for another key or an end without `loop`.
 - **Positioning**: a floating element anchored to its trigger (Floating UI), on Base UI's sides:
   `top`, `bottom`, the logical `inline-start` and `inline-end`, and the physical `left` and
   `right`; a flipped side keeps the kind it was asked with. Its `direction` option (a direction,
@@ -83,5 +89,17 @@ and Form, built on it) and Checkbox use it alone; Slider adds `/range`, `/pointe
   `withoutFormErrors`).
 - **Direction**: `getDirection(element, provided)`, the direction a provider gives, else the
   element's computed `direction`.
-- **Range, id, date**: slider math and keys, document-unique ids, and plain dates with their math
-  and locale data from `Intl` (imported only by the calendar and picker entries).
+- **Range**: slider math and keys, and a progress bar's value. `progressValue(value, options)`
+  clamps the value to `[min, max]` and returns it with its percent (0 to 100), its status
+  (`ProgressStatus`: `indeterminate` for `null`, `complete` at `max`, else `progressing`) and its
+  formatted value: `format` and `locale` for `Intl.NumberFormat`, a percentage of the range
+  without `format`, `""` when indeterminate.
+- **Image**: `watchImageStatus(element, src, options, onStatus)` loads an image outside the
+  document, through the element's window (a `new Image()` of its `ownerDocument.defaultView`),
+  with the `img`'s `srcSet`, `sizes`, `crossOrigin` and `referrerPolicy` (`ImageSourceOptions`),
+  and reports its status (`ImageLoadingStatus`): `loading`, then `loaded` or `error`. No `src`
+  and no `srcSet` is an `error`. A cached image reports at once, synchronously and with no
+  `loading`: `loaded`, or `error` when it has no size. It returns the cleanup, after which no status is reported. Avatar's Image is
+  built on it.
+- **Id, date**: document-unique ids, and plain dates with their math and locale data from `Intl`
+  (imported only by the calendar and picker entries).

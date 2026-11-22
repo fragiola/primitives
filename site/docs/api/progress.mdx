@@ -1,0 +1,159 @@
+---
+title: Progress
+description: How far a task has gone, or an unknown amount of progress, as the ARIA progressbar, with its value formatted by Intl.NumberFormat, in each framework.
+---
+
+Shows how far a task has gone (the ARIA [`progressbar`](https://www.w3.org/TR/wai-aria-1.2/#progressbar)
+role; the APG has no pattern of its own, its
+[range properties](https://www.w3.org/WAI/ARIA/apg/practices/range-related-properties/) practice
+applies): a value between `min` and `max`, or `null` for an unknown amount (indeterminate). It is
+not interactive. A gauge of a known quantity (a disk's usage, a score) is a Meter, which comes
+later.
+
+<Example id="progress" />
+
+## Behaviour
+
+- **Value**: a number, clamped to `[min, max]`, or `null` for an indeterminate progress.
+- **Status**: `indeterminate` (`null`), `complete` (the clamped value is `max`), else
+  `progressing`; every part carries it as one of `data-indeterminate`, `data-complete`,
+  `data-progressing`.
+- **Format**: without `format`, the value is written as a percentage of the range (`"40%"`);
+  with `format` (`Intl.NumberFormatOptions`, in `locale`), as it says (`"128 GB"`). The Value and
+  the Root's `aria-valuetext` use it; `getAriaValueText` wins over it for the Root. Without
+  `locale`, the runtime's default: a page rendered on a server passes `locale`, so the server
+  formats as the browser does.
+- **Indeterminate**: no `aria-valuenow` and no `aria-valuetext` (no text of its own), unless
+  `getAriaValueText` gives one; the Value is empty, and the Indicator has no size: its animation
+  is your CSS, from `data-indeterminate`.
+- **Label**: names the Root (`aria-labelledby`) while it is rendered; or give the Root an
+  `aria-label`.
+- **Indicator**: grows from the inline start (right to left in RTL), with
+  `--progress-indicator-size` for a recipe that draws it otherwise (a ring).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `progress-root` | the `progressbar`; holds the value |
+| Label | `span` | `progress-label` | names the Root |
+| Value | `span` | `progress-value` | shows the formatted value |
+| Track | `div` | `progress-track` | the rail |
+| Indicator | `div` | `progress-indicator` | the filled part, inside the Track |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Progress } from "@fragiola/primitives-react/progress";
+
+<Progress.Root value={128} max={512} format={{ style: "unit", unit: "gigabyte" }} locale="en-US">
+    <Progress.Label>Storage</Progress.Label>
+    <Progress.Value />
+    <Progress.Track>
+        <Progress.Indicator />
+    </Progress.Track>
+</Progress.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Progress.Root :value="upload" locale="en-US">
+        <Progress.Label>Upload</Progress.Label>
+        <Progress.Value v-slot="{ formattedValue }">{{ formattedValue }} done</Progress.Value>
+        <Progress.Track><Progress.Indicator /></Progress.Track>
+    </Progress.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ProgressRoot, ProgressLabel, ProgressValue, ProgressTrack, ProgressIndicator],
+    template: `
+        <div progressRoot [value]="upload()" locale="en-US">
+            <span progressLabel>Upload</span>
+            <span progressValue></span>
+            <div progressTrack><div progressIndicator></div></div>
+        </div>
+    `,
+})
+export class Upload {
+    protected readonly upload = signal<number | null>(40);
+}
+```
+
+`<span progressValue #shown="progressValue">` reads `shown.formattedValue()` and `shown.value()`
+for content of your own.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`:value`, `:get-aria-value-text`), and Angular as inputs
+(`[value]`, `[getAriaValueText]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `number \| null` | required | the value, clamped to `[min, max]`; `null` for indeterminate |
+| `min` | `number` | `0` | the lower bound |
+| `max` | `number` | `100` | the upper bound |
+| `format` | `Intl.NumberFormatOptions` | a percentage of the range | how the Value and `aria-valuetext` write the value |
+| `locale` | `string` | the runtime's | the locale of the format (a BCP 47 tag) |
+| `getAriaValueText` | `(formattedValue: string, value: number \| null) => string` | | the Root's `aria-valuetext` instead of the formatted value; it receives `""` and `null` when indeterminate |
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the id the Root's `aria-labelledby` points at |
+
+### Value
+
+No props of its own. Its children replace the formatted value: a function
+`(formattedValue, value) => ReactNode` in React, the default scoped slot
+`{ formattedValue, value }` in Vue, the directive's `formattedValue()` and `value()` signals in
+Angular.
+
+### Track
+
+No props of its own.
+
+### Indicator
+
+No props of its own.
+
+## State and part attributes
+
+Every part carries exactly one of `data-indeterminate`, `data-progressing`, `data-complete`.
+
+| part | attributes |
+| --- | --- |
+| Root | `role="progressbar"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow` (the clamped value; absent when indeterminate), `aria-valuetext` (the formatted value, or `getAriaValueText`'s; absent when indeterminate without it), `aria-labelledby` (the Label, while one is rendered) |
+| Label | `id` |
+| Value, Track | the status |
+| Indicator | structural inline style while not indeterminate: `inset-inline-start: 0`, `inline-size: <percent>%` and `--progress-indicator-size: <percent>%`; none when indeterminate |
+
+## Keyboard
+
+None: a progress bar is not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/progress` | `Progress`, `ProgressIndicatorProps`, `ProgressLabelProps`, `ProgressRootProps`, `ProgressState`, `ProgressStatus`, `ProgressTrackProps`, `ProgressValueProps`, `RenderProp` |
+| `@fragiola/primitives-vue/progress` | `Progress`, `ProgressLabelProps`, `ProgressRootProps`, `ProgressState`, `ProgressStatus`, `ProgressValueSlotProps`, `ProgressValueSlots`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/progress` | `ProgressIndicator`, `ProgressLabel`, `ProgressRoot`, `ProgressState`, `ProgressStatus`, `ProgressTrack`, `ProgressValue` |

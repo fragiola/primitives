@@ -1,0 +1,108 @@
+---
+title: Separator
+description: A divider between sections of content or groups of controls, as the ARIA separator, or a decorative one that assistive technologies skip, in each framework.
+---
+
+A divider between sections of content or groups of controls (the ARIA
+[`separator`](https://www.w3.org/TR/wai-aria-1.2/#separator) role, not focusable: a static
+structure, not the APG's window splitter, which is
+[`@fragiola/splitter`](https://fragiola.com/splitter)'s). A decorative divider, which means
+nothing to assistive technologies, is `decorative`.
+
+<Example id="separator" />
+
+## Behaviour
+
+- **Semantic**: `role="separator"` with its `aria-orientation`, in the accessibility tree.
+- **Decorative**: `role="none"`, no `aria-orientation`: assistive technologies skip it.
+- **Orientation**: `horizontal` (the default) or `vertical`; your CSS draws it along
+  `data-orientation`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Separator | `div` | `separator-root` | the `separator`, or `none` when decorative |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Separator } from "@fragiola/primitives-react/separator";
+
+<nav>
+    <a href="#docs">Docs</a>
+    <Separator orientation="vertical" />
+    <a href="#blog">Blog</a>
+</nav>
+<Separator decorative />;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <nav>
+        <a href="#docs">Docs</a>
+        <Separator orientation="vertical" />
+        <a href="#blog">Blog</a>
+    </nav>
+    <Separator decorative />
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Separator],
+    template: `
+        <nav>
+            <a href="#docs">Docs</a>
+            <div separator orientation="vertical"></div>
+            <a href="#blog">Blog</a>
+        </nav>
+        <div separator decorative></div>
+    `,
+})
+export class Links {}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards.
+
+### Separator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the axis |
+| `decorative` | `boolean` | `false` | hidden from assistive technologies (`role="none"`) |
+
+## State and part attributes
+
+| case | attributes |
+| --- | --- |
+| semantic | `role="separator"`, `aria-orientation` (`"horizontal"` or `"vertical"`), `data-orientation` |
+| decorative | `role="none"`, `data-orientation` |
+
+## Keyboard
+
+None: a static separator is not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/separator` | `RenderProp`, `Separator`, `SeparatorProps`, `SeparatorState` |
+| `@fragiola/primitives-vue/separator` | `RenderSlotProps`, `Separator`, `SeparatorProps`, `SeparatorState` |
+| `@fragiola/primitives-angular/separator` | `Separator`, `SeparatorOrientation`, `SeparatorState` |

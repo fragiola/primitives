@@ -1,0 +1,138 @@
+---
+title: Switch
+description: An on/off control the user toggles, with native form support and a value while off, following the APG's switch pattern, in each framework.
+---
+
+An on/off control (WAI-ARIA APG [switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)):
+a `switch` role whose state is on or off, never mixed. It works in a native `<form>`: it
+submits, resets and validates as an `<input type="checkbox">` would, and can submit a value while
+off (`uncheckedValue`). A read-only switch is focusable and submits, but does not toggle.
+
+<Example id="switch" />
+
+## Behaviour
+
+- **Toggle**: a click on the Root or on its `<label>`, Space or Enter (the APG's optional key).
+- **Read-only**: `readOnly` keeps it focusable and submitted; a press or a key does not toggle
+  it.
+- **Forms**: a visually hidden `checkbox` input right after the Root submits `name=value` while
+  on (`value` defaults to `"on"`). While off, nothing, or `name=uncheckedValue` when you give
+  `uncheckedValue` (a `type="hidden"` input, rendered only then). `required` blocks the submission
+  while off and focuses the Root; a form reset returns an uncontrolled switch to its default, and
+  a controlled one reports the default through `onCheckedChange`.
+- **Thumb**: always rendered; your CSS moves it from `data-checked`.
+- **In a [Field](/docs/api/field)**, as a Checkbox: the Root takes the field's ids, `name`,
+  `disabled` and states, the Field's Label names it, and `validate` receives `checked`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `button` | `switch-root` | the `switch`; holds its state |
+| Thumb | `span` | `switch-thumb` | the moving part |
+| (hidden input) | `input type="checkbox"` | `switch-input` | what the form submits while on |
+| (unchecked input) | `input type="hidden"` | `switch-unchecked-input` | while off, with `uncheckedValue`: submits it |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Switch } from "@fragiola/primitives-react/switch";
+
+<label>
+    <Switch.Root name="bluetooth" value="yes" uncheckedValue="no" onCheckedChange={(on) => console.log(on)}>
+        <Switch.Thumb />
+    </Switch.Root>
+    Bluetooth
+</label>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label>
+        <Switch.Root v-model:checked="wifi" name="wifi">
+            <Switch.Thumb />
+        </Switch.Root>
+        Wi-Fi
+    </label>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [SwitchRoot, SwitchThumb],
+    template: `
+        <label>
+            <button switchRoot [(checked)]="wifi" name="wifi"><span switchThumb></span></button>
+            Wi-Fi
+        </label>
+    `,
+})
+export class Wifi {
+    protected readonly wifi = signal(true);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:checked`,
+`@checked-change`), and Angular as inputs and outputs (`[(checked)]`, `(checkedChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` | | the state, controlled |
+| `defaultChecked` | `boolean` | `false` | the initial state, uncontrolled |
+| `onCheckedChange` | `(checked: boolean, details: { reason }) => void` | | every change (reason `none`) |
+| `disabled` | `boolean` | `false` | ignores clicks and keys |
+| `required` | `boolean` | `false` | the form cannot submit while off |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but a press or a key does not toggle it |
+| `name` | `string` | | the form name (a field's wins) |
+| `value` | `string` | `"on"` | submitted while on |
+| `uncheckedValue` | `string` | | submitted while off; without it, nothing is |
+| `id` | `string` | generated | the button's id |
+
+### Thumb
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="switch"`, `type="button"`, `aria-checked` (`"true"` or `"false"`), `aria-required="true"` when required, `aria-readonly="true"` when read-only, `disabled` and `data-disabled` when disabled, `data-checked` / `data-unchecked` (exactly one), `data-readonly`, `data-required`; in a Field, the field's states |
+| Thumb | `data-checked` / `data-unchecked`, `data-disabled`, `data-readonly`, `data-required` |
+| hidden input | `type="checkbox"`, `name`, `value`, `checked`, `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, visually hidden |
+| unchecked input | `type="hidden"`, `name`, `value` (the `uncheckedValue`), `disabled` when disabled |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Space | toggles |
+| Enter | toggles |
+| Tab | moves on; every switch is a tab stop |
+
+A read-only switch ignores Space and Enter.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/switch` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `Switch`, `SwitchRootProps`, `SwitchState`, `SwitchThumbProps` |
+| `@fragiola/primitives-vue/switch` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `Switch`, `SwitchRootEmits`, `SwitchRootProps`, `SwitchState` |
+| `@fragiola/primitives-angular/switch` | `ChangeDetails`, `ChangeReason`, `SwitchRoot`, `SwitchState`, `SwitchThumb`, `ValueChangeEvent` |

@@ -7,7 +7,8 @@ The layer that turns a form control into a labelled, described and validated fie
 linked to the control, a description, error messages shown when the value is invalid, and the
 field's interaction states (`dirty`, `touched`, `filled`, `focused`) for styling. It wraps a native
 input (`Field.Control`) or one of the form primitives: a [Checkbox](/docs/api/checkbox), a
-[CheckboxGroup](/docs/api/checkbox-group), a [Select](/docs/api/select), a
+[CheckboxGroup](/docs/api/checkbox-group), a [Switch](/docs/api/switch), a
+[RadioGroup](/docs/api/radio-group), a [Select](/docs/api/select), a
 [Slider](/docs/api/slider), a [Combobox](/docs/api/combobox), a
 [DatePicker](/docs/api/date-picker) or a [DateRangePicker](/docs/api/date-range-picker).
 [Fieldset](/docs/api/fieldset) groups fields under a legend and disables them together;
@@ -45,8 +46,9 @@ The [forms guide](/docs/guides/forms) walks through them together.
   disables the control. A disabled field shows no error and has neither `data-invalid` nor
   `data-valid`.
 - **A blocked submission** focuses the first invalid control: the integrated control's own
-  element (a Checkbox, a Select's or a picker's Trigger, a Combobox's Input), or, in a Form, the
-  first invalid field's focus target (a Slider's first Thumb, a group's first enabled Checkbox).
+  element (a Checkbox, a Switch, a Select's or a picker's Trigger, a Combobox's Input, a
+  RadioGroup's checked or first enabled Radio), or, in a Form, the first invalid field's focus
+  target (a Slider's first Thumb, a group's first enabled Checkbox).
 - **Outside a field**, a control behaves exactly as without it.
 
 ## Anatomy
@@ -60,7 +62,7 @@ The [forms guide](/docs/guides/forms) walks through them together.
 | Error | `div` | `field-error` | rendered only while it is shown |
 
 A field has one control: a `Field.Control`, a `Checkbox.Root`, a `CheckboxGroup`, a
-`Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
+`Switch.Root`, a `RadioGroup`, a `Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
 `DateRangePicker.Root`.
 
 ## Usage
@@ -156,7 +158,7 @@ through.
 
 The integrated controls take no `name` of their own: the field gives it. The Label names the
 control; a click on it focuses the Control, or clicks a labelable control (it toggles a
-Checkbox). A picker's Trigger is only focused: a click would open its popup.
+Checkbox or a Switch). A picker's Trigger is only focused: a click would open its popup.
 
 ```tsx
 <Field.Root name="arrival">
@@ -175,6 +177,8 @@ Checkbox). A picker's Trigger is only focused: a click would open its popup.
 | Field.Control | the `input` | its text | the `input` | the `input` |
 | Checkbox | Checkbox.Root | `checked` | Checkbox.Root | its hidden input |
 | CheckboxGroup | the group (`aria-labelledby`) | the array of checked values | its first enabled Checkbox | none: `validate` decides |
+| Switch | Switch.Root | `checked` | Switch.Root | its hidden `checkbox` input |
+| RadioGroup | the group (`aria-labelledby`) | the value, or `null` | its checked Radio, else its first enabled one | its first enabled Radio's hidden `radio` input |
 | Select | Select.Trigger | the value, or `null` | Select.Trigger | its hidden input |
 | Slider | the Root and its Thumbs (`aria-labelledby`) | the number, or numbers | its first Thumb | none: `validate` decides |
 | Combobox | Combobox.Input | the item, `null`, or the items with `multiple` | Combobox.Input | its hidden input |
@@ -187,6 +191,8 @@ stays in it (WCAG 2.5.3). A Select's Trigger is a `combobox`, named by the label
 
 A Slider and a CheckboxGroup have no element the browser validates: their `validate` still runs
 and shows its messages, but only a [Form](/docs/api/form) blocks a submission with them.
+A RadioGroup has one: its first enabled radio's hidden input, since radios of one name share
+their validity, so a `required` group blocks a native submission too.
 
 ## Props
 
@@ -246,7 +252,7 @@ or a function matches the validity, which server errors are not part of.
 ## State and part attributes
 
 Every part, and the integrated control's main element (Checkbox.Root, the CheckboxGroup,
-Select.Trigger, Slider.Root, Combobox.Input, a picker's Trigger), carries:
+Switch.Root, the RadioGroup, Select.Trigger, Slider.Root, Combobox.Input, a picker's Trigger), carries:
 
 | attribute | when |
 | --- | --- |
@@ -264,7 +270,7 @@ gets `aria-invalid="true"` while invalid, and `aria-describedby`.
 ## Keyboard
 
 Nothing of its own: the control's keyboard applies. A click on the Label focuses the Control, or
-clicks a labelable control (it toggles a Checkbox); a picker's Trigger is only focused.
+clicks a labelable control (it toggles a Checkbox or a Switch); a picker's Trigger is only focused.
 
 ## Exports
 
