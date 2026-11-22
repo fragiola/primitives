@@ -16,6 +16,8 @@
         "combobox",
         "checkbox",
         "slider",
+        "calendar",
+        "date-picker",
         "field",
         "forms",
         "primitives",
@@ -49,6 +51,11 @@
             "types": "./dist/types/fragiola-primitives-angular-internal.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-internal.mjs"
         },
+        "./calendar": {
+            "@fragiola/source": "./calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-calendar.mjs"
+        },
         "./checkbox": {
             "@fragiola/source": "./checkbox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-checkbox.d.ts",
@@ -63,6 +70,16 @@
             "@fragiola/source": "./combobox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-combobox.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-combobox.mjs"
+        },
+        "./date-picker": {
+            "@fragiola/source": "./date-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-picker.mjs"
+        },
+        "./date-range-picker": {
+            "@fragiola/source": "./date-range-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-range-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-range-picker.mjs"
         },
         "./dialog": {
             "@fragiola/source": "./dialog/public-api.ts",
@@ -83,6 +100,11 @@
             "@fragiola/source": "./popover/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-popover.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-popover.mjs"
+        },
+        "./range-calendar": {
+            "@fragiola/source": "./range-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-range-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-range-calendar.mjs"
         },
         "./select": {
             "@fragiola/source": "./select/public-api.ts",
