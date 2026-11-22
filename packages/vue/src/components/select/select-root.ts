@@ -31,15 +31,22 @@ import {
     type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { type SelectItemData, SelectKey } from "./select-context.ts";
+import {
+    type RegisteredItem,
+    type SelectItemData,
+    SelectKey,
+} from "./select-context.ts";
 
 export interface SelectRootProps {
     open?: boolean;
     defaultOpen?: boolean;
     value?: string | null;
     defaultValue?: string | null;
-    /** Every item: the Root needs their labels while the list is closed. */
-    items: readonly SelectItemData[];
+    /**
+     * Every item: the labels known while the list is closed. Without it, the Items register
+     * themselves while mounted (keep the list mounted: `Portal keep-mounted`).
+     */
+    items?: readonly SelectItemData[];
     name?: string;
     required?: boolean;
     disabled?: boolean;
@@ -73,10 +80,10 @@ export const SelectRoot: PublicComponent<
                 type: String as PropType<string | null>,
                 default: null,
             },
-            /** Every item: the Root needs their labels while the list is closed. */
+            /** Every item; without it, the Items register themselves while mounted. */
             items: {
                 type: Array as PropType<readonly SelectItemData[]>,
-                required: true,
+                default: undefined,
             },
             name: { type: String, default: undefined },
             required: { type: Boolean, default: false },
@@ -95,6 +102,28 @@ export const SelectRoot: PublicComponent<
         },
         setup(props, { emit, slots, expose }) {
             const root = useOverlayRoot(props, emit);
+            // without `items`, the Items register themselves (Base UI), in DOM order
+            const registered = shallowRef<readonly RegisteredItem[]>([]);
+            const registerItem = (item: RegisteredItem) => {
+                registered.value = [
+                    ...registered.value.filter(
+                        (entry) => entry.element !== item.element,
+                    ),
+                    item,
+                ].sort((a, b) =>
+                    a.element.compareDocumentPosition(b.element) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+                        ? -1
+                        : 1,
+                );
+                return () => {
+                    registered.value = registered.value.filter(
+                        (entry) => entry !== item,
+                    );
+                };
+            };
+            const items = (): readonly SelectItemData[] =>
+                props.items ?? registered.value;
             // a template ref on the Root: `close()` and `unmount()` (spec/README.md, "Lifecycle")
             expose(root.actions);
             const state = useControllable<string | null, ChangeDetails>(
@@ -123,7 +152,9 @@ export const SelectRoot: PublicComponent<
             provide(SelectKey, {
                 ...root,
                 field,
-                items: () => props.items,
+                items,
+                registers: () => props.items === undefined,
+                registerItem,
                 value,
                 disabled,
                 required: () => props.required,
@@ -136,7 +167,7 @@ export const SelectRoot: PublicComponent<
                     }
                 },
                 choose(entry, reason, event) {
-                    const item = props.items.find(
+                    const item = items().find(
                         (candidate) => candidate.value === entry,
                     );
                     if (item === undefined || item.disabled) {
@@ -147,7 +178,7 @@ export const SelectRoot: PublicComponent<
                 },
                 listId,
                 itemId: (entry) =>
-                    `${baseId}-item-${props.items.findIndex((item) => item.value === entry)}`,
+                    `${baseId}-item-${items().findIndex((item) => item.value === entry)}`,
                 placed: ref<{ side: Side; align: Align }>({
                     side: "bottom",
                     align: "start",

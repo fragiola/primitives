@@ -75,13 +75,19 @@ export const MenuPopup: PartComponent<
                         return;
                     }
                     const doc = popup.ownerDocument;
+                    // a context menu's area is no trigger that toggles it: a press on it is
+                    // outside the menu, but it is still what the menu was opened from
+                    // (spec/context-menu.md)
+                    const area =
+                        !nested && context.component === "context-menu";
                     // Escape, an item and the trigger give focus back to this level's trigger; the
                     // closing arrow of a submenu gives it back to its submenu trigger
                     const session = openOverlaySession(doc, {
                         elements: () => [positioner ?? popup],
                         // read when the session needs them: the active trigger may move while
                         // it is open
-                        ignore: () => context.triggers.value,
+                        ignore: () => (area ? [] : context.triggers.value),
+                        owner: () => context.triggers.value,
                         dismiss: (reason, event) =>
                             context.setOpen(false, reason, event),
                         returnFocus: {
@@ -95,7 +101,10 @@ export const MenuPopup: PartComponent<
                             reason: () =>
                                 context.lastReason.current ??
                                 (nested ? null : "none"),
-                            to: () => context.trigger.value,
+                            to: () =>
+                                nested
+                                    ? context.trigger.value
+                                    : context.returnTarget(),
                         },
                     });
                     onCleanup(() => session.end());
@@ -196,11 +205,12 @@ export const MenuPopup: PartComponent<
                         event.preventDefault();
                         const root = rootOf(context);
                         const skip = positioners(context);
-                        const rootTrigger = root.trigger.value;
-                        const target = rootTrigger
+                        // after the trigger (a context menu: the element focused when it opened)
+                        const from = root.returnTarget() ?? root.trigger.value;
+                        const target = from
                             ? event.shiftKey
-                                ? previousTabbableBefore(rootTrigger, skip)
-                                : nextTabbableAfter(rootTrigger, skip)
+                                ? previousTabbableBefore(from, skip)
+                                : nextTabbableAfter(from, skip)
                             : null;
                         context.closeAll("focus-out", event);
                         target?.focus();
@@ -241,6 +251,7 @@ export const MenuPopup: PartComponent<
                 const open = context.open.value;
                 const status = context.presence.status.value;
                 const placed = context.placed.value;
+                const contextMenu = context.component === "context-menu";
                 return renderPart(
                     "div",
                     { attrs, slots },
@@ -249,12 +260,16 @@ export const MenuPopup: PartComponent<
                     {
                         id: context.popupId,
                         role: "menu",
-                        // the active trigger names the menu (a submenu's: its SubmenuTrigger)
+                        // the active trigger names the menu (a submenu's: its SubmenuTrigger); no
+                        // button names a context menu (spec/context-menu.md)
                         "aria-labelledby":
-                            context.activeTriggerId.value ?? context.triggerId,
+                            contextMenu && !nested
+                                ? undefined
+                                : (context.activeTriggerId.value ??
+                                  context.triggerId),
                         "aria-orientation": "vertical",
                         tabindex: -1,
-                        "data-primitives-part": "menu-popup",
+                        "data-primitives-part": `${context.component}-popup`,
                         ...stateAttributes({
                             open,
                             closed: !open,
@@ -265,6 +280,10 @@ export const MenuPopup: PartComponent<
                             "ending-style": status === "ending",
                         }),
                         onKeydown,
+                        // no browser menu over a context menu (spec/context-menu.md, "Pointer")
+                        onContextmenu: contextMenu
+                            ? (event: MouseEvent) => event.preventDefault()
+                            : undefined,
                         ref: setPopup,
                     },
                 );

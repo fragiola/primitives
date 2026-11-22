@@ -10,6 +10,7 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
+import { MenuKey } from "./menu-context.ts";
 import { MenuGroupKey } from "./menu-group.ts";
 
 /** Names its Group. */
@@ -23,6 +24,7 @@ export const MenuGroupLabel: PartComponent<
         props: asProp,
         setup(props, { attrs, slots }) {
             const labelId = inject(MenuGroupKey, null);
+            const component = inject(MenuKey, null)?.component ?? "menu";
             const generated = useId();
             const id = () => (attrs.id as string | undefined) ?? generated;
             onMounted(() => {
@@ -41,7 +43,10 @@ export const MenuGroupLabel: PartComponent<
                     { attrs, slots },
                     props.as,
                     {},
-                    { id: id(), "data-primitives-part": "menu-group-label" },
+                    {
+                        id: id(),
+                        "data-primitives-part": `${component}-group-label`,
+                    },
                 );
         },
     }),

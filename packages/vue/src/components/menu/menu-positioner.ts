@@ -1,5 +1,5 @@
 import type { Align, Side } from "@fragiola/primitives/positioning";
-import { defineComponent, watch } from "vue";
+import { computed, defineComponent, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import {
     type PositionerProps,
@@ -39,7 +39,8 @@ export const MenuPositioner: PartComponent<
                 nested
                     ? { side: "inline-end", align: "start" }
                     : { side: "bottom", align: "start" },
-                context.trigger,
+                // a context menu's point, else the trigger
+                computed(() => context.anchor.value ?? context.trigger.value),
                 context.positioner,
                 null,
                 context.presence.mounted,
@@ -63,7 +64,7 @@ export const MenuPositioner: PartComponent<
                         style: context.modal()
                             ? { pointerEvents: "auto" }
                             : undefined,
-                        "data-primitives-part": "menu-positioner",
+                        "data-primitives-part": `${context.component}-positioner`,
                         ...stateAttributes({
                             open,
                             closed: !open,

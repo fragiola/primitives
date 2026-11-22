@@ -2,6 +2,7 @@ import {
     type Align,
     anchorFloating,
     type Side,
+    type VirtualAnchor,
 } from "@fragiola/primitives/positioning";
 import { type Ref, ref, watch } from "vue";
 import { useProvidedDirection } from "../direction/direction-context.ts";
@@ -33,7 +34,8 @@ export const positionerProps = {
 export function usePositioner(
     props: PositionerProps,
     defaults: { side: Side; align: Align },
-    anchor: Ref<HTMLElement | null>,
+    /** The trigger, or what the overlay anchors to instead (a context menu's point). */
+    anchor: Readonly<Ref<Element | VirtualAnchor | null>>,
     positioner: Ref<HTMLElement | null>,
     arrow: Ref<HTMLElement | null> | null,
     mounted?: Ref<boolean>,

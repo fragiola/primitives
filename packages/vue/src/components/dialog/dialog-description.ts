@@ -6,6 +6,6 @@ export const DialogDescription = defineLabelledPart(
     "DialogDescription",
     DialogKey,
     "p",
-    "dialog-description",
+    (c) => `${c.component}-description`,
     (c) => c.descriptionId,
 );

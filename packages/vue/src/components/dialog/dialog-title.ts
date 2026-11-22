@@ -6,6 +6,6 @@ export const DialogTitle = defineLabelledPart(
     "DialogTitle",
     DialogKey,
     "h2",
-    "dialog-title",
+    (c) => `${c.component}-title`,
     (c) => c.titleId,
 );
