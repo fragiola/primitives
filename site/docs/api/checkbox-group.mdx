@@ -1,0 +1,129 @@
+---
+title: CheckboxGroup
+description: Checkboxes sharing one array value, with an optional parent checkbox that checks or clears them all, in each framework.
+---
+
+A group of [checkboxes](/docs/api/checkbox) sharing one array value: the values of the checked
+ones. A parent checkbox (`parent`) checks every value of `allValues`, clears them all, and shows
+the mixed state in between (the APG [checkbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/),
+mixed). CheckboxGroup is one component, not a namespace; its checkboxes come from
+`/checkbox`.
+
+<Example id="checkbox" />
+
+## Behaviour
+
+- **Children**: a checkbox's state is whether the group's value holds its `value`; toggling it
+  adds or removes it. The value keeps the order of `allValues`, else the order they were checked.
+- **Parent**: checked when every value of `allValues` is, unchecked when none is, mixed otherwise.
+  Toggling it from unchecked or mixed checks all; from checked, clears all. It submits nothing.
+- **Forms**: each child submits its own `name=value`; a form reset returns an uncontrolled group
+  to `defaultValue`.
+- **Name**: the group is a `role="group"`; name it with `aria-labelledby` (a heading) or
+  `aria-label`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| CheckboxGroup | `div` | `checkbox-group-root` | the `group`; holds the array value |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Checkbox } from "@fragiola/primitives-react/checkbox";
+import { CheckboxGroup } from "@fragiola/primitives-react/checkbox-group";
+
+<CheckboxGroup aria-labelledby="toppings" defaultValue={["cheese"]} allValues={["cheese", "ham"]}>
+    <h2 id="toppings">Toppings</h2>
+    <label>
+        <Checkbox.Root parent />
+        All toppings
+    </label>
+    <label>
+        <Checkbox.Root name="toppings" value="cheese" />
+        Cheese
+    </label>
+    <label>
+        <Checkbox.Root name="toppings" value="ham" />
+        Ham
+    </label>
+</CheckboxGroup>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <CheckboxGroup v-model:value="toppings" :all-values="['cheese', 'ham']" aria-label="Toppings">
+        <label><Checkbox.Root parent /> All toppings</label>
+        <label><Checkbox.Root name="toppings" value="cheese" /> Cheese</label>
+        <label><Checkbox.Root name="toppings" value="ham" /> Ham</label>
+    </CheckboxGroup>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CheckboxGroup, CheckboxRoot],
+    template: `
+        <div checkboxGroup [(value)]="toppings" [allValues]="all" aria-label="Toppings">
+            <label><button checkboxRoot parent></button> All toppings</label>
+            <label><button checkboxRoot name="toppings" value="cheese"></button> Cheese</label>
+            <label><button checkboxRoot name="toppings" value="ham"></button> Ham</label>
+        </div>
+    `,
+})
+export class Toppings {
+    protected readonly all = ["cheese", "ham"];
+    protected readonly toppings = signal<readonly string[]>(["cheese"]);
+}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Vue binds them as `v-model:value` and `@value-change`; Angular as `[(value)]` and
+`(valueChangeDetails)`.
+
+### CheckboxGroup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | | the checked values, controlled |
+| `defaultValue` | `string[]` | `[]` | the initial values, uncontrolled |
+| `onValueChange` | `(value: string[], details: { reason }) => void` | | every change (reason `none`) |
+| `allValues` | `string[]` | `[]` | every child value: what the parent checks |
+| `disabled` | `boolean` | `false` | disables every child |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| CheckboxGroup | `role="group"`, `data-disabled` |
+
+The parent checkbox gets `aria-controls` (its children's ids) and `aria-checked="mixed"` in
+between.
+
+## Keyboard
+
+Each checkbox is a tab stop; Space toggles the focused one.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/checkbox-group` | `ChangeDetails`, `ChangeReason`, `CheckboxGroup`, `CheckboxGroupProps`, `CheckboxGroupState`, `RenderProp` |
+| `@fragiola/primitives-vue/checkbox-group` | `ChangeDetails`, `ChangeReason`, `CheckboxGroup`, `CheckboxGroupEmits`, `CheckboxGroupProps`, `CheckboxGroupState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/checkbox-group` | `ChangeDetails`, `ChangeReason`, `CheckboxGroup`, `CheckboxGroupState`, `ValueChangeEvent` |

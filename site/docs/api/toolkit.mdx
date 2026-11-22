@@ -21,13 +21,17 @@ Each mechanism is its own entry, so a component pulls in only the ones it uses: 
 `/overlay`, `/focus`, `/inert`, `/scroll-lock` and `/presence`; Tabs uses `/collection` and
 `/direction`; Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
-`/scroll-lock`. The root entry, `@fragiola/primitives`, only re-exports them.
+`/scroll-lock`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+layer), so Field's form code reaches only the components that import it: Field and Checkbox use
+it alone; Slider adds `/range`, `/pointer` and `/direction`; Select and Combobox add
+`/collection`, `/overlay` and `/positioning` (Select's `modal` option `/inert` and
+`/scroll-lock`). The root entry, `@fragiola/primitives`, only re-exports them.
 
 ## Exports
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives/collection` | `tabsKeyTarget`, `TabsKeyOptions`, `menuKeyTarget`, `submenuKeys`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `tabsKeyTarget`, `TabsKeyOptions`, `menuKeyTarget`, `submenuKeys`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality` |

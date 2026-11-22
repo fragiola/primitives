@@ -151,13 +151,43 @@ function namespaceOf(source: string): Map<string, string> {
     return parts;
 }
 
+/** `checkbox-group` → `CheckboxGroup`. */
+const pascal = (component: string) =>
+    component
+        .split("-")
+        .map((word) => capitalize(word))
+        .join("");
+
+/**
+ * A component's parts: its namespace (`parts.ts`), or, for a component that is no namespace (a
+ * CheckboxGroup), the one part named after the component, implemented by itself.
+ */
+function partsOf(dir: string, component: string, sources: Sources) {
+    const file = `${dir}/components/${component}/parts.ts`;
+    if (!sources.files(`${dir}/components/${component}`).includes(file)) {
+        return new Map([[pascal(component), pascal(component)]]);
+    }
+    return namespaceOf(sources.read(file));
+}
+
 /** The React props of each part (interfaces, the contract's `PartProps` left out). */
 function reactProps(component: string, sources: Sources) {
     const interfaces = new Map<string, { fields: string[]; bases: string[] }>();
     for (const file of sources.files("packages/react/src")) {
         if (!/\.tsx?$/.test(file)) continue;
         const text = sources.read(file);
-        for (const match of text.matchAll(/export interface (\w+)/g)) {
+        // a union of props (`type ComboboxRootProps<Item> = …SingleProps<Item> | …MultipleProps<Item>`)
+        // has the props of each member
+        for (const match of text.matchAll(
+            /export type (\w+Props)\b(?:<[^=]*>)?\s*=\s*([^;]+);/g,
+        )) {
+            const bases = [...(match[2] ?? "").matchAll(/\b(\w+Props)\b/g)]
+                .map((base) => base[1] ?? "")
+                .filter((base) => base !== "PartProps");
+            interfaces.set(match[1] ?? "", { fields: [], bases });
+        }
+        // an unexported interface can be a base of an exported one
+        for (const match of text.matchAll(/(?:export )?interface (\w+)/g)) {
             // the heritage clause runs to the first `{` outside a type argument
             let depth = 0;
             let open = (match.index ?? 0) + match[0].length;
@@ -187,9 +217,7 @@ function reactProps(component: string, sources: Sources) {
         if (!found) return [];
         return [...found.fields, ...found.bases.flatMap(propsOf)];
     };
-    const parts = namespaceOf(
-        sources.read(`packages/react/src/components/${component}/parts.ts`),
-    );
+    const parts = partsOf("packages/react/src", component, sources);
     return new Map(
         [...parts].map(([part, implementation]) => [
             part,
@@ -228,9 +256,7 @@ function vueProps(component: string, sources: Sources) {
             return keysOf(braced(text, match.index + match[0].length - 1));
         return keysOf(constants.get(match[1] ?? "") ?? "");
     };
-    const parts = namespaceOf(
-        sources.read(`${dir}/components/${component}/parts.ts`),
-    );
+    const parts = partsOf(dir, component, sources);
     const kebab = (name: string) =>
         name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
     return new Map(
@@ -269,7 +295,11 @@ function angularProps(
         name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
     return new Map(
         parts.map((part) => {
-            const directive = `${capitalize(component)}${part}`;
+            // a component that is no namespace is its one part (CheckboxGroup)
+            const directive =
+                part === pascal(component)
+                    ? part
+                    : `${pascal(component)}${part}`;
             const dir = `packages/angular/${component}/directives`;
             const own = `${dir}/${kebab(directive)}.directive.ts`;
             // a part may share another part's directive, which lists its selector too (Menu's
@@ -287,10 +317,24 @@ function angularProps(
                             ).test(sources.read(path)),
                     ) ??
                 own;
+            // a part Angular has no directive for (Combobox's Value: the root's `value()` signal)
+            // declares nothing
+            if (!sources.files(dir).includes(file)) return [part, []];
             const text = sources.read(file);
+            // an input bound under an alias (`boundValue = input(…, { alias: "value" })`) is its
+            // alias, but a structural directive's microsyntax inputs (`alias: "dialogPortal"`,
+            // `"tabsPanelKeepMounted"`) keep their property's name
+            const prefix = selector.slice(1, -1);
             const inputs = [
-                ...text.matchAll(/readonly (\w+) = input(?:\.required)?[<(]/g),
-            ].map((match) => match[1] ?? "");
+                ...text.matchAll(
+                    /readonly (\w+) = input(?:\.required)?[<(]([^;]*);/g,
+                ),
+            ].map((match) => {
+                const alias = /alias:\s*"(\w+)"/.exec(match[2] ?? "")?.[1];
+                return alias !== undefined && !alias.startsWith(prefix)
+                    ? alias
+                    : (match[1] ?? "");
+            });
             const outputs = [
                 ...text.matchAll(/readonly (\w+) = output[<(]/g),
             ].flatMap((match) => {
@@ -551,6 +595,23 @@ describe("the API pages", () => {
 });
 
 describe("the docs reference check", () => {
+    it("reads a component that is no namespace as its one part", () => {
+        expect([...reactProps("checkbox-group", disk).keys()]).toEqual([
+            "CheckboxGroup",
+        ]);
+        const sources = planted(
+            "packages/angular/checkbox-group/directives/checkbox-group.directive.ts",
+            (text) =>
+                text.replace(
+                    "readonly allValues = input",
+                    "readonly everyValue = input",
+                ),
+        );
+        expect(docsReferenceProblems(PAGES, sources)).toContain(
+            "api/checkbox-group: CheckboxGroup: angular declares everyValue, not documented",
+        );
+    });
+
     it("fails when an entry exports a name its page does not list", () => {
         const sources = planted(
             "packages/react/src/components/tabs/index.ts",

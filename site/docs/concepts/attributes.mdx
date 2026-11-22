@@ -16,6 +16,7 @@ Every element carries `data-primitives-part="<component>-<part>"`:
 | a dialog's popup | `data-primitives-part="dialog-popup"` |
 | a tab | `data-primitives-part="tabs-tab"` |
 | the tab indicator | `data-primitives-part="tabs-indicator"` |
+| a combobox's hidden inputs | `data-primitives-part="combobox-hidden-input"` |
 
 One attribute for the whole library, since many components have parts of the same name. Your
 tests, styles and tools can rely on it in every framework.
@@ -28,11 +29,19 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | attribute | on |
 | --- | --- |
 | `data-open` | an open overlay (a popup, its positioner, a dialog's backdrop) |
-| `data-popup-open` | a trigger while its overlay is open |
+| `data-popup-open` | a trigger while its overlay is open (a Select's trigger, a Combobox's input, input group and trigger too) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts once its animations end |
-| `data-selected` | a selected tab, and its panel |
-| `data-highlighted` | the menu item the keyboard or the pointer points at |
+| `data-selected` | a selected tab and its panel, a selected select or combobox option |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator |
+| `data-placeholder` | a Select showing its placeholder |
+| `data-empty` | a combobox list with no item |
+| `data-dragging` | a slider while a pointer drags a thumb |
+| `data-index` | a slider thumb's value index (a value) |
+| `data-required` | a required checkbox |
+| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid |
+| `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus |
+| `data-highlighted` | the menu item, select or combobox option the keyboard or the pointer points at |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group) |
 | `data-nested` | a submenu's positioner and popup |
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
@@ -41,7 +50,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-orientation` | `horizontal` or `vertical` (a value) |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 
-ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-modal`, `aria-controls`.
+ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-checked`, `aria-invalid`,
+`aria-activedescendant`, `aria-modal`, `aria-controls`.
 
 ## An enter and exit transition
 

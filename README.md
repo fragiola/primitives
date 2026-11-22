@@ -12,7 +12,8 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today: **Dialog**, **Popover**, **Tooltip**, **Menu** and **Tabs** ([`spec/`](spec)). The first
+Today: **Dialog**, **Popover**, **Tooltip**, **Menu**, **Tabs**, **Field**, **Checkbox** and
+**CheckboxGroup**, **Slider**, **Select** and **Combobox** ([`spec/`](spec)). The first
 version (stage 0) ports the cross-framework POC's components to production: Dialog, Popover,
 Menu, Combobox, Select, Tooltip, Tabs, Checkbox and CheckboxGroup, Slider, Calendar,
 RangeCalendar, DatePicker and DateRangePicker. See [`docs/handoff.md`](docs/handoff.md),
