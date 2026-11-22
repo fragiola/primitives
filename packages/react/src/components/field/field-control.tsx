@@ -49,6 +49,7 @@ export function FieldControl({
         value,
         filled: value !== "",
         input: () => input.current,
+        focusTarget: () => input.current,
     });
     const state = useContext(FieldContext)?.state ?? OUTSIDE_STATE;
     const disabled = disabledProp || field.disabled;

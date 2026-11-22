@@ -70,6 +70,7 @@ export function SelectRoot({
         value,
         filled: value !== null,
         input: () => input.current,
+        focusTarget: () => root.trigger,
     });
     const disabled = disabledProp || field.disabled;
     const [highlighted, setHighlighted] = useState<string | null>(null);

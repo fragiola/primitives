@@ -7,9 +7,7 @@ export default defineConfig({
     // scripts/components.ts)
     entry: {
         index: "src/index.ts",
-        ...Object.fromEntries(
-            ENTRIES.map((name) => [name, entrySource(name)]),
-        ),
+        ...Object.fromEntries(ENTRIES.map((name) => [name, entrySource(name)])),
     },
     format: "esm",
     platform: "browser",
