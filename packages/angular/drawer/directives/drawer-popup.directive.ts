@@ -72,7 +72,7 @@ const NO_SIZES: Sizes = {
     },
 })
 export class DrawerPopup extends DialogPopup {
-    protected readonly drawer = inject(DrawerRoot);
+    protected readonly drawer = inject<DrawerRoot<unknown>>(DrawerRoot);
     protected readonly movement = signal({ x: 0, y: 0 });
     protected readonly swiping = signal(false);
     protected readonly dismissed = signal(false);

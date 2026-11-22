@@ -16,5 +16,5 @@ import { DrawerRoot } from "./drawer-root.directive.ts";
     },
 })
 export class DrawerBackdrop extends DialogBackdrop {
-    protected readonly drawer = inject(DrawerRoot);
+    protected readonly drawer = inject<DrawerRoot<unknown>>(DrawerRoot);
 }

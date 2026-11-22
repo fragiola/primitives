@@ -11,5 +11,5 @@ import { DrawerRoot } from "./drawer-root.directive.ts";
     host: { "data-primitives-part": "drawer-content" },
 })
 export class DrawerContent {
-    protected readonly root = inject(DrawerRoot);
+    protected readonly root = inject<DrawerRoot<unknown>>(DrawerRoot);
 }

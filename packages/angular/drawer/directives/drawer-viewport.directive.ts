@@ -11,5 +11,5 @@ import { DrawerRoot } from "./drawer-root.directive.ts";
     },
 })
 export class DrawerViewport extends DialogViewport {
-    protected readonly drawer = inject(DrawerRoot);
+    protected readonly drawer = inject<DrawerRoot<unknown>>(DrawerRoot);
 }
