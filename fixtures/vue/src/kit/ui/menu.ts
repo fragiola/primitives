@@ -4,6 +4,7 @@ import { styled } from "../styled.ts";
 
 export const Menu = {
     Root: Primitive.Root,
+    createHandle: Primitive.createHandle,
     SubmenuRoot: Primitive.SubmenuRoot,
     Portal: Primitive.Portal,
     Trigger: styled(Primitive.Trigger, menu.trigger),

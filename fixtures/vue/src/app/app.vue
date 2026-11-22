@@ -12,7 +12,8 @@ const paths = Object.keys(routes);
 
 <template>
     <main v-if="scenario" class="p-6">
-        <component :is="scenario" :locale="query.locale" />
+        <!-- `cancel` only when set: a scenario without the prop gets no attribute -->
+        <component :is="scenario" :locale="query.locale" v-bind="query.cancel ? { cancel: true } : {}" />
     </main>
     <main v-else class="p-6">
         <h1 class="text-lg font-semibold">Vue fixture</h1>
