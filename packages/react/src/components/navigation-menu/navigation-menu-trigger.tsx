@@ -64,7 +64,13 @@ export function NavigationMenuTrigger({
             // another Content is open: this one opens at once
             hover.cancel();
             if (!open) {
-                setValue(item.value, "trigger-hover", event.nativeEvent);
+                // a hover opening: a press within 500 ms keeps it, leaving closes it
+                setValue(
+                    item.value,
+                    "trigger-hover",
+                    event.nativeEvent,
+                    "hover",
+                );
             }
             return;
         }
@@ -86,7 +92,8 @@ export function NavigationMenuTrigger({
         }
         hover.cancel();
         const opened = context.openedBy.current;
-        if (open) {
+        // the live value: a hover may have switched to this item since the last render
+        if (context.getValue() === item.value) {
             if (
                 opened.by === "hover" &&
                 performance.now() - opened.at < PATIENT_CLICK

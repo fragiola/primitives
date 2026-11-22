@@ -108,6 +108,19 @@ test.describe("navigation-menu / basic", () => {
         await expectOutput(page, "reason", "trigger-press");
     });
 
+    test("a hover switch from a pressed Content is a hover opening: leaving closes it", async ({
+        page,
+    }) => {
+        await page.mouse.move(600, 600);
+        await trigger(page, "Products").click();
+        await expectOutput(page, "value", "products");
+        await trigger(page, "Learn").hover();
+        await expectOutput(page, "value", "learn");
+        await page.mouse.move(600, 600);
+        await expectOutput(page, "value", "none");
+        await expectOutput(page, "reason", "trigger-hover");
+    });
+
     test("keyboard: Enter opens with focus on the Trigger; Tab enters the Content, then continues after the Trigger", async ({
         page,
     }) => {

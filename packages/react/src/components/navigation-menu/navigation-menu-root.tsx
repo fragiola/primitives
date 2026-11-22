@@ -178,9 +178,11 @@ export function NavigationMenuRoot({
         [shown, triggers, registryVersion],
     );
 
+    const getValue = useCallback(() => latest.current.value, []);
     const context: NavigationMenuContextValue = useMemo(
         () => ({
             value,
+            getValue,
             lastValue,
             setValue,
             openedBy,
@@ -215,6 +217,7 @@ export function NavigationMenuRoot({
         }),
         [
             value,
+            getValue,
             lastValue,
             setValue,
             orientation,

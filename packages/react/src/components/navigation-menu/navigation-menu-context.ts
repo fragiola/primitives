@@ -13,6 +13,8 @@ export type OpenedBy = "hover" | "press";
 export interface NavigationMenuContextValue {
     /** The open item's value (`null`: closed). */
     value: string | null;
+    /** The open item's value now, before the render a change causes. */
+    getValue: () => string | null;
     /** The last open item's value: its Content stays while the popup exits. */
     lastValue: string | null;
     setValue: (

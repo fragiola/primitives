@@ -108,7 +108,8 @@ size moves from one to the other. When the menu closes, they keep the last Conte
 ## Pointer
 
 - **Hover** (mouse and pen): the pointer entering a Trigger opens its Content after `delay` (reason
-  `trigger-hover`); while a Content is open, entering another Trigger opens that one at once. The
+  `trigger-hover`); while a Content is open, entering another Trigger opens that one at once, as a hover opening (the
+  pointer leaving closes it; a press within 500 ms keeps it). The
   pointer leaving the Trigger and the popup (the hover bridge between them, as a Tooltip's) closes
   it after `closeDelay`, unless it returned.
 - **Press**: a press on a Trigger toggles its Content (reason `trigger-press`). A press within
