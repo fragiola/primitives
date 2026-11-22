@@ -4,6 +4,7 @@ import {
     type InputSignal,
     type OutputEmitterRef,
     type Signal,
+    type WritableSignal,
 } from "@angular/core";
 import type {
     CalendarMode,
@@ -16,6 +17,8 @@ import {
     controllable,
     createOverlayRoot,
     type OpenChangeEvent,
+    type OverlayRoot,
+    type Placement,
     placementSignal,
 } from "@fragiola/primitives-angular/internal";
 
@@ -33,6 +36,26 @@ export interface DatePickerInputs {
     options: Signal<CalendarOptions>;
 }
 
+/**
+ * The enclosing picker's state, for its parts. Declared, not inferred, so the built declarations
+ * name the calendar entry's types by its specifier.
+ */
+export interface DatePickerState {
+    component: DatePickerComponent;
+    mode: CalendarMode;
+    overlay: OverlayRoot;
+    value: Signal<CalendarValue>;
+    options: Signal<CalendarOptions>;
+    /** What the calendar inside binds to. */
+    binding: PickerBinding;
+    placed: WritableSignal<Placement>;
+    state: Signal<{ open: boolean }>;
+    /** Sets the value and closes the popup (reason `item-press`). */
+    choose: (next: CalendarValue) => void;
+    /** The part attribute of one of its parts. */
+    part: (name: string) => string;
+}
+
 /** The enclosing picker's state, for its parts. */
 export const DATE_PICKER = new InjectionToken<DatePickerState>("DATE_PICKER");
 
@@ -46,7 +69,7 @@ export function createDatePicker(
     inputs: DatePickerInputs,
     emitOpen: (event: OpenChangeEvent) => void,
     emitValue: (value: CalendarValue, details: ChangeDetails) => void,
-) {
+): DatePickerState {
     const overlay = createOverlayRoot(
         inputs,
         emitOpen,
@@ -78,11 +101,7 @@ export function createDatePicker(
         binding,
         placed: placementSignal({ side: "bottom", align: "start" }),
         state: computed(() => ({ open: overlay.open() })),
-        /** Sets the value and closes the popup (reason `item-press`). */
         choose,
-        /** The part attribute of one of its parts. */
         part: (name: string) => `${component}-${name}`,
     };
 }
-
-export type DatePickerState = ReturnType<typeof createDatePicker>;
