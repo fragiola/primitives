@@ -181,7 +181,11 @@ export function useOverlayRoot(
         reason: ChangeReason,
         event?: Event,
         pressed?: HTMLElement | null,
-        options: { payload?: { value: unknown } } = {},
+        options: {
+            payload?: { value: unknown };
+            /** It moves to a trigger not rendered yet (a handle's `open(id)`). */
+            movesUnrendered?: boolean;
+        } = {},
     ): boolean {
         const before = pending ?? {
             open: open.value,
@@ -191,15 +195,17 @@ export function useOverlayRoot(
         const moves =
             next &&
             before.open &&
-            pressed != null &&
-            pressed !== before.trigger;
+            ((pressed != null && pressed !== before.trigger) ||
+                options.movesUnrendered === true);
         if (before.open === next && !moves && options.payload === undefined) {
             return false;
         }
         const { details, held } = createOpenChangeDetails(
             reason,
             event,
-            (pressed ?? trigger.value) || undefined,
+            options.movesUnrendered === true
+                ? undefined
+                : (pressed ?? trigger.value) || undefined,
         );
         emit("openChange", next, details);
         if (details.isCanceled) {
@@ -218,6 +224,9 @@ export function useOverlayRoot(
             if (props.triggerId === undefined) {
                 ownTriggerId.value = pressed.id;
             }
+            explicitPayload.value = null;
+        }
+        if (moves && options.movesUnrendered === true) {
             explicitPayload.value = null;
         }
         if (next && options.payload !== undefined) {
@@ -239,9 +248,13 @@ export function useOverlayRoot(
     const openFromHandle = (id: string | null) => {
         const element = id === null ? null : registry.get(id)?.element;
         if (id !== null && element === undefined) {
-            // a trigger not rendered (yet): it becomes the active one when it registers
+            // a trigger not rendered (yet): it becomes the active one when it registers; an overlay
+            // open on another trigger moves to it, as a press on another trigger
+            const isOpen = pending?.open ?? open.value;
             if (
-                setOpen(true, "imperative-action") &&
+                setOpen(true, "imperative-action", undefined, null, {
+                    movesUnrendered: isOpen && requestedTriggerId.value !== id,
+                }) &&
                 props.triggerId === undefined
             ) {
                 ownTriggerId.value = id;

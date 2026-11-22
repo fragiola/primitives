@@ -37,6 +37,8 @@ interface TriggerEntry {
 export interface SetOpenOptions {
     /** An explicit payload (a handle's `openWithPayload`). */
     payload?: { value: unknown };
+    /** It moves to a trigger not rendered yet (a handle's `open(id)`). */
+    movesUnrendered?: boolean;
 }
 
 /**
@@ -169,15 +171,17 @@ export function createOverlayRoot(
         const moves =
             next &&
             before.open &&
-            pressed != null &&
-            pressed !== before.trigger;
+            ((pressed != null && pressed !== before.trigger) ||
+                options.movesUnrendered === true);
         if (before.open === next && !moves && options.payload === undefined) {
             return false;
         }
         const { details, held } = createOpenChangeDetails(
             reason,
             event,
-            (pressed ?? untracked(trigger)) || undefined,
+            options.movesUnrendered === true
+                ? undefined
+                : (pressed ?? untracked(trigger)) || undefined,
         );
         emit({ open: next, details });
         if (details.isCanceled) {
@@ -196,6 +200,9 @@ export function createOverlayRoot(
             if (untracked(() => inputs.triggerId?.()) === undefined) {
                 ownTriggerId.set({ value: pressed.id });
             }
+            explicitPayload.set(null);
+        }
+        if (moves && options.movesUnrendered === true) {
             explicitPayload.set(null);
         }
         if (next && options.payload !== undefined) {
@@ -265,9 +272,15 @@ export function createOverlayRoot(
                     ? null
                     : untracked(registry).get(triggerId)?.element;
             if (triggerId !== null && element === undefined) {
-                // a trigger not rendered (yet): it becomes the active one when it registers
+                // a trigger not rendered (yet): it becomes the active one when it registers; an
+                // overlay open on another trigger moves to it, as a press on another trigger
+                const isOpen = pending?.open ?? untracked(open);
                 if (
-                    setOpen(true, "imperative-action") &&
+                    setOpen(true, "imperative-action", undefined, null, {
+                        movesUnrendered:
+                            isOpen &&
+                            untracked(requestedTriggerId) !== triggerId,
+                    }) &&
                     untracked(() => inputs.triggerId?.()) === undefined
                 ) {
                     ownTriggerId.set({ value: triggerId });

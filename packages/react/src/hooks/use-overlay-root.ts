@@ -140,6 +140,7 @@ export function useOverlayRoot(
         onOpenChange: props.onOpenChange,
         trigger,
         triggerControlled: props.triggerId !== undefined,
+        requestedTriggerId,
     });
     latest.current = {
         open,
@@ -147,6 +148,7 @@ export function useOverlayRoot(
         onOpenChange: props.onOpenChange,
         trigger,
         triggerControlled: props.triggerId !== undefined,
+        requestedTriggerId,
     };
     // the open state just reported, until the render it causes: a second report of the same change
     // in the same task (a popover's Tab-out, then its focus watch) is not repeated
@@ -161,7 +163,11 @@ export function useOverlayRoot(
             reason: ChangeReason,
             event?: Event,
             pressed?: HTMLElement | null,
-            options: { payload?: { value: unknown } } = {},
+            options: {
+                payload?: { value: unknown };
+                /** It moves to a trigger not rendered yet (a handle's `open(id)`). */
+                movesUnrendered?: boolean;
+            } = {},
         ): boolean => {
             const current = latest.current;
             const before = pending.current ?? {
@@ -172,8 +178,8 @@ export function useOverlayRoot(
             const moves =
                 next &&
                 before.open &&
-                pressed != null &&
-                pressed !== before.trigger;
+                ((pressed != null && pressed !== before.trigger) ||
+                    options.movesUnrendered === true);
             if (
                 before.open === next &&
                 !moves &&
@@ -184,7 +190,9 @@ export function useOverlayRoot(
             const { details, held } = createOpenChangeDetails(
                 reason,
                 event,
-                (pressed ?? current.trigger) || undefined,
+                options.movesUnrendered === true
+                    ? undefined
+                    : (pressed ?? current.trigger) || undefined,
             );
             current.onOpenChange?.(next, details);
             if (details.isCanceled) {
@@ -203,6 +211,9 @@ export function useOverlayRoot(
                 if (!current.triggerControlled) {
                     setOwnTriggerId(pressed.id);
                 }
+                setExplicitPayload(null);
+            }
+            if (moves && options.movesUnrendered === true) {
                 setExplicitPayload(null);
             }
             if (next && options.payload !== undefined) {
@@ -249,9 +260,14 @@ export function useOverlayRoot(
         (id: string | null) => {
             const element = id === null ? null : registry.get(id)?.element;
             if (id !== null && element === undefined) {
-                // a trigger not rendered (yet): it becomes the active one when it registers
+                // a trigger not rendered (yet): it becomes the active one when it registers; an
+                // overlay open on another trigger moves to it, as a press on another trigger
+                const open = pending.current?.open ?? latest.current.open;
                 if (
-                    setOpen(true, "imperative-action") &&
+                    setOpen(true, "imperative-action", undefined, null, {
+                        movesUnrendered:
+                            open && latest.current.requestedTriggerId !== id,
+                    }) &&
                     !latest.current.triggerControlled
                 ) {
                     setOwnTriggerId(id);
