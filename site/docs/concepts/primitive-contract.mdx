@@ -54,6 +54,28 @@ A value is controlled when you pass it (`open`, `value`) and uncontrolled otherw
 and `(openChangeDetails)` in Angular. A controlled value you keep unchanged stays yours: a dialog
 whose `open` you keep `true` stays open and working.
 
+An overlay's open change (Dialog, AlertDialog, Popover, Tooltip, Menu, ContextMenu, Select,
+Combobox and the date pickers) carries an `OpenChangeDetails`, and is reported **before** the
+state changes:
+
+| member | what |
+| --- | --- |
+| `reason` | why it changes: `trigger-press`, `escape-key`, `outside-press`, ..., or `imperative-action` for a handle's or the actions' call |
+| `event` | the DOM event that caused it, `undefined` when it came from code |
+| `trigger` | the trigger it is associated with (the pressed one, else the active one), if any |
+| `cancel()`, `isCanceled` | cancel the change: the overlay stays as it is, in both modes, and keeps working |
+| `preventUnmountOnClose()` | on a close: the popup stays mounted (`data-ending-style`) until the actions' `unmount()` |
+
+In Vue, `@open-change` comes first and `update:open` follows only when not canceled; in Angular,
+`(openChangeDetails)` first, then `(openChange)` only when not canceled. Value changes
+(`onValueChange`, `onCheckedChange`) carry `{ reason, event }` and cannot be canceled.
+
+Every overlay also reports the end of its transitions, `onOpenChangeComplete(open)`
+(`@open-change-complete`, `(openChangeComplete)`), and has two **actions**, `close()` and
+`unmount()`: React's `actionsRef` on the Root, the Vue Root's template ref, the Angular root
+directive's methods (`#menu="menuRoot"`, `menu.close()`). Its Portal's `keepMounted` keeps the
+content in the page while closed, `hidden` and `data-closed`.
+
 ## No text, structural style only
 
 A primitive renders only your children: no text and no accessible name of its own. Its inline

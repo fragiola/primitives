@@ -28,6 +28,13 @@ accessible **description** (the control still needs its own name). It follows th
   the last close.
 - **Positioning**: as the [Popover's](/docs/api/popover), from the Trigger, on the `top` by
   default.
+- **Detached triggers**: Triggers anywhere in the page show the same Root through a `handle`,
+  each with a `payload` the content reads ([detached triggers](/docs/guides/detached-triggers)).
+  Hovering another trigger of the open tooltip moves it there at once.
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it as it
+  is, [change details](/docs/concepts/primitive-contract)), `onOpenChangeComplete(open)` reports
+  the end of each transition, the actions `close()` and `unmount()` act from code, and the
+  Portal's `keepMounted` keeps the Positioner in the page while closed (`hidden`, `data-closed`).
 
 ## Anatomy
 
@@ -137,20 +144,31 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | --- | --- | --- | --- |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-hover`, `trigger-focus`, `trigger-press`, `escape-key`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-hover`, `trigger-focus`, `trigger-press`, `escape-key`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `TooltipHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
 | `delay` | `number` | the Provider's, else `600` | ms before a hovered trigger opens it |
 | `closeDelay` | `number` | the Provider's, else `0` | ms before it closes once the pointer left |
 | `disabled` | `boolean` | `false` | a disabled tooltip never opens |
 
 ### Trigger
 
-No props of its own.
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `handle` | `TooltipHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
 
 ### Portal
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*tooltipPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*tooltipPortal="{ keepMounted: true }"`, or `*tooltipPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -176,8 +194,8 @@ No props of its own.
 | part | attributes |
 | --- | --- |
 | Trigger | `aria-describedby` (the popup while open, added to the consumer's own), `data-popup-open` |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the anchor CSS variables, as the Popover's |
-| Popup | `role="tooltip"`, an `id`, `data-side`, `data-align`, `data-open`, `data-instant` (opened with no delay), `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; the anchor CSS variables, as the Popover's; `hidden` while kept mounted and closed |
+| Popup | `role="tooltip"`, an `id`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-instant` (opened with no delay), `data-starting-style`, `data-ending-style` |
 | Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
 
 ## Keyboard
@@ -192,6 +210,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipPortalProps`, `TooltipPositionerProps`, `TooltipPositionerState`, `TooltipPopupState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipRootEmits`, `TooltipTriggerState`, `TooltipPortalProps`, `TooltipPositionerState`, `TooltipPopupState`, `TooltipArrowState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/tooltip` | `TooltipProvider`, `TooltipRoot`, `TooltipTrigger`, `TooltipPortal`, `TooltipPositioner`, `TooltipPopup`, `TooltipArrow`, `injectTooltip`, `TooltipState`, `TooltipPopupState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |
+| `@fragiola/primitives-react/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipPortalProps`, `TooltipPositionerProps`, `TooltipPositionerState`, `TooltipPopupState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `TooltipHandle`, `TooltipTriggerProps`, `createTooltipHandle` |
+| `@fragiola/primitives-vue/tooltip` | `Tooltip`, `TooltipProviderProps`, `TooltipRootProps`, `TooltipRootEmits`, `TooltipTriggerState`, `TooltipPortalProps`, `TooltipPositionerState`, `TooltipPopupState`, `TooltipArrowState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `TooltipHandle`, `TooltipTriggerProps`, `createTooltipHandle` |
+| `@fragiola/primitives-angular/tooltip` | `TooltipProvider`, `TooltipRoot`, `TooltipTrigger`, `TooltipPortal`, `TooltipPositioner`, `TooltipPopup`, `TooltipArrow`, `injectTooltip`, `TooltipState`, `TooltipPopupState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `TooltipHandle`, `TooltipTriggerState`, `createTooltipHandle` |

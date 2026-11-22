@@ -41,6 +41,10 @@ example), and so is the popup's name (`aria-label`).
   Label, then its own content ("Arrival 2026-11-24"), so its visible text stays in its name; a
   click on the Label only focuses it, and opens nothing. A [Fieldset](/docs/api/fieldset)'s
   `disabled` disables it too.
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it as it
+  is, [change details](/docs/concepts/primitive-contract)), `onOpenChangeComplete(open)` reports
+  the end of each transition, the actions `close()` and `unmount()` act from code, and the
+  Portal's `keepMounted` keeps the Positioner in the page while closed (`hidden`, `data-closed`).
 
 ## Anatomy
 
@@ -153,7 +157,9 @@ names below are React's; Vue binds them the same way (`v-model:value`, `v-model:
 | `onValueChange` | `(value: PlainDate \| null, details: { reason }) => void` | | every choice (reason `item-press`) |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
 | `min` | `PlainDate \| null` | | passed to the bound calendar |
 | `max` | `PlainDate \| null` | | passed to the bound calendar |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | passed to the bound calendar |
@@ -173,7 +179,9 @@ No props of its own.
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*datePickerPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*datePickerPortal="{ keepMounted: true }"`, or `*datePickerPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -195,8 +203,8 @@ No props of its own.
 | part | attributes |
 | --- | --- |
 | Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`; `disabled` and `data-disabled` while disabled, `data-readonly` while read-only, `data-required` while required; in a Field, its ids, `aria-labelledby` (the Label, then itself), `aria-describedby`, `aria-invalid` and the field's states |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin` |
-| Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin`; `hidden` while kept mounted and closed |
+| Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
 | hidden input | `name`, `value` (ISO), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`; visually hidden (a text input, which the browser validates, not `type="hidden"`) |
 
 ## Keyboard
@@ -213,6 +221,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderProp`, `Side` |
-| `@fragiola/primitives-vue/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerFormProps`, `DatePickerPositionerState`, `DatePickerRootEmits`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderSlotProps`, `Side` |
-| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerData`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PlainDate`, `Side`, `ValueChangeEvent` |
+| `@fragiola/primitives-react/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderProp`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps` |
+| `@fragiola/primitives-vue/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerFormProps`, `DatePickerPositionerState`, `DatePickerRootEmits`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderSlotProps`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps` |
+| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerData`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PlainDate`, `Side`, `ValueChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalOptions` |

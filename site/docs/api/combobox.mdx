@@ -33,6 +33,10 @@ These are decided (D10): the APG allows them or says nothing about them.
   `multiple`), and a visually hidden input carries `required`. A form reset returns an
   uncontrolled combobox to `defaultValue`. In a [Field](/docs/api/field), the Input takes the
   field's ids and states.
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it as it
+  is, [change details](/docs/concepts/primitive-contract)), `onOpenChangeComplete(open)` reports
+  the end of each transition, the actions `close()` and `unmount()` act from code, and the
+  Portal's `keepMounted` keeps the Positioner in the page while closed (`hidden`, `data-closed`).
 
 ## Anatomy
 
@@ -192,7 +196,9 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | `disabled` | `boolean` | `false` | disables the input and its buttons |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every open change (`input-press`, `input-change`, `list-navigation`, `trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every open change (`input-press`, `input-change`, `list-navigation`, `trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
 
 ### InputGroup
 
@@ -235,7 +241,9 @@ No props of its own.
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*comboboxPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*comboboxPortal="{ keepMounted: true }"`, or `*comboboxPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -321,6 +329,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxItemIndicatorProps`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxListProps`, `ComboboxPortalProps`, `ComboboxPositionerProps`, `ComboboxPositionerState`, `ComboboxRootMultipleProps`, `ComboboxRootProps`, `ComboboxRootSingleProps`, `ComboboxValueProps`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderProp`, `Side` |
-| `@fragiola/primitives-vue/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxDisabledState`, `ComboboxFilter`, `ComboboxItemEquality`, `ComboboxItemIndicatorProps`, `ComboboxItemIndicatorState`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxItemToString`, `ComboboxListSlots`, `ComboboxListState`, `ComboboxOpenState`, `ComboboxPopupState`, `ComboboxPortalProps`, `ComboboxPositionerState`, `ComboboxRootEmits`, `ComboboxRootProps`, `ComboboxValueSlots`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderSlotProps`, `Side` |
-| `@fragiola/primitives-angular/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `ComboboxChip`, `ComboboxChipRemove`, `ComboboxChips`, `ComboboxClear`, `ComboboxEmpty`, `ComboboxGroup`, `ComboboxGroupLabel`, `ComboboxInput`, `ComboboxInputGroup`, `ComboboxItem`, `ComboboxItemIndicator`, `ComboboxItemInfo`, `ComboboxItemState`, `ComboboxItemValue`, `ComboboxList`, `ComboboxPopup`, `ComboboxPortal`, `ComboboxPositioner`, `ComboboxRoot`, `ComboboxSeparator`, `ComboboxState`, `ComboboxStatus`, `ComboboxTrigger`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `OpenChangeEvent`, `PendingHighlight`, `Side`, `ValueChangeEvent`, `injectCombobox` |
+| `@fragiola/primitives-react/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxItemIndicatorProps`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxListProps`, `ComboboxPortalProps`, `ComboboxPositionerProps`, `ComboboxPositionerState`, `ComboboxRootMultipleProps`, `ComboboxRootProps`, `ComboboxRootSingleProps`, `ComboboxValueProps`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderProp`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps` |
+| `@fragiola/primitives-vue/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `Combobox`, `ComboboxDisabledState`, `ComboboxFilter`, `ComboboxItemEquality`, `ComboboxItemIndicatorProps`, `ComboboxItemIndicatorState`, `ComboboxItemProps`, `ComboboxItemState`, `ComboboxItemToString`, `ComboboxListSlots`, `ComboboxListState`, `ComboboxOpenState`, `ComboboxPopupState`, `ComboboxPortalProps`, `ComboboxPositionerState`, `ComboboxRootEmits`, `ComboboxRootProps`, `ComboboxValueSlots`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `PositionerProps`, `RenderSlotProps`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps` |
+| `@fragiola/primitives-angular/combobox` | `Align`, `ChangeDetails`, `ChangeReason`, `ComboboxChip`, `ComboboxChipRemove`, `ComboboxChips`, `ComboboxClear`, `ComboboxEmpty`, `ComboboxGroup`, `ComboboxGroupLabel`, `ComboboxInput`, `ComboboxInputGroup`, `ComboboxItem`, `ComboboxItemIndicator`, `ComboboxItemInfo`, `ComboboxItemState`, `ComboboxItemValue`, `ComboboxList`, `ComboboxPopup`, `ComboboxPortal`, `ComboboxPositioner`, `ComboboxRoot`, `ComboboxSeparator`, `ComboboxState`, `ComboboxStatus`, `ComboboxTrigger`, `ItemEquality`, `ItemFilter`, `ItemGroup`, `OpenChangeEvent`, `PendingHighlight`, `Side`, `ValueChangeEvent`, `injectCombobox`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalOptions` |

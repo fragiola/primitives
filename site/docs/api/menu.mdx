@@ -7,7 +7,8 @@ A list of actions opened by a button, with nested submenus. The highlighted item
 one (roving focus), typing jumps to an item, and each level is a layer. It follows the WAI-ARIA
 APG [menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/): **non-modal by
 default**, with a `modal` option that locks the page's scroll and blocks the pointer outside.
-Checkbox and radio items, context menus and menubars come later.
+Its items may be actions, checkbox items and radio items. A menu opened at the pointer from an
+area is a [ContextMenu](/docs/api/context-menu); menubars come later.
 
 <Example id="menu" />
 
@@ -20,6 +21,11 @@ Checkbox and radio items, context menus and menubars come later.
   never activated (APG). Hovering an item highlights it.
 - **Activate**: Enter, Space or a click fires the item's `click`, then closes every level
   (reason `item-press`) and focuses the trigger.
+- **Checkbox and radio items**: Space toggles a CheckboxItem (checks a RadioItem) and keeps the
+  menu open; Enter toggles it and closes every level (APG); a click toggles it and closes only
+  with `closeOnClick` (default `false`, Base UI). Each change reports `onCheckedChange` or the
+  RadioGroup's `onValueChange` with the reason `item-press`. An indicator renders only while its
+  item is checked, unless `keepMounted`.
 - **Submenus**: ArrowRight (ArrowLeft in RTL), Enter or Space on a SubmenuTrigger opens its
   submenu on its first item, hovering it opens it after `delay`; ArrowLeft closes it. While the
   pointer travels to an open submenu, crossing other items does not close it (a safe area).
@@ -29,6 +35,16 @@ Checkbox and radio items, context menus and menubars come later.
 - **Modal** (`modal`): while open, the page does not scroll and a press outside reaches no
   element of the page: it only closes the menu, focus back on the trigger. The keyboard is
   unchanged.
+- **Layers**: each level is a layer of the [nested overlay tree](/docs/guides/nested-overlays): a
+  submenu is a child of its menu, and a menu opened from a popover or a dialog is that overlay's
+  child, so a press inside the parent closes the menu only.
+- **Detached triggers**: Triggers anywhere in the page open the same Root through a `handle`,
+  each with a `payload` ([detached triggers](/docs/guides/detached-triggers)). The menu anchors to
+  the active trigger and its popup is labelled by it; a press on another trigger while open moves
+  the menu there (it stays open, with the new payload).
+- **Lifecycle**: `onOpenChangeComplete(open)` reports the end of each transition, the actions
+  `close()` and `unmount()` act from code, and the Portal's `keepMounted` keeps the Positioner in
+  the page while closed (`hidden`, `data-closed`).
 
 ## Anatomy
 
@@ -43,6 +59,11 @@ Checkbox and radio items, context menus and menubars come later.
 | Separator | `div` | `menu-separator` | separates items |
 | Group | `div` | `menu-group` | groups items under a label |
 | GroupLabel | `div` | `menu-group-label` | names its group |
+| CheckboxItem | `div` | `menu-checkbox-item` | an item that toggles a setting |
+| CheckboxItemIndicator | `span` | `menu-checkbox-item-indicator` | inside a CheckboxItem, rendered while it is checked |
+| RadioGroup | `div` | `menu-radio-group` | holds the value of its radio items |
+| RadioItem | `div` | `menu-radio-item` | an item of a set where one is checked |
+| RadioItemIndicator | `span` | `menu-radio-item-indicator` | inside a RadioItem, rendered while it is checked |
 | SubmenuRoot | none | | a nested level |
 | SubmenuTrigger | `div` | `menu-submenu-trigger` | the item that opens a submenu |
 
@@ -75,6 +96,30 @@ import { Menu } from "@fragiola/primitives-react/menu";
         </Menu.Positioner>
     </Menu.Portal>
 </Menu.Root>;
+```
+
+Checkbox and radio items:
+
+```tsx
+<Menu.Popup>
+    <Menu.CheckboxItem checked={toolbar} onCheckedChange={setToolbar}>
+        <Menu.CheckboxItemIndicator>✓</Menu.CheckboxItemIndicator>
+        Show toolbar
+    </Menu.CheckboxItem>
+    <Menu.Group>
+        <Menu.GroupLabel>Sort by</Menu.GroupLabel>
+        <Menu.RadioGroup value={sort} onValueChange={setSort}>
+            <Menu.RadioItem value="name">
+                <Menu.RadioItemIndicator>•</Menu.RadioItemIndicator>
+                Name
+            </Menu.RadioItem>
+            <Menu.RadioItem value="date">
+                <Menu.RadioItemIndicator>•</Menu.RadioItemIndicator>
+                Date
+            </Menu.RadioItem>
+        </Menu.RadioGroup>
+    </Menu.Group>
+</Menu.Popup>;
 ```
 
 </Framework>
@@ -112,6 +157,10 @@ import { Menu } from "@fragiola/primitives-vue/menu";
 </template>
 ```
 
+Checkbox and radio items: `<Menu.CheckboxItem v-model:checked="toolbar">` and
+`<Menu.RadioGroup v-model:value="sort">` around `<Menu.RadioItem value="name">`, each with its
+`Menu.CheckboxItemIndicator` or `Menu.RadioItemIndicator`.
+
 </Framework>
 
 <Framework name="angular">
@@ -147,6 +196,11 @@ import { Menu } from "@fragiola/primitives-vue/menu";
 export class FileMenu {}
 ```
 
+Checkbox and radio items: `<div menuCheckboxItem [(checked)]="toolbar">` and
+`<div menuRadioGroup [(value)]="sort">` around `<div menuRadioItem value="name">`; their
+indicators are structural (`<span *menuCheckboxItemIndicator>✓</span>`, rendered while checked;
+`*menuRadioItemIndicator="{ keepMounted: true }"` keeps one).
+
 `[menuRoot]` and `[menuSubmenuRoot]` are one directive, `MenuRoot`. `injectMenu()` gives a child
 component its level's state.
 
@@ -167,7 +221,12 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | --- | --- | --- | --- |
 | `open` | `boolean` | | the open state, controlled |
 | `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason (`trigger-press`, `list-navigation`, `item-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `list-navigation`, `item-press`, `escape-key`, `outside-press`, `focus-out`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `MenuHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
 | `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
 | `modal` | `boolean` | `false` | locks the page's scroll and blocks the pointer outside while open |
 
@@ -176,12 +235,17 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `disabled` | `boolean` | `false` | a disabled trigger opens nothing |
+| `handle` | `MenuHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
 
 ### Portal
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `container` | `Element` | `document.body` | where the Positioner goes (Angular: `*menuPortal="element"`) |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*menuPortal="{ keepMounted: true }"`, or `*menuPortal="element"` for a container alone |
 
 ### Positioner
 
@@ -220,15 +284,63 @@ No props of its own.
 | --- | --- | --- | --- |
 | `id` (angular) | `string` | generated | the id its group's `aria-labelledby` points at; React and Vue take it as a plain attribute |
 
+### CheckboxItem
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` | | the checked state, controlled |
+| `defaultChecked` | `boolean` | `false` | the initial state, uncontrolled |
+| `onCheckedChange` | `(checked: boolean, details: { reason, event }) => void` | | every change (reason `item-press`) |
+| `disabled` | `boolean` | `false` | focusable, but never toggled |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `false` | a click also closes every level (Enter always closes, Space never) |
+
+### CheckboxItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
+| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*menuCheckboxItemIndicator="{ keepMounted: true }"` |
+
+### RadioGroup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string \| null` | | the checked RadioItem's value, controlled (`null`: none) |
+| `defaultValue` | `string \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value: string \| null, details: { reason, event }) => void` | | every change (reason `item-press`) |
+| `disabled` | `boolean` | `false` | disables every RadioItem of the group |
+
+### RadioItem
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | required | the group's value when this item is checked |
+| `disabled` | `boolean` | `false` | focusable, but never checked |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `false` | a click also closes every level (Enter always closes, Space never) |
+
+### RadioItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
+| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*menuRadioItemIndicator="{ keepMounted: true }"` |
+
 ### SubmenuRoot
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `open` | `boolean` | | the submenu's open state, controlled |
 | `defaultOpen` | `boolean` | `false` | its initial open state, uncontrolled |
-| `onOpenChange` | `(open: boolean, details: { reason }) => void` | | every change, with its reason |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason; `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives the submenu's `close()` and `unmount()` |
 | `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
 | `modal` (angular) | `boolean` | | read on the root menu only (`[menuSubmenuRoot]` is the `MenuRoot` directive): a submenu follows its root |
+| `handle` (angular) | | | read on the root menu only, as `modal`: a submenu opens from its SubmenuTrigger only |
+| `triggerId` (angular) | | | read on the root menu only |
+| `defaultTriggerId` (angular) | | | read on the root menu only |
 
 ### SubmenuTrigger
 
@@ -243,11 +355,15 @@ No props of its own.
 
 | part | attributes |
 | --- | --- |
-| Trigger | `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`, `data-disabled` |
-| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`, `data-nested` (a submenu) |
-| Popup | `role="menu"`, `aria-labelledby` (its trigger), `aria-orientation="vertical"`, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-nested`, `data-starting-style`, `data-ending-style` |
+| Trigger | `aria-haspopup="menu"`, `aria-expanded` (`"true"` on the active trigger while open), `aria-controls` (the popup, on the active trigger while open), `data-popup-open` (the active trigger), `data-disabled`, an `id` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-nested` (a submenu); `hidden` while kept mounted and closed |
+| Popup | `role="menu"`, `aria-labelledby` (the active trigger), `aria-orientation="vertical"`, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-nested`, `data-starting-style`, `data-ending-style` |
 | Item | `role="menuitem"`, `tabindex="-1"`, `aria-disabled`, `data-highlighted`, `data-disabled` |
 | SubmenuTrigger | as an Item, plus `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-popup-open` |
+| CheckboxItem | `role="menuitemcheckbox"`, `tabindex="-1"`, `aria-checked`, `data-checked` / `data-unchecked`, `data-highlighted`, `aria-disabled` and `data-disabled` |
+| RadioGroup | `role="group"`, `data-disabled`; named by your `aria-label`, or a Group's GroupLabel around it |
+| RadioItem | `role="menuitemradio"`, `tabindex="-1"`, `aria-checked`, `data-checked` / `data-unchecked`, `data-highlighted`, `aria-disabled` and `data-disabled` (itself or its group) |
+| CheckboxItemIndicator, RadioItemIndicator | `aria-hidden="true"`, `data-checked` / `data-unchecked`, `data-disabled` |
 | Separator | `role="separator"`, `aria-orientation="horizontal"` |
 | Group | `role="group"`, `aria-labelledby` (its GroupLabel) |
 | GroupLabel | an `id` |
@@ -262,6 +378,8 @@ No props of its own.
 | Home, End | the first or last item |
 | a character | the next item that starts with the typed text |
 | Enter, Space | activates the item, closing every level |
+| Space on a CheckboxItem or RadioItem | toggles or checks it; the menu stays open |
+| Enter on a CheckboxItem or RadioItem | toggles or checks it, closing every level |
 | ArrowRight (ArrowLeft in RTL) on a SubmenuTrigger | opens its submenu on its first item |
 | ArrowLeft (ArrowRight in RTL) in a submenu | closes it |
 | Escape | closes the current level |
@@ -271,6 +389,6 @@ No props of its own.
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives-react/menu` | `Menu`, `MenuRootProps`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerProps`, `MenuPositionerState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
-| `@fragiola/primitives-vue/menu` | `Menu`, `MenuRootProps`, `MenuRootEmits`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerState`, `MenuPopupState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/menu` | `MenuRoot`, `MenuTrigger`, `MenuPortal`, `MenuPositioner`, `MenuPopup`, `MenuItem`, `MenuSeparator`, `MenuGroup`, `MenuGroupLabel`, `MenuSubmenuTrigger`, `injectMenu`, `MenuState`, `MenuTriggerState`, `MenuPositionerState`, `MenuPopupState`, `MenuItemState`, `MenuSubmenuTriggerState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent` |
+| `@fragiola/primitives-react/menu` | `Menu`, `MenuRootProps`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerProps`, `MenuPositionerState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `MenuCheckableItemState`, `MenuCheckboxItemIndicatorProps`, `MenuCheckboxItemProps`, `MenuCheckboxItemState`, `MenuHandle`, `MenuRadioGroupProps`, `MenuRadioItemIndicatorProps`, `MenuRadioItemProps`, `MenuRadioItemState`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createMenuHandle` |
+| `@fragiola/primitives-vue/menu` | `Menu`, `MenuRootProps`, `MenuRootEmits`, `MenuSubmenuRootProps`, `MenuTriggerProps`, `MenuTriggerState`, `MenuPortalProps`, `MenuPositionerState`, `MenuPopupState`, `MenuItemProps`, `MenuItemState`, `MenuSubmenuTriggerProps`, `MenuSubmenuTriggerState`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps`, `createMenuHandle` |
+| `@fragiola/primitives-angular/menu` | `MenuRoot`, `MenuTrigger`, `MenuPortal`, `MenuPositioner`, `MenuPopup`, `MenuItem`, `MenuSeparator`, `MenuGroup`, `MenuGroupLabel`, `MenuCheckboxItem`, `MenuCheckboxItemIndicator`, `MenuRadioGroup`, `MenuRadioItem`, `MenuRadioItemIndicator`, `MenuSubmenuTrigger`, `injectMenu`, `MenuState`, `MenuTriggerState`, `MenuPositionerState`, `MenuPopupState`, `MenuItemState`, `MenuSubmenuTriggerState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `MenuHandle`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions`, `createMenuHandle` |

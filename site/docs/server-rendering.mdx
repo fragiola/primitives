@@ -23,6 +23,8 @@ ends as the browser alone renders it, with the server's ids kept.
   matters.
 - **Layout.** Nothing is measured on a server. The overlays render closed, and the parts that
   follow a measurement render without it until they are mounted.
+- **Portals.** An overlay's portal content is never rendered on a server, even open or with the
+  Portal's `keepMounted`: it appears once the page is hydrated.
 
 ## Placed before hydration
 

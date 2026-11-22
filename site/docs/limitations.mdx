@@ -8,7 +8,7 @@ date pickers, and a progress bar, an avatar and a separator. Here is what it lea
 
 ## Not in this release
 
-- **Twenty-six components.** Dialog, Popover, Tooltip, Menu, Tabs, Collapsible, Accordion, Field, Fieldset, Form,
+- **Twenty-eight components.** Dialog, AlertDialog, Popover, Tooltip, Menu, ContextMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form,
   Button, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, Select, Combobox, Calendar,
   RangeCalendar, DatePicker, DateRangePicker, Progress, Avatar and Separator ship today, with two entries that are no component: the
   [direction provider](/docs/api/direction) and the [render utilities](/docs/api/render).
@@ -25,13 +25,12 @@ date pickers, and a progress bar, an avatar and a separator. Here is what it lea
 - **Avatar leaves out** Base UI's `keepMounted` on the Image and its enter and exit transitions:
   the image only shows once loaded.
 - **Combobox and Select**: no virtualization or async lists, no `readOnly` or `autoHighlight`, no
-  input inside the popup; a Select chooses one value (no `multiple`, groups or scroll arrows), and
-  a Combobox has no `modal` option.
-- **No menu checkbox or radio items, context menu, menubar or hover card** yet: they come with
-  later stages.
+  input inside the popup; a Select chooses one value (no `multiple`, scroll arrows or
+  `alignItemWithTrigger`), and a Combobox has no `modal` option.
+- **No menubar, navigation menu or hover card** yet: they come with later stages. Value changes
+  (`onValueChange`, `onCheckedChange`) cannot be canceled; only open changes can.
 - **Not on npm yet.** The packages are published once the maintainer validates the library.
 - **React, Vue and Angular.** Svelte and Solid are not planned for now.
-- **No alert dialog.** A modal dialog only; an alert dialog comes with its own spec.
 - **No screen reader sign-off yet.** The conformance suite checks roles, names, focus and axe in
   every framework, but a person has not yet checked each pattern with a screen reader.
 
