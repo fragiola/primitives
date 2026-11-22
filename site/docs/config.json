@@ -44,6 +44,24 @@
             ]
         },
         {
+            "label": "Guides",
+            "collapsible": true,
+            "pages": [
+                {
+                    "label": "Forms and validation",
+                    "path": "guides/forms"
+                },
+                {
+                    "label": "Right-to-left",
+                    "path": "guides/rtl"
+                },
+                {
+                    "label": "Composition",
+                    "path": "guides/composition"
+                }
+            ]
+        },
+        {
             "label": "API: components",
             "collapsible": true,
             "pages": [
@@ -70,6 +88,14 @@
                 {
                     "label": "Field",
                     "path": "api/field"
+                },
+                {
+                    "label": "Fieldset",
+                    "path": "api/fieldset"
+                },
+                {
+                    "label": "Form",
+                    "path": "api/form"
                 },
                 {
                     "label": "Checkbox",
@@ -106,6 +132,20 @@
                 {
                     "label": "DateRangePicker",
                     "path": "api/date-range-picker"
+                }
+            ]
+        },
+        {
+            "label": "API: utilities",
+            "collapsible": true,
+            "pages": [
+                {
+                    "label": "Direction",
+                    "path": "api/direction"
+                },
+                {
+                    "label": "Render utilities",
+                    "path": "api/render"
                 }
             ]
         },

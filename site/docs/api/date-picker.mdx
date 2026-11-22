@@ -29,6 +29,18 @@ example), and so is the popup's name (`aria-label`).
   its last element moves on and closes it, Shift+Tab from its first goes back to the trigger and
   closes it (`focus-out`).
 - **Positioning**: as a Popover's, below the trigger and aligned to its start by default.
+- **Forms**: with a `name`, the Root renders a hidden input after its children, which the form
+  submits as `name=<ISO date>` (`arrival=2026-11-24`), or an empty value with no date. `required`
+  blocks a native submission with no date and focuses the Trigger; `disabled` disables the
+  Trigger and submits nothing; `readOnly` still opens the popup, whose calendar can be browsed but
+  chooses nothing, and still submits. A form reset returns an uncontrolled picker to its
+  `defaultValue` (a controlled one reports it through `onValueChange`, reason `none`).
+- **Field**: inside a [Field](/docs/api/field), the field's `name` and `disabled` win, the
+  Trigger is the labelled element and the focus target, `validate` receives the date (or
+  `null`), and the hidden input is the validated element. The Trigger is named by the Field's
+  Label, then its own content ("Arrival 2026-11-24"), so its visible text stays in its name; a
+  click on the Label only focuses it, and opens nothing. A [Fieldset](/docs/api/fieldset)'s
+  `disabled` disables it too.
 
 ## Anatomy
 
@@ -39,6 +51,7 @@ example), and so is the popup's name (`aria-label`).
 | Portal | none | | moves the Positioner to the end of `body` |
 | Positioner | `div` | `date-picker-positioner` | places the popup next to the trigger |
 | Popup | `div` | `date-picker-popup` | the non-modal dialog, holding a `Calendar.Root` |
+| (hidden input) | `input` | `date-picker-input` | rendered after the Root's children while it has a `name` (or a Field's): what the form submits |
 
 ## Usage
 
@@ -147,6 +160,10 @@ names below are React's; Vue binds them the same way (`v-model:value`, `v-model:
 | `locale` | `string` | the document's `lang` | passed to the bound calendar |
 | `firstDayOfWeek` | `number` | the locale's | passed to the bound calendar |
 | `visibleMonths` | `number` | `1` | passed to the bound calendar |
+| `name` | `string` | | the hidden input's form name (a Field's wins); without one, no input is rendered |
+| `required` | `boolean` | `false` | a native form's validation blocks a submission with no date |
+| `disabled` | `boolean` | `false` | the Trigger cannot open the popup; the hidden input submits nothing |
+| `readOnly` | `boolean` | `false` | the popup still opens; its calendar can be browsed, no date chosen |
 
 ### Trigger
 
@@ -177,9 +194,10 @@ No props of its own.
 
 | part | attributes |
 | --- | --- |
-| Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open` |
+| Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup while open), `data-popup-open`; `disabled` and `data-disabled` while disabled, `data-readonly` while read-only, `data-required` while required; in a Field, its ids, `aria-labelledby` (the Label, then itself), `aria-describedby`, `aria-invalid` and the field's states |
 | Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`; the CSS variables `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`, `--transform-origin` |
 | Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-side`, `data-align`, `data-open`, `data-starting-style`, `data-ending-style` |
+| hidden input | `name`, `value` (ISO), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`; visually hidden (a text input, which the browser validates, not `type="hidden"`) |
 
 ## Keyboard
 
@@ -196,5 +214,5 @@ No props of its own.
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives-react/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderProp`, `Side` |
-| `@fragiola/primitives-vue/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerState`, `DatePickerRootEmits`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderSlotProps`, `Side` |
-| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PlainDate`, `Side`, `ValueChangeEvent` |
+| `@fragiola/primitives-vue/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerFormProps`, `DatePickerPositionerState`, `DatePickerRootEmits`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderSlotProps`, `Side` |
+| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerData`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PlainDate`, `Side`, `ValueChangeEvent` |

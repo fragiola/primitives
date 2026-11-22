@@ -1,0 +1,134 @@
+---
+title: Fieldset
+description: A native fieldset that groups related fields under a legend and disables them together, nested fieldsets included, in each framework.
+---
+
+Groups related [fields](/docs/api/field) under a shared legend, and disables them together: a
+native `<fieldset>`, a `group` named by its Legend. A Fieldset inside a disabled Fieldset is
+disabled too. The APG has no fieldset pattern; it follows Base UI's Fieldset (the
+[behaviour rule](/docs/concepts/behaviour-rule)).
+
+<Example id="fieldset" />
+
+## Behaviour
+
+- **Name**: the Root's `aria-labelledby` points at the Legend's `id`, while a Legend is rendered.
+  The Legend is a `div`, not a native `<legend>`: a `<legend>` sits on the fieldset's border and
+  resists styling.
+- **Disabled**: `disabled` disables the native fieldset, so every native control inside it, and
+  every Field inside it: their parts and controls carry `data-disabled`, show no error and submit
+  nothing. A nested Fieldset inherits it.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `fieldset` | `fieldset-root` | the `group`, named by its Legend |
+| Legend | `div` | `fieldset-legend` | names the Root |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Field } from "@fragiola/primitives-react/field";
+import { Fieldset } from "@fragiola/primitives-react/fieldset";
+
+<form>
+    <Fieldset.Root>
+        <Fieldset.Legend>Shipping address</Fieldset.Legend>
+        <Field.Root name="street">
+            <Field.Label>Street</Field.Label>
+            <Field.Control />
+        </Field.Root>
+    </Fieldset.Root>
+    <Fieldset.Root disabled={sameAsShipping}>
+        <Fieldset.Legend>Billing address</Fieldset.Legend>
+        <Field.Root name="billing-street">
+            <Field.Label>Billing street</Field.Label>
+            <Field.Control />
+        </Field.Root>
+    </Fieldset.Root>
+</form>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <form @submit.prevent>
+        <Fieldset.Root :disabled="sameAsShipping">
+            <Fieldset.Legend>Billing address</Fieldset.Legend>
+            <Field.Root name="billing-street">
+                <Field.Label>Billing street</Field.Label>
+                <Field.Control />
+            </Field.Root>
+        </Fieldset.Root>
+    </form>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [FieldsetRoot, FieldsetLegend, FieldRoot, FieldLabel, FieldControl],
+    template: `
+        <fieldset fieldsetRoot [disabled]="sameAsShipping()">
+            <div fieldsetLegend>Billing address</div>
+            <div fieldRoot [name]="'billing-street'">
+                <label fieldLabel>Billing street</label>
+                <input fieldControl />
+            </div>
+        </fieldset>
+    `,
+})
+export class Billing {
+    protected readonly sameAsShipping = signal(true);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them the same way (`:disabled`), and Angular as inputs (`[disabled]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | disables the fieldset and every field inside it, nested fieldsets included |
+
+### Legend
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the id the Root's `aria-labelledby` points at |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `aria-labelledby` (the Legend's `id`), `disabled` and `data-disabled` while disabled |
+| Legend | `id`, `data-disabled` while the Root is disabled |
+
+A Field inside a disabled Fieldset carries `data-disabled` on its parts and its control.
+
+## Keyboard
+
+Nothing of its own: a disabled fieldset's controls are not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/fieldset` | `Fieldset`, `FieldsetLegendProps`, `FieldsetRootProps`, `FieldsetState`, `RenderProp` |
+| `@fragiola/primitives-vue/fieldset` | `Fieldset`, `FieldsetLegendProps`, `FieldsetRootProps`, `FieldsetState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/fieldset` | `FieldsetLegend`, `FieldsetRoot`, `FieldsetState` |

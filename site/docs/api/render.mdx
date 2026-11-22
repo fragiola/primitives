@@ -1,0 +1,176 @@
+---
+title: Render utilities
+description: The primitive contract's render, made public - React's useRender and mergeProps, Vue's renderPart, Angular's dataValue - to write parts of your own.
+---
+
+Every part follows the [primitive contract](/docs/concepts/primitive-contract): a default
+element you can replace (`render`), your props merged into it, its state as `data-*` attributes.
+The `/render` entry of each framework package makes that machinery public, for a part of your own
+written the same way (Base UI's `useRender` and `mergeProps`). It references no component. The
+[composition guide](/docs/guides/composition) shows it next to `render` on the library's own
+parts.
+
+## Behaviour
+
+- **The element**: the part's default tag, or the consumer's `render`: an element its props merge
+  into, or a function of the props and the state (React); `as` or the `render` scoped slot (Vue);
+  in Angular the directive sits on the consumer's own element, so there is nothing to render.
+- **The merge**: event handlers compose (the earlier first), `className` / `class` join, `style`
+  merges (the later wins), any other later prop wins; in React an `undefined` leaves the earlier.
+- **The state attributes**: a boolean `true` gives an empty attribute, `false` (or `null`,
+  `undefined`) none, never `"false"`; a string gives its value
+  ([part and state attributes](/docs/concepts/attributes)).
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import type { HTMLAttributes } from "react";
+import { type RenderProp, type UseRenderProps, mergeProps, useRender } from "@fragiola/primitives-react/render";
+
+interface BadgeState {
+    active: boolean;
+}
+
+interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+    active?: boolean;
+    render?: RenderProp<BadgeState>;
+}
+
+function Badge({ active = false, render, ...props }: BadgeProps) {
+    // the part's own props: its handler runs first, then the consumer's
+    const own: UseRenderProps<BadgeState> = {
+        "data-primitives-part": "badge",
+        onClick: () => track("badge"),
+    };
+    return useRender({
+        render,
+        state: { active },
+        defaultTagName: "span",
+        props: mergeProps(own, props),
+    });
+}
+
+<Badge active>New</Badge>; // <span data-primitives-part="badge" data-active>New</span>
+<Badge render={<a href="/new" />}>New</Badge>; // the same props on your <a>
+```
+
+`useRender` merges `className` and `style` given as functions of the state too, and the part's
+own `ref` (`ref`) with the consumer's (`props.ref`).
+
+</Framework>
+
+<Framework name="vue">
+
+```ts
+import { asProp, renderPart, stateAttributes } from "@fragiola/primitives-vue/render";
+import { defineComponent } from "vue";
+
+export const Badge = defineComponent({
+    name: "Badge",
+    inheritAttrs: false,
+    props: { ...asProp, active: { type: Boolean, default: false } },
+    setup(props, { attrs, slots }) {
+        return () => {
+            const state = { active: props.active };
+            return renderPart("span", { attrs, slots }, props.as, state, {
+                "data-primitives-part": "badge",
+                ...stateAttributes(state),
+            });
+        };
+    },
+});
+```
+
+```vue
+<template>
+    <Badge active>New</Badge>
+    <Badge as="a" href="/new">New</Badge>
+    <Badge>
+        <template #render="{ props, state, children }">
+            <a v-bind="props" href="/new"><component :is="children" /></a>
+        </template>
+    </Badge>
+</template>
+```
+
+`renderPart` merges the part's props with the attributes through Vue's own `mergeProps`;
+`inheritAttrs: false` keeps Vue from binding them twice.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+import { computed, Directive, input } from "@angular/core";
+import { dataValues } from "@fragiola/primitives-angular/render";
+
+@Directive({
+    selector: "[badge]",
+    exportAs: "badge",
+    host: {
+        "data-primitives-part": "badge",
+        "[attr.data-active]": "data().active",
+    },
+})
+export class Badge {
+    readonly active = input(false);
+    readonly state = computed(() => ({ active: this.active() }));
+    protected readonly data = computed(() => dataValues(this.state()));
+}
+```
+
+```html
+<span badge [active]="true">New</span>
+<a badge href="/new">New</a>
+```
+
+`dataValue(value)` gives one attribute's value: `""` for `true`, the string, or `null`, which
+removes the attribute.
+
+</Framework>
+
+## Props
+
+### useRender (React)
+
+| option | type | default | description |
+| --- | --- | --- | --- |
+| `render` | `RenderProp<State>` | | the consumer's element, or `(props, state) => ReactNode` |
+| `props` | `UseRenderProps<State>` | `{}` | the props to merge into the element; `className` and `style` may be functions of the state |
+| `state` | `State` | `{}` | its booleans and strings become `data-*` attributes; `render` receives it |
+| `ref` | `Ref<HTMLElement>` | | the part's own ref, merged with the consumer's |
+| `defaultTagName` | `string` | `"div"` | the element rendered without `render` |
+
+`mergeProps(...props)` takes any number of props objects (`null` and `undefined` are skipped) and
+returns them merged, left to right.
+
+### renderPart (Vue)
+
+| argument | type | description |
+| --- | --- | --- |
+| `tag` | `string` | the default element |
+| `context` | `{ attrs, slots }` | the component's `setup` context: the consumer's attributes, and its `render` and default slots |
+| `as` | `string \| Component \| undefined` | the `as` prop: another element or component |
+| `state` | `State` | given to the `render` slot and the default slot |
+| `internal` | `Record<string, unknown>` | the part's own props (ARIA, `data-*`, listeners) |
+| `children` | `() => VNodeChild` | the content, instead of the default slot |
+
+`asProp` is the `as` prop's definition, to spread into `props`; `stateAttributes(state)` gives the
+`data-*` attributes of a record of booleans and strings.
+
+### dataValue and dataValues (Angular)
+
+| function | returns |
+| --- | --- |
+| `dataValue(value)` | `""` for `true`, the string, or `null` (no attribute) for `false`, `null` and `undefined` |
+| `dataValues(state)` | the same for every key of a record: `[attr.data-open]="data().open"` |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/render` | `RenderProp`, `UseRenderOptions`, `UseRenderProps`, `mergeProps`, `useRender` |
+| `@fragiola/primitives-vue/render` | `AsProp`, `RenderSlotProps`, `asProp`, `renderPart`, `stateAttributes` |
+| `@fragiola/primitives-angular/render` | `dataValue`, `dataValues` |

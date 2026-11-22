@@ -1,0 +1,179 @@
+---
+title: Form
+description: A native form that validates its fields on submission, focuses the first invalid one, shows server errors and sets its fields' validation mode.
+---
+
+A native `<form>` that runs the [Field](/docs/api/field) layer's validation itself: its
+submission validates every field, shows their errors, focuses the first invalid field and is
+blocked while one is invalid. It shows server errors on the fields they name, and gives its fields
+a default `validationMode`. The APG has no form pattern; it follows Base UI's Form (the
+[behaviour rule](/docs/concepts/behaviour-rule)). Form is one component, not a namespace.
+
+Controls the browser cannot validate (a [Slider](/docs/api/slider), a
+[CheckboxGroup](/docs/api/checkbox-group)) block a Form's submission through their field's
+`validate`, which a plain `<form>` cannot do.
+
+<Example id="form" />
+
+## Behaviour
+
+- **`novalidate`**: the Form validates, not the browser, and shows no browser bubble.
+- **A submission** (a submit button, Enter in a text field, `requestSubmit()`): every Field inside
+  validates as on a submission attempt, and shows its errors; an `onSubmit` field validates on
+  every change from then on. While a field is invalid (its validity, `invalid`, or server errors
+  for it), the submission is blocked before any listener of yours runs, and focus moves to the
+  first invalid field in document order (a text input's text is selected). Otherwise your
+  `submit` listener runs: it may still `preventDefault` and send the `FormData` with `fetch`.
+- **Server errors**: `errors` is `{ [fieldName]: string | string[] }`, keyed by the Fields'
+  `name`. The Form keeps its own copy; a new object replaces it. A field with errors is invalid
+  and its Error with no `match` shows them. When `errors` changes after a submission went on (the
+  server answered), focus moves to the first invalid field.
+- **Clearing**: the first change of a field's value hides its server errors at once, and
+  `onClearErrors` receives the errors left (that field's key removed), whether or not you pass
+  the new object back.
+- **`validationMode`**: the default of every Field inside it; a Field's own wins.
+- **A form reset** clears neither the Form's errors nor the fields' states, as in Base UI.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Form | `form` | `form-root` | none of its own; a `form` with an accessible name (`aria-label`) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Field } from "@fragiola/primitives-react/field";
+import { Form, type FormErrors } from "@fragiola/primitives-react/form";
+
+const [errors, setErrors] = useState<FormErrors>({});
+
+<Form
+    aria-label="Create account"
+    validationMode="onBlur"
+    errors={errors}
+    onClearErrors={setErrors}
+    onSubmit={async (event) => {
+        event.preventDefault();
+        const response = await fetch("/api/accounts", {
+            method: "POST",
+            body: new FormData(event.currentTarget),
+        });
+        if (!response.ok) setErrors((await response.json()) as FormErrors);
+    }}
+>
+    <Field.Root name="username">
+        <Field.Label>Username</Field.Label>
+        <Field.Control required />
+        <Field.Error />
+    </Field.Root>
+    <button type="submit">Create account</button>
+</Form>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Field } from "@fragiola/primitives-vue/field";
+import { Form, type FormErrors } from "@fragiola/primitives-vue/form";
+import { ref } from "vue";
+
+const errors = ref<FormErrors>({});
+
+async function submit(event: SubmitEvent) {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const response = await fetch("/api/accounts", { method: "POST", body: new FormData(form) });
+    if (!response.ok) errors.value = (await response.json()) as FormErrors;
+}
+</script>
+
+<template>
+    <Form aria-label="Create account" :errors="errors" @clear-errors="errors = $event" @submit="submit">
+        <Field.Root name="username">
+            <Field.Label>Username</Field.Label>
+            <Field.Control required />
+            <Field.Error />
+        </Field.Root>
+        <button type="submit">Create account</button>
+    </Form>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Form, FieldRoot, FieldLabel, FieldControl, FieldError],
+    template: `
+        <form formRoot aria-label="Create account" [errors]="errors()" (clearErrors)="errors.set($event)" (submit)="submit($event)">
+            <div fieldRoot [name]="'username'">
+                <label fieldLabel>Username</label>
+                <input fieldControl required />
+                <div *fieldError></div>
+            </div>
+            <button type="submit">Create account</button>
+        </form>
+    `,
+})
+export class CreateAccount {
+    protected readonly errors = signal<FormErrors>({});
+
+    protected async submit(event: SubmitEvent): Promise<void> {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const response = await fetch("/api/accounts", { method: "POST", body: new FormData(form) });
+        if (!response.ok) this.errors.set((await response.json()) as FormErrors);
+    }
+}
+```
+
+The directive's selector is `form[formRoot]`: it goes on your own `<form>`. A blocked submission
+stops the `submit` event in its capture phase, so your `(submit)` runs only for a submission that
+goes on.
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards (`action`, `method`, ...). Vue binds them as `:errors`, `validation-mode` and
+`@clear-errors`; Angular as `[errors]`, `validationMode` and `(clearErrors)`.
+
+### Form
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `errors` | `FormErrors` (`{ [name]: string \| string[] }`) | `{}` | server errors, keyed by the Fields' `name` |
+| `onClearErrors` | `(errors: FormErrors) => void` | | a field's value changed while the Form had errors for it: the errors left |
+| `validationMode` | `"onSubmit" \| "onBlur" \| "onChange"` | `"onSubmit"` | the default of every Field inside it |
+| `onSubmit` (react) | `(event: FormEvent<HTMLFormElement>) => void` | | the native `submit` event, only for a submission that goes on (Vue: `@submit`; Angular: `(submit)`, both native) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Form | `novalidate` |
+
+The fields inside carry their own state ([Field](/docs/api/field)); a field with server errors
+carries `data-invalid` and `aria-invalid="true"`.
+
+## Keyboard
+
+Nothing of its own: Enter in a text field submits, natively.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/form` | `FieldValidationMode`, `Form`, `FormErrors`, `FormProps`, `FormState`, `RenderProp` |
+| `@fragiola/primitives-vue/form` | `FieldValidationMode`, `Form`, `FormEmits`, `FormErrors`, `FormProps`, `FormState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/form` | `FieldValidationMode`, `Form`, `FormErrors` |

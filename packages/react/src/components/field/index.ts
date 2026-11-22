@@ -1,5 +1,5 @@
 // The entry of @fragiola/primitives-react/field: the layer that labels, describes and validates a
-// form control (spec/field.md; the POC's Field, ported as it is).
+// form control (spec/field.md).
 
 export type {
     FieldErrorMatch,

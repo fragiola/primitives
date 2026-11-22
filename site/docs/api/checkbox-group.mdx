@@ -20,7 +20,14 @@ mixed). CheckboxGroup is one component, not a namespace; its checkboxes come fro
 - **Forms**: each child submits its own `name=value`; a form reset returns an uncontrolled group
   to `defaultValue`.
 - **Name**: the group is a `role="group"`; name it with `aria-labelledby` (a heading) or
-  `aria-label`.
+  `aria-label`, or put it in a Field, whose Label names it.
+- **In a [Field](/docs/api/field)**: the group is the field's control. The Field's Label names
+  it (`aria-labelledby`), its Description and Errors describe it (`aria-describedby`),
+  `aria-invalid` and the field's state attributes are on the group, and `validate` receives the
+  array of checked values. Its checkboxes take the field's `name` (each still submits its own
+  `value`; a parent submits nothing) and `disabled`, and do not register as the field's control
+  themselves. The browser validates no element for it: a [Form](/docs/api/form) blocks a
+  submission with an invalid group, and focuses its first enabled checkbox.
 
 ## Anatomy
 
@@ -90,6 +97,27 @@ export class Toppings {
 
 </Framework>
 
+### In a Field
+
+```tsx
+<Form>
+    <Field.Root name="toppings" validate={(value) => ((value as string[]).length === 0 ? "Choose a topping." : null)}>
+        <Field.Label>Toppings</Field.Label>
+        <CheckboxGroup>
+            <label><Checkbox.Root value="cheese" /> Cheese</label>
+            <label><Checkbox.Root value="ham" /> Ham</label>
+        </CheckboxGroup>
+        <Field.Description>Pick at least one.</Field.Description>
+        <Field.Error />
+    </Field.Root>
+    <button type="submit">Order</button>
+</Form>
+```
+
+The checkboxes have no `name` of their own: the field gives it, and the form submits
+`toppings=ham`. The Field's Label is a `label` with no labelable control here; it names the group
+through `aria-labelledby`.
+
 ## Props
 
 It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
@@ -111,7 +139,7 @@ forwards. Vue binds them as `v-model:value` and `@value-change`; Angular as `[(v
 
 | part | attributes |
 | --- | --- |
-| CheckboxGroup | `role="group"`, `data-disabled` |
+| CheckboxGroup | `role="group"`, `data-disabled`; in a Field, `aria-labelledby` (the Field's Label), `aria-describedby`, `aria-invalid` and the field's states |
 
 The parent checkbox gets `aria-controls` (its children's ids) and `aria-checked="mixed"` in
 between.

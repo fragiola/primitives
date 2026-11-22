@@ -1,0 +1,103 @@
+---
+title: Right-to-left
+description: What changes in right to left, when the document's dir is enough, and when to add a DirectionProvider so the components know the direction first.
+---
+
+Every component that depends on the reading direction follows it: the arrow keys of Tabs, Slider,
+Menu, Combobox's chips and the calendars swap, a horizontal Slider runs right to left, and every
+positioned popup resolves its logical sides (`inline-start`, `inline-end`) on the right side. What
+stays yours: setting the direction of your page, and the layout of your own CSS (use logical
+properties, `margin-inline-start` rather than `margin-left`, and it follows).
+
+## dir is usually enough
+
+Without a provider, a component reads the computed `direction` of its element when it needs it:
+on a key press, on a placement. Set `dir` on the document, or on the element around a part of the
+page, and the components follow it.
+
+```html
+<html dir="rtl" lang="ar">
+```
+
+This also works for CSS that sets `direction`, and for a part of the page whose `dir` changes:
+the direction is read again at the next key press or placement.
+
+## When to add a DirectionProvider
+
+The [DirectionProvider](/docs/api/direction) tells the components the direction without reading
+the DOM. Add one when your app knows the direction before the DOM does, or where the computed
+style is not the reading direction:
+
+- **a page rendered on a server**: the components' direction is known in the first render, not
+  read after mount;
+- **a subtree whose direction your app switches** (a preview of an Arabic version), in the same
+  render as the change;
+- **components rendered where the computed `direction` differs** from the direction you mean.
+
+The provider sets no `dir` and no style. Keep `dir` too: it is what makes the layout flow right
+to left, and the Slider maps the pointer onto that layout.
+
+<Framework name="react">
+
+```tsx
+import { DirectionProvider } from "@fragiola/primitives-react/direction";
+
+<div dir={direction}>
+    <DirectionProvider direction={direction}>
+        <App />
+    </DirectionProvider>
+</div>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <div :dir="direction">
+        <DirectionProvider :direction="direction">
+            <App />
+        </DirectionProvider>
+    </div>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<div [dir]="direction()" [directionProvider]="direction()">
+    <app-shell />
+</div>
+```
+
+Or for a whole application, a route or a component: `providers: [provideDirection("rtl")]`.
+
+</Framework>
+
+A nested provider wins inside it. A component without a provider around it falls back to the
+computed direction, so the two can be mixed.
+
+## Reading the direction in your own code
+
+`useDirection()` (React, Vue: a computed ref) and `injectDirection()` (Angular: a signal) read
+the nearest provider, or `"ltr"` without one: they never read the DOM. For an element of your own,
+the toolkit's `getDirection(element, provided)` gives the provider's direction when you pass it,
+else the element's computed one; the positioning entry's `direction` option does the same for a
+floating element ([the toolkit](/docs/api/toolkit)).
+
+## What changes, component by component
+
+| component | in right to left |
+| --- | --- |
+| [Tabs](/docs/api/tabs) | ArrowLeft moves to the next tab, ArrowRight to the previous (horizontal) |
+| [Slider](/docs/api/slider) | a horizontal slider has `min` at the right; the arrows swap |
+| [Menu](/docs/api/menu) | ArrowLeft opens a submenu, ArrowRight closes it; submenus open to the left |
+| [Combobox](/docs/api/combobox) | the arrows between chips swap |
+| [Calendar](/docs/api/calendar) and the pickers | ArrowRight moves to the previous day, ArrowLeft to the next; weeks still start on the locale's first day, at the inline start |
+| every positioned popup | `inline-start` and `inline-end` resolve to the right and the left; `left` and `right` stay physical |
+
+The Tabs Indicator is measured in the List's own box, so it follows the layout whatever the
+provider says.

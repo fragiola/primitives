@@ -1,19 +1,19 @@
 ---
 title: Field
-description: The layer that labels, describes and validates a form control, wrapping a native input or one of the form primitives, in each framework.
+description: The layer that labels, describes and validates a form control, a native input or any of the form primitives, with async validation and server errors.
 ---
 
 The layer that turns a form control into a labelled, described and validated field: a label
 linked to the control, a description, error messages shown when the value is invalid, and the
 field's interaction states (`dirty`, `touched`, `filled`, `focused`) for styling. It wraps a native
 input (`Field.Control`) or one of the form primitives: a [Checkbox](/docs/api/checkbox), a
-[Select](/docs/api/select), a [Slider](/docs/api/slider) or a [Combobox](/docs/api/combobox).
-The APG has no pattern for it: it follows Base UI's Field (the
-[behaviour rule](/docs/concepts/behaviour-rule)).
-
-**Scope: the POC's Field, as it is.** The form support of the other controls depends on it; the
-production scope (Fieldset, Form, async validation, ...) comes with stage 1, see the
-[limitations](/docs/limitations).
+[CheckboxGroup](/docs/api/checkbox-group), a [Select](/docs/api/select), a
+[Slider](/docs/api/slider), a [Combobox](/docs/api/combobox), a
+[DatePicker](/docs/api/date-picker) or a [DateRangePicker](/docs/api/date-range-picker).
+[Fieldset](/docs/api/fieldset) groups fields under a legend and disables them together;
+[Form](/docs/api/form) validates every field on submission and shows server errors. The APG has
+no pattern for it: it follows Base UI's Field (the [behaviour rule](/docs/concepts/behaviour-rule)).
+The [forms guide](/docs/guides/forms) walks through them together.
 
 <Example id="field" />
 
@@ -22,13 +22,31 @@ production scope (Fieldset, Form, async validation, ...) comes with stage 1, see
 - **Wiring**: the Label's `for` and the control's `aria-labelledby` point at each other; the
   control's `aria-describedby` lists the Description and every shown Error, in document order.
 - **Validation**: the control's native validity (`required`, `type`, `pattern`, ...) plus a
-  `validate(value)` function, which returns a message, a list of messages, or `null`. Its messages
-  are also set as the control's custom validity, so a native form never submits a rejected value.
-- **When errors show** (`validationMode`): `onSubmit` (the default) on a submission attempt, then
-  on every change; `onBlur` when the control loses focus; `onChange` on every change. Focusing and
-  leaving an empty required field shows nothing until a submission was attempted.
-- **A blocked submission** focuses the first invalid control (the integrated control's own
-  element for a Checkbox, a Select or a Combobox).
+  `validate(value)` function, which returns a message, a list of messages, or `null`; or a
+  promise of one of these. Its messages are also set as the control's custom validity, so a
+  native form never submits a rejected value. The custom validity is kept current on every
+  change, whatever the mode: the mode only decides when the result is shown.
+- **When errors show** (`validationMode`): `onSubmit` on a submission attempt, then on every
+  change; `onBlur` when the control loses focus; `onChange` on every change. The default is the
+  enclosing [Form](/docs/api/form)'s `validationMode`, else `onSubmit`. Focusing and leaving an
+  empty required field shows nothing until the value changed or a submission was attempted. A
+  change on a field that shows an error, in a mode that does not validate on every change, hides
+  the error, unless it leaves a required value missing.
+- **Async validation**: the native validity is checked at once; a native error is shown without
+  waiting for the promise. While the latest run is pending, the field keeps what it shows. The
+  latest run wins: an answer for an older value is dropped, even when it arrives last. A value
+  the last resolved run already validated is not validated again: its messages are reused at
+  once, so a submission with an unchanged value is blocked by that answer. A submission does not
+  wait for a pending run. A rejected promise counts as no message.
+- **Server errors**: inside a [Form](/docs/api/form), the field's `name` keys the Form's
+  `errors`. While the Form has errors for it, the field is invalid and its Error with no `match`
+  shows them; the first change of the value clears them (the Form's `onClearErrors`).
+- **Disabled**: `disabled`, or a disabled [Fieldset](/docs/api/fieldset) around the field,
+  disables the control. A disabled field shows no error and has neither `data-invalid` nor
+  `data-valid`.
+- **A blocked submission** focuses the first invalid control: the integrated control's own
+  element (a Checkbox, a Select's or a picker's Trigger, a Combobox's Input), or, in a Form, the
+  first invalid field's focus target (a Slider's first Thumb, a group's first enabled Checkbox).
 - **Outside a field**, a control behaves exactly as without it.
 
 ## Anatomy
@@ -41,12 +59,22 @@ production scope (Fieldset, Form, async validation, ...) comes with stage 1, see
 | Description | `p` | `field-description` | describes the control |
 | Error | `div` | `field-error` | rendered only while it is shown |
 
+A field has one control: a `Field.Control`, a `Checkbox.Root`, a `CheckboxGroup`, a
+`Select.Root`, a `Slider.Root`, a `Combobox.Root`, a `DatePicker.Root` or a
+`DateRangePicker.Root`.
+
 ## Usage
 
 <Framework name="react">
 
 ```tsx
 import { Field } from "@fragiola/primitives-react/field";
+
+async function usernameFree(value: unknown) {
+    const response = await fetch(`/api/usernames/${encodeURIComponent(String(value))}`);
+    const { taken } = (await response.json()) as { taken: boolean };
+    return taken ? "This username is taken." : null;
+}
 
 <form>
     <Field.Root name="email">
@@ -55,6 +83,11 @@ import { Field } from "@fragiola/primitives-react/field";
         <Field.Description>We never share it.</Field.Description>
         <Field.Error match="valueMissing">Enter your email.</Field.Error>
         <Field.Error match="typeMismatch">Enter a valid email.</Field.Error>
+    </Field.Root>
+    <Field.Root name="username" validate={usernameFree} validationMode="onChange">
+        <Field.Label>Username</Field.Label>
+        <Field.Control required />
+        <Field.Error />
     </Field.Root>
     <button type="submit">Sign up</button>
 </form>;
@@ -71,6 +104,13 @@ import { Field } from "@fragiola/primitives-react/field";
             <Field.Label>Email</Field.Label>
             <Field.Control type="email" required />
             <Field.Error />
+        </Field.Root>
+        <Field.Root name="age">
+            <Field.Label>Age</Field.Label>
+            <Field.Control type="number" min="18" max="120" />
+            <Field.Error :match="(validity) => validity.rangeUnderflow || validity.rangeOverflow">
+                Enter an age from 18 to 120.
+            </Field.Error>
         </Field.Root>
     </form>
 </template>
@@ -91,16 +131,62 @@ import { Field } from "@fragiola/primitives-react/field";
                 <p fieldDescription>We never share it.</p>
                 <div *fieldError="'valueMissing'">Enter your email.</div>
             </div>
+            <div fieldRoot [name]="'age'">
+                <label fieldLabel>Age</label>
+                <input fieldControl type="number" min="18" max="120" />
+                <div *fieldError="outOfRange">Enter an age from 18 to 120.</div>
+            </div>
         </form>
     `,
 })
-export class SignUp {}
+export class SignUp {
+    protected readonly outOfRange = (validity: FieldValidity) =>
+        validity.rangeUnderflow || validity.rangeOverflow;
+}
 ```
 
 `injectField()` gives a control the enclosing `[fieldRoot]` (or `null`); `fieldControl()` and
 `writeFieldAria()` are the binding the integrated controls use, the lower layer for a custom one.
+`FIELDSET_CONTEXT` and `FORM_CONTEXT` are the tokens a field reads its Fieldset and its Form
+through.
 
 </Framework>
+
+### Around a form control
+
+The integrated controls take no `name` of their own: the field gives it. The Label names the
+control; a click on it focuses the Control, or clicks a labelable control (it toggles a
+Checkbox). A picker's Trigger is only focused: a click would open its popup.
+
+```tsx
+<Field.Root name="arrival">
+    <Field.Label>Arrival</Field.Label>
+    <DatePicker.Root required locale="en-US">
+        <DatePicker.Trigger>{/* the chosen date, or "none" */}</DatePicker.Trigger>
+        {/* its Portal, Positioner and Popup */}
+    </DatePicker.Root>
+    <Field.Description>The day you arrive.</Field.Description>
+    <Field.Error>Choose a date.</Field.Error>
+</Field.Root>
+```
+
+| control | labelled element | value given to `validate` | focused when invalid | validated element |
+| --- | --- | --- | --- | --- |
+| Field.Control | the `input` | its text | the `input` | the `input` |
+| Checkbox | Checkbox.Root | `checked` | Checkbox.Root | its hidden input |
+| CheckboxGroup | the group (`aria-labelledby`) | the array of checked values | its first enabled Checkbox | none: `validate` decides |
+| Select | Select.Trigger | the value, or `null` | Select.Trigger | its hidden input |
+| Slider | the Root and its Thumbs (`aria-labelledby`) | the number, or numbers | its first Thumb | none: `validate` decides |
+| Combobox | Combobox.Input | the item, `null`, or the items with `multiple` | Combobox.Input | its hidden input |
+| DatePicker | DatePicker.Trigger | the date, or `null` | DatePicker.Trigger | its hidden input |
+| DateRangePicker | DateRangePicker.Trigger | the range `{ start, end }`, or `null` | DateRangePicker.Trigger | its hidden input |
+
+**A picker's Trigger is named by the label, then its own content.** Its `aria-labelledby` lists
+the Label, then the Trigger itself, so the name reads "Arrival 2026-11-24" and the visible text
+stays in it (WCAG 2.5.3). A Select's Trigger is a `combobox`, named by the label alone.
+
+A Slider and a CheckboxGroup have no element the browser validates: their `validate` still runs
+and shows its messages, but only a [Form](/docs/api/form) blocks a submission with them.
 
 ## Props
 
@@ -113,11 +199,11 @@ it forwards. The names below are React's; Vue binds them the same way (`:validat
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `name` | `string` | | the control's form name; it wins over the control's own |
-| `disabled` | `boolean` | `false` | disables the control; no error is shown |
-| `invalid` | `boolean` | `false` | forces the invalid state, for an error the app found (a server answer) |
-| `validate` | `(value) => string \| string[] \| null` | | synchronous validation of the control's value (the text, a checkbox's `checked`, a select's value, a slider's number) |
-| `validationMode` | `"onSubmit" \| "onBlur" \| "onChange"` | `"onSubmit"` | when the result is shown |
+| `name` | `string` | | the control's form name; it wins over the control's own, and keys the field's server errors in a Form |
+| `disabled` | `boolean` | `false` | disables the control; no error is shown. A disabled Fieldset around it does too |
+| `invalid` | `boolean` | `false` | forces the invalid state, for an error the app found |
+| `validate` | `(value) => FieldValidateResult \| PromiseLike<FieldValidateResult>` | | a message, a list of messages, or `null` / `undefined`; or a promise of one. The value is the control's (the table above) |
+| `validationMode` | `"onSubmit" \| "onBlur" \| "onChange"` | the Form's, else `"onSubmit"` | when the result is shown |
 
 ### Label
 
@@ -149,37 +235,41 @@ forwarded.
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `match` | a `ValidityState` key, or `true` | | without it, shown while the field is invalid; with a key (`"valueMissing"`, `"typeMismatch"`, ..., `"customError"` for `validate`'s messages), while that key is set; `true`: always (Angular: `*fieldError="'valueMissing'"`) |
-| `id` | `string` | generated | the id in the control's `aria-describedby` while shown |
+| `match` | a `ValidityState` key, `(validity: FieldValidity) => boolean`, or `true` | | without it, shown while the field is invalid; with a key (`"valueMissing"`, `"typeMismatch"`, ..., `"customError"` for `validate`'s messages), while that key is set; with a function, while it returns `true` (it receives every key, and `valid`: `null` before the first validation); `true`: always (Angular: `*fieldError="'valueMissing'"`) |
+| `id` | `string` | generated | the id in the control's `aria-describedby` while shown (Angular: `fieldErrorId`) |
 
-With no children, an Error shows the current messages: one as text, several as a list.
+With no children, an Error shows the current messages: one as text, several as a list. These are
+the field's server errors when it has some, else `validate`'s messages, else the browser's
+`validationMessage`. Server errors are shown only by an Error with no `match` (or `true`): a key
+or a function matches the validity, which server errors are not part of.
 
 ## State and part attributes
 
-Every part, and the integrated control's main element (Checkbox.Root, Select.Trigger,
-Slider.Root, Combobox.Input), carries:
+Every part, and the integrated control's main element (Checkbox.Root, the CheckboxGroup,
+Select.Trigger, Slider.Root, Combobox.Input, a picker's Trigger), carries:
 
 | attribute | when |
 | --- | --- |
-| `data-invalid` | the field shows an error, or `invalid` is set |
+| `data-invalid` | the field shows an error, `invalid` is set, or its Form has errors for it |
 | `data-valid` | the field validated and is valid |
 | `data-dirty` | the value differs from the value at mount |
 | `data-touched` | the control has lost focus once |
-| `data-filled` | the value is not empty |
-| `data-focused` | the control has focus |
-| `data-disabled` | the field is disabled |
+| `data-filled` | the value is not empty (a slider is always filled) |
+| `data-focused` | the control has focus (a slider: one of its thumbs) |
+| `data-disabled` | the field is disabled, or a Fieldset around it is |
 
-The Control also gets `aria-invalid="true"` while invalid, and `aria-describedby`.
+Before the first validation, neither `data-invalid` nor `data-valid` is present. The control also
+gets `aria-invalid="true"` while invalid, and `aria-describedby`.
 
 ## Keyboard
 
 Nothing of its own: the control's keyboard applies. A click on the Label focuses the Control, or
-clicks a labelable control (it toggles a Checkbox).
+clicks a labelable control (it toggles a Checkbox); a picker's Trigger is only focused.
 
 ## Exports
 
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives-react/field` | `ChangeDetails`, `ChangeReason`, `Field`, `FieldControlProps`, `FieldDescriptionProps`, `FieldErrorMatch`, `FieldErrorProps`, `FieldLabelProps`, `FieldRootProps`, `FieldState`, `FieldValidate`, `FieldValidationMode`, `RenderProp` |
-| `@fragiola/primitives-vue/field` | `ChangeDetails`, `ChangeReason`, `Field`, `FieldControlEmits`, `FieldControlProps`, `FieldDescriptionProps`, `FieldErrorMatch`, `FieldErrorProps`, `FieldLabelProps`, `FieldRootProps`, `FieldState`, `FieldValidate`, `FieldValidationMode`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/field` | `ChangeDetails`, `ChangeReason`, `FieldControl`, `FieldControlBinding`, `FieldControlData`, `FieldControlEvents`, `FieldControlOptions`, `FieldDescription`, `FieldError`, `FieldErrorContext`, `FieldErrorMatch`, `FieldLabel`, `FieldRoot`, `FieldState`, `FieldValidate`, `FieldValidationMode`, `ValueChangeEvent`, `fieldControl`, `injectField`, `writeFieldAria` |
+| `@fragiola/primitives-vue/field` | `ChangeDetails`, `ChangeReason`, `Field`, `FieldControlEmits`, `FieldControlProps`, `FieldDescriptionProps`, `FieldErrorMatch`, `FieldErrorProps`, `FieldLabelProps`, `FieldRootProps`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidationMode`, `FieldValidity`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/field` | `ChangeDetails`, `ChangeReason`, `FIELDSET_CONTEXT`, `FORM_CONTEXT`, `FieldControl`, `FieldControlBinding`, `FieldControlData`, `FieldControlEntry`, `FieldControlEvents`, `FieldControlOptions`, `FieldDescription`, `FieldError`, `FieldErrorContext`, `FieldErrorMatch`, `FieldLabel`, `FieldRoot`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidationMode`, `FieldValidity`, `FieldsetContext`, `FormContext`, `FormErrors`, `FormField`, `ValidityKey`, `ValueChangeEvent`, `fieldControl`, `injectField`, `writeFieldAria` |
