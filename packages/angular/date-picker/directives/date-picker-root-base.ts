@@ -1,8 +1,17 @@
-import { computed, Directive, input, output } from "@angular/core";
+import {
+    computed,
+    Directive,
+    input,
+    numberAttribute,
+    output,
+} from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives/date";
 import type { CalendarOptions } from "@fragiola/primitives-angular/calendar";
 import type { OpenChangeEvent } from "@fragiola/primitives-angular/internal";
 import type { DatePickerState } from "../utils/date-picker-state.ts";
+
+const optionalNumber = (value: unknown): number | undefined =>
+    value === undefined || value === null ? undefined : numberAttribute(value);
 
 /** The open state and the calendar options both pickers share; each declares its typed value. */
 @Directive()
@@ -22,9 +31,13 @@ export abstract class DatePickerRootBase {
     /** A BCP 47 tag (default: the document's `lang`, then the browser's). */
     readonly locale = input<string | undefined>(undefined);
     /** `0`–`6`, Sunday = 0 (default: the locale's). */
-    readonly firstDayOfWeek = input<number | undefined>(undefined);
+    readonly firstDayOfWeek = input<number | undefined, unknown>(undefined, {
+        transform: optionalNumber,
+    });
     /** How many months are shown side by side (default 1). */
-    readonly visibleMonths = input<number | undefined>(undefined);
+    readonly visibleMonths = input<number | undefined, unknown>(undefined, {
+        transform: optionalNumber,
+    });
     /** The picker's state, for its parts and `exportAs`. */
     abstract readonly picker: DatePickerState;
     protected readonly options = computed<CalendarOptions>(() => ({

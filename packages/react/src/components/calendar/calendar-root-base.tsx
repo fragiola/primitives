@@ -55,16 +55,18 @@ export function CalendarRootBase({
         context: state,
         bound,
         opened,
+        reopened,
         focusKey,
     } = useCalendar(component, mode, stateProps as CalendarStateProps);
     // a calendar in a picker focuses its focused date when it opens (spec/calendar.md, "Focus")
     const focusPending = useRef(bound);
-    // reopened while its exit animation still ran, the same calendar takes the focus again
+    // reopened while its exit animation still ran, the same calendar takes the focus again, on
+    // the date it reseeded from the value
     useLayoutEffect(() => {
-        if (opened) {
+        if (reopened > 0) {
             focusPending.current = true;
         }
-    }, [opened]);
+    }, [reopened]);
     const context = useMemo(
         () => ({
             ...state,

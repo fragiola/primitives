@@ -4,7 +4,7 @@ import {
     type PlainDate,
     toIsoDate,
 } from "@fragiola/primitives/date";
-import { useLayoutEffect } from "react";
+import { type MouseEvent, useLayoutEffect } from "react";
 import { useElement } from "../../hooks/use-element.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -56,7 +56,11 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
         state,
         {
             role: "gridcell",
-            tabIndex: state.outsideMonth ? undefined : state.focused ? 0 : -1,
+            tabIndex: state.outsideMonth
+                ? undefined
+                : state.focused && !state.disabled
+                  ? 0
+                  : -1,
             "aria-selected": state.selected ? "true" : undefined,
             "aria-disabled":
                 state.disabled || state.unavailable || state.outsideMonth
@@ -75,6 +79,12 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
                 "in-range": state.inRange,
                 "range-preview": state.rangePreview,
             }),
+            // a disabled date never takes the focus, not even from a press
+            onMouseDown: (event: MouseEvent) => {
+                if (state.disabled) {
+                    event.preventDefault();
+                }
+            },
             onClick: () => {
                 if (choosable && !state.disabled) {
                     context.select(date);

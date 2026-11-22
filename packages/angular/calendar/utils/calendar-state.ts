@@ -1,6 +1,7 @@
 import {
     afterEveryRender,
     computed,
+    effect,
     InjectionToken,
     inject,
     type OutputEmitterRef,
@@ -170,6 +171,25 @@ export class CalendarState {
         // after every render while a focus is pending: the focused date's cell may mount later
         // than the keyboard moved to it (a new month, a picker opening; AGENTS.md "Porting", 5)
         afterEveryRender(() => this.applyPendingFocus());
+        // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels
+        // a started range, and reopening starts again from the value, as a fresh calendar would
+        let wasOpen: boolean | null = null;
+        effect(() => {
+            const open = this.bound() && (this.picker?.open() ?? false);
+            untracked(() => {
+                if (wasOpen !== null && wasOpen !== open) {
+                    this.anchor.set(null);
+                    this.hovered.set(null);
+                    if (open) {
+                        this.seed = null;
+                        this.focusedOwn.set(null);
+                        this.visibleOwn.set(null);
+                        this.focusPending = true;
+                    }
+                }
+                wasOpen = open;
+            });
+        });
     }
 
     private initialFocus(): PlainDate {
@@ -213,6 +233,8 @@ export class CalendarState {
         const visibleMonths = this.visibleMonths();
         const start = this.visibleStart();
         const offset = monthsBetween(start, date);
+        // the keyboard previews the range from now on, not the last hovered date
+        this.hovered.set(null);
         this.focusedOwn.set(date);
         if (offset < 0) {
             this.visibleOwn.set(startOfMonth(date));
@@ -239,6 +261,8 @@ export class CalendarState {
     }
 
     page(delta: 1 | -1): void {
+        // the button keeps the focus: a focus left pending is dropped
+        this.focusPending = false;
         if (!this.canPage(delta)) {
             return;
         }

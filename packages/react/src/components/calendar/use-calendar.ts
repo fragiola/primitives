@@ -15,7 +15,15 @@ import {
     today,
     toIsoDate,
 } from "@fragiola/primitives/date";
-import { useCallback, useContext, useId, useMemo, useState } from "react";
+import {
+    useCallback,
+    useContext,
+    useId,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import type {
@@ -119,6 +127,8 @@ export function useCalendar(
             if (isOutOfBounds(date)) {
                 return false;
             }
+            // the keyboard previews the range from now on, not the last hovered date
+            setHovered(null);
             setFocusedDate(date);
             setVisibleStart((start) => {
                 const offset = monthsBetween(start, date);
@@ -195,6 +205,31 @@ export function useCalendar(
         [isOutOfBounds, isUnavailable, readOnly, mode, anchor, commit],
     );
 
+    // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels a
+    // started range, and reopening starts again from the value, as a fresh calendar would
+    const opened = bound && picker.open;
+    const wasOpened = useRef(opened);
+    // counts the reopenings: the root asks for the focus once the reseeded date has rendered
+    const [reopened, setReopened] = useState(0);
+    useLayoutEffect(() => {
+        if (wasOpened.current === opened) {
+            return;
+        }
+        wasOpened.current = opened;
+        setAnchor(null);
+        setHovered(null);
+        if (opened) {
+            const start = clampDate(
+                (isRange(value) ? value.start : value) ?? todayDate,
+                min,
+                max,
+            );
+            setFocusedDate(start);
+            setVisibleStart(startOfMonth(start));
+            setReopened((count) => count + 1);
+        }
+    }, [opened, value, todayDate, min, max]);
+
     const rangeValue: DateRange | null = isRange(value) ? value : null;
     const previewTo = hovered ?? focusedDate;
     const cellState = useCallback(
@@ -268,7 +303,9 @@ export function useCalendar(
         context,
         bound,
         /** Bound to a picker whose popup is open. */
-        opened: bound && picker.open,
+        opened,
+        /** How many times its picker reopened while it stayed mounted. */
+        reopened,
         focusKey: toIsoDate(focusedDate),
     };
 }

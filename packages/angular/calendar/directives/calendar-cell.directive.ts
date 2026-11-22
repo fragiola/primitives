@@ -33,7 +33,7 @@ import { CalendarGrid } from "./calendar-grid.directive.ts";
         "[attr.data-primitives-part]": "calendar.part('cell')",
         "[attr.aria-label]": "label()",
         "[attr.tabindex]":
-            "state().outsideMonth ? null : state().focused ? 0 : -1",
+            "state().outsideMonth ? null : state().focused && !state().disabled ? 0 : -1",
         "[attr.aria-selected]": "state().selected ? 'true' : null",
         "[attr.aria-disabled]":
             "state().disabled || state().unavailable || state().outsideMonth ? 'true' : null",
@@ -47,6 +47,7 @@ import { CalendarGrid } from "./calendar-grid.directive.ts";
         "[attr.data-range-end]": "data()['range-end']",
         "[attr.data-in-range]": "data()['in-range']",
         "[attr.data-range-preview]": "data()['range-preview']",
+        "(mousedown)": "onMouseDown($event)",
         "(click)": "onClick()",
         "(pointerenter)": "onPointerEnter()",
         "(focus)": "onFocus()",
@@ -105,6 +106,13 @@ export class CalendarCell {
             }
         });
         inject(DestroyRef).onDestroy(release);
+    }
+
+    /** A disabled date never takes the focus, not even from a press. */
+    protected onMouseDown(event: MouseEvent): void {
+        if (this.state().disabled) {
+            event.preventDefault();
+        }
     }
 
     protected onClick(): void {

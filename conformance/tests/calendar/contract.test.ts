@@ -172,6 +172,26 @@ test("calendar / range: the range calendar's parts, preview, start, end and in-r
     await expectNoFalseStates(page.locator("[data-primitives-part]"));
 });
 
+test("calendar / range: after a hover, the keyboard moves the preview", async ({
+    page,
+}) => {
+    await openScenario(page, "/calendar/range", { today: true });
+    await cellOf(page, 11, 10, "range-calendar").click();
+    await cellOf(page, 11, 15, "range-calendar").hover();
+    await expect(cellOf(page, 11, 12, "range-calendar")).toHaveAttribute(
+        "data-range-preview",
+        "",
+    );
+    await page.keyboard.press("ArrowLeft");
+    await expect(cellOf(page, 11, 9, "range-calendar")).toHaveAttribute(
+        "data-range-preview",
+        "",
+    );
+    await expect(cellOf(page, 11, 12, "range-calendar")).not.toHaveAttribute(
+        "data-range-preview",
+    );
+});
+
 test("date-picker / basic: picker parts and the trigger's popup state", async ({
     page,
 }) => {

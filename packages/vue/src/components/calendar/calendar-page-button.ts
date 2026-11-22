@@ -37,7 +37,12 @@ export function definePageButton(name: string, delta: 1 | -1) {
                         "aria-controls": grids,
                         "data-primitives-part": `${context.component}-${part}`,
                         ...stateAttributes({ disabled }),
-                        onClick: () => context.page(delta),
+                        onClick: () => {
+                            // the button keeps the focus: a focus left pending (a click on a
+                            // date that could not be chosen) is dropped
+                            context.focusPending.current = false;
+                            context.page(delta);
+                        },
                     },
                 );
             };

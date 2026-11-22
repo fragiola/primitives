@@ -1,5 +1,6 @@
 import { getTabbables, nextTabbableAfter } from "@fragiola/primitives/focus";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
+import type { Align, Side } from "@fragiola/primitives/positioning";
 import { type KeyboardEvent, useEffect } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -8,8 +9,8 @@ import { DatePickerContext } from "./date-picker-context.ts";
 
 export interface DatePickerPopupState {
     open: boolean;
-    side: string;
-    align: string;
+    side: Side;
+    align: Align;
 }
 
 export interface DatePickerPopupProps extends PartProps<DatePickerPopupState> {}

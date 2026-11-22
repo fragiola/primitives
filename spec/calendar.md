@@ -114,13 +114,13 @@ have no name of their own: the consumer labels them; the picker's popup likewise
 | PrevButton, NextButton | `type="button"`, `aria-controls` (the grids' ids), `disabled` and `data-disabled` when they cannot move |
 | Grid | `role="grid"`, an `id`, `aria-labelledby` (the Heading with the same `offset`), `aria-readonly="true"` when read-only, `aria-disabled="true"` when disabled, `aria-multiselectable="true"` in a RangeCalendar |
 | HeaderCell | `scope="col"`, `abbr` (the long weekday name) |
-| Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused date, `-1` on the other dates of the shown months, absent on outside-month cells), `aria-selected="true"` when selected (absent otherwise), `aria-disabled="true"` when disabled, unavailable or outside the month, `aria-current="date"` on today; `data-today`, `data-selected`, `data-disabled`, `data-unavailable`, `data-outside-month`; in a RangeCalendar also `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` |
+| Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused date unless the calendar is disabled, `-1` on the other dates of the shown months, absent on outside-month cells), `aria-selected="true"` when selected (absent otherwise), `aria-disabled="true"` when disabled, unavailable or outside the month, `aria-current="date"` on today; `data-today`, `data-selected`, `data-disabled`, `data-unavailable`, `data-outside-month`; in a RangeCalendar also `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` |
 | Picker Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (the popup's id, while open), `data-popup-open` while open (Base UI's name, D4 §3 "Naming") |
 | Picker Positioner | `role="presentation"`, `data-open`, `data-side`, `data-align` |
 | Picker Popup | `role="dialog"` (no `aria-modal`), an `id`, `data-open`, `data-side`, `data-align`, `data-starting-style`, `data-ending-style` |
 
 A date is **disabled** when it is before `min`, after `max`, or the calendar is disabled: it
-cannot be focused by the keyboard nor chosen. A date is **unavailable** when
+cannot be focused (by the keyboard, nor by a press) nor chosen. A date is **unavailable** when
 `isDateUnavailable` says so: it can be focused but not chosen. **Outside-month** cells (the
 leading and trailing days of the 6-week grid) cannot be focused nor chosen; the keyboard reaches
 those dates by moving the visible month.
@@ -164,6 +164,9 @@ ArrowLeft in RTL:
   order. Tab from its last tabbable element closes (reason `focus-out`) and moves focus to the
   element after the Trigger; Shift+Tab from its first closes (reason `focus-out`) and focuses the
   Trigger.
+- **Reopening**: a picker opens on its value as a new calendar would, even when it reopens while
+  its popup's exit animation still runs (the calendar is still mounted): the focused date returns
+  to the value (else today), and closing cancels a started range.
 - **After an outside press** (as [popover.md](popover.md#focus), D4 §3 "Popover focus after an
   outside press"): focus returns to the Trigger unless the press landed on a focusable element,
   which keeps the focus the press gave it (`returnFocus.whenUnfocused`). The POC's pickers moved no
@@ -174,7 +177,8 @@ ArrowLeft in RTL:
 - Clicking an enabled, available date chooses it (and focuses it).
 - **RangeCalendar**: the first choice sets the start (the range is pending); while pending,
   hovering or focusing a date previews the range between the start and it
-  (`data-range-preview`); the second choice sets the end. If the second date is before the
+  (`data-range-preview`; a key that moves the focused date previews to it again); the second
+  choice sets the end. If the second date is before the
   first, they are swapped. `onValueChange` fires once, with the complete range.
 - Pickers: a press on the Trigger toggles (reason `trigger-press`).
 

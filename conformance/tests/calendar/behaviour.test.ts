@@ -178,6 +178,8 @@ test.describe("calendar / min-max", () => {
         );
         await cell(page, 11, 9).click({ force: true });
         await expectOutput(page, "value", "none");
+        // a press never focuses a disabled date
+        await expect(cell(page, 11, 9)).not.toBeFocused();
     });
 
     test("previous month is disabled at the lower bound, next at the upper bound", async ({
@@ -215,6 +217,19 @@ test("calendar / unavailable: weekends can be focused but not chosen", async ({
     await expectFocusWithin(cell(page, 11, 21));
     await page.keyboard.press("Enter");
     await expectOutput(page, "value", "none");
+});
+
+test("calendar / unavailable: a click on an unavailable date leaves the page buttons their focus", async ({
+    page,
+}) => {
+    await openScenario(page, "/calendar/unavailable", { today: true });
+    // focusable, though `aria-disabled`: the press goes through
+    await cell(page, 11, 21).click({ force: true });
+    await expectFocusWithin(cell(page, 11, 21));
+    const next = page.getByRole("button", { name: "Next month" });
+    await next.click();
+    await expect(grid(page, 2026, 12)).toBeVisible();
+    await expect(next).toBeFocused();
 });
 
 test("calendar / locale de-DE: German weekday headers, Monday first", async ({
@@ -393,6 +408,19 @@ test.describe("date-picker / basic", () => {
         );
     });
 
+    test("reopened right after Escape, it focuses the value again, not the date it moved to", async ({
+        page,
+    }) => {
+        await trigger(page).click();
+        await expectFocusWithin(cell(page, 11, 20));
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await expectFocusWithin(cell(page, 11, 22));
+        await page.keyboard.press("Escape");
+        await trigger(page).click();
+        await expectFocusWithin(cell(page, 11, 20));
+    });
+
     test("Escape closes and focuses the trigger", async ({ page }) => {
         await trigger(page).click();
         await expect(page.getByRole("dialog")).toBeVisible();
@@ -440,6 +468,24 @@ test.describe("date-picker / basic", () => {
         await expect(page.getByRole("dialog")).toBeVisible();
         await expectNoAxeViolations(page);
     });
+});
+
+test("date-picker / range: closing cancels a started range", async ({
+    page,
+}) => {
+    await openScenario(page, "/date-picker/range", { today: true });
+    const trigger = page.getByRole("button", { name: "Choose dates" });
+    await trigger.click();
+    await cell(page, 11, 10).click();
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+    // reopened at once: the start on the 10th is gone, so the 13th starts a new range
+    await trigger.click();
+    await cell(page, 11, 13).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expectOutput(page, "value", "none");
+    await cell(page, 11, 15).click();
+    await expectOutput(page, "value", "2026-11-13..2026-11-15");
 });
 
 test("date-picker / range: closes after the end date", async ({ page }) => {

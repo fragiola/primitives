@@ -96,7 +96,7 @@ export const CalendarCell: PartComponent<CalendarCellProps, CalendarCellState> =
                             role: "gridcell",
                             tabindex: cell.outsideMonth
                                 ? undefined
-                                : cell.focused
+                                : cell.focused && !cell.disabled
                                   ? 0
                                   : -1,
                             "aria-selected": cell.selected ? "true" : undefined,
@@ -119,6 +119,12 @@ export const CalendarCell: PartComponent<CalendarCellProps, CalendarCellState> =
                                 "in-range": cell.inRange,
                                 "range-preview": cell.rangePreview,
                             }),
+                            // a disabled date never takes the focus, not even from a press
+                            onMousedown: (event: MouseEvent) => {
+                                if (cell.disabled) {
+                                    event.preventDefault();
+                                }
+                            },
                             onClick: () => {
                                 if (!cell.outsideMonth && !cell.disabled) {
                                     context.select(props.date);

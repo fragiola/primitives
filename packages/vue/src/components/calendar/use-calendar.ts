@@ -14,7 +14,7 @@ import {
     startOfMonth,
     today,
 } from "@fragiola/primitives/date";
-import { computed, inject, shallowRef, useId } from "vue";
+import { computed, inject, shallowRef, useId, watch } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import type {
@@ -111,6 +111,29 @@ export function useCalendar(
             own.set(next, { reason: "item-press" });
         }
     };
+    // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels a
+    // started range, and reopening starts again from the value, as a fresh calendar would
+    if (picker !== null) {
+        watch(
+            picker.open,
+            (open) => {
+                anchor.value = null;
+                hovered.value = null;
+                if (open) {
+                    const current = value.value;
+                    const start = clampDate(
+                        (isRange(current) ? current.start : current) ??
+                            todayDate,
+                        min(),
+                        max(),
+                    );
+                    focusedDate.value = start;
+                    visibleStart.value = startOfMonth(start);
+                }
+            },
+            { flush: "sync" },
+        );
+    }
     const rangeValue = (): DateRange | null =>
         isRange(value.value) ? value.value : null;
 
@@ -156,6 +179,8 @@ export function useCalendar(
             if (isOutOfBounds(date)) {
                 return false;
             }
+            // the keyboard previews the range from now on, not the last hovered date
+            hovered.value = null;
             focusedDate.value = date;
             const offset = monthsBetween(visibleStart.value, date);
             if (offset < 0) {

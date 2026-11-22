@@ -1,3 +1,4 @@
+import type { Align, Side } from "@fragiola/primitives/positioning";
 import { useLayoutEffect } from "react";
 import {
     type PositionerProps,
@@ -10,8 +11,8 @@ import { DatePickerContext } from "./date-picker-context.ts";
 
 export interface DatePickerPositionerState {
     open: boolean;
-    side: string;
-    align: string;
+    side: Side;
+    align: Align;
 }
 
 export interface DatePickerPositionerProps
