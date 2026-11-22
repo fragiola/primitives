@@ -140,6 +140,31 @@ Base UI decides (D4) unless a row says otherwise.
 | Angular's Slider value type | Renamed `SliderRootValue`: `SliderValue` is now the Value directive (nothing is published yet) | another name for the directive (the part is `Value` everywhere) | `slider.md` |
 | The fixtures' `dir` | A fixture page sets `dir` only for `?dir=rtl` (it set `dir="ltr"` always), so `/direction/provider` runs in a document with no `dir` | | `direction.md` |
 
+## Controls and display: details decided during Epic #29 (Issues #27–#28)
+
+Stage 1's third Epic: Button, RadioGroup and Radio, Switch, Progress, Avatar and Separator. No
+rule of the handoff (D1–D10, §3, §4) changed. The APG decides the button, radio group and switch;
+where it has no rule (Progress, Avatar, Separator, `focusableWhenDisabled`), Base UI does (D4).
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| The entries | `/button`, `/radio-group`, `/radio`, `/switch`, `/progress`, `/avatar`, `/separator`; Radio is built on its group's context and the Field (`ENTRY_DEPENDENCIES`: `radio` on `radio-group` and `field`, `radio-group` and `switch` on `field`), as Checkbox on CheckboxGroup | one `/radio` entry holding the group (the group would ship to an app that only reads the context type) | |
+| The toolkit | `radioKeyTarget` in `/collection`, `progressValue` (clamp, percent, status, format) in `/range`, and a new mechanism `/image` (`watchImageStatus`: loads through the element's own window, reports a cached image synchronously, never the same status twice) | the image loading in each framework (the same listener three times; the toolkit rule takes listeners) | `avatar.md`, `progress.md`, `radio-group.md` |
+| Radio and Switch elements | A native `button` with `role="radio"` / `role="switch"`, labelable by `<label for>`, Indicator `aria-hidden`, as Checkbox | Base UI's `span` (`nativeButton` `false`) | `radio-group.md`, `switch.md` |
+| RadioGroup's keys | Every arrow moves and checks (APG), RTL swaps Left and Right (the direction provider, else the computed direction), disabled radios skipped; `loopFocus` (`true`) stops at the ends when `false`; `orientation` only sets `aria-orientation`. No Home/End (APG, Base UI) | arrows by orientation only (the APG uses all four); always looping (Base UI) | `radio-group.md` |
+| RadioGroup's values and tab stop | String values; `onValueChange` reports `null` when a reset returns a controlled group to none. The tab stop is the checked enabled radio, else the first enabled, computed in DOM order once the radios registered (a server render sets `tabindex="0"` only on a checked radio; the hydrated DOM matches) | any value (the hidden input submits the string) | `radio-group.md` |
+| RadioGroup in a Field | The group is the field's control (as CheckboxGroup); the validated element is the first enabled radio's hidden input (radios of one name share their validity), so `required` blocks a native submission | no validated element (a native form could not block it) | `field.md` |
+| Switch's `uncheckedValue` | A `type="hidden"` input after the hidden checkbox, rendered only while off (`switch-unchecked-input`), disabled with the switch (Base UI) | toggling one input's type | `switch.md` |
+| Switch's keys | Space and Enter toggle through the native button's click (the APG's optional Enter; Base UI) | Space only (Checkbox's rule) | `switch.md` |
+| A disabled Button | No consumer handler runs (click, pointer and mouse down, key down and up; Angular in the capture phase, as Menu.Item), a click is prevented (a focusable disabled submit button does not submit); a non-native Button clicks on Enter key down and Space key up | Base UI's development warning on a `nativeButton` mismatch (no console output) | `button.md` |
+| Progress's text | No `aria-valuetext` while indeterminate (Base UI's English "indeterminate progress" is text) and no visually hidden `x` for NVDA; the default format is a percentage of the range; the default `locale` the runtime's, as Slider's | Base UI's text | `progress.md` |
+| Progress's Indicator | Structural `inset-inline-start: 0` and `inline-size: <percent>%` (as Slider's Indicator), plus `--progress-indicator-size` for a recipe that draws it otherwise; nothing while indeterminate. Its Label's id reaches the Root after mount (as Slider's Label), so the server render has no `aria-labelledby` | the variable alone | `progress.md` |
+| Avatar's load | Started at mount in the browser (React's layout effect, Vue's `onMounted`, Angular's `afterRenderEffect`), so a cached image is `loaded` before paint with no `loading`; idle (Fallback, no Image) on a server; the Image unmounted returns the Root to `idle`. Angular: `*avatarImage="src"` and `*avatarFallback="delay"` are structural (rendered only in some states) | starting the load after the window's `load` (it only suited the test's timing) | `avatar.md` |
+| Avatar's tests | The images are the fixtures' own (`public/avatar/ada.svg`); the slow image is held through `page.route` and the page opened at DOMContentLoaded (a loading image holds the window's `load` back, and Vue and Angular mount before it); the ssr layer waits on `/avatar/` pages for the network and the statuses before comparing | an 800 ms delay (React passed because it mounts after `load`) | `avatar.md` |
+| Separator's `decorative` | `role="none"`, no `aria-orientation` (the Epic's scope, Radix's name; Base UI has none) | | `separator.md` |
+| The examples | A `display` gallery category (Progress, Avatar, Separator); the `radio-group` example is the settings form (a Form with a RadioGroup and a Switch in Fields, and a Button), shared by `radio`; the avatar example uses data URIs (a missing file logs a console error) | | |
+| The indeterminate recipe | A still third of the track: an endless animation would never let `settleAnimations` (before every axe check) finish | an animated stripe | |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,
