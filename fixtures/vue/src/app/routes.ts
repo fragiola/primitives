@@ -43,6 +43,11 @@ import DialogNestedPopover from "../scenarios/dialog/dialog-nested-popover.vue";
 import DialogNestedTree from "../scenarios/dialog/dialog-nested-tree.vue";
 import DialogRejectedClose from "../scenarios/dialog/dialog-rejected-close.vue";
 import DirectionProviderScenario from "../scenarios/direction/direction-provider.vue";
+import DrawerBasic from "../scenarios/drawer/drawer-basic.vue";
+import DrawerLifecycle from "../scenarios/drawer/drawer-lifecycle.vue";
+import DrawerNested from "../scenarios/drawer/drawer-nested.vue";
+import DrawerSide from "../scenarios/drawer/drawer-side.vue";
+import DrawerSnapPoints from "../scenarios/drawer/drawer-snap-points.vue";
 import FieldAsync from "../scenarios/field/field-async.vue";
 import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
@@ -106,6 +111,11 @@ export const routes: Record<string, Component> = {
     "/dialog/nested-dialogs": DialogNestedDialogs,
     "/dialog/detached": DialogDetached,
     "/dialog/lifecycle": DialogLifecycle,
+    "/drawer/basic": DrawerBasic,
+    "/drawer/side": DrawerSide,
+    "/drawer/snap-points": DrawerSnapPoints,
+    "/drawer/nested": DrawerNested,
+    "/drawer/lifecycle": DrawerLifecycle,
     "/alert-dialog/basic": AlertDialogBasic,
     "/alert-dialog/detached": AlertDialogDetached,
     "/alert-dialog/lifecycle": AlertDialogLifecycle,

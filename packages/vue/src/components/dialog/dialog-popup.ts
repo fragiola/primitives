@@ -15,7 +15,7 @@ import {
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import { DialogKey, DialogNestingKey } from "./dialog-context.ts";
+import { DialogKey, DialogNestingKey, nestedName } from "./dialog-context.ts";
 
 /** The modal dialog (spec/dialog.md): focus trap, inert page, scroll lock, its own layer. */
 export interface DialogPopupState {
@@ -172,13 +172,17 @@ export const DialogPopup: PartComponent<DialogPopupProps, DialogPopupState> =
                                 : true,
                             // the open chain of dialogs nested below it, for a recipe
                             // (spec/dialog.md, "Nested dialogs")
-                            style: { "--nested-dialogs": nestedDialogs },
+                            style: {
+                                [`--nested-${nestedName(component)}s`]:
+                                    nestedDialogs,
+                            },
                             "data-primitives-part": `${component}-popup`,
                             ...stateAttributes({
                                 open,
                                 closed: !open,
                                 nested,
-                                "nested-dialog-open": nestedDialogOpen,
+                                [`nested-${nestedName(context.component)}-open`]:
+                                    nestedDialogOpen,
                                 "starting-style": status === "starting",
                                 "ending-style": status === "ending",
                             }),

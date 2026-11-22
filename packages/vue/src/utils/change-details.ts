@@ -17,6 +17,7 @@ export type ChangeReason =
     | "keyboard"
     | "track-press"
     | "drag"
+    | "swipe"
     | "imperative-action"
     | "none";
 
