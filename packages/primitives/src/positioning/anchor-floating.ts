@@ -14,6 +14,7 @@ import {
     type Side,
     toPlacement,
 } from "./placement.ts";
+import { isElementAnchor, type VirtualAnchor } from "./virtual-anchor.ts";
 
 export interface AnchorOptions {
     side?: Side;
@@ -38,13 +39,15 @@ export interface AnchorOptions {
 
 /**
  * Keeps `floating` next to `anchor` (spec/popover.md, "Positioning"): flip, shift, logical and
- * physical sides, and it follows scroll and resize until the returned function is called. It
+ * physical sides, and it follows scroll and resize until the returned function is called. The
+ * anchor is an element, or a virtual anchor (`virtualAnchor`: a point or a rectangle, as a context
+ * menu's pointer; its direction is its `contextElement`'s, else the floating element's). It
  * writes structural inline style only (`position`, `top`, `left`), the CSS variables
  * `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height`,
  * `--transform-origin`, and the arrow's offset.
  */
 export function anchorFloating(
-    anchor: Element,
+    anchor: Element | VirtualAnchor,
     floating: HTMLElement,
     options: AnchorOptions = {},
 ): () => void {
@@ -64,7 +67,12 @@ export function anchorFloating(
             typeof options.direction === "function"
                 ? options.direction()
                 : options.direction;
-        const direction = getDirection(anchor, provided);
+        const direction = getDirection(
+            isElementAnchor(anchor)
+                ? anchor
+                : (anchor.contextElement ?? floating),
+            provided,
+        );
         const middleware = [
             offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
             flip({ padding: collisionPadding }),

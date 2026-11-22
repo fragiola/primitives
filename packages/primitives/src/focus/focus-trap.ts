@@ -1,5 +1,14 @@
 import { getTabbables } from "./tabbable.ts";
 
+export interface FocusTrapOptions {
+    /**
+     * A press outside `container` and `allow()` keeps focus where it is: its default focus change
+     * is prevented (an alert dialog, which an outside press never dismisses: spec/alert-dialog.md,
+     * "Focus").
+     */
+    holdOutsidePress?: boolean;
+}
+
 /**
  * Keeps Tab and Shift+Tab inside `container` (spec/dialog.md, "Focus"), wrapping at its ends, and
  * pulls focus back when it escapes (to an element outside `container` and outside `allow()`, the
@@ -8,6 +17,7 @@ import { getTabbables } from "./tabbable.ts";
 export function trapFocus(
     container: HTMLElement,
     allow: () => readonly (Element | null | undefined)[] = () => [],
+    options: FocusTrapOptions = {},
 ): () => void {
     const doc = container.ownerDocument;
     const inside = (target: EventTarget | null) =>
@@ -45,11 +55,24 @@ export function trapFocus(
             (getTabbables(container)[0] ?? container).focus();
         }
     };
+    // the focus a press gives is the `mousedown`'s default (after a touch, its compatibility one)
+    const onMouseDown = (event: MouseEvent) => {
+        if (!inside(event.target)) {
+            event.preventDefault();
+        }
+    };
+    const hold = options.holdOutsidePress === true;
     doc.addEventListener("keydown", onKeyDown);
     doc.addEventListener("focusin", onFocusIn);
+    if (hold) {
+        doc.addEventListener("mousedown", onMouseDown, true);
+    }
     return () => {
         doc.removeEventListener("keydown", onKeyDown);
         doc.removeEventListener("focusin", onFocusIn);
+        if (hold) {
+            doc.removeEventListener("mousedown", onMouseDown, true);
+        }
     };
 }
 

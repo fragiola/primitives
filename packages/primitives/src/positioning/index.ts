@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/positioning: anchoring a floating element to its anchor (Floating UI), logical sides and aligns.
+// The entry of @fragiola/primitives/positioning: anchoring a floating element to its anchor (Floating UI), logical sides and aligns, virtual anchors (a point).
 
 export {
     type AnchorOptions,
@@ -10,3 +10,8 @@ export {
     type Side,
     toPlacement,
 } from "./placement.ts";
+export {
+    type AnchorRect,
+    type VirtualAnchor,
+    virtualAnchor,
+} from "./virtual-anchor.ts";
