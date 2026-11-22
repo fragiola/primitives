@@ -22,7 +22,7 @@ const TABS = [
         <div tabsRoot [class]="styles.root">
             <div tabsList [class]="styles.list">
                 @for (tab of tabs; track tab.value) {
-                    <button tabsTab [value]="tab.value" disabled [class]="styles.tab">{{ tab.label }}</button>
+                    <button tabsTab [value]="tab.value" [disabled]="true" [class]="styles.tab">{{ tab.label }}</button>
                 }
                 <span *tabsIndicator [class]="styles.indicator"></span>
             </div>
