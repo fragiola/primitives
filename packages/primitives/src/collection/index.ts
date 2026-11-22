@@ -1,5 +1,9 @@
-// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, menus and radio groups, typeahead, the combobox's item helpers and chip keys, the Tabs Indicator's placement before hydration.
+// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, accordions, menus and radio groups, a tab's activation direction, typeahead, the combobox's item helpers and chip keys, the Tabs Indicator's placement before hydration.
 
+export {
+    type ActivationDirection,
+    activationDirection,
+} from "./activation-direction.ts";
 export {
     type ChipKeyAction,
     chipArrows,
@@ -23,6 +27,8 @@ export {
     toggleItem,
 } from "./combobox-items.ts";
 export {
+    type AccordionKeyOptions,
+    accordionKeyTarget,
     menuKeyTarget,
     type RadioKeyOptions,
     radioKeyTarget,
@@ -37,5 +43,9 @@ export {
     stepThroughNone,
 } from "./list-navigation.ts";
 export { scrollIntoViewWithin } from "./scroll-into-view.ts";
-export { placeTabsIndicator } from "./tabs-indicator.ts";
+export {
+    placeTabsIndicator,
+    type TabsIndicatorBox,
+    tabsIndicatorBox,
+} from "./tabs-indicator.ts";
 export { createTypeahead } from "./typeahead.ts";

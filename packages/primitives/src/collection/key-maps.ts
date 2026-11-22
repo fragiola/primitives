@@ -42,6 +42,22 @@ export function tabsKeyTarget(
     return null;
 }
 
+export type AccordionKeyOptions = TabsKeyOptions;
+
+/**
+ * The Trigger a key moves focus to in an accordion (spec/accordion.md, "Keyboard"): the tabs' key
+ * map (arrows along the orientation, mirrored in RTL, Home and End) over the enabled Triggers the
+ * caller passes; `null` when the key does not move it.
+ */
+export function accordionKeyTarget(
+    key: string,
+    index: number,
+    count: number,
+    options: AccordionKeyOptions,
+): number | null {
+    return tabsKeyTarget(key, index, count, options);
+}
+
 /**
  * The item a key moves focus to in a menu (spec/menu.md, "Keyboard"): ArrowDown and ArrowUp (wrapping
  * with `loop`), Home and End; `null` when the key does not move it. Disabled items are reachable.
