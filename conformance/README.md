@@ -67,3 +67,4 @@ top-left corner.
 | `form.ts` | `expectSubmitted(page, entries)`: the form scenarios' `form: ...` line |
 | `pointer.ts` | `pointAlong`, `pressAlong`, `dragFrom`: whole-pixel presses and drags along a box |
 | `slider.ts` | `sliderState`, `expectSliderValue` |
+| `dates.ts` | `fullDate`, `monthHeading`, `shortWeekday`: the calendar's expected names, computed with `Intl` |

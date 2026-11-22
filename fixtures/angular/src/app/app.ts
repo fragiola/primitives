@@ -1,5 +1,9 @@
 import { Component, ViewEncapsulation } from "@angular/core";
+import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { readQuery } from "../kit/query.ts";
+import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
+import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts";
+import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.ts";
@@ -12,6 +16,8 @@ import { ComboboxGroups } from "../scenarios/combobox/combobox-groups.ts";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.ts";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
+import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
+import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.ts";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.ts";
 import { DialogInitialFocus } from "../scenarios/dialog/dialog-initial-focus.ts";
@@ -90,6 +96,11 @@ import { ROUTES } from "./routes.ts";
         SliderControlled,
         SliderRange,
         SliderVertical,
+        SingleCalendar,
+        CalendarTwoMonths,
+        CalendarRange,
+        DatePickerBasic,
+        DatePickerRange,
     ],
     template: `
         @switch (path) {
@@ -136,6 +147,15 @@ import { ROUTES } from "./routes.ts";
             @case ("/field/basic") { <main class="p-6" scenario-field-basic></main> }
             @case ("/field/validation") { <main class="p-6" scenario-field-validation></main> }
             @case ("/field/controls") { <main class="p-6" scenario-field-controls></main> }
+            @case ("/calendar/single") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
+            @case ("/calendar/min-max") { <main class="p-6" scenario-single-calendar [locale]="query.locale" [min]="{ year: 2026, month: 11, day: 10 }" [max]="{ year: 2026, month: 12, day: 5 }"></main> }
+            @case ("/calendar/unavailable") { <main class="p-6" scenario-single-calendar [locale]="query.locale" [isDateUnavailable]="isWeekend"></main> }
+            @case ("/calendar/locale") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
+            @case ("/calendar/rtl") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
+            @case ("/calendar/two-months") { <main class="p-6" scenario-calendar-two-months [locale]="query.locale"></main> }
+            @case ("/calendar/range") { <main class="p-6" scenario-calendar-range [locale]="query.locale"></main> }
+            @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
+            @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>
@@ -153,6 +173,12 @@ export class App {
     protected readonly query = readQuery(window.location.search);
     protected readonly path = window.location.pathname;
     protected readonly routes = ROUTES;
+
+    /** The unavailable dates of `/calendar/unavailable`: weekends. */
+    protected readonly isWeekend = (date: PlainDate) => {
+        const day = new Date(date.year, date.month - 1, date.day).getDay();
+        return day === 0 || day === 6;
+    };
 
     constructor() {
         document.documentElement.dir = this.query.dir;

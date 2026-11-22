@@ -61,6 +61,27 @@ Questions the handoff §3, the APG and Base UI did not settle, decided by the Ep
 | Field's scope | The POC's Field, ported as it is; production scope (Fieldset, Form, async validation, ...) is stage 1 | extending it now | `field.md` |
 | Combobox's part on triggers | `data-popup-open` on the Input, InputGroup and Trigger (Base UI's names, D4 §3 "Naming"); `data-open` stays the Positioner's and the Popup's | `data-open` (the POC) | `combobox.md` |
 
+## Dates: details decided during Epic #11 (Issue #10)
+
+Questions the handoff §3, the APG and Base UI did not settle (Base UI has no calendar), decided by
+the Epic's stop condition (take the APG-closest option, record it in the spec and here).
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| Entries | One per component, `/calendar`, `/range-calendar`, `/date-picker`, `/date-range-picker`, over shared modules: RangeCalendar's Root and the Calendar's parts, DateRangePicker's Root and the DatePicker's parts. The bundle guard keeps all four and `/date` out of the Dialog + Tabs app; a Calendar alone never imports a picker's module (the binding the pickers provide lives with the calendar) | one `/calendar` entry exporting Calendar and RangeCalendar (and one `/date-picker` for both pickers) | `calendar.md` "Anatomy" |
+| The part attribute of shared parts | Named by the root they sit in: `calendar-cell` in a Calendar, `range-calendar-cell` in a RangeCalendar, `date-picker-*` / `date-range-picker-*` (the root's component, read from its context) | `calendar-*` for both (the POC's one `data-calendar-part`) | `calendar.md` "Anatomy" |
+| Angular's shared directives | The Calendar's part directives (`[calendarCell]`, ...) serve both roots and `/range-calendar` exports them again (likewise the picker parts from `/date-range-picker`); the calendar and date-picker entries export their bases and tokens (`CalendarRootBase`, `CALENDAR`, `PICKER_BINDING`, `DatePickerRootBase`, `DATE_PICKER`) as the lower layer the other entries build on | `[rangeCalendarCell]` aliases | `calendar.md` "Anatomy" |
+| The pickers' popup | Non-modal, as a Popover (not trapped, Tab out closes), kept from the POC; the APG example is a modal dialog with OK / Cancel | a modal picker | `calendar.md` "Differences from Base UI" |
+| A picker trigger's open state | `data-popup-open` (Base UI's trigger name, D4 §3 "Naming") | `data-open` (the POC) | `calendar.md` "State attributes and ARIA" |
+| A picker's outside press and focus | As Popover's (D4 §3): focus returns to the trigger unless the press focused something (`returnFocus.whenUnfocused`) | no focus move (the POC) | `calendar.md` "Focus" |
+| A picker reopened during its exit animation | Its calendar, still mounted, takes the focus again (the binding carries the picker's `open`); a closing picker's calendar takes none | relying on a remount (failed when reopened quickly) | `calendar.md` `/date-picker/basic` check 4 |
+| A picker reopened during its exit animation, in detail | It reseeds the focused date from the value (else today) and closing cancels a started range, as a remount would (found by the review: the focused date and a range start survived) | keeping the last navigated date | `calendar.md` "Focus" |
+| A disabled calendar, a disabled date | A disabled calendar's grid has no tab stop; a press on a disabled date never focuses it (`mousedown` default prevented) | the POC's tab stop on a disabled grid | `calendar.md` "State attributes and ARIA" |
+| A calendar inside a picker of the other mode | Not bound (a Calendar in a DateRangePicker keeps its own value) | binding any calendar | `calendar.md` "Anatomy" |
+| The picker's popup name | No name of its own (no text); the fixtures and examples give `aria-label` | a name from the calendar's heading | `calendar.md` "API" |
+| A cell's `aria-label` in Angular | A static `aria-label` of the consumer's replaces the `Intl` name (`ownAttribute`), as React's and Vue's props do | the host binding always winning (the POC) | `calendar.md` "API" |
+| A form | The pickers take no `name` in stage 0; the example's hidden input carries the ISO date. Form support and Field come with stage 3 | adding `name` and a hidden input now | `calendar.md` "Purpose" |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,

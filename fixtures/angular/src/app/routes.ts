@@ -43,4 +43,13 @@ export const ROUTES: readonly string[] = [
     "/field/basic",
     "/field/validation",
     "/field/controls",
+    "/calendar/single",
+    "/calendar/min-max",
+    "/calendar/unavailable",
+    "/calendar/locale",
+    "/calendar/rtl",
+    "/calendar/two-months",
+    "/calendar/range",
+    "/date-picker/basic",
+    "/date-picker/range",
 ];

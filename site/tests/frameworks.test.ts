@@ -110,8 +110,10 @@ describe("the embeds", () => {
             listExampleIds(examplesApp(framework)),
         );
         expect(ids[0]).toEqual([
+            "calendar",
             "checkbox",
             "combobox",
+            "date-picker",
             "dialog",
             "field",
             "menu",
@@ -125,7 +127,7 @@ describe("the embeds", () => {
         const manifests = await buildManifests();
         expect([...manifests.keys()]).toEqual([...FRAMEWORKS]);
         for (const [framework, manifest] of manifests) {
-            // by category (overlays, navigation, then forms), then by order
+            // by category (overlays, navigation, forms, then dates), then by order
             expect(manifest.examples.map((example) => example.id)).toEqual([
                 "dialog",
                 "popover",
@@ -137,6 +139,8 @@ describe("the embeds", () => {
                 "slider",
                 "select",
                 "combobox",
+                "date-picker",
+                "calendar",
             ]);
             for (const example of manifest.examples) {
                 expect(example.packages, framework).toEqual([

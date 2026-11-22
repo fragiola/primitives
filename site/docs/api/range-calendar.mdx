@@ -1,0 +1,218 @@
+---
+title: RangeCalendar
+description: A month grid for choosing a start and an end date, with the Calendar's parts and keyboard and a preview while choosing, in each framework.
+---
+
+The [Calendar](/docs/api/calendar)'s grid for a range: the first choice is the start, the second
+the end, and `onValueChange` fires once, with `{ start, end }`. It is the same ARIA `grid` with the
+keyboard of the WAI-ARIA APG [date picker dialog example](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/),
+marked `aria-multiselectable`. A range in a popup is a
+[DateRangePicker](/docs/api/date-range-picker).
+
+Its parts are the Calendar's: `/range-calendar` exports its own Root with them, named
+`range-calendar-*` inside it. Dates are plain `{ year, month, day }` values with no time zone; the
+names come from `Intl`.
+
+<Example id="calendar" />
+
+## Behaviour
+
+- **Choosing**: the first choice (a click, Enter or Space) starts the range; while it is pending,
+  hovering or focusing a date previews the range up to it (`data-range-preview`); the second
+  choice ends it. An end before the start swaps them. Escape cancels a started range.
+- **Keyboard, focus, bounds, pages, locale**: the Calendar's. Enter that starts a range keeps the
+  focused date where it is.
+- **Months**: `visibleMonths` shows several grids side by side; the keyboard crosses them without
+  moving the page, and the page buttons move them all.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `range-calendar-root` | holds the state |
+| Heading | `h2` | `range-calendar-heading` | the month a grid shows |
+| PrevButton | `button` | `range-calendar-prev-button` | shows the previous page of months |
+| NextButton | `button` | `range-calendar-next-button` | shows the next page of months |
+| Grid | `table` | `range-calendar-grid` | one month |
+| GridHeader | `thead` | `range-calendar-grid-header` | the weekday row |
+| HeaderCell | `th` | `range-calendar-header-cell` | one weekday |
+| GridBody | `tbody` | `range-calendar-grid-body` | the six weeks |
+| Row | `tr` | `range-calendar-row` | one week |
+| Cell | `td` | `range-calendar-cell` | one date |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { type DateRange, RangeCalendar } from "@fragiola/primitives-react/range-calendar";
+
+const [stay, setStay] = useState<DateRange | null>(null);
+
+<RangeCalendar.Root value={stay} onValueChange={setStay} visibleMonths={2} locale="en-US">
+    <RangeCalendar.PrevButton aria-label="Previous months">‹</RangeCalendar.PrevButton>
+    <RangeCalendar.NextButton aria-label="Next months">›</RangeCalendar.NextButton>
+    {[0, 1].map((offset) => (
+        <div key={offset}>
+            <RangeCalendar.Heading offset={offset} />
+            <RangeCalendar.Grid offset={offset}>
+                <RangeCalendar.GridHeader />
+                <RangeCalendar.GridBody />
+            </RangeCalendar.Grid>
+        </div>
+    ))}
+</RangeCalendar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { type DateRange, RangeCalendar } from "@fragiola/primitives-vue/range-calendar";
+import { ref } from "vue";
+
+const stay = ref<DateRange | null>(null);
+</script>
+
+<template>
+    <RangeCalendar.Root v-model:value="stay" :visible-months="2" locale="en-US">
+        <RangeCalendar.PrevButton aria-label="Previous months">‹</RangeCalendar.PrevButton>
+        <RangeCalendar.NextButton aria-label="Next months">›</RangeCalendar.NextButton>
+        <div v-for="offset in [0, 1]" :key="offset">
+            <RangeCalendar.Heading :offset="offset" />
+            <RangeCalendar.Grid :offset="offset">
+                <RangeCalendar.GridHeader />
+                <RangeCalendar.GridBody />
+            </RangeCalendar.Grid>
+        </div>
+    </RangeCalendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [RangeCalendarRoot, CalendarHeading, CalendarPrevButton, CalendarNextButton, CalendarGrid, CalendarGridHeader, CalendarHeaderCell, CalendarGridBody, CalendarRow, CalendarCell],
+    template: `
+        <div rangeCalendarRoot [(value)]="stay" [visibleMonths]="2" locale="en-US">
+            <button calendarPrevButton aria-label="Previous months">‹</button>
+            <button calendarNextButton aria-label="Next months">›</button>
+            @for (offset of [0, 1]; track offset) {
+                <h2 calendarHeading #heading="calendarHeading" [offset]="offset">{{ heading.month() }}</h2>
+                <table calendarGrid [offset]="offset">
+                    <!-- the weekday row and the weeks, as on the Calendar page -->
+                </table>
+            }
+        </div>
+    `,
+})
+export class TripDates {
+    protected readonly stay = signal<DateRange | null>(null);
+}
+```
+
+The part directives are the Calendar's (`[calendarCell]`, ...), exported again by
+`/range-calendar`; inside a `[rangeCalendarRoot]` they carry `range-calendar-*`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue and Angular bind them as on the [Calendar](/docs/api/calendar)
+page.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `DateRange \| null` | | the chosen `{ start, end }`, controlled |
+| `defaultValue` | `DateRange \| null` | `null` | the initial range, uncontrolled |
+| `onValueChange` | `(value: DateRange \| null, details: { reason }) => void` | | once per complete range (reason `item-press`) |
+| `min` | `PlainDate \| null` | | dates before it are disabled |
+| `max` | `PlainDate \| null` | | dates after it are disabled |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | unavailable dates can be focused, not chosen |
+| `locale` | `string` | the document's `lang` | a BCP 47 tag |
+| `firstDayOfWeek` | `number` | the locale's | `0`–`6`, Sunday is `0` |
+| `visibleMonths` | `number` | `1` | how many months are shown |
+| `disabled` | `boolean` | `false` | nothing can be focused or chosen |
+| `readOnly` | `boolean` | `false` | dates can be focused, not chosen |
+
+### Heading
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it names |
+
+### PrevButton
+
+No props of its own.
+
+### NextButton
+
+No props of its own.
+
+### Grid
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it shows |
+
+### GridHeader
+
+No props of its own: React's children are a function of each weekday, Vue's default slot gets
+`{ weekday }`, Angular's `weekdays()` lists them.
+
+### HeaderCell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `weekday` | `Weekday` | | `{ index, short, long }`: its text is `short`, its `abbr` is `long` |
+
+### GridBody
+
+No props of its own: React's children are a function of each week, Vue's default slot gets
+`{ week }`, Angular's `weeks()` lists them.
+
+### Row
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `week` (react, vue) | `PlainDate[]` | | its seven dates; Angular loops over the week itself |
+
+### Cell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `date` | `PlainDate` | | its date; its name is the full date from `Intl` unless it has an `aria-label` |
+
+## State and part attributes
+
+As the Calendar's, and:
+
+| part | attributes |
+| --- | --- |
+| Grid | `aria-multiselectable="true"` |
+| Cell | `aria-selected` on every date of the range; `data-range-start`, `data-range-end`, `data-in-range`, `data-range-preview` (between a started range's start and the hovered or focused date) |
+
+## Keyboard
+
+The Calendar's, and:
+
+| key | action |
+| --- | --- |
+| Enter, Space | starts the range, then ends it |
+| Escape | cancels a started range |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/range-calendar` | `RangeCalendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodyProps`, `CalendarGridHeaderProps`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `ChangeDetails`, `ChangeReason`, `DateRange`, `PlainDate`, `RangeCalendarRootProps`, `RenderProp`, `Weekday` |
+| `@fragiola/primitives-vue/range-calendar` | `RangeCalendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodySlots`, `CalendarGridHeaderSlots`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `CalendarRowSlots`, `ChangeDetails`, `ChangeReason`, `DateRange`, `PlainDate`, `RangeCalendarRootEmits`, `RangeCalendarRootProps`, `RenderSlotProps`, `Weekday` |
+| `@fragiola/primitives-angular/range-calendar` | `RangeCalendarRoot`, `CalendarCell`, `CalendarCellState`, `CalendarGrid`, `CalendarGridBody`, `CalendarGridHeader`, `CalendarHeaderCell`, `CalendarHeading`, `CalendarNextButton`, `CalendarNextButtonState`, `CalendarOptions`, `CalendarPrevButton`, `CalendarPrevButtonState`, `CalendarRow`, `ChangeDetails`, `ChangeReason`, `DateRange`, `injectCalendar`, `PlainDate`, `ValueChangeEvent`, `Weekday` |

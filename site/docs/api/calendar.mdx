@@ -1,0 +1,259 @@
+---
+title: Calendar
+description: A month grid for choosing one date, with the APG date grid's keyboard, plain dates with no time zone and the locale's names from Intl, in each framework.
+---
+
+A month grid for choosing one date. It is an ARIA `grid` with one tab stop, the keyboard of the
+WAI-ARIA APG [date picker dialog example](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
+(the [grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/)). A start and an end date is a
+[RangeCalendar](/docs/api/range-calendar); a calendar in a popup is a
+[DatePicker](/docs/api/date-picker).
+
+A date is a plain `{ year, month, day }` (`PlainDate`, `month` 1–12) with no time and no time
+zone, and no date library: the math is the toolkit's
+[`@fragiola/primitives/date`](/docs/api/toolkit), which only the calendar and picker entries
+import. The month heading, the weekday names, the day numbers and each cell's full date name come
+from `Intl` for the `locale`: the one exception to "no text", and the consumer can replace each
+one.
+
+<Example id="calendar" />
+
+## Behaviour
+
+- **Focus**: the grid is one tab stop, the focused date's cell. It starts at the value, else
+  today, kept inside `min` and `max`.
+- **Keyboard**: the arrows move a day and a week (left and right swap in right-to-left), Home and
+  End go to the start and end of the week, Page Up and Page Down a month, with Shift a year;
+  Enter and Space choose. Moving past the visible months shows the next ones, and the cell of the
+  new month takes the focus within the same key, so a quick second key reaches it.
+- **Bounds**: dates before `min` or after `max` are disabled (the keyboard never goes there);
+  unavailable dates (`isDateUnavailable`) can be focused but not chosen; the leading and trailing
+  days of other months can neither be focused nor chosen.
+- **Pages**: PrevButton and NextButton move by `visibleMonths` and keep the focus; the focused
+  date follows. They are disabled when the next page would only hold disabled dates.
+- **Locale**: `locale` (default: the document's `lang`, then the browser's) gives the names and the
+  first day of the week (`firstDayOfWeek` overrides it).
+- **Grid**: six weeks always, so it never changes height. The month Heading of offset 0 is
+  announced (`aria-live`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `calendar-root` | holds the state |
+| Heading | `h2` | `calendar-heading` | the month a grid shows (it names the grid) |
+| PrevButton | `button` | `calendar-prev-button` | shows the previous page of months |
+| NextButton | `button` | `calendar-next-button` | shows the next page of months |
+| Grid | `table` | `calendar-grid` | one month |
+| GridHeader | `thead` | `calendar-grid-header` | the weekday row (with its `tr`) |
+| HeaderCell | `th` | `calendar-header-cell` | one weekday |
+| GridBody | `tbody` | `calendar-grid-body` | the six weeks |
+| Row | `tr` | `calendar-row` | one week |
+| Cell | `td` | `calendar-cell` | one date |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Calendar, type PlainDate } from "@fragiola/primitives-react/calendar";
+
+const [date, setDate] = useState<PlainDate | null>(null);
+
+<Calendar.Root value={date} onValueChange={setDate} locale="en-US">
+    <Calendar.PrevButton aria-label="Previous month">‹</Calendar.PrevButton>
+    <Calendar.Heading />
+    <Calendar.NextButton aria-label="Next month">›</Calendar.NextButton>
+    <Calendar.Grid>
+        <Calendar.GridHeader>
+            {(weekday) => <Calendar.HeaderCell key={weekday.index} weekday={weekday} />}
+        </Calendar.GridHeader>
+        <Calendar.GridBody>
+            {(week) => (
+                <Calendar.Row key={week[0]?.day} week={week}>
+                    {(date) => <Calendar.Cell key={date.day} date={date} />}
+                </Calendar.Row>
+            )}
+        </Calendar.GridBody>
+    </Calendar.Grid>
+</Calendar.Root>;
+```
+
+`GridHeader`, `GridBody` and `Row` render their default parts when given no children.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Calendar, type PlainDate } from "@fragiola/primitives-vue/calendar";
+import { ref } from "vue";
+
+const date = ref<PlainDate | null>(null);
+</script>
+
+<template>
+    <Calendar.Root v-model:value="date" locale="en-US">
+        <Calendar.PrevButton aria-label="Previous month">‹</Calendar.PrevButton>
+        <Calendar.Heading />
+        <Calendar.NextButton aria-label="Next month">›</Calendar.NextButton>
+        <Calendar.Grid>
+            <Calendar.GridHeader v-slot="{ weekday }">
+                <Calendar.HeaderCell :key="weekday.index" :weekday="weekday" />
+            </Calendar.GridHeader>
+            <Calendar.GridBody v-slot="{ week }">
+                <Calendar.Row :key="week[0]?.day" :week="week" v-slot="{ date }">
+                    <Calendar.Cell :key="date.day" :date="date" />
+                </Calendar.Row>
+            </Calendar.GridBody>
+        </Calendar.Grid>
+    </Calendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CalendarRoot, CalendarHeading, CalendarPrevButton, CalendarNextButton, CalendarGrid, CalendarGridHeader, CalendarHeaderCell, CalendarGridBody, CalendarRow, CalendarCell],
+    template: `
+        <div calendarRoot [(value)]="date" locale="en-US">
+            <button calendarPrevButton aria-label="Previous month">‹</button>
+            <h2 calendarHeading #heading="calendarHeading">{{ heading.month() }}</h2>
+            <button calendarNextButton aria-label="Next month">›</button>
+            <table calendarGrid>
+                <thead calendarGridHeader #header="calendarGridHeader">
+                    <tr>
+                        @for (weekday of header.weekdays(); track weekday.index) {
+                            <th calendarHeaderCell [weekday]="weekday">{{ weekday.short }}</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody calendarGridBody #body="calendarGridBody">
+                    @for (week of body.weeks(); track $index) {
+                        <tr calendarRow>
+                            @for (date of week; track $index) {
+                                <td calendarCell #cell="calendarCell" [date]="date">{{ cell.dayNumber() }}</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    `,
+})
+export class DueDate {
+    protected readonly date = signal<PlainDate | null>(null);
+}
+```
+
+The directives render no text: the Heading's `month()`, the GridHeader's `weekdays()`, the
+GridBody's `weeks()` and the Cell's `dayNumber()` give it. `injectCalendar()` gives a child
+component the calendar's state.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `:visible-months`), and Angular as inputs and outputs (`[(value)]`,
+`(valueChangeDetails)`, `[visibleMonths]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainDate \| null` | | the chosen date, controlled |
+| `defaultValue` | `PlainDate \| null` | `null` | the initial date, uncontrolled |
+| `onValueChange` | `(value: PlainDate \| null, details: { reason }) => void` | | every choice (reason `item-press`) |
+| `min` | `PlainDate \| null` | | dates before it are disabled |
+| `max` | `PlainDate \| null` | | dates after it are disabled |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | unavailable dates can be focused, not chosen |
+| `locale` | `string` | the document's `lang` | a BCP 47 tag: the names and the first day of the week |
+| `firstDayOfWeek` | `number` | the locale's | `0`–`6`, Sunday is `0` |
+| `visibleMonths` | `number` | `1` | how many months are shown, each a Grid with its `offset` |
+| `disabled` | `boolean` | `false` | nothing can be focused or chosen |
+| `readOnly` | `boolean` | `false` | dates can be focused, not chosen |
+
+### Heading
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it names |
+
+### PrevButton
+
+No props of its own.
+
+### NextButton
+
+No props of its own.
+
+### Grid
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it shows |
+
+### GridHeader
+
+No props of its own: React's children are a function of each weekday, Vue's default slot gets
+`{ weekday }`, Angular's `weekdays()` lists them.
+
+### HeaderCell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `weekday` | `Weekday` | | `{ index, short, long }`: its text is `short`, its `abbr` is `long` |
+
+### GridBody
+
+No props of its own: React's children are a function of each week, Vue's default slot gets
+`{ week }`, Angular's `weeks()` lists them.
+
+### Row
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `week` (react, vue) | `PlainDate[]` | | its seven dates; Angular loops over the week itself |
+
+### Cell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `date` | `PlainDate` | | its date; its name is the full date from `Intl` unless it has an `aria-label` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-readonly` |
+| Heading | an `id`, `aria-live="polite"` (offset 0) |
+| PrevButton, NextButton | `type="button"`, `aria-controls` (the grids), `disabled` and `data-disabled` when they cannot move |
+| Grid | `role="grid"`, `aria-labelledby` (its Heading), `aria-readonly`, `aria-disabled` |
+| HeaderCell | `scope="col"`, `abbr` |
+| Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused date, `-1` on the month's other dates, none on other months' days), `aria-selected`, `aria-disabled`, `aria-current="date"` (today); `data-today`, `data-selected`, `data-disabled`, `data-unavailable`, `data-outside-month` |
+
+## Keyboard
+
+| key | moves the focused date to |
+| --- | --- |
+| ArrowRight / ArrowLeft | the next / previous day (swapped in right-to-left) |
+| ArrowDown / ArrowUp | the same day of the next / previous week |
+| Home / End | the first / last day of its week |
+| PageDown / PageUp | the same day of the next / previous month |
+| Shift+PageDown / Shift+PageUp | the same day of the next / previous year |
+| Enter, Space | chooses it |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/calendar` | `Calendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodyProps`, `CalendarGridHeaderProps`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `ChangeDetails`, `ChangeReason`, `DateRange`, `PlainDate`, `RenderProp`, `Weekday` |
+| `@fragiola/primitives-vue/calendar` | `Calendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodySlots`, `CalendarGridHeaderSlots`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootEmits`, `CalendarRootProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `CalendarRowSlots`, `ChangeDetails`, `ChangeReason`, `DateRange`, `PlainDate`, `RenderSlotProps`, `Weekday` |
+| `@fragiola/primitives-angular/calendar` | `CalendarRoot`, `CALENDAR`, `CalendarCell`, `CalendarCellState`, `CalendarComponent`, `CalendarGrid`, `CalendarGridBody`, `CalendarGridHeader`, `CalendarHeaderCell`, `CalendarHeading`, `CalendarInputs`, `CalendarMode`, `CalendarNextButton`, `CalendarNextButtonState`, `CalendarOptions`, `CalendarPrevButton`, `CalendarPrevButtonState`, `CalendarRootBase`, `CalendarRow`, `CalendarState`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `DateRange`, `injectCalendar`, `PICKER_BINDING`, `PickerBinding`, `PlainDate`, `ValueChangeEvent`, `Weekday` |

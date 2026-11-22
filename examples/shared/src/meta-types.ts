@@ -9,7 +9,7 @@
 // test keeps the two equal), and each manifest entry's `level` is its category's id.
 
 /** The gallery's groups, in the order the sidebar lists them. */
-export const CATEGORIES = ["overlays", "navigation", "forms"] as const;
+export const CATEGORIES = ["overlays", "navigation", "forms", "dates"] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
@@ -17,6 +17,7 @@ export const CATEGORY_TITLES: Record<Category, string> = {
     overlays: "Overlays",
     navigation: "Navigation",
     forms: "Forms and selection",
+    dates: "Dates",
 };
 
 export const LAYOUTS = ["fill", "flow"] as const;
@@ -50,4 +51,5 @@ export const DEFAULT_HEIGHT: Record<Category, number> = {
     overlays: 360,
     navigation: 320,
     forms: 360,
+    dates: 440,
 };

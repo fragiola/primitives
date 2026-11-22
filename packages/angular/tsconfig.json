@@ -30,6 +30,10 @@
         "field",
         "select",
         "slider",
+        "calendar",
+        "range-calendar",
+        "date-picker",
+        "date-range-picker",
         "tests",
         "*.config.ts"
     ]
