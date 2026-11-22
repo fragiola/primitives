@@ -149,9 +149,25 @@ const capitalize = (name: string) =>
  */
 function namespaceOf(source: string): Map<string, string> {
     const open = source.indexOf("{", source.search(/export const \w+ = \{/));
+    const body = withoutComments(braced(source, open));
+    // the namespace's own entries only, not the names inside an entry's type
+    // (`Trigger: DialogTrigger as <Payload>(props: AlertDialogTriggerProps<Payload>) => ReactNode`)
+    const entries: string[] = [];
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i <= body.length; i++) {
+        const char = body[i];
+        if (char === "{" || char === "(" || char === "[") depth++;
+        else if (char === "}" || char === ")" || char === "]") depth--;
+        else if (i === body.length || (char === "," && depth === 0)) {
+            entries.push(body.slice(start, i));
+            start = i + 1;
+        }
+    }
     const parts = new Map<string, string>();
-    for (const match of braced(source, open).matchAll(/(\w+):\s*(\w+)/g)) {
-        if (match[1] && match[2] && /^[A-Z]/.test(match[2])) {
+    for (const entry of entries) {
+        const match = /^\s*(\w+):\s*(\w+)/.exec(entry);
+        if (match?.[1] && match[2] && /^[A-Z]/.test(match[2])) {
             parts.set(match[1], match[2]);
         }
     }
@@ -179,7 +195,10 @@ function partsOf(dir: string, component: string, sources: Sources) {
 
 /** The React props of each part (interfaces, the contract's `PartProps` left out). */
 function reactProps(component: string, sources: Sources) {
-    const interfaces = new Map<string, { fields: string[]; bases: string[] }>();
+    const interfaces = new Map<
+        string,
+        { fields: string[]; bases: string[]; omitted?: string[] }
+    >();
     for (const file of sources.files("packages/react/src")) {
         if (!/\.tsx?$/.test(file)) continue;
         const text = sources.read(file);
@@ -213,17 +232,33 @@ function reactProps(component: string, sources: Sources) {
             const fields = [...body.matchAll(/^ {4}(\w+)\??[:(<]/gm)].map(
                 (field) => field[1] ?? "",
             );
+            // a base may be an `Omit<Base, "a" | "b">`: Base's props but those keys
+            const omitted: string[] = [];
             const bases = (/extends\s+([\s\S]*)$/.exec(heritage)?.[1] ?? "")
                 .split(/,(?![^<]*>)/)
-                .map((base) => base.trim().replace(/<[\s\S]*$/, ""))
+                .map((base) => {
+                    const omit = /^Omit<\s*(\w+)[^,]*,([^>]*)>/.exec(
+                        base.trim(),
+                    );
+                    if (!omit) return base.trim().replace(/<[\s\S]*$/, "");
+                    for (const key of (omit[2] ?? "").matchAll(/"(\w+)"/g))
+                        omitted.push(key[1] ?? "");
+                    return omit[1] ?? "";
+                })
                 .filter((base) => base && base !== "PartProps");
-            interfaces.set(match[1] ?? "", { fields, bases });
+            interfaces.set(match[1] ?? "", { fields, bases, omitted });
         }
     }
     const propsOf = (name: string): string[] => {
         const found = interfaces.get(name);
         if (!found) return [];
-        return [...found.fields, ...found.bases.flatMap(propsOf)];
+        const omitted = found.omitted ?? [];
+        return [
+            ...found.fields,
+            ...found.bases
+                .flatMap(propsOf)
+                .filter((prop) => !omitted.includes(prop)),
+        ];
     };
     const parts = partsOf("packages/react/src", component, sources);
     return new Map(
@@ -657,6 +692,11 @@ describe("the API pages", () => {
             { name: "open" },
             { name: "defaultOpen" },
             { name: "onOpenChange" },
+            { name: "onOpenChangeComplete" },
+            { name: "actionsRef", frameworks: ["react"] },
+            { name: "handle" },
+            { name: "triggerId" },
+            { name: "defaultTriggerId" },
         ]);
         expect(
             documentedProps(PAGES.get("api/dialog") ?? "").get("Title"),
@@ -670,9 +710,13 @@ describe("the API pages", () => {
             "loopFocus",
         ]);
         expect(vueProps("dialog", disk).get("Root")).toEqual([
+            "handle",
             "open",
             "defaultOpen",
+            "triggerId",
+            "defaultTriggerId",
             "onOpenChange",
+            "onOpenChangeComplete",
         ]);
         expect(angularProps("dialog", ["Root"], disk).get("Root")).toEqual([
             "open",
@@ -774,6 +818,25 @@ describe("the docs reference check", () => {
         expect(docsReferenceProblems(pages)).toContain(
             'api/render: no "## Exports" row for @fragiola/primitives-angular/render',
         );
+    });
+
+    it("reads the props of an Omit<…> base, and a namespace's entries only", () => {
+        // `MenuRootProps extends Omit<MenuSubmenuRootProps, "children">, …`
+        expect(reactProps("menu", disk).get("Root")).toEqual(
+            expect.arrayContaining(["open", "loopFocus", "modal", "handle"]),
+        );
+        // `Trigger: DialogTrigger as <Payload>(props: AlertDialogTriggerProps<Payload>) => …`
+        expect([...reactProps("alert-dialog", disk).keys()]).toEqual([
+            "Root",
+            "Trigger",
+            "Portal",
+            "Backdrop",
+            "Viewport",
+            "Popup",
+            "Title",
+            "Description",
+            "Close",
+        ]);
     });
 
     it("reads a method of a props interface as a prop", () => {
