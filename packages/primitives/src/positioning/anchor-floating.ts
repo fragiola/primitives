@@ -7,7 +7,7 @@ import {
     shift,
     size,
 } from "@floating-ui/dom";
-import { getDirection } from "../direction/direction.ts";
+import { type Direction, getDirection } from "../direction/direction.ts";
 import {
     type Align,
     fromPlacement,
@@ -26,6 +26,12 @@ export interface AnchorOptions {
     collisionPadding?: number;
     /** An arrow element inside the floating element, placed along its edge. */
     arrow?: HTMLElement | null;
+    /**
+     * The reading direction a DirectionProvider gives (spec/direction.md): the logical sides follow
+     * it. Without it, the anchor's computed direction, read at every placement. A getter is read at
+     * every placement too.
+     */
+    direction?: Direction | null | (() => Direction | null | undefined);
     /** Called after every placement with the side and align it ended up on. */
     onPlaced?: (placed: { side: Side; align: Align }) => void;
 }
@@ -54,7 +60,11 @@ export function anchorFloating(
     floating.style.left = "0";
 
     const update = async () => {
-        const direction = getDirection(anchor);
+        const provided =
+            typeof options.direction === "function"
+                ? options.direction()
+                : options.direction;
+        const direction = getDirection(anchor, provided);
         const middleware = [
             offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
             flip({ padding: collisionPadding }),
