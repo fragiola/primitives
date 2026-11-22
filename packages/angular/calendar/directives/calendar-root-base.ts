@@ -43,7 +43,11 @@ export abstract class CalendarRootBase {
         transform: optionalNumber,
     });
     readonly disabled = input(false, { transform: booleanAttribute });
-    readonly readOnly = input(false, { transform: booleanAttribute });
+    /** Default: a bound picker's `readOnly`, else `false`; an explicit `false` wins over the picker's. */
+    readonly readOnly = input<boolean | undefined, unknown>(undefined, {
+        transform: (value: unknown) =>
+            value === undefined ? undefined : booleanAttribute(value),
+    });
     /** The root's state, for its parts and `exportAs`. */
     abstract readonly calendar: CalendarState;
     protected readonly data = computed(() =>

@@ -67,7 +67,8 @@ export interface CalendarInputs {
     firstDayOfWeek: Signal<number | undefined>;
     visibleMonths: Signal<number | undefined>;
     disabled: Signal<boolean>;
-    readOnly: Signal<boolean>;
+    /** `undefined` when unset: a bound picker's then applies. */
+    readOnly: Signal<boolean | undefined>;
 }
 
 /** The enclosing calendar's state, for its parts (provided by both roots). */
@@ -148,10 +149,10 @@ export class CalendarState {
         Math.max(1, this.options().visibleMonths ?? 1),
     );
     readonly disabled = computed(() => this.inputs.disabled());
-    /** Its own `readOnly`, or its read-only picker's. */
+    /** Its own `readOnly` when set (an explicit `false` included), else its bound picker's. */
     readonly readOnly = computed(
         () =>
-            this.inputs.readOnly() ||
+            this.inputs.readOnly() ??
             (this.bound() && (this.picker?.readOnly() ?? false)),
     );
     readonly todayDate = today();
