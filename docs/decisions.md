@@ -44,6 +44,23 @@ Questions the handoff §3, the APG and Base UI did not settle, decided by the Ep
 | A submenu and `modal` | A submenu follows its root menu; `SubmenuRoot` takes no `modal` (Angular's shared `MenuRoot` directive accepts the input and ignores it on a submenu) | a per-level option | `menu.md` "API" |
 | A non-modal menu's outside press | Unchanged from the POC: no focus return, the press reaches the page | returning focus like the Popover (not in §3) | `menu.md` "Focus" |
 
+## Forms and selection: details decided during Epic #9 (Issue #8)
+
+Questions the handoff §3, the APG and Base UI did not settle, decided by the Epic's stop condition
+(take the APG-closest option, record it in the spec and here).
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| Select typing while closed, with no match | Nothing happens: the list stays closed (the POC's behaviour) | opening on the selected or first item | `select.md` "Typing while closed" |
+| Select typing while closed, on a disabled item | The disabled item is highlighted (options stay discoverable), never chosen | skipping disabled items | `select.md` "Typing while closed" |
+| A modal Select's outside press and focus | The press reaches nothing and would leave focus on the body, so focus goes back to the trigger (`returnFocus.whenUnfocused`, as Menu's modal) | leaving focus on the body | `select.md` "Modal" |
+| How a modal Select blocks the outside pointer | As Menu's: the body stops taking pointer events, the trigger and the positioner take them back; the lock and the block have their own effect, so toggling `modal` while open keeps the session | an invisible backdrop part | `select.md` "Modal" |
+| A highlighted option scrolled into view | Only inside its popup (`@fragiola/primitives/collection`, `scrollIntoViewWithin`): `Element.scrollIntoView` also scrolled the page when a list mounted before it was positioned at the end of a tall page | `scrollIntoView` with `block: "nearest"` (the POC) | `select.md`, `combobox.md` |
+| CheckboxGroup's API | One component (`CheckboxGroup`, Angular `[checkboxGroup]`), as Base UI and the POC; its own entry `/checkbox-group`; its example is the Checkbox example (Pizza toppings) | a `CheckboxGroup.Root` namespace | `checkbox.md` |
+| Field's binding in Angular | In the `field` entry, exported as the lower layer (`injectField`, `fieldControl`, `writeFieldAria`); Checkbox, Select, Slider and Combobox import `@fragiola/primitives-angular/field`. `/internal` cannot hold it: it would import the field entry, which imports `/internal` | `/internal` | `field.md` "Integration contract" |
+| Field's scope | The POC's Field, ported as it is; production scope (Fieldset, Form, async validation, ...) is stage 1 | extending it now | `field.md` |
+| Combobox's part on triggers | `data-popup-open` on the Input, InputGroup and Trigger (Base UI's names, D4 §3 "Naming"); `data-open` stays the Positioner's and the Popup's | `data-open` (the POC) | `combobox.md` |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,
