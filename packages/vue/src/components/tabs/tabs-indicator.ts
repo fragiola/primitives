@@ -1,4 +1,7 @@
-import { placeTabsIndicator } from "@fragiola/primitives/collection";
+import {
+    placeTabsIndicator,
+    tabsIndicatorBox,
+} from "@fragiola/primitives/collection";
 import { getDirection } from "@fragiola/primitives/direction";
 import { defineComponent, h, ref, watch } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
@@ -64,18 +67,11 @@ export const TabsIndicator: PartComponent<
                             box.value = null;
                             return;
                         }
-                        const listRect = list.getBoundingClientRect();
-                        const tabRect = tab.getBoundingClientRect();
-                        const inlineStart =
-                            getDirection(list) === "rtl"
-                                ? listRect.right - tabRect.right
-                                : tabRect.left - listRect.left;
-                        box.value = {
-                            "--tabs-indicator-inset-inline-start": `${inlineStart}px`,
-                            "--tabs-indicator-inset-block-start": `${tabRect.top - listRect.top}px`,
-                            "--tabs-indicator-inline-size": `${tabRect.width}px`,
-                            "--tabs-indicator-block-size": `${tabRect.height}px`,
-                        };
+                        box.value = tabsIndicatorBox(
+                            list,
+                            tab,
+                            getDirection(list) === "rtl",
+                        );
                     };
                     measure();
                     const view = list.ownerDocument.defaultView;
@@ -111,7 +107,11 @@ export const TabsIndicator: PartComponent<
                     {
                         "aria-hidden": "true",
                         "data-primitives-part": "tabs-indicator",
-                        ...stateAttributes({ orientation }),
+                        ...stateAttributes({
+                            orientation,
+                            "activation-direction":
+                                context.activationDirection.value,
+                        }),
                         // no style until measured: a server's script may have set one, which the
                         // hydration must not read as a mismatch
                         ...(box.value === null ? {} : { style: box.value }),

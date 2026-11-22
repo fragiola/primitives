@@ -85,7 +85,11 @@ export const TabsList: PartComponent<
                         role: "tablist",
                         "aria-orientation": orientation,
                         "data-primitives-part": "tabs-list",
-                        ...stateAttributes({ orientation }),
+                        ...stateAttributes({
+                            orientation,
+                            "activation-direction":
+                                context.activationDirection.value,
+                        }),
                         onKeydown,
                         ref: setList,
                     },

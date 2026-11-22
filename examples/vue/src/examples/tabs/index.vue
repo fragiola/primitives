@@ -30,7 +30,9 @@ const SECTIONS = [
 ];
 
 // Settings in tabs: the arrow keys move between tabs and select (automatic activation), Home and
-// End jump, a disabled tab stays focusable but is never selected, and the indicator follows.
+// End jump, a disabled tab stays focusable but is never selected, and the indicator follows. The
+// panels stack in one grid cell and slide in and out from the side the selection moved to
+// (`data-activation-direction`, `data-starting-style`, `data-ending-style`).
 </script>
 
 <template>
@@ -47,14 +49,16 @@ const SECTIONS = [
             </Tabs.Tab>
             <Tabs.Indicator :class="styles.indicator" />
         </Tabs.List>
-        <Tabs.Panel
-            v-for="section in SECTIONS"
-            :key="section.value"
-            :value="section.value"
-            :class="styles.panel"
-        >
-            <h3 :class="styles.heading">{{ section.label }}</h3>
-            <p :class="styles.text">{{ section.text }}</p>
-        </Tabs.Panel>
+        <div :class="styles.panels">
+            <Tabs.Panel
+                v-for="section in SECTIONS"
+                :key="section.value"
+                :value="section.value"
+                :class="styles.panel"
+            >
+                <h3 :class="styles.heading">{{ section.label }}</h3>
+                <p :class="styles.text">{{ section.text }}</p>
+            </Tabs.Panel>
+        </div>
     </Tabs.Root>
 </template>

@@ -1,3 +1,4 @@
+import type { ActivationDirection } from "@fragiola/primitives/collection";
 import type { InjectionKey, Ref, ShallowRef } from "vue";
 import type { ChangeReason } from "../../utils/change-details.ts";
 
@@ -12,6 +13,8 @@ export interface TabsContext {
     orientation: () => "horizontal" | "vertical";
     activation: () => "automatic" | "manual";
     loopFocus: () => boolean;
+    /** Where the selected tab sits from the one selected before it (spec/tabs.md). */
+    activationDirection: Ref<ActivationDirection>;
     baseId: string;
     tabs: Map<HTMLElement, TabInfo>;
     list: ShallowRef<HTMLElement | null>;
