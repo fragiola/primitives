@@ -1,0 +1,352 @@
+---
+title: ContextMenu
+description: A menu opened from an area at the pointer, by a right-click, a long press or the ContextMenu key, built on Menu's parts, in each framework.
+---
+
+A menu of actions opened **from an area of the page**: a right-click opens it at the pointer, a
+touch long press at the finger, and the `ContextMenu` key or Shift+F10 at the focused element.
+Its content is a [Menu](/docs/api/menu)'s: items, groups, separators, checkbox and radio items,
+submenus. The menu follows the WAI-ARIA APG
+[menu pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) (roles, keys, roving focus); the
+APG has no context menu pattern of its own, so its opening follows Base UI and the platforms. A
+menu opened by a button is a Menu.
+
+ContextMenu has its own entry and is built on Menu's parts, whose part attribute names the
+context menu (`context-menu-item`). Only its Root and its Trigger area are its own.
+
+<Example id="context-menu" />
+
+## Behaviour
+
+- **Right-click** on the area, or on an element inside it: the browser's menu is prevented and
+  the menu opens with its popup's corner at the pointer (reason `trigger-press`), the popup
+  focused and no item highlighted. The mouseup that ends the right-click activates nothing: an
+  item activates on a click only. A right-click on the area while the menu is open closes it (an
+  outside press) and opens it again at the new point.
+- **Touch long press**: a touch held still on the area for 500 ms opens it at the press point
+  (`trigger-press`). A move beyond 10 px, a release or a cancel before then opens nothing; the
+  click and the `contextmenu` that follow a long press are ignored. Mouse and pen long presses do
+  nothing.
+- **Keyboard**: the `ContextMenu` key or Shift+F10, with focus on the area or inside it, opens the
+  menu anchored at the focused element with the first item highlighted (`list-navigation`). The
+  browser's own `contextmenu` after the key neither reopens it nor shows the browser's menu.
+- **Inside**: every key and pointer rule is Menu's: arrows, Home and End, typeahead, Enter and
+  Space, checkbox and radio items, submenus with their safe area. A `contextmenu` inside the menu
+  is prevented and does nothing.
+- **Close**: Escape closes one level (`escape-key`), an item closes them all (`item-press`), a
+  press outside closes them all (`outside-press`), Tab closes them all (`focus-out`) and moves on
+  from the element that had focus when it opened. Focus returns to the element that had focus
+  when the menu opened (a right-click focuses the focusable element it presses), when it is still
+  in the page and not disabled; else focus does not move.
+- **Positioning**: the root level is anchored to a point (a [virtual anchor](/docs/api/toolkit)),
+  `side="bottom" align="start"` with no offset: its start corner is at the point, flipped and
+  shifted to stay in the viewport. In RTL its start corner is its right edge. It does not follow
+  the page's scroll.
+- **Modal** (`modal`, off by default): as Menu's, the page does not scroll and the pointer
+  outside is blocked while open.
+- **Lifecycle**: `onOpenChange` before the change (`details.cancel()` keeps it as it is),
+  `onOpenChangeComplete(open)`, the actions `close()` and `unmount()`, and the Portal's
+  `keepMounted`, as every overlay's. A context menu has one Trigger area: no handle and no
+  `triggerId`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state of the root menu level |
+| Trigger | `div` | `context-menu-trigger` | the area the menu opens from (no button) |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `context-menu-positioner` | places a level at its point, or next to its SubmenuTrigger |
+| Popup | `div` | `context-menu-popup` | the menu |
+| Item | `div` | `context-menu-item` | an action |
+| Separator | `div` | `context-menu-separator` | separates items |
+| Group | `div` | `context-menu-group` | groups items under a label |
+| GroupLabel | `div` | `context-menu-group-label` | names its group |
+| CheckboxItem | `div` | `context-menu-checkbox-item` | an item that toggles a setting |
+| CheckboxItemIndicator | `span` | `context-menu-checkbox-item-indicator` | rendered while its item is checked |
+| RadioGroup | `div` | `context-menu-radio-group` | holds the value of its radio items |
+| RadioItem | `div` | `context-menu-radio-item` | an item of a set where one is checked |
+| RadioItemIndicator | `span` | `context-menu-radio-item-indicator` | rendered while its item is checked |
+| SubmenuRoot | none | | a nested level |
+| SubmenuTrigger | `div` | `context-menu-submenu-trigger` | the item that opens a submenu |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ContextMenu } from "@fragiola/primitives-react/context-menu";
+
+<ContextMenu.Root>
+    <ContextMenu.Trigger className="file-area">
+        <button type="button">report.pdf</button>
+        <button type="button">notes.txt</button>
+    </ContextMenu.Trigger>
+    <ContextMenu.Portal>
+        <ContextMenu.Positioner>
+            <ContextMenu.Popup aria-label="File actions">
+                <ContextMenu.Item onClick={() => open()}>Open</ContextMenu.Item>
+                <ContextMenu.Item onClick={() => rename()}>Rename</ContextMenu.Item>
+                <ContextMenu.Separator />
+                <ContextMenu.SubmenuRoot>
+                    <ContextMenu.SubmenuTrigger>Share</ContextMenu.SubmenuTrigger>
+                    <ContextMenu.Portal>
+                        <ContextMenu.Positioner>
+                            <ContextMenu.Popup>
+                                <ContextMenu.Item onClick={() => share("email")}>Email</ContextMenu.Item>
+                            </ContextMenu.Popup>
+                        </ContextMenu.Positioner>
+                    </ContextMenu.Portal>
+                </ContextMenu.SubmenuRoot>
+            </ContextMenu.Popup>
+        </ContextMenu.Positioner>
+    </ContextMenu.Portal>
+</ContextMenu.Root>;
+```
+
+No button names the popup: give it an `aria-label`. Turn off text selection and the system
+callout of a long press in your styles (`user-select: none`, `-webkit-touch-callout: none`).
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { ContextMenu } from "@fragiola/primitives-vue/context-menu";
+</script>
+
+<template>
+    <ContextMenu.Root>
+        <ContextMenu.Trigger class="file-area">
+            <button type="button">report.pdf</button>
+            <button type="button">notes.txt</button>
+        </ContextMenu.Trigger>
+        <ContextMenu.Portal>
+            <ContextMenu.Positioner>
+                <ContextMenu.Popup aria-label="File actions">
+                    <ContextMenu.Item @click="open()">Open</ContextMenu.Item>
+                    <ContextMenu.Item @click="rename()">Rename</ContextMenu.Item>
+                    <ContextMenu.Separator />
+                    <ContextMenu.SubmenuRoot>
+                        <ContextMenu.SubmenuTrigger>Share</ContextMenu.SubmenuTrigger>
+                        <ContextMenu.Portal>
+                            <ContextMenu.Positioner>
+                                <ContextMenu.Popup>
+                                    <ContextMenu.Item @click="share('email')">Email</ContextMenu.Item>
+                                </ContextMenu.Popup>
+                            </ContextMenu.Positioner>
+                        </ContextMenu.Portal>
+                    </ContextMenu.SubmenuRoot>
+                </ContextMenu.Popup>
+            </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+    </ContextMenu.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ContextMenuRoot, ContextMenuTrigger, ContextMenuPortal, ContextMenuPositioner, ContextMenuPopup, ContextMenuItem, ContextMenuSeparator, ContextMenuSubmenuRoot, ContextMenuSubmenuTrigger],
+    template: `
+        <ng-container contextMenuRoot>
+            <div contextMenuTrigger class="file-area">
+                <button type="button">report.pdf</button>
+                <button type="button">notes.txt</button>
+            </div>
+            <ng-container *contextMenuPortal>
+                <div contextMenuPositioner>
+                    <div contextMenuPopup aria-label="File actions">
+                        <div contextMenuItem (click)="open()">Open</div>
+                        <div contextMenuItem (click)="rename()">Rename</div>
+                        <div contextMenuSeparator></div>
+                        <ng-container contextMenuSubmenuRoot>
+                            <div contextMenuSubmenuTrigger>Share</div>
+                            <ng-container *contextMenuPortal>
+                                <div contextMenuPositioner>
+                                    <div contextMenuPopup>
+                                        <div contextMenuItem (click)="share('email')">Email</div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class FileArea {}
+```
+
+Each directive is Menu's behaviour under the entry's own selector (`[contextMenuItem]`,
+`[contextMenuCheckboxItem]`, `*contextMenuCheckboxItemIndicator`, ...).
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:open`, `@open-change`), and Angular
+as inputs and outputs (`[(open)]`, `(openChangeDetails)`). The parts after the Trigger are
+[Menu's](/docs/api/menu#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `list-navigation`, `item-press`, `escape-key`, `outside-press`, `focus-out`); `details.trigger` is the area; called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+| `modal` | `boolean` | `false` | locks the page's scroll and blocks the pointer outside while open |
+| `disabled` | `boolean` | `false` | the area opens nothing, and the browser's own menu shows |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed, `hidden` and `data-closed` |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*contextMenuPortal="{ keepMounted: true }"` |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"`; a submenu's `"inline-end"` | the side of the point |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the point, in px |
+| `alignOffset` | `number` | `0` | the shift along the point, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the point that opened it | the element to place the level next to |
+
+### Popup
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | focusable, but never activated |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `true` | activating it closes every level |
+
+### Separator
+
+No props of its own.
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id its group's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### CheckboxItem
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` | | the checked state, controlled |
+| `defaultChecked` | `boolean` | `false` | the initial state, uncontrolled |
+| `onCheckedChange` | `(checked: boolean, details: { reason, event }) => void` | | every change (reason `item-press`) |
+| `disabled` | `boolean` | `false` | focusable, but never toggled |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `false` | a click also closes every level (Enter always closes, Space never) |
+
+### CheckboxItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
+| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*contextMenuCheckboxItemIndicator="{ keepMounted: true }"` |
+
+### RadioGroup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string \| null` | | the checked RadioItem's value, controlled (`null`: none) |
+| `defaultValue` | `string \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value: string \| null, details: { reason, event }) => void` | | every change (reason `item-press`) |
+| `disabled` | `boolean` | `false` | disables every RadioItem of the group |
+
+### RadioItem
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | required | the group's value when this item is checked |
+| `disabled` | `boolean` | `false` | focusable, but never checked |
+| `label` | `string` | its text | the text typeahead matches |
+| `closeOnClick` | `boolean` | `false` | a click also closes every level (Enter always closes, Space never) |
+
+### RadioItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` (react, vue) | `boolean` | `false` | rendered while the item is unchecked too |
+| `options` (angular) | `{ keepMounted? }` | `{}` | the same option: `*contextMenuRadioItemIndicator="{ keepMounted: true }"` |
+
+### SubmenuRoot
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the submenu's open state, controlled |
+| `defaultOpen` | `boolean` | `false` | its initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason; `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives the submenu's `close()` and `unmount()` |
+| `loopFocus` | `boolean` | `true` | the arrow keys wrap at the ends |
+
+### SubmenuTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | focusable, but opens nothing |
+| `label` | `string` | its text | the text typeahead matches |
+| `openOnHover` | `boolean` | `true` | hovering opens the submenu |
+| `delay` | `number` | `100` | ms of hover before it opens |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `data-popup-open` while the menu is open, `data-disabled`; no role, no `aria-haspopup` and no inline style (it is an area, not a button) |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-nested` (a submenu); `hidden` while kept mounted and closed |
+| Popup | `role="menu"`, `aria-orientation="vertical"`, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style`; no `aria-labelledby` on the root level (give it an `aria-label`); a submenu's is labelled by its SubmenuTrigger and carries `data-nested` |
+| the other parts | as [Menu's](/docs/api/menu), with `context-menu-*` part attributes |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| `ContextMenu`, Shift+F10 on the area or inside it | opens the menu at the focused element, on the first item |
+| ArrowDown, ArrowUp | the next or previous item (wrapping with `loopFocus`) |
+| Home, End | the first or last item |
+| a character | the next item that starts with the typed text |
+| Enter, Space | activates the item, closing every level (Space keeps it open on a checkbox or radio item) |
+| ArrowRight (ArrowLeft in RTL) on a SubmenuTrigger | opens its submenu on its first item |
+| ArrowLeft (ArrowRight in RTL) in a submenu | closes it |
+| Escape | closes the current level |
+| Tab, Shift+Tab | closes every level and moves on from the element focused when it opened |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/context-menu` | `ContextMenu`, `ContextMenuRootProps`, `ContextMenuTriggerState`, `ContextMenuPortalProps`, `ContextMenuPositionerProps`, `ContextMenuPositionerState`, `ContextMenuItemProps`, `ContextMenuItemState`, `ContextMenuCheckboxItemProps`, `ContextMenuCheckboxItemState`, `ContextMenuCheckboxItemIndicatorProps`, `ContextMenuRadioGroupProps`, `ContextMenuRadioItemProps`, `ContextMenuRadioItemState`, `ContextMenuRadioItemIndicatorProps`, `ContextMenuSubmenuRootProps`, `ContextMenuSubmenuTriggerProps`, `ContextMenuSubmenuTriggerState`, `OverlayRootProps`, `OverlayPortalProps`, `OverlayActions`, `OpenChangeDetails`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/context-menu` | `ContextMenu`, `ContextMenuRootProps`, `ContextMenuRootEmits`, `ContextMenuTriggerState`, `ContextMenuPortalProps`, `ContextMenuPositionerState`, `ContextMenuPopupState`, `ContextMenuItemProps`, `ContextMenuItemState`, `ContextMenuSubmenuRootProps`, `ContextMenuSubmenuTriggerProps`, `ContextMenuSubmenuTriggerState`, `OverlayRootProps`, `OverlayRootEmits`, `OverlayPortalProps`, `OverlayActions`, `OpenChangeDetails`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/context-menu` | `ContextMenuRoot`, `ContextMenuTrigger`, `ContextMenuPortal`, `ContextMenuPositioner`, `ContextMenuPopup`, `ContextMenuItem`, `ContextMenuSeparator`, `ContextMenuGroup`, `ContextMenuGroupLabel`, `ContextMenuCheckboxItem`, `ContextMenuCheckboxItemIndicator`, `ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuRadioItemIndicator`, `ContextMenuSubmenuRoot`, `ContextMenuSubmenuTrigger`, `OverlayActions`, `OverlayPortalOptions`, `OpenChangeDetails`, `OpenChangeEvent`, `Side`, `Align`, `ChangeDetails`, `ChangeReason` |

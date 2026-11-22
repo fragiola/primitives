@@ -58,6 +58,14 @@
                 {
                     "label": "Composition",
                     "path": "guides/composition"
+                },
+                {
+                    "label": "Detached triggers",
+                    "path": "guides/detached-triggers"
+                },
+                {
+                    "label": "Nested overlays",
+                    "path": "guides/nested-overlays"
                 }
             ]
         },
@@ -70,6 +78,10 @@
                     "path": "api/dialog"
                 },
                 {
+                    "label": "AlertDialog",
+                    "path": "api/alert-dialog"
+                },
+                {
                     "label": "Popover",
                     "path": "api/popover"
                 },
@@ -80,6 +92,10 @@
                 {
                     "label": "Menu",
                     "path": "api/menu"
+                },
+                {
+                    "label": "ContextMenu",
+                    "path": "api/context-menu"
                 },
                 {
                     "label": "Tabs",
