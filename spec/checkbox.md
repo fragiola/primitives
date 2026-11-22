@@ -45,6 +45,14 @@ children's `value`s, in the order of `allValues`, else in the order they were ch
 `allValues`: every child value, which the parent checkbox checks; `disabled` (disables every
 child).
 
+**Inside a [Field](field.md)** (its integration contract): a Checkbox alone is the field's
+control. A CheckboxGroup inside a `Field.Root` is the field's control instead: the Field's Label
+names the group (`aria-labelledby`), its description and errors describe it
+(`aria-describedby`), `aria-invalid` is on the group, the group carries the field's state
+attributes, and `validate` receives the group's array. The group's Checkboxes take the field's
+`name` (each submits its own `value`; a parent checkbox submits nothing) and `disabled`, and do
+not register as the field's control themselves.
+
 A change reports reason `none` (the vocabulary of spec/README.md has no reason a toggle could
 explain better; Base UI does the same).
 
@@ -58,7 +66,7 @@ group to its default; a controlled one reports the default through `on*Change` (
 | Root | `role="checkbox"`, `type="button"`, `aria-checked` (`"true"`, `"false"`, `"mixed"`), `aria-required="true"` when required, `disabled` and `data-disabled` when disabled, `data-checked` / `data-unchecked` / `data-indeterminate` (exactly one), `data-required`; a parent checkbox also has `aria-controls` (its children's ids) |
 | Indicator | `aria-hidden="true"`, the same `data-checked` / `data-unchecked` / `data-indeterminate`, `data-disabled` |
 | hidden input | `type="checkbox"`, `name`, `value`, `checked`, `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, structural inline style (visually hidden) |
-| CheckboxGroup | `role="group"`, `data-disabled`; its accessible name comes from the consumer (`aria-labelledby`) |
+| CheckboxGroup | `role="group"`, `data-disabled`; its accessible name comes from the consumer (`aria-labelledby`), or the Field's Label; inside a Field, `aria-describedby`, `aria-invalid` and the field's state attributes |
 
 The Root's accessible name comes from the consumer: a `<label>` around it, `<label for>` (a
 `button` is labelable), or `aria-label`.
@@ -126,6 +134,7 @@ Checks:
 4. "Submit" with "Accept terms" unchecked submits nothing (`form: none`, required) and focuses
    "Accept terms"; checked, it submits `form: terms=on&news=yes`.
 5. "Reset" returns every checkbox to its default ("Accept terms" unchecked, "Subscribe" checked).
+   The field scenario of the group is [`/field/more-controls`](field.md#fieldmore-controls).
 6. A click on "Locked" does nothing.
 7. Axe finds no violation.
 

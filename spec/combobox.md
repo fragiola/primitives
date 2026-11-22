@@ -449,7 +449,9 @@ Checks:
    "Pick one. Choose a fruit.".
 4. Choosing "Banana" hides the error and removes `aria-invalid`; "Submit" gives
    `form: fruit=banana`.
-5. Axe finds no violation, before and after the failed submission.
+5. A form reset (`form.reset()`) empties the input and the value; "Submit" then submits nothing
+   again.
+6. Axe finds no violation, before and after the failed submission.
 
 ## Differences from Base UI
 

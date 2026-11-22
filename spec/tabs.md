@@ -90,7 +90,9 @@ on them animates it.
 ## RTL
 
 In horizontal orientation, ArrowLeft moves to the next tab and ArrowRight to the previous one. The
-Indicator's inline-start variable is measured from the List's inline-start edge.
+direction is a [DirectionProvider](direction.md)'s, else the List's computed one. The
+Indicator's inline-start variable is measured from the List's inline-start edge (the layout's,
+so always the computed direction).
 
 ## Server rendering
 
