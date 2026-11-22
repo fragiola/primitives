@@ -6,7 +6,10 @@ import {
     untracked,
 } from "@angular/core";
 import { getDirection } from "@fragiola/primitives/direction";
-import { dataValues, injectHost } from "@fragiola/primitives-angular/internal";
+import {
+    conditionalView,
+    writeAttributes,
+} from "@fragiola/primitives-angular/internal";
 import { TabsRoot } from "./tabs-root.directive.ts";
 
 const VARIABLES = [
@@ -16,32 +19,50 @@ const VARIABLES = [
     "--tabs-indicator-block-size",
 ] as const;
 
+export interface TabsIndicatorState {
+    orientation: "horizontal" | "vertical";
+}
+
 /**
  * Follows the selected tab through CSS variables measured from the list (spec/tabs.md):
- * `<span tabsIndicator>` inside the list. It stays rendered; until a tab is selected it carries
- * no variables.
+ * `<span *tabsIndicator>` inside the list. Structural, so it is not rendered while no tab is
+ * selected, as in React and Vue. The directive writes its attributes on the element it renders.
  */
-@Directive({
-    selector: "[tabsIndicator]",
-    exportAs: "tabsIndicator",
-    host: {
-        "aria-hidden": "true",
-        "data-primitives-part": "tabs-indicator",
-        "[attr.data-orientation]": "data().orientation",
-    },
-})
+@Directive({ selector: "[tabsIndicator]", exportAs: "tabsIndicator" })
 export class TabsIndicator {
     private readonly root = inject(TabsRoot);
-    readonly state = computed(() => ({ orientation: this.root.orientation() }));
-    protected readonly data = computed(() => dataValues(this.state()));
+    readonly state = computed<TabsIndicatorState>(() => ({
+        orientation: this.root.orientation(),
+    }));
 
     constructor() {
-        const host = injectHost();
         const root = this.root;
+        const element = conditionalView(
+            computed(() => root.selected() !== undefined),
+            (rendered) =>
+                writeAttributes(rendered, {
+                    "aria-hidden": "true",
+                    "data-primitives-part": "tabs-indicator",
+                    "data-orientation": untracked(this.state).orientation,
+                }),
+        );
+        afterRenderEffect(() => {
+            const host = element();
+            const orientation = this.state().orientation;
+            if (host !== null) {
+                untracked(() =>
+                    writeAttributes(host, { "data-orientation": orientation }),
+                );
+            }
+        });
         afterRenderEffect((onCleanup) => {
+            const host = element();
             const list = root.list();
             const value = root.selected();
             root.version();
+            if (host === null) {
+                return;
+            }
             untracked(() => {
                 const clear = () => {
                     for (const name of VARIABLES) {

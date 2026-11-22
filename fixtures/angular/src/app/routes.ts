@@ -8,6 +8,7 @@ export const ROUTES: readonly string[] = [
     "/tabs/automatic",
     "/tabs/manual",
     "/tabs/vertical",
+    "/tabs/none-selected",
     "/popover/basic",
     "/popover/initial-focus",
     "/popover/placement",

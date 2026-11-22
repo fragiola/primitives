@@ -44,6 +44,7 @@ import { SliderRange } from "../scenarios/slider/slider-range.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
 import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
+import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.tsx";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.tsx";
@@ -59,6 +60,7 @@ export const routes: Record<string, ComponentType<{ locale: string }>> = {
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
+    "/tabs/none-selected": TabsNoneSelected,
     "/popover/basic": PopoverBasic,
     "/popover/initial-focus": PopoverInitialFocus,
     "/popover/placement": PopoverPlacement,

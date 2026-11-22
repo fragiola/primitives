@@ -33,8 +33,9 @@ spaces still gives valid `aria-controls` / `aria-labelledby`), `disabled`.
 **Indicator**: no props. It exposes the selected tab's box, relative to the List, as structural
 CSS variables: `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
 `--tabs-indicator-inline-size`, `--tabs-indicator-block-size`. It is not rendered while no tab is
-selected. In Angular, the Indicator is an attribute directive on the consumer's element, which
-stays in the DOM: while no tab is selected it carries no variables (wrap it in `@if` to remove it).
+selected, in every framework: Angular's is structural (`<span *tabsIndicator>`), as its panels
+are, so it leaves the DOM too (Epic #22; it was an attribute directive that stayed, with no
+variables).
 
 ## State attributes and ARIA
 
@@ -127,6 +128,14 @@ The same content with `orientation="vertical"`.
 
 Checks: the tablist has `aria-orientation="vertical"`; ArrowDown and ArrowUp move between tabs;
 ArrowRight does nothing.
+
+### `/tabs/none-selected`
+
+Tabs **"Account"** and **"Password"**, both disabled, with panels "Account settings" and
+"Password settings", an Indicator, and no `value` nor `defaultValue`.
+
+Checks: no tab is selected (`aria-selected="false"`, no `data-selected`), no panel and no
+Indicator is rendered.
 
 ### `/tabs/automatic?dir=rtl`
 

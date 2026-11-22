@@ -43,6 +43,7 @@ import { SliderControlled } from "../scenarios/slider/slider-controlled.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
+import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.ts";
@@ -62,6 +63,7 @@ import { ROUTES } from "./routes.ts";
         DialogRejectedClose,
         DialogNestedPopover,
         SettingsTabs,
+        TabsNoneSelected,
         PopoverBasic,
         PopoverInitialFocus,
         PopoverPlacement,
@@ -112,6 +114,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/tabs/automatic") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="horizontal"></main> }
             @case ("/tabs/manual") { <main class="p-6" scenario-settings-tabs activation="manual" orientation="horizontal"></main> }
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
+            @case ("/tabs/none-selected") { <main class="p-6" scenario-tabs-none-selected></main> }
             @case ("/popover/basic") { <main class="p-6" scenario-popover-basic></main> }
             @case ("/popover/initial-focus") { <main class="p-6" scenario-popover-initial-focus></main> }
             @case ("/popover/placement") { <main class="p-6" scenario-popover-placement></main> }

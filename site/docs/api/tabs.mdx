@@ -77,14 +77,14 @@ import { Tabs } from "@fragiola/primitives-react/tabs";
     <div tabsList aria-label="Account settings">
         <button tabsTab value="account">Account</button>
         <button tabsTab value="password">Password</button>
-        <span tabsIndicator></span>
+        <span *tabsIndicator></span>
     </div>
     <div *tabsPanel="'account'">Your account.</div>
     <div *tabsPanel="'password'">Your password.</div>
 </div>
 ```
 
-`*tabsPanel` renders its panel only while it is selected;
+`*tabsIndicator` is structural too: it is rendered only while a tab is selected. `*tabsPanel` renders its panel only while it is selected;
 `*tabsPanel="'account'; keepMounted: true"` keeps it in the page, `hidden`. `injectTabs()` gives a child component the tabs' state.
 
 </Framework>
@@ -157,4 +157,4 @@ tab is selected.
 | --- | --- |
 | `@fragiola/primitives-react/tabs` | `Tabs`, `TabsRootProps`, `TabsRootState`, `TabsTabProps`, `TabsTabState`, `TabsPanelProps`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
 | `@fragiola/primitives-vue/tabs` | `Tabs`, `TabsRootProps`, `TabsRootEmits`, `TabsRootState`, `TabsListState`, `TabsTabProps`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelProps`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
-| `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |
+| `@fragiola/primitives-angular/tabs` | `TabsRoot`, `TabsList`, `TabsTab`, `TabsIndicator`, `TabsPanel`, `injectTabs`, `TabInfo`, `TabsRootState`, `TabsTabState`, `TabsIndicatorState`, `TabsPanelState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |

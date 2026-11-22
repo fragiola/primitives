@@ -44,6 +44,7 @@ import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
 import TabsManual from "../scenarios/tabs/tabs-manual.vue";
+import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
 import TooltipGroup from "../scenarios/tooltip/tooltip-group.vue";
@@ -59,6 +60,7 @@ export const routes: Record<string, Component> = {
     "/tabs/automatic": TabsAutomatic,
     "/tabs/manual": TabsManual,
     "/tabs/vertical": TabsVertical,
+    "/tabs/none-selected": TabsNoneSelected,
     "/popover/basic": PopoverBasic,
     "/popover/initial-focus": PopoverInitialFocus,
     "/popover/placement": PopoverPlacement,

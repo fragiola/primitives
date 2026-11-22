@@ -707,7 +707,7 @@ import {
             <div tabsList aria-label="Tabs">
                 <button tabsTab value="a">A</button>
                 <button tabsTab value="b">B</button>
-                <span tabsIndicator></span>
+                <span *tabsIndicator></span>
             </div>
             <div *tabsPanel="'a'">A</div>
             <div *tabsPanel="'b'">B</div>
