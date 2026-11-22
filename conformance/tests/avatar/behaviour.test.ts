@@ -27,15 +27,22 @@ test.describe("avatar / basic", () => {
     });
 
     test("a slow image shows its fallback while it loads", async ({ page }) => {
-        // the image is answered 800 ms late, through the request, never the network
+        // the image is held through its request, never the network, until the loading state is
+        // checked: a framework that mounts before the window's `load` (which a loading image
+        // holds back) and one that mounts after it see the same page
+        let release: () => void = () => {};
+        const held = new Promise<void>((resolve) => {
+            release = resolve;
+        });
         await page.route("**/avatar/ada.svg", async (route) => {
-            await new Promise((resolve) => setTimeout(resolve, 800));
+            await held;
             await route.continue();
         });
-        await openScenario(page, "/avatar/basic");
+        await page.goto("/avatar/basic", { waitUntil: "domcontentloaded" });
         await expectOutput(page, "ada", "loading");
         await expect(text(page, "AL")).toBeVisible();
         await expect(image(page, "Ada Lovelace")).toHaveCount(0);
+        release();
         await expectOutput(page, "ada", "loaded");
         await expect(image(page, "Ada Lovelace")).toBeVisible();
         await expect(text(page, "AL")).toHaveCount(0);

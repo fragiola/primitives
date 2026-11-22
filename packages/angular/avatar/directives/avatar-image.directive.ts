@@ -75,9 +75,7 @@ export class AvatarImage {
             });
         });
         // after each render that changed the source (a browser only runs it): a cached image is
-        // `loaded` within the same tick, so its view is rendered before the browser paints. While
-        // the page itself is still loading, the load starts with the page's `load` event: an image
-        // loading earlier would hold that event back (React's first render comes after it)
+        // `loaded` within the same tick, so its view is rendered before the browser paints
         afterRenderEffect((onCleanup) => {
             const src = this.src();
             const options = {
@@ -87,26 +85,15 @@ export class AvatarImage {
                 referrerPolicy: this.referrerPolicy(),
             };
             untracked(() => {
-                let stop = () => {};
-                const start = () => {
-                    stop = watchImageStatus(
-                        root.host,
-                        src,
-                        options,
-                        (status) => {
-                            root.status.set(status);
-                            this.loadingStatusChange.emit(status);
-                        },
-                    );
-                };
-                const document = root.host.ownerDocument;
-                const view = document.defaultView;
-                if (view === null || document.readyState === "complete") {
-                    start();
-                } else {
-                    view.addEventListener("load", start, { once: true });
-                    stop = () => view.removeEventListener("load", start);
-                }
+                const stop = watchImageStatus(
+                    root.host,
+                    src,
+                    options,
+                    (status) => {
+                        root.status.set(status);
+                        this.loadingStatusChange.emit(status);
+                    },
+                );
                 onCleanup(() => {
                     stop();
                     root.status.set("idle");

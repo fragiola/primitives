@@ -91,7 +91,8 @@ Checks:
 
 1. Once loaded (`ada: loaded`), an `img` named "Ada Lovelace" is shown and "AL" is not.
 2. The broken image: `missing: error`, no `img` named "Grace Hopper", "GH" is shown.
-3. **A slow image**: with `/avatar/ada.svg` answered after 800 ms, the first Avatar reports
+3. **A slow image**: with `/avatar/ada.svg` held until the test has checked (the page opened at
+   `DOMContentLoaded`: a loading image holds the window's `load` back), the first Avatar reports
    `ada: loading` and shows "AL" with no `img`; once answered, `ada: loaded`, the image is shown
    and "AL" is gone.
 4. **The delay**: with the clock installed before the page loads, "KJ" is not rendered at first,
