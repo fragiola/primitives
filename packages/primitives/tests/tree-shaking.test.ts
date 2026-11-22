@@ -46,6 +46,7 @@ describe("importing from the root", () => {
         ["collection", "tabsKeyTarget"],
         ["date", "monthGrid"],
         ["positioning", "anchorFloating"],
+        ["swipe", "watchSwipe"],
     ] as const) {
         it(`tree-shakes ${name} to the same output as @fragiola/primitives/${mechanism}`, async () => {
             const use = `globalThis.used = ${name};`;
