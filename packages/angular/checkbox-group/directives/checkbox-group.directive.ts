@@ -77,6 +77,7 @@ export class CheckboxGroup {
         value: computed(() => [...this.checked()]),
         filled: computed(() => this.checked().length > 0),
         input: () => null,
+        element: () => this.host,
         focusTarget: () =>
             this.host.querySelector<HTMLElement>(
                 '[data-primitives-part="checkbox-root"]:not([disabled])',

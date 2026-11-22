@@ -1,5 +1,4 @@
 import {
-    afterNextRender,
     afterRenderEffect,
     computed,
     DestroyRef,
@@ -34,6 +33,11 @@ export interface FieldControlOptions {
      * first enabled Checkbox.
      */
     focusTarget: () => HTMLElement | null;
+    /**
+     * The control's own element, for one with no validated element (a CheckboxGroup): where its
+     * native form is found (default: the focus target).
+     */
+    element?: () => HTMLElement | null;
     /**
      * A control that is part of the field's control (a CheckboxGroup's Checkbox): it does not
      * register as the field's control, and gets nothing from the field.
@@ -174,20 +178,29 @@ export function fieldControl(
         });
     });
 
-    // inside a `form[formRoot]`, its submission validates the field instead
+    // inside a `form[formRoot]`, its submission validates the field instead; outside one, the
+    // native form is found once the control's elements render (a group's checkboxes, a picker's
+    // trigger), and listened to until the control is destroyed
     let stop: (() => void) | null = null;
-    afterNextRender(() => {
-        if (field.inForm) {
-            return;
-        }
-        const form = options.input()?.form;
-        if (form === null || form === undefined) {
-            return;
-        }
-        stop = onSubmitAttempt(form, () =>
-            events.submitAttempt(options.input(), untracked(options.value)),
-        );
-    });
+    if (!field.inForm) {
+        afterRenderEffect(() => {
+            if (stop !== null) {
+                return;
+            }
+            const form =
+                options.input()?.form ??
+                (options.element?.() ?? options.focusTarget())?.closest(
+                    "form",
+                ) ??
+                null;
+            if (form === null) {
+                return;
+            }
+            stop = onSubmitAttempt(form, () =>
+                events.submitAttempt(options.input(), untracked(options.value)),
+            );
+        });
+    }
     inject(DestroyRef).onDestroy(() => stop?.());
 
     return {

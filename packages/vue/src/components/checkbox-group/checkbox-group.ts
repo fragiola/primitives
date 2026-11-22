@@ -88,6 +88,7 @@ export const CheckboxGroup: PartComponent<
                 filled: () => value.value.length > 0,
                 // nothing the browser validates: `validate` decides
                 input: () => null,
+                element: () => element.value,
                 // the first enabled checkbox
                 focusTarget: () =>
                     element.value?.querySelector<HTMLElement>(

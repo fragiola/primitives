@@ -46,6 +46,7 @@ export function CheckboxGroup({
         value: [...value],
         filled: value.length > 0,
         input: () => null,
+        element: () => element,
         focusTarget: () =>
             element?.querySelector<HTMLElement>(
                 '[role="checkbox"]:not([disabled])',

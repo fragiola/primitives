@@ -20,6 +20,11 @@ export interface UseFieldControlOptions {
     input: () => HTMLInputElement | null;
     /** The element a Form focuses when the field is the first invalid one (spec/field.md, 5). */
     focusTarget: () => HTMLElement | null;
+    /**
+     * The control's own element, for one with no validated element (a CheckboxGroup): where its
+     * native form is found (default: the focus target).
+     */
+    element?: () => HTMLElement | null;
 }
 
 /** What a control renders inside a field; each getter is read at render time. */
@@ -111,14 +116,38 @@ export function useFieldControl(
         const initial = serialize(options.value());
         let previous = initial;
         events.mounted(options.input(), options.value(), options.filled());
-        // inside a Form, the Form's submission validates the field (spec/form.md)
-        const form = field.inForm ? null : options.input()?.form;
-        if (form !== null && form !== undefined) {
-            stop.push(
-                onSubmitAttempt(form, () => {
-                    events.submitAttempt(options.input(), options.value());
-                }),
-            );
+        // inside a Form, the Form's submission validates the field (spec/form.md); outside one,
+        // the native form is found once the control's elements render (a picker's trigger), and
+        // listened to until unmount
+        if (!field.inForm) {
+            const findForm = () =>
+                options.input()?.form ??
+                (options.element?.() ?? options.focusTarget())?.closest(
+                    "form",
+                ) ??
+                null;
+            const listen = (form: HTMLFormElement) =>
+                stop.push(
+                    onSubmitAttempt(form, () => {
+                        events.submitAttempt(options.input(), options.value());
+                    }),
+                );
+            const form = findForm();
+            if (form !== null) {
+                listen(form);
+            } else {
+                const unwatch = watch(
+                    findForm,
+                    (found) => {
+                        if (found !== null) {
+                            unwatch();
+                            listen(found);
+                        }
+                    },
+                    { flush: "post" },
+                );
+                stop.push(unwatch);
+            }
         }
         // after the render: the validated element holds the new value
         stop.push(

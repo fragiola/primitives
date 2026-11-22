@@ -29,6 +29,11 @@ export interface UseFieldControlOptions {
     /** The element a Form focuses when the field is the first invalid one (spec/field.md). */
     focusTarget: () => HTMLElement | null;
     /**
+     * The control's own element, for one with no validated element (a CheckboxGroup): where its
+     * native form is found (default: the focus target).
+     */
+    element?: () => HTMLElement | null;
+    /**
      * The control is not the field's own (a Checkbox inside a CheckboxGroup that is): it reads
      * nothing of the field and reports nothing.
      */
@@ -140,22 +145,33 @@ export function useFieldControl(
         events.changed(input(), value, serialized !== initial.current, filled);
     }, [events, serialized, resets]);
 
-    // inside a Form, the Form runs the submission attempts (spec/form.md)
+    // inside a Form, the Form runs the submission attempts (spec/form.md). Outside one, the native
+    // form is found once the control's elements render (a group's checkboxes, a picker's trigger,
+    // which may come after the control's first render), and listened to until unmount
     const inForm = field?.inForm ?? false;
+    const [form, setForm] = useState<HTMLFormElement | null>(null);
     useEffect(() => {
-        if (events === undefined || inForm) {
-            return undefined;
+        if (events === undefined || inForm || form !== null) {
+            return;
         }
-        const { input, focusTarget } = latest.current;
-        const form = input()?.form ?? focusTarget()?.closest("form") ?? null;
-        if (form === null) {
+        const { input, focusTarget, element } = latest.current;
+        const found =
+            input()?.form ??
+            (element?.() ?? focusTarget())?.closest("form") ??
+            null;
+        if (found !== null) {
+            setForm(found);
+        }
+    });
+    useEffect(() => {
+        if (events === undefined || inForm || form === null) {
             return undefined;
         }
         return onSubmitAttempt(form, () => {
             const { input: current, value } = latest.current;
             events.submitAttempt(current(), value);
         });
-    }, [events, inForm]);
+    }, [events, inForm, form]);
 
     const onBlur = useCallback(() => {
         const { input, value } = latest.current;
