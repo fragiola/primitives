@@ -1,11 +1,10 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // slider: a volume and a price range (spec/slider.md).
@@ -60,6 +59,5 @@ test("axe finds no violation", async ({ page }) => {
     requireExamples("slider");
     await page.goto(`${EMBED_BASE}?id=slider`);
     await expect(page.getByRole("slider")).toHaveCount(3);
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

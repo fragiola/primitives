@@ -1,11 +1,10 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // field: a sign-up email in a form (spec/field.md).
@@ -45,12 +44,8 @@ test("axe finds no violation, before and after a failed submission", async ({
 }) => {
     requireExamples("field");
     await page.goto(`${EMBED_BASE}?id=field`);
-    expect(
-        (await new AxeBuilder({ page }).withTags(WCAG).analyze()).violations,
-    ).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
     await page.getByRole("button", { name: "Sign up" }).click();
     await expect(page.getByText("Enter your email.")).toBeVisible();
-    expect(
-        (await new AxeBuilder({ page }).withTags(WCAG).analyze()).violations,
-    ).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

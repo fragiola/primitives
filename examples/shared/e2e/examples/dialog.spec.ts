@@ -1,6 +1,6 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     messages,
@@ -8,7 +8,6 @@ import {
     part,
     promoted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // dialog: the "Edit profile" dialog (spec/dialog.md). Inside the site's frame its overlay is
@@ -132,6 +131,5 @@ test("axe finds no violation with the dialog open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=dialog`);
     await page.getByRole("button", { name: "Edit profile" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

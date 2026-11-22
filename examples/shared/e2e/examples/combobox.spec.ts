@@ -1,12 +1,11 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     promoted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // combobox: fruit tags, a multiple combobox with chips (spec/combobox.md, D10). Non-modal: never
@@ -66,6 +65,5 @@ test("axe finds no violation with the list open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=combobox`);
     await page.getByRole("combobox", { name: "Fruits" }).click();
     await expect(page.getByRole("listbox")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

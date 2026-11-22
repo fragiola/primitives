@@ -1,11 +1,10 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, type FrameLocator, type Page, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // calendar: trip dates, a RangeCalendar over two months (spec/calendar.md). Today is fixed at
@@ -118,6 +117,5 @@ test("axe finds no violation", async ({ page }) => {
     await page.clock.setFixedTime(TODAY);
     await page.goto(`${EMBED_BASE}?id=calendar`);
     await expect(page.getByRole("grid")).toHaveCount(2);
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

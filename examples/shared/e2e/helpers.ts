@@ -1,4 +1,5 @@
 // Adapted from Tree (fragiola/tree, examples/shared/e2e/helpers.ts), same author and licence.
+import AxeBuilder from "@axe-core/playwright";
 import { expect, type FrameLocator, type Page, test } from "@playwright/test";
 import { examplesApp, listExampleIds } from "../scripts/examples-lib.ts";
 import { THEMES, type ThemeName } from "../src/themes/themes.ts";
@@ -107,3 +108,37 @@ export { test };
  * `h1`, no landmarks), so the page-level best practices do not apply to it.
  */
 export const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+
+/**
+ * Waits until no animation runs in the page: an overlay's enter transition starts once its popup
+ * drops `data-starting-style`, which a framework that renders in a later task (zoneless Angular)
+ * does a frame or two after the popup is visible. Waits for the frames, then for every running
+ * animation, until none is left (as the conformance suite's axe check).
+ */
+export async function settleAnimations(page: Page): Promise<void> {
+    await page.evaluate(async () => {
+        const frame = () =>
+            new Promise((resolve) =>
+                requestAnimationFrame(() => resolve(null)),
+            );
+        for (let round = 0; round < 10; round += 1) {
+            await frame();
+            await frame();
+            const running = document.getAnimations();
+            if (running.length === 0) {
+                return;
+            }
+            await Promise.all(running.map((animation) => animation.finished));
+        }
+    });
+}
+
+/**
+ * The page's axe violations under {@link WCAG}, once its transitions have settled: a half-faded
+ * popup has no stable colour contrast. Every example's axe check goes through it, in every
+ * framework, so none measures an enter transition (tests/axe-settled.test.ts).
+ */
+export async function axeViolations(page: Page) {
+    await settleAnimations(page);
+    return (await new AxeBuilder({ page }).withTags(WCAG).analyze()).violations;
+}

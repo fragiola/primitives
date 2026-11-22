@@ -1,11 +1,10 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import {
+    axeViolations,
     collectErrors,
     EMBED_BASE,
     openHosted,
     requireExamples,
-    WCAG,
 } from "../helpers.ts";
 
 // tooltip: the toolbar hints (spec/tooltip.md). A tooltip is no layer: never promoted.
@@ -54,6 +53,5 @@ test("axe finds no violation with a tooltip open", async ({ page }) => {
     await page.goto(`${EMBED_BASE}?id=tooltip`);
     await page.getByRole("button", { name: "Bold", exact: true }).hover();
     await expect(page.getByRole("tooltip")).toBeVisible();
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(results.violations).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 });

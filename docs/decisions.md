@@ -82,6 +82,16 @@ the Epic's stop condition (take the APG-closest option, record it in the spec an
 | A cell's `aria-label` in Angular | A static `aria-label` of the consumer's replaces the `Intl` name (`ownAttribute`), as React's and Vue's props do | the host binding always winning (the POC) | `calendar.md` "API" |
 | A form | The pickers take no `name` in stage 0; the example's hidden input carries the ISO date. Form support and Field come with stage 3 | adding `name` and a hidden input now | `calendar.md` "Purpose" |
 
+## Hardening: details decided during Epic #22 (Issues #18–#21)
+
+The Stage 0 follow-ups and server rendering. No rule of the handoff (D1–D10, §3, §4) changed.
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| Angular's presence | Its effect runs after rendering (`afterRenderEffect`), so the exit is awaited once the popup carries `data-ending-style`: every Angular overlay now plays its exit transition and can be reopened during it, as React's and Vue's (`conformance/tests/presence`) | a frame's wait before `waitForAnimations` (the plain `effect` ran before the view was refreshed and found no animation) | `dialog.md` "Animation" |
+| Angular's Tabs Indicator | Structural, `<span *tabsIndicator>`, as its panels: not rendered while no tab is selected, as in React and Vue (`/tabs/none-selected`) | keeping the attribute directive and recording the difference (Stage 0) | `tabs.md` "API" |
+| An axe check during a transition | Every axe check (conformance and examples) waits until the page's animations have finished (`settleAnimations`), in every framework; no rule is disabled | retrying the check, disabling `color-contrast` | |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,
