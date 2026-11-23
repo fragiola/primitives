@@ -133,8 +133,16 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.tsx";
 import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
+import { RatingBasic } from "../scenarios/rating/rating-basic.tsx";
+import { RatingField } from "../scenarios/rating/rating-field.tsx";
+import { RatingHalf } from "../scenarios/rating/rating-half.tsx";
+import { RatingReadOnly } from "../scenarios/rating/rating-read-only.tsx";
 import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.tsx";
 import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.tsx";
+import { SegmentedControlBasic } from "../scenarios/segmented-control/segmented-control-basic.tsx";
+import { SegmentedControlDisabled } from "../scenarios/segmented-control/segmented-control-disabled.tsx";
+import { SegmentedControlField } from "../scenarios/segmented-control/segmented-control-field.tsx";
+import { SegmentedControlVertical } from "../scenarios/segmented-control/segmented-control-vertical.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
 import { SelectGroups } from "../scenarios/select/select-groups.tsx";
@@ -156,6 +164,18 @@ import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNonce } from "../scenarios/tabs/tabs-nonce.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
+import { TagGroupBasic } from "../scenarios/tag-group/tag-group-basic.tsx";
+import { TagGroupDisabled } from "../scenarios/tag-group/tag-group-disabled.tsx";
+import { TagGroupEmpty } from "../scenarios/tag-group/tag-group-empty.tsx";
+import { TagGroupField } from "../scenarios/tag-group/tag-group-field.tsx";
+import { TagGroupForm } from "../scenarios/tag-group/tag-group-form.tsx";
+import { TagGroupSelection } from "../scenarios/tag-group/tag-group-selection.tsx";
+import { TagGroupSingle } from "../scenarios/tag-group/tag-group-single.tsx";
+import { TagsInputBasic } from "../scenarios/tags-input/tags-input-basic.tsx";
+import { TagsInputBlur } from "../scenarios/tags-input/tags-input-blur.tsx";
+import { TagsInputEdit } from "../scenarios/tags-input/tags-input-edit.tsx";
+import { TagsInputField } from "../scenarios/tags-input/tags-input-field.tsx";
+import { TagsInputOptions } from "../scenarios/tags-input/tags-input-options.tsx";
 import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.tsx";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.tsx";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.tsx";
@@ -384,6 +404,26 @@ export const routes: Record<
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/tag-group/basic": TagGroupBasic,
+    "/tag-group/selection": TagGroupSelection,
+    "/tag-group/single": TagGroupSingle,
+    "/tag-group/disabled": TagGroupDisabled,
+    "/tag-group/empty": TagGroupEmpty,
+    "/tag-group/field": TagGroupField,
+    "/tag-group/form": TagGroupForm,
+    "/tags-input/basic": TagsInputBasic,
+    "/tags-input/options": TagsInputOptions,
+    "/tags-input/edit": TagsInputEdit,
+    "/tags-input/blur": TagsInputBlur,
+    "/tags-input/field": TagsInputField,
+    "/segmented-control/basic": SegmentedControlBasic,
+    "/segmented-control/vertical": SegmentedControlVertical,
+    "/segmented-control/disabled": SegmentedControlDisabled,
+    "/segmented-control/field": SegmentedControlField,
+    "/rating/basic": RatingBasic,
+    "/rating/half": RatingHalf,
+    "/rating/read-only": RatingReadOnly,
+    "/rating/field": RatingField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,

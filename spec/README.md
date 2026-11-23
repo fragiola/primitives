@@ -51,6 +51,10 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [hover-card.md](hover-card.md) | HoverCard |
 | [scroll-area.md](scroll-area.md) | ScrollArea (native scrolling, custom scrollbars, on the toolkit's `/scroll-area`) |
 | [pagination.md](pagination.md) | Pagination (no APG pattern and no Base UI component: the APG-closest behaviour, decided there; the range is the toolkit's `/pagination`) |
+| [tag-group.md](tag-group.md) | TagGroup (no APG pattern and no Base UI component: React Aria's grid of tags, decided there; its selection on the toolkit's `/selection`) |
+| [tags-input.md](tags-input.md) | TagsInput (no APG pattern and no Base UI component: Zag/Ark's and Reka UI's, decided there; a form control, one hidden input per tag) |
+| [segmented-control.md](segmented-control.md) | SegmentedControl (no APG pattern and no Base UI component: the APG radio group with Tabs' moving Indicator, decided there) |
+| [rating.md](rating.md) | Rating (the APG's rating radio group example, with half steps, a pointer preview and clearing decided there; its value math on the toolkit's `/range`) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -88,6 +92,11 @@ Issue #75: DatePickerInput and DateRangePickerInput, [calendar.md](calendar.md))
 variants (Epic #79, Issue #77: MultipleCalendar and CalendarPreset, [calendar.md](calendar.md);
 Issue #78: the month and year calendars and pickers and CalendarView, on the toolkit's
 `/month-year`, [month-calendar.md](month-calendar.md)).
+Stage 4 starts with the tags and choices (Epic #91, Issue #89: TagGroup and TagsInput,
+[tag-group.md](tag-group.md), [tags-input.md](tags-input.md), with their keys in the toolkit's
+`/collection` and the rules that add and edit a tag in `/form`; Issue #90: SegmentedControl and
+Rating, [segmented-control.md](segmented-control.md), [rating.md](rating.md), with the segment
+Indicator's measurement in `/collection` and the rating's value math in `/range`).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -138,7 +147,8 @@ The vocabulary is shared by every component:
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
-| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox and autocomplete item, select item); a Listbox's focused option while the focus is in the list |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox and autocomplete item, select item); a Listbox's focused option while the focus is in the list; a Rating's star drawn filled (whole or half) by the value or the pointer's preview ([rating.md](rating.md#state-attributes-and-aria)) |
+| `data-half` | a Rating's star drawn half filled |
 | `data-selected` | a selected tab, combobox item, listbox option or calendar date |
 | `data-pressed` | a pressed Toggle (spec/toggle.md) |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
@@ -150,13 +160,14 @@ The vocabulary is shared by every component:
 | `data-today` | the calendar cell of today |
 | `data-outside-month` | a calendar cell of the previous or next month |
 | `data-unavailable` | a calendar date the app marked unavailable |
-| `data-readonly` | a read-only calendar or switch |
+| `data-readonly` | a read-only calendar or switch; a read-only Rating's Root and stars |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
-| `data-empty` | a combobox's or an autocomplete's list with no item |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a TagGroup's Root and List with no tag (once mounted); a TagsInput's Root and Control with no tag |
+| `data-editing` | a TagsInput's Tag while its TagInput edits it |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; an indeterminate Progress |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; a SegmentedControl's Item and ItemText, a Rating's star; an indeterminate Progress |
 | `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present); `data-complete` also on every part of an OTPField whose code is `length` long |
 | `data-scrubbing` | every part of a NumberField while its ScrubArea scrubs |
 | `data-required` | a required form control |
@@ -197,18 +208,18 @@ The reasons are shared:
 | `escape-key` | Escape dismissed the overlay |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's selection; a Pagination Item's press changed its page |
+| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value |
+| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
-| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md) |
-| `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md) |
-| `clear-press` | a combobox's or an autocomplete's Clear was pressed |
-| `chip-remove-press` | a combobox chip's remove button was pressed |
+| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md) |
+| `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md), or added a TagsInput's tags (spec/tags-input.md) |
+| `clear-press` | a combobox's or an autocomplete's Clear, or a TagsInput's ClearTrigger, was pressed |
+| `chip-remove-press` | a combobox chip's remove button, a TagGroup's RemoveButton or a TagsInput's TagRemove was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's selection |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
@@ -251,13 +262,13 @@ Checkbox, Slider and Select.
 ### Forms
 
 The form controls (Select, Checkbox, Switch, RadioGroup, Slider, Combobox, DatePicker,
-DateRangePicker, NumberField, OTPField, Listbox, DateField, TimeField) take `name` and render a **hidden input** that
+DateRangePicker, NumberField, OTPField, Listbox, DateField, TimeField, TagsInput, SegmentedControl, Rating) take `name` and render a **hidden input** (Rating: its `HiddenInput` part) that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
 (`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
-`hidden-input`, since its `input` is the visible Input; NumberField, OTPField, DateField and TimeField: `hidden-input` too); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
+`hidden-input`, since its `input` is the visible Input; NumberField, OTPField, DateField, TimeField and TagsInput: `hidden-input` too; Rating's part is `HiddenInput`, `rating-hidden-input`); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
 input is).
 Outside a Field, a control is named by a [Label](label.md) (`for`, or wrapping it), or by the
 consumer's `aria-label` / `aria-labelledby`.
@@ -270,7 +281,7 @@ the toolkit's form bridge cancels the later controls' `invalid` events of that v
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
-DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox, an Autocomplete, a DateField or a TimeField gives the control:
+DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox, an Autocomplete, a DateField, a TimeField, a TagGroup, a TagsInput, a SegmentedControl or a Rating gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
@@ -469,6 +480,14 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Pagination's page | `page` + `onPageChange(page, details)` (`defaultPage`) on `Pagination.Root` | `v-model:page` (`default-page`, `@page-change="(page, details) => ..."`) | `[(page)]` on `nav[paginationRoot]` (`defaultPage`; `pageChangeDetails` output `{ value, details }`) |
 | Pagination's parts and range | `Pagination.Root` (children `({ items, page, count }) => ...`), `.Item`, `.Ellipsis`, `.Previous`, `.Next`, `.First`, `.Last` | the same (the Root's default scoped slot `v-slot="{ items, page, count }"`) | `nav[paginationRoot]` (`items()`, `currentPage()`, `pageCount()` through `exportAs`: `page` and `count` are its inputs), `[paginationItem]` (`[value]`), `[paginationEllipsis]`, `[paginationPrevious]`, `[paginationNext]`, `[paginationFirst]`, `[paginationLast]` |
 | AspectRatio | `<AspectRatio ratio={16 / 9}>` (one component, as Label) | `<AspectRatio :ratio="16 / 9">` | `<div aspectRatio [ratio]="16 / 9">` (selector `[aspectRatio]`, class `AspectRatio`) |
+| TagGroup's selection (an array of strings) and removal | `value` + `onValueChange(value, details)` (`defaultValue`), `onRemove(value, details)`, `disabledKeys` on `TagGroup.Root` | `v-model:value` (`default-value`, `@value-change`, `@remove="(value, details) => ..."`, `:disabled-keys`) | `[(value)]` on `[tagGroupRoot]` (`defaultValue`, `[disabledKeys]`; `valueChangeDetails` output `{ value, details }`; `remove` output `{ value, details }`) |
+| TagGroup's parts | `TagGroup.Root`, `.Label`, `.List`, `.Tag` (`value`), `.TagCell`, `.RemoveButton` | the same | `[tagGroupRoot]`, `[tagGroupLabel]`, `[tagGroupList]`, `[tagGroupTag]` (`[value]`), `[tagGroupTagCell]`, `button[tagGroupRemoveButton]` |
+| TagsInput's tags, text and refusals | `value` + `onValueChange(value, details)` (`defaultValue`), `inputValue` + `onInputValueChange(text, details)` (`defaultInputValue`), `onValueInvalid(text, details)` on `TagsInput.Root` | `v-model:value`, `v-model:input-value` (`default-value`, `default-input-value`, `@value-change`, `@input-value-change`, `@value-invalid`) | `[(value)]`, `[(inputValue)]` on `[tagsInputRoot]` (`defaultValue`, `defaultInputValue`; `valueChangeDetails`, `inputValueChangeDetails` and `valueInvalid` outputs, each `{ value, details }`) |
+| TagsInput's parts and its tags | `TagsInput.Root` (children `({ value }) => ...`), `.Control`, `.Input`, `.Tag` (`index`), `.TagText`, `.TagRemove`, `.TagInput`, `.ClearTrigger` | the same (the Root's default scoped slot `v-slot="{ value }"`) | `[tagsInputRoot]` (`tags()` through `exportAs`, `#tags="tagsInputRoot"`: `value` is its input), `[tagsInputControl]`, `input[tagsInputInput]`, `[tagsInputTag]` (`[index]`), `[tagsInputTagText]`, `button[tagsInputTagRemove]`, `input[tagsInputTagInput]`, `button[tagsInputClearTrigger]` |
+| SegmentedControl's value (a string or `null`) | `value` + `onValueChange(value, details)` (`defaultValue`) on `SegmentedControl.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[segmentedControlRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
+| SegmentedControl's parts | `SegmentedControl.Root`, `.Item` (`value`), `.ItemText`, `.Indicator` (`renderBeforeHydration`, `nonce`) | the same (`render-before-hydration`) | `[segmentedControlRoot]`, `button[segmentedControlItem]` (`[value]`), `[segmentedControlItemText]`, structural `*segmentedControlIndicator` (`*segmentedControlIndicator="true"` for `renderBeforeHydration`, `*segmentedControlIndicator="true; nonce: cspNonce"`), as Tabs' |
+| Rating's value (a number, `0` for none) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Rating.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[ratingRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
+| Rating's parts, its stars and their state | `Rating.Root` (children `({ items, value }) => ...`), `.Item` (`index`; children `(state) => ...`), `.HiddenInput` | the same (the Root's default scoped slot `v-slot="{ items, value }"`, the Item's `v-slot="state"`) | `[ratingRoot]` (`items()`, `value()` through `exportAs`, `#rating="ratingRoot"`), `button[ratingItem]` (`[index]`; `state()` through `exportAs`, `#star="ratingItem"`), `input[ratingHiddenInput]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
@@ -508,7 +527,8 @@ the framework's (`useId` in React and Vue, an application's own counter in Angul
 counter of the JavaScript realm, which a server shares between pages. A part created outside its
 framework's template (Angular's hidden inputs) is added in the browser once the page is hydrated.
 Base UI's parts that need a script before hydration: the Tabs Indicator (`renderBeforeHydration`,
-`tabs.md`); the Slider thumb needs none (its position is a percentage, `slider.md`).
+`tabs.md`), and the SegmentedControl's Indicator, built the same way (`segmented-control.md`); the
+Slider thumb needs none (its position is a percentage, `slider.md`).
 
 ## Scenarios and fixtures
 

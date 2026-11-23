@@ -23,14 +23,14 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 113,397 B | 39,128 B |
+| `@fragiola/primitives` | 118,022 B | 40,422 B |
 | `@fragiola/primitives/async-list` | 839 B | 447 B |
 | `@fragiola/primitives/calendar-systems` | 9,711 B | 3,608 B |
-| `@fragiola/primitives/collection` | 7,330 B | 2,979 B |
+| `@fragiola/primitives/collection` | 10,242 B | 3,657 B |
 | `@fragiola/primitives/date` | 3,703 B | 1,624 B |
 | `@fragiola/primitives/direction` | 151 B | 135 B |
 | `@fragiola/primitives/focus` | 2,155 B | 976 B |
-| `@fragiola/primitives/form` | 5,747 B | 2,481 B |
+| `@fragiola/primitives/form` | 6,776 B | 2,890 B |
 | `@fragiola/primitives/hover` | 475 B | 288 B |
 | `@fragiola/primitives/id` | 81 B | 98 B |
 | `@fragiola/primitives/image` | 683 B | 358 B |
@@ -43,7 +43,7 @@ No peers: everything is bundled.
 | `@fragiola/primitives/pointer` | 3,353 B | 1,241 B |
 | `@fragiola/primitives/positioning` | 19,470 B | 7,623 B |
 | `@fragiola/primitives/presence` | 1,210 B | 573 B |
-| `@fragiola/primitives/range` | 1,738 B | 851 B |
+| `@fragiola/primitives/range` | 2,387 B | 1,096 B |
 | `@fragiola/primitives/scroll-area` | 7,657 B | 2,997 B |
 | `@fragiola/primitives/scroll-lock` | 510 B | 306 B |
 | `@fragiola/primitives/segments` | 8,519 B | 3,447 B |
@@ -60,7 +60,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 300,568 B | 94,822 B | 213,914 B | 64,306 B |
+| `@fragiola/primitives-react` | 325,545 B | 101,739 B | 234,829 B | 69,982 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -109,13 +109,17 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/radio` | 3,979 B | 1,808 B | 2,975 B | 1,419 B |
 | `@fragiola/primitives-react/radio-group` | 6,273 B | 2,790 B | 5,354 B | 2,395 B |
 | `@fragiola/primitives-react/range-calendar` | 12,992 B | 5,129 B | 10,059 B | 3,988 B |
+| `@fragiola/primitives-react/rating` | 9,459 B | 3,939 B | 7,498 B | 3,205 B |
 | `@fragiola/primitives-react/scroll-area` | 12,636 B | 4,608 B | 5,292 B | 1,998 B |
+| `@fragiola/primitives-react/segmented-control` | 11,070 B | 4,432 B | 8,014 B | 3,361 B |
 | `@fragiola/primitives-react/select` | 41,652 B | 15,361 B | 16,021 B | 6,149 B |
 | `@fragiola/primitives-react/select-virtual` | 47,470 B | 17,572 B | 17,767 B | 6,854 B |
 | `@fragiola/primitives-react/separator` | 1,386 B | 672 B | 1,386 B | 672 B |
 | `@fragiola/primitives-react/slider` | 12,820 B | 5,089 B | 10,055 B | 4,119 B |
 | `@fragiola/primitives-react/switch` | 6,488 B | 2,706 B | 5,210 B | 2,247 B |
 | `@fragiola/primitives-react/tabs` | 9,522 B | 3,710 B | 7,330 B | 2,971 B |
+| `@fragiola/primitives-react/tag-group` | 12,108 B | 4,858 B | 8,693 B | 3,567 B |
+| `@fragiola/primitives-react/tags-input` | 14,385 B | 5,414 B | 11,416 B | 4,365 B |
 | `@fragiola/primitives-react/time-field` | 21,939 B | 8,508 B | 11,676 B | 4,650 B |
 | `@fragiola/primitives-react/time-range-field` | 23,509 B | 9,010 B | 13,248 B | 5,183 B |
 | `@fragiola/primitives-react/toast` | 17,213 B | 6,407 B | 6,969 B | 2,836 B |
@@ -137,7 +141,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 339,736 B | 95,334 B | 252,983 B | 64,494 B |
+| `@fragiola/primitives-vue` | 368,311 B | 102,163 B | 277,485 B | 70,054 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -186,13 +190,17 @@ External: `vue`.
 | `@fragiola/primitives-vue/radio` | 3,756 B | 1,748 B | 2,790 B | 1,348 B |
 | `@fragiola/primitives-vue/radio-group` | 6,010 B | 2,634 B | 5,129 B | 2,241 B |
 | `@fragiola/primitives-vue/range-calendar` | 13,995 B | 5,179 B | 11,109 B | 4,039 B |
+| `@fragiola/primitives-vue/rating` | 9,455 B | 3,847 B | 7,532 B | 3,137 B |
 | `@fragiola/primitives-vue/scroll-area` | 12,744 B | 4,510 B | 5,406 B | 1,922 B |
+| `@fragiola/primitives-vue/segmented-control` | 11,317 B | 4,333 B | 8,299 B | 3,268 B |
 | `@fragiola/primitives-vue/select` | 42,370 B | 15,163 B | 16,753 B | 5,869 B |
 | `@fragiola/primitives-vue/select-virtual` | 49,405 B | 17,759 B | 19,707 B | 6,977 B |
 | `@fragiola/primitives-vue/separator` | 999 B | 561 B | 999 B | 561 B |
 | `@fragiola/primitives-vue/slider` | 13,277 B | 4,876 B | 10,566 B | 3,914 B |
 | `@fragiola/primitives-vue/switch` | 6,274 B | 2,573 B | 5,034 B | 2,115 B |
 | `@fragiola/primitives-vue/tabs` | 9,676 B | 3,572 B | 7,484 B | 2,840 B |
+| `@fragiola/primitives-vue/tag-group` | 12,306 B | 4,778 B | 8,927 B | 3,500 B |
+| `@fragiola/primitives-vue/tags-input` | 14,506 B | 5,188 B | 11,572 B | 4,152 B |
 | `@fragiola/primitives-vue/time-field` | 21,865 B | 8,340 B | 11,646 B | 4,496 B |
 | `@fragiola/primitives-vue/time-range-field` | 24,068 B | 9,005 B | 13,838 B | 5,183 B |
 | `@fragiola/primitives-vue/toast` | 17,561 B | 6,348 B | 7,321 B | 2,763 B |
@@ -214,7 +222,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 868,072 B | 145,400 B | 781,297 B | 112,981 B |
+| `@fragiola/primitives-angular` | 939,882 B | 156,058 B | 849,034 B | 122,401 B |
 | `@fragiola/primitives-angular/internal` | 39,584 B | 14,364 B | 17,713 B | 6,268 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -264,13 +272,17 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/radio` | 37,814 B | 8,190 B | 34,366 B | 6,966 B |
 | `@fragiola/primitives-angular/radio-group` | 31,132 B | 6,878 B | 28,516 B | 5,911 B |
 | `@fragiola/primitives-angular/range-calendar` | 33,405 B | 7,212 B | 30,634 B | 6,123 B |
+| `@fragiola/primitives-angular/rating` | 38,701 B | 8,583 B | 35,073 B | 7,254 B |
 | `@fragiola/primitives-angular/scroll-area` | 21,804 B | 5,574 B | 14,658 B | 3,011 B |
+| `@fragiola/primitives-angular/segmented-control` | 42,797 B | 9,267 B | 38,036 B | 7,623 B |
 | `@fragiola/primitives-angular/select` | 83,131 B | 21,183 B | 55,742 B | 11,301 B |
 | `@fragiola/primitives-angular/select-virtual` | 93,002 B | 24,108 B | 61,535 B | 12,488 B |
 | `@fragiola/primitives-angular/separator` | 2,833 B | 980 B | 3,025 B | 1,025 B |
 | `@fragiola/primitives-angular/slider` | 48,275 B | 9,952 B | 43,849 B | 8,419 B |
 | `@fragiola/primitives-angular/switch` | 33,516 B | 7,271 B | 30,614 B | 6,211 B |
 | `@fragiola/primitives-angular/tabs` | 20,077 B | 5,185 B | 17,960 B | 4,513 B |
+| `@fragiola/primitives-angular/tag-group` | 43,456 B | 9,367 B | 38,328 B | 7,518 B |
+| `@fragiola/primitives-angular/tags-input` | 49,665 B | 10,252 B | 44,981 B | 8,576 B |
 | `@fragiola/primitives-angular/time-field` | 62,281 B | 14,493 B | 50,291 B | 9,885 B |
 | `@fragiola/primitives-angular/time-range-field` | 80,139 B | 16,237 B | 68,145 B | 11,637 B |
 | `@fragiola/primitives-angular/toast` | 27,276 B | 7,597 B | 17,188 B | 4,038 B |

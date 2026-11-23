@@ -220,6 +220,10 @@ describe("the sidebar", () => {
             "api/slider",
             "api/number-field",
             "api/otp-field",
+            "api/tag-group",
+            "api/tags-input",
+            "api/segmented-control",
+            "api/rating",
             "api/select",
             "api/select-virtual",
             "api/combobox",
@@ -293,6 +297,10 @@ describe("the sidebar", () => {
             "api/slider",
             "api/number-field",
             "api/otp-field",
+            "api/tag-group",
+            "api/tags-input",
+            "api/segmented-control",
+            "api/rating",
             "api/select",
             "api/select-virtual",
             "api/combobox",
@@ -341,7 +349,9 @@ describe("the sidebar", () => {
             // Toast and ScrollArea, which have none (Base UI's Field, Fieldset, Form, OTP Field,
             // PreviewCard, Toast and ScrollArea; Toast follows WAI-ARIA's live regions);
             // Pagination links the APG patterns it is the closest to, AspectRatio the APG's index
-            // beside CSS's aspect-ratio
+            // beside CSS's aspect-ratio; TagGroup the APG grid (React Aria's grid of tags),
+            // TagsInput the APG's index (no pattern: its Input is a textbox), SegmentedControl
+            // and Rating the APG radio group
             if (
                 ![
                     "api/field",

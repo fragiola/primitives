@@ -198,6 +198,22 @@
                     "path": "api/otp-field"
                 },
                 {
+                    "label": "TagGroup",
+                    "path": "api/tag-group"
+                },
+                {
+                    "label": "TagsInput",
+                    "path": "api/tags-input"
+                },
+                {
+                    "label": "SegmentedControl",
+                    "path": "api/segmented-control"
+                },
+                {
+                    "label": "Rating",
+                    "path": "api/rating"
+                },
+                {
                     "label": "Select",
                     "path": "api/select"
                 },

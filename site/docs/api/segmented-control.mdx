@@ -1,0 +1,201 @@
+---
+title: SegmentedControl
+description: Mutually exclusive segments with an Indicator that moves to the checked one, the APG radio group, as a form control, in each framework.
+---
+
+A row (or a column) of mutually exclusive segments, one of them checked, with an Indicator that
+moves to the checked segment: a view switcher, a density or a unit picker. The APG has no
+segmented control and Base UI none: a segmented control is a set of radios with a moving mark, so
+it takes the WAI-ARIA APG [radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
+whole, as [RadioGroup](/docs/api/radio-group) does, and its Indicator is
+[Tabs](/docs/api/tabs)' Indicator applied to the checked segment. It is a choice of one value:
+switching panels is the app's business (Tabs own panels), and pressing several or none is a
+[ToggleGroup](/docs/api/toggle-group).
+
+<Example id="segmented-control" />
+
+## Behaviour
+
+- **Value**: the checked Item's `value` (a string), or `null` while none is checked (the
+  default). Reasons: `item-press` (a press on an Item, or on its `<label>`), `keyboard`, `none` (a
+  form reset). A press on the checked Item changes nothing: there is no deselecting.
+- **Focus**: one tab stop, the checked Item when it is enabled, else the first enabled Item; every
+  other Item has `tabindex="-1"`. Tab enters the control there, and Tab again leaves it.
+- **Arrows**: every arrow moves the focus to the next or previous enabled Item **and checks it**
+  (the APG radio group), whatever the `orientation`; disabled Items are skipped. With `loopFocus`
+  (the default) they wrap; without it, an arrow at an end does nothing. Home and End do nothing
+  (the APG radio group has neither).
+- **RTL**: ArrowLeft is the next Item and ArrowRight the previous, in the direction of a
+  [DirectionProvider](/docs/api/direction), else the Root's computed one. ArrowDown and ArrowUp do
+  not change.
+- **Indicator**: it exposes the checked Item's box, measured from the Root's padding box (where an
+  absolute Indicator is placed from), as ten structural CSS variables, logical and physical (see
+  Props). It is measured on mount, when the value changes, when the Root or the checked Item
+  resizes and when a provider's direction changes; a CSS transition on the variables animates it.
+  It is not rendered while no Item is checked. Place it after the Items, and paint it under them
+  (`isolation: isolate` on the Root, a negative `z-index` on the Indicator).
+- **Server rendering**: with `renderBeforeHydration`, a server render writes the Indicator with a
+  small inline script that measures the checked Item as the page parses, so it is in place before
+  hydration ([Server rendering](/docs/server-rendering)).
+- **Forms**: the Root renders, as its last child, one visually hidden input with the `name` (only
+  while an Item is checked: none checked submits nothing, as a radio set) and the value; `required`
+  fails the validation while none is checked and focuses the tab stop. A form reset returns an
+  uncontrolled Root to `defaultValue`; a controlled one reports the default through
+  `onValueChange`.
+- **Name**: the Root is a `radiogroup`; name it with `aria-labelledby` (a heading or a label) or
+  `aria-label`, or put it in a Field, whose Label names it. An Item's name is its content.
+- **In a [Field](/docs/api/field)**: the Root is the field's control, as a RadioGroup: named and
+  described by the field, `aria-invalid` and the field's states on it, `validate` gets the value
+  (or `null`); it takes the field's `name` and `disabled`.
+- **The mechanisms**: the toolkit's [`/collection`](/docs/api/toolkit) (`radioKeyTarget`,
+  `segmentIndicatorBox`, `placeSegmentIndicator`) and `/form`; it shares no code with RadioGroup's
+  entries.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `segmented-control-root` | the `radiogroup`; holds the value; the Indicator's containing block |
+| Item | `button` | `segmented-control-item` | a `radio` |
+| ItemText | `span` | `segmented-control-item-text` | the Item's text (optional) |
+| Indicator | `span` | `segmented-control-indicator` | follows the checked Item (optional) |
+| (hidden input) | `input` | `segmented-control-input` | the Root's last child: what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { SegmentedControl } from "@fragiola/primitives-react/segmented-control";
+
+<span id="view">View</span>
+<SegmentedControl.Root aria-labelledby="view" name="view" defaultValue="list">
+    <SegmentedControl.Item value="list">
+        <SegmentedControl.ItemText>List</SegmentedControl.ItemText>
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="grid">
+        <SegmentedControl.ItemText>Grid</SegmentedControl.ItemText>
+    </SegmentedControl.Item>
+    <SegmentedControl.Indicator />
+</SegmentedControl.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <span id="view">View</span>
+    <SegmentedControl.Root v-model:value="view" aria-labelledby="view">
+        <SegmentedControl.Item value="list">
+            <SegmentedControl.ItemText>List</SegmentedControl.ItemText>
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value="grid">
+            <SegmentedControl.ItemText>Grid</SegmentedControl.ItemText>
+        </SegmentedControl.Item>
+        <SegmentedControl.Indicator />
+    </SegmentedControl.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [SegmentedControlRoot, SegmentedControlItem, SegmentedControlItemText, SegmentedControlIndicator],
+    template: `
+        <span id="view">View</span>
+        <div segmentedControlRoot aria-labelledby="view" [(value)]="view">
+            <button segmentedControlItem value="list"><span segmentedControlItemText>List</span></button>
+            <button segmentedControlItem value="grid"><span segmentedControlItemText>Grid</span></button>
+            <span *segmentedControlIndicator></span>
+        </div>
+    `,
+})
+export class ViewSwitcher {
+    protected readonly view = signal<string | null>("list");
+}
+```
+
+`*segmentedControlIndicator` is structural: it is rendered only while an Item is checked.
+`*segmentedControlIndicator="true"` asks for `renderBeforeHydration`, with
+`*segmentedControlIndicator="true; nonce: cspNonce"` for its script's nonce.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`), and Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)` with
+`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string \| null` | | the checked Item's value, controlled; `null` for none |
+| `defaultValue` | `string \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value: string \| null, details: { reason }) => void` | | every change (`item-press`, `keyboard`, `none`); `null` when a reset returns it to none |
+| `disabled` | `boolean` | `false` | disables every Item |
+| `required` | `boolean` | `false` | the form's validation fails while no Item is checked |
+| `name` | `string` | | the hidden input's name (a Field's wins) |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `aria-orientation` and `data-orientation` on every part; it changes no key |
+| `loopFocus` | `boolean` | `true` | the arrows wrap from the last Item to the first and back |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: its value |
+| `disabled` | `boolean` | `false` | skipped by the arrows, never checked |
+| `id` | `string` | generated | its id, for a `<label for>` |
+
+### ItemText
+
+No props of its own: it reads its Item's state.
+
+### Indicator
+
+It sets the logical `--segment-indicator-inset-inline-start` (from the Root's inline-start padding
+edge: its right one in RTL), `--segment-indicator-inset-block-start`,
+`--segment-indicator-inline-size` and `--segment-indicator-block-size`, and the physical
+`--segment-indicator-left`, `-right`, `-top`, `-bottom`, `--segment-indicator-width` and
+`--segment-indicator-height`, in pixels, as its inline style.
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `renderBeforeHydration` | `boolean` | `false` | in a server render, places it before hydration: a small inline script inside it measures the checked Item as the page parses, then removes itself (Angular: `*segmentedControlIndicator="true"`) |
+| `nonce` | `string` | | the `nonce` of that script, for a Content Security Policy that allows inline scripts by nonce (Angular: `*segmentedControlIndicator="true; nonce: cspNonce"`, else Angular's `CSP_NONCE` provider) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="radiogroup"`, `aria-orientation` and `data-orientation`, `aria-required="true"` and `data-required` when required, `aria-disabled="true"` and `data-disabled` when disabled; in a Field, `aria-labelledby`, `aria-describedby`, `aria-invalid` and the field's states |
+| Item | `role="radio"`, `type="button"`, `aria-checked` (`"true"` or `"false"`), `tabindex` (`0` on the tab stop, `-1` on the others), `disabled` and `data-disabled` when disabled (itself or the Root), `data-checked` / `data-unchecked` (exactly one), `data-orientation` |
+| ItemText | its Item's `data-checked` / `data-unchecked`, `data-disabled` |
+| Indicator | `aria-hidden="true"`, `data-orientation`, `data-disabled` when the Root is disabled; the ten variables |
+| hidden input | `name` (while an Item is checked), `value` (`""` for none), `required`, `disabled`, `aria-hidden="true"`, `tabindex="-1"`, visually hidden |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab | enters the control at the checked Item, else its first enabled one; Tab again leaves it |
+| ArrowRight, ArrowDown | the next enabled Item, focused and checked (ArrowLeft in RTL); wraps with `loopFocus` |
+| ArrowLeft, ArrowUp | the previous enabled Item, focused and checked (ArrowRight in RTL); wraps with `loopFocus` |
+| Space | checks the focused Item |
+| Enter | nothing (a native radio does not check on Enter) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/segmented-control` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `SegmentedControl`, `SegmentedControlIndicatorProps`, `SegmentedControlIndicatorState`, `SegmentedControlItemProps`, `SegmentedControlItemState`, `SegmentedControlRootProps`, `SegmentedControlRootState` |
+| `@fragiola/primitives-vue/segmented-control` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `SegmentedControl`, `SegmentedControlIndicatorProps`, `SegmentedControlIndicatorState`, `SegmentedControlItemProps`, `SegmentedControlItemState`, `SegmentedControlRootEmits`, `SegmentedControlRootProps`, `SegmentedControlRootState` |
+| `@fragiola/primitives-angular/segmented-control` | `ChangeDetails`, `ChangeReason`, `SegmentedControlIndicator`, `SegmentedControlIndicatorState`, `SegmentedControlItem`, `SegmentedControlItemEntry`, `SegmentedControlItemState`, `SegmentedControlItemText`, `SegmentedControlOrientation`, `SegmentedControlRoot`, `SegmentedControlRootState`, `ValueChangeEvent` |

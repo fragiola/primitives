@@ -133,8 +133,16 @@ import PopoverRtl from "../scenarios/popover/popover-rtl.vue";
 import ProgressBasic from "../scenarios/progress/progress-basic.vue";
 import RadioGroupBasic from "../scenarios/radio-group/radio-group-basic.vue";
 import RadioGroupControlled from "../scenarios/radio-group/radio-group-controlled.vue";
+import RatingBasic from "../scenarios/rating/rating-basic.vue";
+import RatingField from "../scenarios/rating/rating-field.vue";
+import RatingHalf from "../scenarios/rating/rating-half.vue";
+import RatingReadOnly from "../scenarios/rating/rating-read-only.vue";
 import ScrollAreaBasic from "../scenarios/scroll-area/scroll-area-basic.vue";
 import ScrollAreaLinks from "../scenarios/scroll-area/scroll-area-links.vue";
+import SegmentedControlBasic from "../scenarios/segmented-control/segmented-control-basic.vue";
+import SegmentedControlDisabled from "../scenarios/segmented-control/segmented-control-disabled.vue";
+import SegmentedControlField from "../scenarios/segmented-control/segmented-control-field.vue";
+import SegmentedControlVertical from "../scenarios/segmented-control/segmented-control-vertical.vue";
 import SelectBasic from "../scenarios/select/select-basic.vue";
 import SelectControlled from "../scenarios/select/select-controlled.vue";
 import SelectGroups from "../scenarios/select/select-groups.vue";
@@ -156,6 +164,18 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
+import TagGroupBasic from "../scenarios/tag-group/tag-group-basic.vue";
+import TagGroupDisabled from "../scenarios/tag-group/tag-group-disabled.vue";
+import TagGroupEmpty from "../scenarios/tag-group/tag-group-empty.vue";
+import TagGroupField from "../scenarios/tag-group/tag-group-field.vue";
+import TagGroupForm from "../scenarios/tag-group/tag-group-form.vue";
+import TagGroupSelection from "../scenarios/tag-group/tag-group-selection.vue";
+import TagGroupSingle from "../scenarios/tag-group/tag-group-single.vue";
+import TagsInputBasic from "../scenarios/tags-input/tags-input-basic.vue";
+import TagsInputBlur from "../scenarios/tags-input/tags-input-blur.vue";
+import TagsInputEdit from "../scenarios/tags-input/tags-input-edit.vue";
+import TagsInputField from "../scenarios/tags-input/tags-input-field.vue";
+import TagsInputOptions from "../scenarios/tags-input/tags-input-options.vue";
 import TimeFieldBasic from "../scenarios/time-field/time-field-basic.vue";
 import TimeFieldForm from "../scenarios/time-field/time-field-form.vue";
 import TimeFieldMinMax from "../scenarios/time-field/time-field-min-max.vue";
@@ -382,6 +402,26 @@ export const routes: Record<string, Component> = {
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/tag-group/basic": TagGroupBasic,
+    "/tag-group/selection": TagGroupSelection,
+    "/tag-group/single": TagGroupSingle,
+    "/tag-group/disabled": TagGroupDisabled,
+    "/tag-group/empty": TagGroupEmpty,
+    "/tag-group/field": TagGroupField,
+    "/tag-group/form": TagGroupForm,
+    "/tags-input/basic": TagsInputBasic,
+    "/tags-input/options": TagsInputOptions,
+    "/tags-input/edit": TagsInputEdit,
+    "/tags-input/blur": TagsInputBlur,
+    "/tags-input/field": TagsInputField,
+    "/segmented-control/basic": SegmentedControlBasic,
+    "/segmented-control/vertical": SegmentedControlVertical,
+    "/segmented-control/disabled": SegmentedControlDisabled,
+    "/segmented-control/field": SegmentedControlField,
+    "/rating/basic": RatingBasic,
+    "/rating/half": RatingHalf,
+    "/rating/read-only": RatingReadOnly,
+    "/rating/field": RatingField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,

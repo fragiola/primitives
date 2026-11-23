@@ -48,7 +48,12 @@ other component imports it), OTPField uses `/form` (its value rules), `/collecti
 `/direction`; Meter uses `/range` alone, Label `/form` alone (its press). Listbox adds
 `/selection`, the collections mechanism (its list model, selection rules and key map; no other
 component imports it yet), to `/collection` (typeahead), `/direction` and `/form`; Autocomplete
-uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`). The virtual
+uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`). TagGroup uses
+`/collection` (its key map and removal focus), `/selection` (its selection rules), `/direction`
+and `/form` (the Field binding); TagsInput `/collection` (its keys), `/form` (the rules that add
+and edit a tag, the form bridge) and `/direction`. SegmentedControl uses `/collection` (the radio
+key map and its Indicator's measurement), `/direction` and `/form`; Rating `/range` (its steps,
+the value under the pointer and a star's state), `/direction` and `/form`. The virtual
 lists ([ListboxVirtual](/docs/api/listbox-virtual) and the others) add `/virtual` to their
 component's mechanisms, and the [async list](/docs/api/async-list) utility uses `/async-list`
 alone: a list that does not opt in imports neither. The root entry,
@@ -60,12 +65,12 @@ alone: a list that does not opt in imports neither. The root entry,
 | --- | --- |
 | `@fragiola/primitives/async-list` | `createAsyncList`, `AsyncList`, `AsyncListOptions`, `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListState`, `AsyncListStatus` |
 | `@fragiola/primitives/calendar-systems` | `buddhist`, `coptic`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamicCivil`, `islamicTbla`, `islamicUmalqura`, `japanese`, `persian`, `roc`, `CalendarSystem`, `CalendarId`, `CalendarDateFields`, `CalendarFieldsInput`, `CalendarYearMonth`, `CalendarUnit`, `CalendarUnits` |
-| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `placeSegmentIndicator`, `segmentIndicatorBox`, `SegmentIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `tagGroupKeyTarget`, `removalFocusIndex`, `tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`, `TagGroupKeyAction`, `TagGroupKeyOptions`, `TagKeyEvent`, `TagsInputInputKeyAction`, `TagsInputTagKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |
-| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType` |
+| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType`, `takeTags`, `typesDelimiter`, `editTag`, `TagRules`, `TakenTags`, `RefusedTag`, `TagRefusal`, `EditedTag` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/image` | `watchImageStatus`, `ImageLoadingStatus`, `ImageSourceOptions` |
@@ -77,7 +82,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `watchPointerExit`, `LongPressOptions`, `watchLongPress` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement`, `AnchorRect`, `VirtualAnchor`, `virtualAnchor` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `isAnimating`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
-| `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
+| `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue`, `ratingKeyTarget`, `RatingKeyOptions`, `ratingValueAt`, `ratingItemState`, `RatingItemState` |
 | `@fragiola/primitives/scroll-area` | `createScrollArea`, `ScrollAreaController`, `ScrollAreaOptions`, `ScrollAreaOrientation`, `ScrollAreaPart`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `initialScrollAreaState`, `normalizeScrollAreaThreshold`, `thumbGeometry`, `ThumbGeometry`, `ThumbGeometryInput`, `scrollFromStart`, `scrollForThumbOffset`, `MIN_THUMB_SIZE` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
 | `@fragiola/primitives/segments` | `segmentFormat`, `SegmentFormat`, `SegmentFormatOptions`, `SegmentGranularity`, `SegmentKind`, `SegmentPart`, `SegmentType`, `EditableSegmentType`, `HourCycle`, `dateSegments`, `DateSegment`, `SEGMENT_PLACEHOLDER`, `SegmentValues`, `SegmentRange`, `segmentRange`, `SEGMENT_PAGE_STEPS`, `setSegment`, `stepSegment`, `segmentToEdge`, `shownValue`, `displayHour`, `isSegmentsComplete`, `segmentValuesOf`, `segmentsToDate`, `segmentsToTime`, `segmentsToDateTime`, `typeSegment`, `eraseSegment`, `segmentDigit`, `SegmentEdit`, `SegmentTypeResult`, `SegmentEraseResult`, `segmentKeyDown`, `SegmentKeyResult`, `segmentTarget`, `SegmentMove`, `focusOnLabelPress` |
@@ -128,7 +133,16 @@ alone: a list that does not opt in imports neither. The root entry,
   the radio an arrow key moves the focus and the check to: ArrowDown and ArrowRight the next,
   ArrowUp and ArrowLeft the previous, whatever the orientation, ArrowLeft and ArrowRight swapped
   with `rtl`; it passes over the radios `skip` returns `true` for (the disabled ones), wraps at
-  the ends with `loop`, and returns `null` for another key or an end without `loop`.
+  the ends with `loop`, and returns `null` for another key or an end without `loop`. The tags'
+  keys (Epic #91): `tagGroupKeyTarget(event, index, count, options)` (a TagGroup's: both axes'
+  arrows, Home, End, select, remove), `removalFocusIndex(count, removed, skip)` (the next item
+  after a removal, else the previous one), `tagsInputInputKeyTarget` and `tagsInputTagKeyTarget`
+  (a TagsInput's Input and tags: Enter adds, Backspace at the start reaches the last tag, a tag's
+  arrows, removals and edit) ([TagGroup](/docs/api/tag-group), [TagsInput](/docs/api/tags-input)).
+  A segmented control's Indicator (Epic #91): `segmentIndicatorBox(root, item, rtl)` gives the
+  checked Item's box from the Root's padding box as the ten `--segment-indicator-*` variables,
+  and `placeSegmentIndicator(script)`, self-contained, writes them before hydration
+  ([SegmentedControl](/docs/api/segmented-control)).
 - **Positioning**: a floating element anchored to its trigger, or to a point
   (`virtualAnchor({ x, y, width?, height? }, contextElement?)`, a `VirtualAnchor` whose
   `AnchorRect` is in client coordinates: a context menu's pointer; its direction is read from
@@ -181,7 +195,11 @@ alone: a list that does not opt in imports neither. The root entry,
   validated is reused), the Error's matching and messages, and a Form's pieces:
   `guardFormSubmit` (a capture listener that blocks a submission before any other listener),
   `firstInDocumentOrder`, `focusFieldControl`, and the server errors (`formErrorsFor`,
-  `withoutFormErrors`).
+  `withoutFormErrors`). A tags input's rules (Epic #91): `takeTags(value, text, rules, whole)`
+  offers a text as tags (split by the delimiter, trimmed, refused as a duplicate, past `max` or by
+  `validate`, the refused texts and the typed rest left for the input), `typesDelimiter(previous,
+  next, delimiter, inserted)` tells whether an input typed the delimiter (only then is a typed text
+  offered), `editTag(value, index, text, rules)` ends a tag's edit ([TagsInput](/docs/api/tags-input)).
 - **Direction**: `getDirection(element, provided)`, the direction a provider gives, else the
   element's computed `direction`.
 - **Number**: a number field's text and steps (Epic #52). `formatNumber(value, { locale, format })`
@@ -214,7 +232,12 @@ alone: a list that does not opt in imports neither. The root entry,
   clamps the value to `[min, max]` and returns it with its percent (0 to 100), its status
   (`ProgressStatus`: `indeterminate` for `null`, `complete` at `max`, else `progressing`) and its
   formatted value: `format` and `locale` for `Intl.NumberFormat`, a percentage of the range
-  without `format`, `""` when indeterminate.
+  without `format`, `""` when indeterminate. A rating's steps (Epic #91):
+  `ratingKeyTarget(key, value, { count, allowHalf, rtl, loop })` gives the value an arrow, Home
+  or End moves to (steps of 1 or 0.5, wrapping with `loop`, never to `0`),
+  `ratingValueAt(index, fraction, allowHalf)` the value a pointer chooses on a star, and
+  `ratingItemState(index, value, displayed)` a star's `checked`, `highlighted` and `half`
+  ([Rating](/docs/api/rating)).
 - **Image**: `watchImageStatus(element, src, options, onStatus)` loads an image outside the
   document, through the element's window (a `new Image()` of its `ownerDocument.defaultView`),
   with the `img`'s `srcSet`, `sizes`, `crossOrigin` and `referrerPolicy` (`ImageSourceOptions`),
