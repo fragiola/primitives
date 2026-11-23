@@ -111,5 +111,11 @@ export const ROUTES: readonly string[] = [
     "/progress/basic",
     "/avatar/basic",
     "/separator/basic",
+    "/toggle/basic",
+    "/toggle/controlled",
+    "/toggle-group/basic",
+    "/toggle-group/vertical",
+    "/toolbar/basic",
+    "/toolbar/vertical",
     "/direction/provider",
 ];
