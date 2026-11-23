@@ -21,6 +21,10 @@ import { CalendarRange } from "../scenarios/calendar/calendar-range.tsx";
 import { CalendarSingle } from "../scenarios/calendar/calendar-single.tsx";
 import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.tsx";
 import { CalendarUnavailable } from "../scenarios/calendar/calendar-unavailable.tsx";
+import { CalendarPresetBasic } from "../scenarios/calendar-preset/calendar-preset-basic.tsx";
+import { CalendarPresetPicker } from "../scenarios/calendar-preset/calendar-preset-picker.tsx";
+import { CalendarViewPicker } from "../scenarios/calendar-view/calendar-view-picker.tsx";
+import { CalendarViewTyped } from "../scenarios/calendar-view/calendar-view-typed.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
@@ -101,6 +105,11 @@ import { MenubarBasic } from "../scenarios/menubar/menubar-basic.tsx";
 import { MenubarModal } from "../scenarios/menubar/menubar-modal.tsx";
 import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.tsx";
 import { MeterBasic } from "../scenarios/meter/meter-basic.tsx";
+import { MonthCalendarBasic } from "../scenarios/month-calendar/month-calendar-basic.tsx";
+import { MonthCalendarRange } from "../scenarios/month-calendar/month-calendar-range.tsx";
+import { MonthPickerForm } from "../scenarios/month-picker/month-picker-form.tsx";
+import { MultipleCalendarBasic } from "../scenarios/multiple-calendar/multiple-calendar-basic.tsx";
+import { MultipleCalendarForm } from "../scenarios/multiple-calendar/multiple-calendar-form.tsx";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.tsx";
@@ -174,6 +183,9 @@ import { ListboxVirtualAsync } from "../scenarios/virtual-lists/listbox-virtual-
 import { ListboxVirtualBasic } from "../scenarios/virtual-lists/listbox-virtual-basic.tsx";
 import { SelectVirtualAsync } from "../scenarios/virtual-lists/select-virtual-async.tsx";
 import { SelectVirtualBasic } from "../scenarios/virtual-lists/select-virtual-basic.tsx";
+import { YearCalendarBasic } from "../scenarios/year-calendar/year-calendar-basic.tsx";
+import { YearCalendarRange } from "../scenarios/year-calendar/year-calendar-range.tsx";
+import { YearPickerForm } from "../scenarios/year-picker/year-picker-form.tsx";
 export const routes: Record<
     string,
     ComponentType<{ locale?: string; cancel?: boolean }>
@@ -289,6 +301,8 @@ export const routes: Record<
     "/calendar/rtl": CalendarSingle,
     "/calendar/two-months": CalendarTwoMonths,
     "/calendar/range": CalendarRange,
+    "/calendar-preset/basic": CalendarPresetBasic,
+    "/calendar-preset/picker": CalendarPresetPicker,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
@@ -302,6 +316,16 @@ export const routes: Record<
     "/listbox/horizontal": ListboxHorizontal,
     "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
+    "/multiple-calendar/basic": MultipleCalendarBasic,
+    "/multiple-calendar/form": MultipleCalendarForm,
+    "/calendar-view/picker": CalendarViewPicker,
+    "/calendar-view/typed": CalendarViewTyped,
+    "/month-calendar/basic": MonthCalendarBasic,
+    "/month-calendar/range": MonthCalendarRange,
+    "/year-calendar/basic": YearCalendarBasic,
+    "/year-calendar/range": YearCalendarRange,
+    "/month-picker/form": MonthPickerForm,
+    "/year-picker/form": YearPickerForm,
     "/number-field/basic": NumberFieldBasic,
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,

@@ -6,8 +6,16 @@ import type { OverlayRoot } from "../../composables/use-overlay-root.ts";
 /** The component a picker's parts belong to: their part attribute's prefix. */
 export type DatePickerComponent = "date-picker" | "date-range-picker";
 
+/** The pickers whose Root provides this context: the month and year pickers' too (Epic #79). */
+export type PickerComponent =
+    | DatePickerComponent
+    | "month-picker"
+    | "month-range-picker"
+    | "year-picker"
+    | "year-range-picker";
+
 export interface DatePickerContext extends OverlayRoot {
-    component: DatePickerComponent;
+    component: PickerComponent;
     placed: Ref<{ side: Side; align: Align }>;
     /** The enclosing field's binding, for the trigger (spec/field.md). */
     field: FieldControlBinding;

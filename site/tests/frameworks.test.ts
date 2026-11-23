@@ -117,6 +117,7 @@ describe("the embeds", () => {
             "avatar",
             "button",
             "calendar",
+            "calendar-preset",
             "checkbox",
             "collapsible",
             "combobox",
@@ -138,6 +139,8 @@ describe("the embeds", () => {
             "menu-view-options",
             "menubar",
             "meter",
+            "month-picker",
+            "multiple-calendar",
             "navigation-menu",
             "number-field",
             "otp-field",
@@ -159,6 +162,7 @@ describe("the embeds", () => {
             "toggle-group",
             "toolbar",
             "tooltip",
+            "year-range-picker",
         ]);
         for (const list of ids) expect(list).toEqual(ids[0]);
         const manifests = await buildManifests();
@@ -210,6 +214,10 @@ describe("the embeds", () => {
                 "time-field",
                 "date-range-field",
                 "date-picker-input",
+                "multiple-calendar",
+                "calendar-preset",
+                "month-picker",
+                "year-range-picker",
                 "progress",
                 "meter",
                 "avatar",

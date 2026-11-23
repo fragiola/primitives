@@ -46,6 +46,15 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
         "_recipes/date-field.ts",
         "_recipes/field.ts",
     ],
+    // the calendar variants (Epic #79): a preset's picker and calendar, a month or year
+    // picker's popup, the calendar's root and buttons, its Field
+    "calendar-preset": ["_recipes/date-picker.ts"],
+    "month-picker": [
+        "_recipes/calendar.ts",
+        "_recipes/date-picker.ts",
+        "_recipes/field.ts",
+    ],
+    "year-range-picker": ["_recipes/calendar.ts", "_recipes/date-picker.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -75,6 +84,12 @@ const RECIPE_OF: Record<string, string> = {
     // DateRangeField's recipe is in DateField's file; the typed picker's in DatePicker's
     "date-range-field": "date-field",
     "date-picker-input": "date-picker",
+    // a MultipleCalendar has the Calendar's parts, a preset's recipe is in the Calendar's file,
+    // the month and year pickers' grids are the MonthCalendar's
+    "multiple-calendar": "calendar",
+    "calendar-preset": "calendar",
+    "month-picker": "month-calendar",
+    "year-range-picker": "month-calendar",
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
@@ -136,6 +151,10 @@ describe("the manifest", () => {
                 "time-field",
                 "date-range-field",
                 "date-picker-input",
+                "multiple-calendar",
+                "calendar-preset",
+                "month-picker",
+                "year-range-picker",
                 "progress",
                 "meter",
                 "avatar",

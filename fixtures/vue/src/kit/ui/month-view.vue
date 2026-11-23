@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import { Calendar } from "@fragiola/primitives-vue/calendar";
-import { calendar } from "examples-shared/recipes/calendar";
+import { CalendarView } from "@fragiola/primitives-vue/calendar-view";
+import { calendar, calendarView } from "examples-shared/recipes/calendar";
 
-// The month header and one grid, as every calendar scenario shows them.
-withDefaults(defineProps<{ offset?: number; withButtons?: boolean }>(), {
-    offset: 0,
-    withButtons: true,
-});
+// The month header and one grid, as every calendar scenario shows them; `viewTrigger` puts the
+// Heading inside a CalendarView Trigger (spec/month-calendar.md, "Views").
+withDefaults(
+    defineProps<{
+        offset?: number;
+        withButtons?: boolean;
+        viewTrigger?: boolean;
+    }>(),
+    {
+        offset: 0,
+        withButtons: true,
+        viewTrigger: false,
+    },
+);
 </script>
 
 <template>
@@ -14,7 +24,10 @@ withDefaults(defineProps<{ offset?: number; withButtons?: boolean }>(), {
         <div class="flex items-center justify-between gap-2">
             <Calendar.PrevButton v-if="withButtons" aria-label="Previous month" :class="calendar['prev-button']">‹</Calendar.PrevButton>
             <span v-else class="size-8" />
-            <Calendar.Heading :offset="offset" :class="calendar.heading" />
+            <CalendarView.Trigger v-if="viewTrigger" :class="calendarView.trigger">
+                <Calendar.Heading :offset="offset" as="span" :class="calendar.heading" />
+            </CalendarView.Trigger>
+            <Calendar.Heading v-else :offset="offset" :class="calendar.heading" />
             <Calendar.NextButton v-if="withButtons" aria-label="Next month" :class="calendar['next-button']">›</Calendar.NextButton>
             <span v-else class="size-8" />
         </div>

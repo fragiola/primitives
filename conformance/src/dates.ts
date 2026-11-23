@@ -35,3 +35,24 @@ export function shortWeekday(
         new Date(year, month - 1, day),
     );
 }
+
+/** A month's name (`Intl` `month: "long"`), a month cell's content. */
+export function longMonth(locale: string, year: number, month: number): string {
+    return new Intl.DateTimeFormat(locale, { month: "long" }).format(
+        new Date(year, month - 1, 1),
+    );
+}
+
+/** A year (`Intl` `year: "numeric"`), a year cell's name and a month grid's heading. */
+export function yearName(locale: string, year: number): string {
+    return new Intl.DateTimeFormat(locale, { year: "numeric" }).format(
+        new Date(year, 0, 1),
+    );
+}
+
+/** A page of years (`Intl.DateTimeFormat#formatRange`, its spaces as U+0020), a year grid's heading. */
+export function yearSpan(locale: string, first: number, last: number): string {
+    return new Intl.DateTimeFormat(locale, { year: "numeric" })
+        .formatRange(new Date(first, 0, 1), new Date(last, 0, 1))
+        .replace(/[\u00a0\u2009\u202f]/g, " ");
+}

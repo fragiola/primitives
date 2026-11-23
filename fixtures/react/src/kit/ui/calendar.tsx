@@ -1,6 +1,7 @@
 import { Calendar as Primitive } from "@fragiola/primitives-react/calendar";
+import { CalendarView } from "@fragiola/primitives-react/calendar-view";
 import { RangeCalendar as RangePrimitive } from "@fragiola/primitives-react/range-calendar";
-import { calendar } from "examples-shared/recipes/calendar";
+import { calendar, calendarView } from "examples-shared/recipes/calendar";
 import type { ComponentProps } from "react";
 
 const parts = {
@@ -51,9 +52,11 @@ const parts = {
 function MonthHeader({
     offset = 0,
     withButtons = true,
+    viewTrigger = false,
 }: {
     offset?: number;
     withButtons?: boolean;
+    viewTrigger?: boolean;
 }) {
     return (
         <div className="flex items-center justify-between gap-2">
@@ -64,7 +67,13 @@ function MonthHeader({
             ) : (
                 <span className="size-8" />
             )}
-            <parts.Heading offset={offset} />
+            {viewTrigger ? (
+                <CalendarView.Trigger className={calendarView.trigger}>
+                    <parts.Heading offset={offset} render={<span />} />
+                </CalendarView.Trigger>
+            ) : (
+                <parts.Heading offset={offset} />
+            )}
             {withButtons ? (
                 <parts.NextButton aria-label="Next month">›</parts.NextButton>
             ) : (
@@ -77,13 +86,20 @@ function MonthHeader({
 export function MonthView({
     offset = 0,
     withButtons = true,
+    viewTrigger = false,
 }: {
     offset?: number;
     withButtons?: boolean;
+    /** The Heading inside a CalendarView Trigger (spec/month-calendar.md, "Views"). */
+    viewTrigger?: boolean;
 }) {
     return (
         <div className="flex flex-col gap-2">
-            <MonthHeader offset={offset} withButtons={withButtons} />
+            <MonthHeader
+                offset={offset}
+                withButtons={withButtons}
+                viewTrigger={viewTrigger}
+            />
             <parts.Grid offset={offset}>
                 <parts.GridHeader />
                 <parts.GridBody />

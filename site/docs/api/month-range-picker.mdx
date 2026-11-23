@@ -1,0 +1,167 @@
+---
+title: MonthRangePicker
+description: "A trigger and a non-modal popup holding a bound MonthRangeCalendar: a range of months, submitted as 2026-03/2026-06."
+---
+
+A trigger and a non-modal popup holding a [MonthRangeCalendar](/docs/api/month-range-calendar): the
+[DatePicker](/docs/api/date-picker)'s trigger, popup, form and Field, with a range of months as its value. Its
+parts are the DatePicker's, named `month-range-picker-*`; the MonthRangeCalendar inside the Popup has no value of its own and
+**binds** to the picker. The popup is a non-modal APG
+[dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) disclosed by a button, as the
+DatePicker's. It renders no text: the trigger's content and the popup's name are yours.
+
+## Behaviour
+
+- **Open, choose, close**: as the [DatePicker's](/docs/api/date-picker#behaviour): the calendar
+  focuses its focused month as the popup opens (the value, else the month holding today);
+  choosing the range's end sets the value, closes the popup (reason `item-press`) and focuses the
+  Trigger; Escape, an outside press and Tab out close it; focus is not trapped.
+- **Forms**: with a `name`, the Root renders a hidden input after its children, which submits
+  the ISO interval `period=2026-03/2026-06`, or an empty value. `required`, `disabled`, `readOnly`, a form reset and a
+  [Field](/docs/api/field) work as the DatePicker's.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the value and the open state |
+| Trigger | `button` | `month-range-picker-trigger` | toggles the popup, and anchors it |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `month-range-picker-positioner` | places the popup next to the trigger |
+| Popup | `div` | `month-range-picker-popup` | the non-modal dialog, holding a `MonthRangeCalendar.Root` |
+| (hidden input) | `input` | `month-range-picker-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { MonthRangePicker, type YearMonthRange } from "@fragiola/primitives-react/month-range-picker";
+import { MonthRangeCalendar } from "@fragiola/primitives-react/month-range-calendar";
+
+<MonthRangePicker.Root value={value} onValueChange={setValue} name="month">
+    <MonthRangePicker.Trigger>{/* the formatted value */}</MonthRangePicker.Trigger>
+    <MonthRangePicker.Portal>
+        <MonthRangePicker.Positioner>
+            <MonthRangePicker.Popup aria-label="Choose months">
+                <MonthRangeCalendar.Root>{/* its header and grid */}</MonthRangeCalendar.Root>
+            </MonthRangePicker.Popup>
+        </MonthRangePicker.Positioner>
+    </MonthRangePicker.Portal>
+</MonthRangePicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <MonthRangePicker.Root v-model:value="value" name="month">
+        <MonthRangePicker.Trigger><!-- the formatted value --></MonthRangePicker.Trigger>
+        <MonthRangePicker.Portal>
+            <MonthRangePicker.Positioner>
+                <MonthRangePicker.Popup aria-label="Choose months">
+                    <MonthRangeCalendar.Root><!-- its header and grid --></MonthRangeCalendar.Root>
+                </MonthRangePicker.Popup>
+            </MonthRangePicker.Positioner>
+        </MonthRangePicker.Portal>
+    </MonthRangePicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [MonthRangePickerRoot, DatePickerTrigger, DatePickerPortal, DatePickerPositioner, DatePickerPopup, MonthRangeCalendarRoot /* , its parts */],
+    template: `
+        <ng-container monthRangePickerRoot [(value)]="value" name="month">
+            <button datePickerTrigger><!-- the formatted value --></button>
+            <div *datePickerPortal datePickerPositioner>
+                <div datePickerPopup aria-label="Choose months">
+                    <div monthRangeCalendarRoot><!-- its header and grid --></div>
+                </div>
+            </div>
+        </ng-container>
+    `,
+})
+```
+
+The DatePicker's part directives serve it, re-exported from this entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. Vue
+binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`, `(valueChangeDetails)`,
+`(openChangeDetails)`. The other parts' props are the [DatePicker's](/docs/api/date-picker#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `YearMonthRange \| null` | | the chosen range, controlled |
+| `defaultValue` | `YearMonthRange \| null` | `null` | the initial range, uncontrolled |
+| `onValueChange` | `(value: YearMonthRange \| null, details: { reason }) => void` | | every choice (reason `item-press`), a form reset (`none`) |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason; called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `min` | `PlainYearMonth \| null` | | passed to the bound calendar |
+| `max` | `PlainYearMonth \| null` | | passed to the bound calendar |
+| `isUnavailable` | `(month: PlainYearMonth) => boolean` | | passed to the bound calendar |
+| `locale` | `string` | the document's `lang` | passed to the bound calendar |
+| `columns` | `number` | `3` | passed to the bound calendar |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+| `required` | `boolean` | `false` | a native form's validation blocks a submission with no value |
+| `disabled` | `boolean` | `false` | the Trigger cannot open the popup; nothing is submitted |
+| `readOnly` | `boolean` | `false` | the popup still opens; its calendar chooses nothing |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*datePickerPortal="{ keepMounted: true }"`, or `*datePickerPortal="element"` for a container alone |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the trigger |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along its edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+## State and part attributes
+
+The [DatePicker's](/docs/api/date-picker#state-and-part-attributes), named `month-range-picker-*`; the hidden
+input's value is the ISO text (the ISO interval `period=2026-03/2026-06`).
+
+## Keyboard
+
+The [DatePicker's](/docs/api/date-picker#keyboard), with the [MonthRangeCalendar's](/docs/api/month-range-calendar#keyboard) keys in the popup.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/month-range-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `MonthRangePicker`, `MonthRangePickerRootProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PlainYearMonth`, `PositionerProps`, `RenderProp`, `Side`, `YearMonthRange` |
+| `@fragiola/primitives-vue/month-range-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `MonthRangePicker`, `MonthRangePickerRootEmits`, `MonthRangePickerRootProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PlainYearMonth`, `PositionerProps`, `RenderSlotProps`, `Side`, `YearMonthRange` |
+| `@fragiola/primitives-angular/month-range-picker` | `ChangeDetails`, `ChangeReason`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerTrigger`, `DatePickerTriggerState`, `MonthRangePickerRoot`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `PlainYear`, `PlainYearMonth`, `ValueChangeEvent`, `YearMonthRange`, `YearRange` |

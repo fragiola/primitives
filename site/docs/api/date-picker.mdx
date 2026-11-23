@@ -8,7 +8,9 @@ disclosed by a button, as a [Popover](/docs/api/popover) (WAI-ARIA APG
 [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), without the modal
 parts), and the calendar inside keeps the keyboard of the APG
 [date picker dialog example](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
-A start and an end date is a [DateRangePicker](/docs/api/date-range-picker).
+A start and an end date is a [DateRangePicker](/docs/api/date-range-picker). Its calendar can take
+[presets](/docs/api/calendar-preset) and day, month and year [views](/docs/api/calendar-view); a month or
+a year alone is a [MonthPicker](/docs/api/month-picker) or a [YearPicker](/docs/api/year-picker).
 
 The Calendar inside the Popup has no value of its own: it **binds** to the picker, showing its
 value and setting it, and takes the picker's calendar options (`min`, `max`, `locale`, ...).
@@ -223,4 +225,4 @@ No props of its own.
 | --- | --- |
 | `@fragiola/primitives-react/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderProp`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps` |
 | `@fragiola/primitives-vue/date-picker` | `DatePicker`, `Align`, `CalendarOptions`, `ChangeDetails`, `ChangeReason`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerFormProps`, `DatePickerPositionerState`, `DatePickerRootEmits`, `DatePickerRootProps`, `DatePickerRootSharedProps`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `PlainDate`, `PositionerProps`, `RenderSlotProps`, `Side`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps` |
-| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerData`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PlainDate`, `Side`, `ValueChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalOptions` |
+| `@fragiola/primitives-angular/date-picker` | `DatePickerRoot`, `Align`, `CalendarOptions`, `CalendarValue`, `ChangeDetails`, `ChangeReason`, `createDatePicker`, `DATE_PICKER`, `DatePickerComponent`, `DatePickerInputs`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerRootBase`, `DatePickerState`, `DatePickerTrigger`, `DatePickerTriggerData`, `DatePickerTriggerState`, `injectDatePicker`, `OpenChangeEvent`, `PickerComponent`, `PlainDate`, `Side`, `ValueChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalOptions` |

@@ -102,6 +102,12 @@
             "import": "./dist/layers.js",
             "default": "./dist/layers.js"
         },
+        "./month-year": {
+            "@fragiola/source": "./src/month-year/index.ts",
+            "types": "./dist/month-year.d.ts",
+            "import": "./dist/month-year.js",
+            "default": "./dist/month-year.js"
+        },
         "./number": {
             "@fragiola/source": "./src/number/index.ts",
             "types": "./dist/number.d.ts",
@@ -261,6 +267,11 @@
                 "types": "./dist/layers.d.ts",
                 "import": "./dist/layers.js",
                 "default": "./dist/layers.js"
+            },
+            "./month-year": {
+                "types": "./dist/month-year.d.ts",
+                "import": "./dist/month-year.js",
+                "default": "./dist/month-year.js"
             },
             "./number": {
                 "types": "./dist/number.d.ts",

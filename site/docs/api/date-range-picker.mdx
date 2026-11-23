@@ -5,7 +5,9 @@ description: A trigger and a non-modal popup holding a bound RangeCalendar, whic
 
 A [RangeCalendar](/docs/api/range-calendar) in a popup: the [DatePicker](/docs/api/date-picker)'s
 trigger, positioner and popup for a range. The popup stays open after the first date and closes
-on the second.
+on the second. Its RangeCalendar can take [presets](/docs/api/calendar-preset) and
+[views](/docs/api/calendar-view); a range of months or years is a
+[MonthRangePicker](/docs/api/month-range-picker) or a [YearRangePicker](/docs/api/year-range-picker).
 
 Its parts are the DatePicker's (WAI-ARIA APG [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/),
 non-modal): `/date-range-picker` exports its own Root with them, named `date-range-picker-*`.

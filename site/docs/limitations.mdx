@@ -8,18 +8,23 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
 
 ## Not in this release
 
-- **Forty-three components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
+- **Fifty-two components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
   Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Autocomplete, Listbox, Calendar,
-  RangeCalendar, DatePicker, DateRangePicker, DateField, TimeField, DateRangeField, TimeRangeField, Progress, Meter, Avatar and Separator ship today, with the opt-in virtual lists of Listbox,
+  RangeCalendar, MultipleCalendar, MonthCalendar, MonthRangeCalendar, YearCalendar, YearRangeCalendar, DatePicker, DateRangePicker, MonthPicker, MonthRangePicker, YearPicker, YearRangePicker, DateField, TimeField, DateRangeField, TimeRangeField, Progress, Meter, Avatar and Separator ship today, with the opt-in virtual lists of Listbox,
   Select, Combobox and Autocomplete ([ListboxVirtual](/docs/api/listbox-virtual), [SelectVirtual](/docs/api/select-virtual),
   [ComboboxVirtual](/docs/api/combobox-virtual), [AutocompleteVirtual](/docs/api/autocomplete-virtual)), the opt-in typed input of the pickers
-  ([DatePickerInput](/docs/api/date-picker-input), [DateRangePickerInput](/docs/api/date-range-picker-input)) and three entries that are no
+  ([DatePickerInput](/docs/api/date-picker-input), [DateRangePickerInput](/docs/api/date-range-picker-input)), a calendar's opt-in
+  [presets](/docs/api/calendar-preset) and [views](/docs/api/calendar-view), and three entries that are no
   component: the [direction provider](/docs/api/direction), the [render utilities](/docs/api/render) and the
   [async list](/docs/api/async-list).
-- **Dates are stage 3's second step.** A plain `{ year, month, day }` and a plain time in the
-  Gregorian calendar, with no time zone, typed in a DateField, a TimeField, their range fields or
-  a picker's typed input. No multiple-date calendar, no month or year pickers, no presets,
-  calendar systems or time zones yet: they come with the rest of stage 3.
+- **Dates are stage 3's third step.** A plain `{ year, month, day }`, a plain time, a month
+  `{ year, month }` and a year `{ year }` in the Gregorian calendar, with no time zone: typed in a
+  DateField, a TimeField, their range fields or a picker's typed input, chosen in a calendar, a
+  [MultipleCalendar](/docs/api/multiple-calendar), a [MonthCalendar](/docs/api/month-calendar) or a
+  [YearCalendar](/docs/api/year-calendar) (and their pickers), with [presets](/docs/api/calendar-preset)
+  and a calendar's [views](/docs/api/calendar-view). No calendar systems or time zones yet: they
+  come with the last step of stage 3. A MultipleCalendar has no `required`, no Field and no
+  picker; a view's month or year only navigates.
 - **DateField and TimeField leave out** a paste and an IME composition into a segment, the
   expansion of a two-digit year (`26` is the year 26), a native message for an unavailable date
   (a Field's `validate` gives yours), and a range across midnight (a TimeField's `min` later than

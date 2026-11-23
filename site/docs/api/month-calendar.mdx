@@ -1,0 +1,197 @@
+---
+title: MonthCalendar
+description: A grid of the 12 months of a year for choosing one month, with the calendar's keys mapped to months and the month names from Intl.
+---
+
+A grid of the **12 months of a year** for choosing one month: a card's expiry, a reporting month. A range of months is a [MonthRangeCalendar](/docs/api/month-range-calendar), a page of years a [YearCalendar](/docs/api/year-calendar), a month in a popup a [MonthPicker](/docs/api/month-picker).
+
+A month is a plain `{ year, month }` (`PlainYearMonth`), with no day and no time zone, from the toolkit's
+[`@fragiola/primitives/month-year`](/docs/api/toolkit), which only the month and year entries import. The grid is
+the WAI-ARIA APG [grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) with the
+[Calendar](/docs/api/calendar)'s keys mapped to months; the names come from `Intl` for the `locale`.
+
+## Behaviour
+
+- **Page**: 12 months in rows of `columns` (default 3, so 4 rows); paging never shifts the rows.
+- **Focus**: the grid is one tab stop, the focused month's cell. It starts at the value, else the month holding today, kept inside `min` and `max`.
+- **Keyboard**: the arrows move one month and one row (left and right swap in right-to-left), Home and End go to the row's ends, Page Up and Page Down one page (a year); Enter and Space choose. Moving off the page shows the next one, its cell taking the focus within the same key.
+- **Bounds**: months outside `min` / `max` are disabled (never focused); unavailable ones (`isUnavailable`) can be focused, not chosen. PrevButton and NextButton keep the focus and are disabled when the next page holds only disabled months.
+- **Names**: a month cell reads its long name ("November", a word of its name, WCAG 2.5.3) and is named "November 2026"; the Heading is the year; the consumer can replace each one.
+- **In a picker or a view**: with no value of its own it binds to a [MonthPicker](/docs/api/month-picker) or to a [CalendarView](/docs/api/calendar-view).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `month-calendar-root` | holds the state |
+| Heading | `h2` | `month-calendar-heading` | the year shown (it names the grid) |
+| PrevButton | `button` | `month-calendar-prev-button` | shows the previous page |
+| NextButton | `button` | `month-calendar-next-button` | shows the next page |
+| Grid | `table` | `month-calendar-grid` | the page |
+| GridBody | `tbody` | `month-calendar-grid-body` | its rows |
+| Row | `tr` | `month-calendar-row` | one row |
+| Cell | `td` | `month-calendar-cell` | one month |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { MonthCalendar, type PlainYearMonth } from "@fragiola/primitives-react/month-calendar";
+
+const [value, setValue] = useState<PlainYearMonth | null>(null);
+
+<MonthCalendar.Root value={value} onValueChange={setValue} locale="en-US">
+    <MonthCalendar.PrevButton aria-label="Previous year">‹</MonthCalendar.PrevButton>
+    <MonthCalendar.Heading />
+    <MonthCalendar.NextButton aria-label="Next year">›</MonthCalendar.NextButton>
+    <MonthCalendar.Grid>
+        <MonthCalendar.GridBody>
+            {(row) => (
+                <MonthCalendar.Row key={row[0]?.year} row={row}>
+                    {(item) => <MonthCalendar.Cell key={JSON.stringify(item)} value={item} />}
+                </MonthCalendar.Row>
+            )}
+        </MonthCalendar.GridBody>
+    </MonthCalendar.Grid>
+</MonthCalendar.Root>;
+```
+
+`GridBody` and `Row` render their default parts when given no children.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <MonthCalendar.Root v-model:value="value" locale="en-US">
+        <MonthCalendar.PrevButton aria-label="Previous year">‹</MonthCalendar.PrevButton>
+        <MonthCalendar.Heading />
+        <MonthCalendar.NextButton aria-label="Next year">›</MonthCalendar.NextButton>
+        <MonthCalendar.Grid>
+            <MonthCalendar.GridBody v-slot="{ row }">
+                <MonthCalendar.Row :row="row" v-slot="{ item }">
+                    <MonthCalendar.Cell :value="item" />
+                </MonthCalendar.Row>
+            </MonthCalendar.GridBody>
+        </MonthCalendar.Grid>
+    </MonthCalendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [MonthCalendarRoot, MonthCalendarHeading, MonthCalendarPrevButton, MonthCalendarNextButton, MonthCalendarGrid, MonthCalendarGridBody, MonthCalendarRow, MonthCalendarCell],
+    template: `
+        <div monthCalendarRoot [(value)]="value" locale="en-US">
+            <button monthCalendarPrevButton aria-label="Previous year">‹</button>
+            <h2 monthCalendarHeading #heading="monthCalendarHeading">{{ heading.label() }}</h2>
+            <button monthCalendarNextButton aria-label="Next year">›</button>
+            <table monthCalendarGrid>
+                <tbody monthCalendarGridBody #body="monthCalendarGridBody">
+                    @for (row of body.rows(); track $index) {
+                        <tr monthCalendarRow>
+                            @for (item of row; track $index) {
+                                <td monthCalendarCell #cell="monthCalendarCell" [value]="item">{{ cell.text() }}</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    `,
+})
+```
+
+The parts are the MonthCalendar's directives, which serve the four month and year calendars.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:value`, `@value-change`), and
+Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainYearMonth \| null` | | the chosen month, controlled |
+| `defaultValue` | `PlainYearMonth \| null` | `null` | the initial month, uncontrolled |
+| `onValueChange` | `(value: PlainYearMonth \| null, details: { reason }) => void` | | every choice (reason `item-press`) |
+| `min` | `PlainYearMonth \| null` | | months before it are disabled |
+| `max` | `PlainYearMonth \| null` | | months after it are disabled |
+| `isUnavailable` | `(month: PlainYearMonth) => boolean` | | unavailable months can be focused, not chosen |
+| `locale` | `string` | the document's `lang` | a BCP 47 tag: the names |
+| `columns` | `number` | `3` | items per row |
+| `disabled` | `boolean` | `false` | nothing can be focused or chosen |
+| `readOnly` | `boolean` | `false` | months can be focused, not chosen |
+
+### Heading
+
+No props of its own: its text is the year (a month calendar) or the page's span of years (a year
+calendar), from `Intl`, unless it has children.
+
+### PrevButton
+
+No props of its own.
+
+### NextButton
+
+No props of its own.
+
+### Grid
+
+No props of its own.
+
+### GridBody
+
+No props of its own: React's children are a function of each row, Vue's default slot gets
+`{ row }`, Angular's `rows()` lists them.
+
+### Row
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `row` (react, vue) | `PlainYearMonth[] \| PlainYear[]` | | its items; Angular loops over the row itself |
+
+### Cell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainYearMonth \| PlainYear` | | its month or year; its name is the full name from `Intl` unless it has an `aria-label` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-readonly` |
+| Heading | an `id`, `aria-live="polite"` |
+| PrevButton, NextButton | `type="button"`, `aria-controls` (the grid), `disabled` and `data-disabled` when they cannot move |
+| Grid | `role="grid"`, `aria-labelledby` (the Heading), `aria-readonly`, `aria-disabled` |
+| Cell | `role="gridcell"`, `aria-label`, `tabindex` (`0` on the focused item, `-1` on the others), `aria-selected`, `aria-disabled`, `aria-current="date"` (the item holding today); `data-today`, `data-selected`, `data-disabled`, `data-unavailable` |
+
+## Keyboard
+
+| key | moves the focused item to |
+| --- | --- |
+| ArrowRight / ArrowLeft | the next / previous item (swapped in right-to-left) |
+| ArrowDown / ArrowUp | the item below / above (`columns` items on) |
+| Home / End | the first / last item of its row |
+| PageDown / PageUp | the same place on the next / previous page (a year) |
+| Enter, Space | chooses it |
+| Escape | in a range calendar with a started range, cancels it |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/month-calendar` | `ChangeDetails`, `ChangeReason`, `MonthCalendar`, `MonthCalendarCellProps`, `MonthCalendarCellState`, `MonthCalendarGridBodyProps`, `MonthCalendarGridProps`, `MonthCalendarHeadingProps`, `MonthCalendarHeadingState`, `MonthCalendarItem`, `MonthCalendarNextButtonProps`, `MonthCalendarPageButtonState`, `MonthCalendarPrevButtonProps`, `MonthCalendarRootProps`, `MonthCalendarRootSharedProps`, `MonthCalendarRootState`, `MonthCalendarRowProps`, `PlainYear`, `PlainYearMonth`, `RenderProp`, `YearMonthRange`, `YearRange` |
+| `@fragiola/primitives-vue/month-calendar` | `ChangeDetails`, `ChangeReason`, `MonthCalendar`, `MonthCalendarCellProps`, `MonthCalendarCellState`, `MonthCalendarGridBodySlots`, `MonthCalendarGridProps`, `MonthCalendarHeadingProps`, `MonthCalendarHeadingState`, `MonthCalendarItem`, `MonthCalendarNextButtonProps`, `MonthCalendarPageButtonState`, `MonthCalendarPrevButtonProps`, `MonthCalendarRootEmits`, `MonthCalendarRootProps`, `MonthCalendarRootSharedProps`, `MonthCalendarRootState`, `MonthCalendarRowProps`, `MonthCalendarRowSlots`, `PlainYear`, `PlainYearMonth`, `RenderSlotProps`, `YearMonthRange`, `YearRange` |
+| `@fragiola/primitives-angular/month-calendar` | `ChangeDetails`, `ChangeReason`, `MONTH_CALENDAR`, `MONTH_CALENDAR_BINDING`, `MonthCalendarBinding`, `MonthCalendarCell`, `MonthCalendarCellState`, `MonthCalendarComponent`, `MonthCalendarGrid`, `MonthCalendarGridBody`, `MonthCalendarHeading`, `MonthCalendarInputs`, `MonthCalendarItem`, `MonthCalendarKind`, `MonthCalendarMode`, `MonthCalendarNextButton`, `MonthCalendarNextButtonState`, `MonthCalendarOptions`, `MonthCalendarPrevButton`, `MonthCalendarPrevButtonState`, `MonthCalendarRoot`, `MonthCalendarRootBase`, `MonthCalendarRow`, `MonthCalendarState`, `MonthCalendarValue`, `PlainYear`, `PlainYearMonth`, `ValueChangeEvent`, `YearMonthRange`, `YearRange`, `isItemRange`, `itemIndex`, `itemOf` |

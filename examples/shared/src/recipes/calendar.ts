@@ -28,3 +28,15 @@ export const calendar: Recipe<
     row: "",
     cell: `relative size-10 p-0 text-center cursor-default select-none rounded-control transition-colors duration-(--pr-motion) ${FOCUS_RING} hover:bg-palette-soft data-today:font-semibold data-today:after:absolute data-today:after:inset-x-0 data-today:after:bottom-1 data-today:after:mx-auto data-today:after:size-1 data-today:after:rounded-full data-today:after:bg-current data-outside-month:text-palette-accent/40 data-outside-month:hover:bg-transparent data-disabled:opacity-40 data-disabled:hover:bg-transparent data-unavailable:line-through data-unavailable:opacity-50 data-range-preview:rounded-none data-range-preview:bg-palette-soft data-in-range:rounded-none data-in-range:bg-palette-soft data-range-start:rounded-s-control data-range-end:rounded-e-control data-selected:bg-palette-contrast data-selected:text-palette-base data-in-range:data-selected:bg-palette-soft data-in-range:data-selected:text-palette-contrast data-range-start:data-selected:bg-palette-contrast data-range-start:data-selected:text-palette-base data-range-end:data-selected:bg-palette-contrast data-range-end:data-selected:text-palette-base`,
 };
+
+// spec/calendar.md, "Presets": a column of quiet buttons beside the grid, the current one painted
+// as a chosen day
+export const calendarPreset: Recipe<"list" | "preset"> = {
+    list: "flex flex-wrap gap-1",
+    preset: `${BUTTON} h-8 px-2 text-xs data-selected:bg-palette-contrast data-selected:text-palette-base`,
+};
+
+// spec/month-calendar.md, "Views": the view trigger holds the heading, a quiet button
+export const calendarView: Recipe<"trigger"> = {
+    trigger: `inline-flex items-center gap-1 rounded-control px-2 py-1 font-semibold cursor-default transition-colors duration-(--pr-motion) ${FOCUS_RING} hover:bg-palette-soft disabled:hover:bg-transparent`,
+};

@@ -41,4 +41,5 @@ export {
     type DatePickerInputs,
     type DatePickerState,
     type DatePickerTriggerData,
+    type PickerComponent,
 } from "./utils/date-picker-state.ts";

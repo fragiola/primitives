@@ -32,7 +32,8 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [autocomplete.md](autocomplete.md) | Autocomplete (the value is the text; the APG's four autocomplete behaviours) |
 | [listbox.md](listbox.md) | Listbox (on the toolkit's collections mechanism, `/selection`) |
 | [virtual-lists.md](virtual-lists.md) | ListboxVirtual, SelectVirtual, ComboboxVirtual and AutocompleteVirtual (the opt-in virtual and async lists, on the toolkit's `/virtual` and `/async-list`), and each framework's `useAsyncList` |
-| [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker, and the pickers' opt-in typed input (DatePickerInput, DateRangePickerInput) |
+| [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker, the pickers' opt-in typed input (DatePickerInput, DateRangePickerInput), MultipleCalendar and CalendarPreset |
+| [month-calendar.md](month-calendar.md) | MonthCalendar, YearCalendar and their range variants, their pickers (MonthPicker, MonthRangePicker, YearPicker, YearRangePicker) and a calendar's views (CalendarView), on the toolkit's `/month-year` |
 | [date-field.md](date-field.md) | DateField and TimeField (typed in segments, each an APG spinbutton; on the toolkit's `/segments` and `/time`) |
 | [date-range-field.md](date-range-field.md) | DateRangeField and TimeRangeField (two ends typed in segments, on DateField's segments) |
 | [progress.md](progress.md) | Progress |
@@ -83,7 +84,10 @@ Stage 3 starts with the segmented fields (Epic #73, Issue #71: the toolkit's seg
 `/segments`, and time values, `/time`, and DateField; Issue #72: TimeField and DateField's time
 granularities, [date-field.md](date-field.md)), then the range fields and the pickers' typed input
 (Epic #76, Issue #74: DateRangeField and TimeRangeField, [date-range-field.md](date-range-field.md);
-Issue #75: DatePickerInput and DateRangePickerInput, [calendar.md](calendar.md)).
+Issue #75: DatePickerInput and DateRangePickerInput, [calendar.md](calendar.md)), then the calendar
+variants (Epic #79, Issue #77: MultipleCalendar and CalendarPreset, [calendar.md](calendar.md);
+Issue #78: the month and year calendars and pickers and CalendarView, on the toolkit's
+`/month-year`, [month-calendar.md](month-calendar.md)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
