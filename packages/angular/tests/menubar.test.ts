@@ -3,6 +3,7 @@ import {
     Component,
     Input,
     provideZonelessChangeDetection,
+    signal,
 } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import {
@@ -98,6 +99,26 @@ class DisabledBar {}
 })
 class InnerMenu {}
 
+@Component({
+    selector: "test-bound-trigger",
+    imports: [MenuRoot, MenuTrigger],
+    template: `
+        <ng-container menuRoot>
+            <button
+                menuTrigger
+                [attr.role]="role()"
+                [attr.tabindex]="tabIndex()"
+                [attr.aria-disabled]="ariaDisabled()"
+            >Bound</button>
+        </ng-container>
+    `,
+})
+class BoundTrigger {
+    readonly role = signal<string | null>("button");
+    readonly tabIndex = signal<string | null>("3");
+    readonly ariaDisabled = signal<string | null>("true");
+}
+
 // spec/menu.md, "In a Menubar": the contract of a parent bar reaches the bar's own menus only
 describe("a [menuTrigger] and its bar", () => {
     it("outside a bar, and in a Toolbar, is a plain menu button that joins no roving scope", async () => {
@@ -130,6 +151,30 @@ describe("a [menuTrigger] and its bar", () => {
         expect(inner.getAttribute("role")).toBeNull();
         expect(inner.getAttribute("tabindex")).toBeNull();
         expect(button(root, "File").getAttribute("role")).toBe("menuitem");
+        root.remove();
+    });
+
+    // Epic #49 review: outside a bar, the Trigger binds no role, tabindex or aria-disabled of
+    // its own, so a consumer's bindings are the only ones
+    it("outside a bar, leaves a consumer's bound role, tabindex and aria-disabled alone", async () => {
+        TestBed.configureTestingModule({
+            providers: [provideZonelessChangeDetection()],
+        });
+        const fixture = TestBed.createComponent(BoundTrigger);
+        await fixture.whenStable();
+        const root = fixture.nativeElement as HTMLElement;
+        document.body.append(root);
+        const bound = button(root, "Bound");
+        expect(bound.getAttribute("role")).toBe("button");
+        expect(bound.getAttribute("tabindex")).toBe("3");
+        expect(bound.getAttribute("aria-disabled")).toBe("true");
+        fixture.componentInstance.role.set("link");
+        fixture.componentInstance.tabIndex.set("-1");
+        fixture.componentInstance.ariaDisabled.set(null);
+        await fixture.whenStable();
+        expect(bound.getAttribute("role")).toBe("link");
+        expect(bound.getAttribute("tabindex")).toBe("-1");
+        expect(bound.hasAttribute("aria-disabled")).toBe(false);
         root.remove();
     });
 });

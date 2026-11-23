@@ -4,6 +4,7 @@ import {
     computed,
     DestroyRef,
     Directive,
+    effect,
     inject,
     input,
 } from "@angular/core";
@@ -12,7 +13,7 @@ import {
     dataValues,
     injectRovingItem,
     overlayTrigger,
-    ownAttribute,
+    writeAttributes,
 } from "@fragiola/primitives-angular/internal";
 import type { MenuBar } from "../utils/menu-bar.ts";
 import type { MenuHandle } from "../utils/menu-handle.ts";
@@ -36,12 +37,9 @@ export interface MenuTriggerState {
         "aria-haspopup": "menu",
         "data-primitives-part": "menu-trigger",
         "[attr.id]": "trigger.id()",
-        // in a bar: a menuitem with the bar's roving tabindex, focusable while disabled
-        "[attr.role]": "bar ? 'menuitem' : ownRole",
-        "[attr.tabindex]": "item ? item.tabIndex() : ownTabIndex",
+        // in a bar, focusable while disabled: its role, tabindex and aria-disabled are written
+        // only there (the constructor), so outside a bar a consumer's bindings are the only ones
         "[attr.disabled]": "bar ? null : data().disabled",
-        "[attr.aria-disabled]":
-            "bar && state().disabled ? 'true' : ownAriaDisabled",
         "[attr.aria-expanded]": "String(state().open)",
         "[attr.aria-controls]":
             "state().open ? (trigger.root()?.overlay?.popupId ?? null) : null",
@@ -78,9 +76,6 @@ export class MenuTrigger<Payload = unknown> {
         () => true,
         this.bar?.scope ?? null,
     );
-    protected readonly ownRole = ownAttribute("role");
-    protected readonly ownTabIndex = ownAttribute("tabindex");
-    protected readonly ownAriaDisabled = ownAttribute("aria-disabled");
     readonly state = computed<MenuTriggerState>(() => ({
         open: this.trigger.active(),
         disabled: this.isDisabled(),
@@ -99,6 +94,16 @@ export class MenuTrigger<Payload = unknown> {
             return;
         }
         const host = this.trigger.host;
+        // a menuitem with the bar's roving tabindex, focusable while disabled (spec/menu.md, "In
+        // a Menubar"); also on a server, so the server's output keeps them
+        const item = this.item;
+        effect(() => {
+            writeAttributes(host, {
+                role: "menuitem",
+                tabindex: item?.tabIndex() ?? null,
+                "aria-disabled": this.isDisabled() ? "true" : null,
+            });
+        });
         // registered once rendered, as its roving item (never on a server)
         let unregister: (() => void) | null = null;
         afterNextRender(() => {
