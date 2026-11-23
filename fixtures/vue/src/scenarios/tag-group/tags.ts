@@ -28,3 +28,10 @@ export const SKILLS: readonly Tag[] = [
 export function printList(values: readonly string[]): string {
     return values.length === 0 ? "none" : values.join(",");
 }
+
+/** /tag-group/form: at least one skill. */
+export function validateSkills(value: unknown): string | null {
+    return Array.isArray(value) && value.length === 0
+        ? "Choose a skill."
+        : null;
+}

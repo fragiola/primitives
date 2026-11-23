@@ -168,6 +168,7 @@ import { TagGroupBasic } from "../scenarios/tag-group/tag-group-basic.tsx";
 import { TagGroupDisabled } from "../scenarios/tag-group/tag-group-disabled.tsx";
 import { TagGroupEmpty } from "../scenarios/tag-group/tag-group-empty.tsx";
 import { TagGroupField } from "../scenarios/tag-group/tag-group-field.tsx";
+import { TagGroupForm } from "../scenarios/tag-group/tag-group-form.tsx";
 import { TagGroupSelection } from "../scenarios/tag-group/tag-group-selection.tsx";
 import { TagGroupSingle } from "../scenarios/tag-group/tag-group-single.tsx";
 import { TagsInputBasic } from "../scenarios/tags-input/tags-input-basic.tsx";
@@ -409,6 +410,7 @@ export const routes: Record<
     "/tag-group/disabled": TagGroupDisabled,
     "/tag-group/empty": TagGroupEmpty,
     "/tag-group/field": TagGroupField,
+    "/tag-group/form": TagGroupForm,
     "/tags-input/basic": TagsInputBasic,
     "/tags-input/options": TagsInputOptions,
     "/tags-input/edit": TagsInputEdit,

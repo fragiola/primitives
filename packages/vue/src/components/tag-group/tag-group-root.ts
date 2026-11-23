@@ -165,17 +165,9 @@ export const TagGroupRoot: PartComponent<
             };
             const disabledKeys = () => props.disabledKeys ?? NONE;
 
-            const tabStopElement = () => {
-                const current = inOrder(entries.value);
-                return (
-                    current.find(
-                        (entry) =>
-                            !entry.disabled && entry.element === active.value,
-                    )?.element ??
-                    current.find((entry) => !entry.disabled)?.element ??
-                    null
-                );
-            };
+            // the Field focuses the tab stop: none when every tag is disabled (`disabledKeys`,
+            // the group's or the field's `disabled` included)
+            const tabStopElement = (): HTMLElement | null => tabStop.value;
 
             // inside a Field, the List is the field's control (spec/tag-group.md, "Forms")
             const field = useFieldControl({

@@ -304,3 +304,17 @@ test.describe("tag-group / field", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+test.describe("tag-group / form", () => {
+    test("a failed submission focuses the tab stop, passing over disabledKeys", async ({
+        page,
+    }) => {
+        await openScenario(page, "/tag-group/form");
+        const grid = page.getByRole("grid", { name: "Skills" });
+        await page.getByRole("button", { name: "Submit" }).click();
+        await expectFocused(page, "Writing");
+        await expect(grid).toHaveAttribute("aria-invalid", "true");
+        await expect(page.getByText("Choose a skill.")).toBeVisible();
+        await expectNoAxeViolations(page);
+    });
+});

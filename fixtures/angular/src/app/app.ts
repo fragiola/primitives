@@ -168,6 +168,7 @@ import { TagGroupBasic } from "../scenarios/tag-group/tag-group-basic.ts";
 import { TagGroupDisabled } from "../scenarios/tag-group/tag-group-disabled.ts";
 import { TagGroupEmpty } from "../scenarios/tag-group/tag-group-empty.ts";
 import { TagGroupField } from "../scenarios/tag-group/tag-group-field.ts";
+import { TagGroupForm } from "../scenarios/tag-group/tag-group-form.ts";
 import { TagGroupSelection } from "../scenarios/tag-group/tag-group-selection.ts";
 import { TagGroupSingle } from "../scenarios/tag-group/tag-group-single.ts";
 import { TagsInputBasic } from "../scenarios/tags-input/tags-input-basic.ts";
@@ -408,6 +409,7 @@ import { ROUTES } from "./routes.ts";
         TagGroupDisabled,
         TagGroupEmpty,
         TagGroupField,
+        TagGroupForm,
         TagsInputBasic,
         TagsInputOptions,
         TagsInputEdit,
@@ -624,6 +626,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/tag-group/disabled") { <main class="p-6" scenario-tag-group-disabled></main> }
             @case ("/tag-group/empty") { <main class="p-6" scenario-tag-group-empty></main> }
             @case ("/tag-group/field") { <main class="p-6" scenario-tag-group-field></main> }
+            @case ("/tag-group/form") { <main class="p-6" scenario-tag-group-form></main> }
             @case ("/tags-input/basic") { <main class="p-6" scenario-tags-input-basic></main> }
             @case ("/tags-input/options") { <main class="p-6" scenario-tags-input-options></main> }
             @case ("/tags-input/edit") { <main class="p-6" scenario-tags-input-edit></main> }

@@ -196,6 +196,7 @@ export const ROUTES: readonly string[] = [
     "/tag-group/disabled",
     "/tag-group/empty",
     "/tag-group/field",
+    "/tag-group/form",
     "/tags-input/basic",
     "/tags-input/options",
     "/tags-input/edit",

@@ -111,15 +111,10 @@ export function TagGroupRoot(props: TagGroupRootProps) {
     const ordered = inOrder(entries);
     const latest = useRef({ entries, value, onRemove, list });
     latest.current = { entries, value, onRemove, list };
-    const tabStopElement = useCallback(() => {
-        const current = inOrder(latest.current.entries);
-        return (
-            current.find((entry) => !entry.disabled && entry.element === active)
-                ?.element ??
-            current.find((entry) => !entry.disabled)?.element ??
-            null
-        );
-    }, [active]);
+    // the Field focuses the tab stop: none when every tag is disabled (`disabledKeys`, the
+    // group's or the field's `disabled` included)
+    const tabStopRef = useRef<HTMLElement | null>(null);
+    const tabStopElement = useCallback(() => tabStopRef.current, []);
 
     // inside a Field, the List is the field's control (spec/tag-group.md, "Forms")
     const field = useFieldControl({
@@ -306,6 +301,7 @@ export function TagGroupRoot(props: TagGroupRootProps) {
         },
     );
     const tabStop = ordered[tabStopIndex]?.element ?? null;
+    tabStopRef.current = tabStop;
     const labelledBy = field.aria["aria-labelledby"] ?? labelId;
     const context = useMemo(
         () => ({

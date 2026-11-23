@@ -168,6 +168,7 @@ import TagGroupBasic from "../scenarios/tag-group/tag-group-basic.vue";
 import TagGroupDisabled from "../scenarios/tag-group/tag-group-disabled.vue";
 import TagGroupEmpty from "../scenarios/tag-group/tag-group-empty.vue";
 import TagGroupField from "../scenarios/tag-group/tag-group-field.vue";
+import TagGroupForm from "../scenarios/tag-group/tag-group-form.vue";
 import TagGroupSelection from "../scenarios/tag-group/tag-group-selection.vue";
 import TagGroupSingle from "../scenarios/tag-group/tag-group-single.vue";
 import TagsInputBasic from "../scenarios/tags-input/tags-input-basic.vue";
@@ -407,6 +408,7 @@ export const routes: Record<string, Component> = {
     "/tag-group/disabled": TagGroupDisabled,
     "/tag-group/empty": TagGroupEmpty,
     "/tag-group/field": TagGroupField,
+    "/tag-group/form": TagGroupForm,
     "/tags-input/basic": TagsInputBasic,
     "/tags-input/options": TagsInputOptions,
     "/tags-input/edit": TagsInputEdit,

@@ -140,7 +140,10 @@ is the app's. **In a Field** ([field.md](field.md#integration-contract)): the Li
 control (as Listbox's Root), named by the `Field.Label` (`aria-labelledby`), described by the
 field (`aria-describedby`), `aria-invalid` and the field's states on it; focus and blur are the
 focus entering and leaving the List; `validate` gets the selected values; there is no validated
-element. The field's `disabled` disables every tag.
+element. The field's `disabled` disables every tag. Its focus target (the element a
+[Form](form.md) focuses when the field is the first invalid one) is the tab stop ("Focus"): a tag
+disabled by `disabledKeys` is never it, and a group with no enabled tag (every tag disabled, the
+Root's or the field's `disabled`) has none.
 
 ## RTL
 
@@ -257,6 +260,20 @@ Checks:
 1. A `grid` named "Skills", described by "Your strongest skills.", not `aria-invalid`.
 2. Tab focuses "Design"; Space selects it (`value: design`).
 3. Axe finds no violation.
+
+### `/tag-group/form`
+
+A `Form` with a `Field.Root` `name="skills"` whose `validate` refuses no selection
+(**"Choose a skill."**): a `Field.Label` **"Skills"**, a Root with `selectionMode` `"multiple"`
+and `disabledKeys` `["design"]` holding the tags of `/tag-group/field` without RemoveButtons, a
+`Field.Error`; then a **"Submit"** button.
+
+Checks:
+
+1. "Submit" submits nothing, focuses "Writing" (the field's focus target is the tab stop, which
+   passes over "Design", disabled by `disabledKeys`), makes the `grid` `aria-invalid="true"` and
+   shows "Choose a skill.".
+2. Axe finds no violation after the failed submission.
 
 ## Differences from Base UI and the references
 
