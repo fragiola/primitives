@@ -44,7 +44,9 @@ One entry, `/search-field` (D8), built on no other component; a Field control
   `input-change` (typing, a paste), `escape-key` (Escape cleared it), `clear-press` (the
   ClearButton), `none` (a form reset).
 - `onSubmit(value)`: Enter in the Input, with the current value (also while it is empty); not
-  called while disabled or read-only.
+  called while disabled or read-only. Vue emits `submit`; Angular's output is `(valueSubmit)`: a
+  directive output named `submit` would also listen to the native `submit` event of the Root's
+  element.
 - `disabled` (`false`): the Input and the ClearButton are disabled.
 - `readOnly` (`false`): the Input is read-only; Escape and the ClearButton do not clear it.
 - `required` (`false`): the Input is `required`.

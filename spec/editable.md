@@ -138,7 +138,9 @@ EditTrigger.
 | a form reset | the edit ends, neither committed nor reverted (the value returns to its default, reason `none`) | the return target, when the focus was in the edit; else it stays |
 
 The focus moving between the Input, the SubmitTrigger and the CancelTrigger does not end the
-edit. A blur ends it only once the focus is outside the three of them.
+edit. Only a blur of one of those three ends it, once the focus is outside the three of them (the
+EditTrigger or the Preview, hidden while focused as an edit starts, may report a blur with no
+`relatedTarget`: it is not the edit's).
 
 ## Pointer
 

@@ -232,7 +232,13 @@ export function EditableRoot({
                 }
                 const related = event.relatedTarget as Node | null;
                 const { submit, cancel } = elements.current;
-                for (const part of [current.input, submit, cancel]) {
+                const parts = [current.input, submit, cancel];
+                // only a blur of the edit's own parts ends it: the EditTrigger or the Preview,
+                // hidden as the edit starts, may report a blur to nowhere (spec/editable.md)
+                if (!parts.includes(event.target as HTMLElement)) {
+                    return;
+                }
+                for (const part of parts) {
                     if (
                         part !== null &&
                         related !== null &&

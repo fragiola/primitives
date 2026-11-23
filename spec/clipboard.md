@@ -34,7 +34,7 @@ never copied). Where they are silent, the APG-closest option is decided here (D4
 | Trigger | `button` | `clipboard-trigger` | copies the value; `type="button"` |
 | Indicator | `span` | `clipboard-indicator` | follows the status (the app's icons); `aria-hidden="true"` |
 | Input | `input` | `clipboard-input` | optional: shows the value, read-only |
-| (announcer) | `span` | `clipboard-announcer` | rendered by the Root: the polite live region, visually hidden |
+| (announcer) | `span` | `clipboard-announcer` | rendered by the Root: the polite live region, visually hidden (Angular: the Root's directive appends it once the page renders in the browser, as its hidden inputs, since a directive renders no child; a server render has none, and the region is there before any copy) |
 
 One entry, `/clipboard` (D8), built on no other component. Its writing and its announcement are
 the toolkit's `/clipboard` (`writeClipboard`, `announceText`).
