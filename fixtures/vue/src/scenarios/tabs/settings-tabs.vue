@@ -8,6 +8,8 @@ import { Tabs } from "../../kit/ui/tabs.ts";
 defineProps<{
     activation: "automatic" | "manual";
     orientation: "horizontal" | "vertical";
+    /** `/tabs/nonce`: the Indicator script's nonce. */
+    nonce?: string;
 }>();
 const value = ref("account");
 const TABS = [
@@ -22,7 +24,7 @@ const TABS = [
     <Tabs.Root v-model:value="value" :activation="activation" :orientation="orientation">
         <Tabs.List>
             <Tabs.Tab v-for="tab in TABS" :key="tab.value" :value="tab.value" :disabled="tab.disabled">{{ tab.label }}</Tabs.Tab>
-            <Tabs.Indicator render-before-hydration />
+            <Tabs.Indicator render-before-hydration :nonce="nonce" />
         </Tabs.List>
         <Tabs.Panel v-for="tab in TABS" :key="tab.value" :value="tab.value">
             <p><TextRuns :runs="[tab.label, ' settings']" /></p>
