@@ -32,7 +32,9 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 `/direction`; Select and Combobox add `/collection`, `/overlay` and `/positioning` (Select's `modal` option `/inert` and
 `/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms; DateField and
 TimeField add `/segments` (the segment editing) and `/time` (the plain times and date-times) to
-`/date` and `/form`, and no other component imports those two. Progress uses
+`/date` and `/form`, as do the range fields and the pickers' opt-in typed input (DatePickerInput,
+DateRangePickerInput, in entries of their own), and no other component imports those two: a
+DatePicker without the typed input stays on `/date`. Progress uses
 `/range` alone, Avatar `/image` alone; Button and Separator use none. Toolbar and ToggleGroup use
 the roving focus of `/collection` and `/direction` (a Toggle alone imports neither: its
 composite's root handles the keys). NumberField adds `/number` to `/form` (its parsing and
@@ -74,7 +76,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/segments` | `segmentFormat`, `SegmentFormat`, `SegmentFormatOptions`, `SegmentGranularity`, `SegmentKind`, `SegmentPart`, `SegmentType`, `EditableSegmentType`, `HourCycle`, `dateSegments`, `DateSegment`, `SEGMENT_PLACEHOLDER`, `SegmentValues`, `SegmentRange`, `segmentRange`, `SEGMENT_PAGE_STEPS`, `setSegment`, `stepSegment`, `segmentToEdge`, `shownValue`, `displayHour`, `isSegmentsComplete`, `segmentValuesOf`, `segmentsToDate`, `segmentsToTime`, `segmentsToDateTime`, `typeSegment`, `eraseSegment`, `segmentDigit`, `SegmentEdit`, `SegmentTypeResult`, `SegmentEraseResult`, `segmentKeyDown`, `SegmentKeyResult`, `segmentTarget`, `SegmentMove`, `focusOnLabelPress` |
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
-| `@fragiola/primitives/time` | `PlainTime`, `plainTime`, `currentTime`, `compareTimes`, `isSameTime`, `addTime`, `cycleTime`, `TimeDuration`, `TimeField`, `toIsoTime`, `fromIsoTime`, `IsoTimePrecision`, `PlainDateTime`, `plainDateTime`, `currentDateTime`, `toPlainDate`, `toPlainTime`, `compareDateTimes`, `isSameDateTime`, `addDateTime`, `DateTimeDuration`, `toIsoDateTime`, `fromIsoDateTime` |
+| `@fragiola/primitives/time` | `addDateTime`, `addTime`, `compareDateTimes`, `compareTimes`, `currentDateTime`, `currentTime`, `cycleTime`, `DateTimeDuration`, `fromIsoDateTime`, `fromIsoTime`, `IsoTimePrecision`, `isSameDateTime`, `isSameTime`, `PlainDateTime`, `plainDateTime`, `PlainTime`, `plainTime`, `TimeDuration`, `TimeField`, `TimeRange`, `toIsoDateTime`, `toIsoTime`, `toPlainDate`, `toPlainTime` |
 | `@fragiola/primitives/toast` | `createToastManager`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `watchToastViewport`, `ToastViewportWatch`, `ToastViewportWatchOptions`, `measureToastHeight` |
 | `@fragiola/primitives/virtual` | `createVirtualizer`, `Virtualizer`, `VirtualizerOptions`, `VirtualAlign`, `scrollContainer`, `virtualLayout`, `VirtualLayoutOptions`, `VirtualRange`, `VirtualRow`, `rowStarts`, `rowAt`, `activeSticky`, `pageIndex` |
 

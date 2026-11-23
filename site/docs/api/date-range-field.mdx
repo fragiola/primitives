@@ -1,0 +1,160 @@
+---
+title: DateRangeField
+description: A start and an end date typed in segments as one control, an end before the start invalid, two form values and Field support, in each framework.
+---
+
+A start date and an end date typed in parts, as two [DateField](/docs/api/date-field) inputs in
+one control: a stay's check-in and check-out, a report's period. With a time granularity both
+ends are a date and a time. Each end is a `group` of segments you name ("Check-in",
+"Check-out"); each segment is the [APG spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/),
+as in a DateField, with React Aria's DateRangePicker as the behaviour reference where the APG says
+nothing (the [behaviour rule](/docs/concepts/behaviour-rule)). [TimeRangeField](/docs/api/time-range-field)
+is the same anatomy over two times.
+
+<Example id="date-range-field" />
+
+## Behaviour
+
+- **Value**: a `DateRange` (`{ start, end }` of `PlainDate`s, or of `PlainDateTime`s with a time
+  granularity), set only once every segment of both ends is; `null` until then.
+- **One sequence**: typing moves on from the start's last segment to the end's first, Backspace on
+  an empty segment moves back across the ends, and ArrowLeft and ArrowRight cross them; moving
+  between the ends is no blur of the Field.
+- **An end before the start** is still the value, and invalid (`data-invalid`, `aria-invalid` on
+  every segment), as an end before `min`, after `max` or unavailable (`isDateUnavailable`).
+- **Forms**: two hidden native inputs, `startName` and `endName`, submit each ISO date. Their
+  bounds cross: the start's `max` is the end, the end's `min` the start, so a reversed range is
+  the browser's own `rangeOverflow` / `rangeUnderflow` (a native form refuses it, a Field shows
+  its error); `required` refuses an empty range; a reset returns both ends to `defaultValue`.
+- **No text**: name each Input (`aria-label`); inside a Field, a segment is named by the label,
+  its end and itself ("Stay Check-in month").
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `date-range-field-root` | holds the value; renders the hidden inputs after it |
+| Input | `div` | `date-range-field-input` | `group` of one end's segments (`range`) |
+| Segment | `span` | `date-range-field-segment` | `spinbutton`, or a literal hidden from assistive technology |
+| (hidden inputs) | `input type="date"` ×2 | `date-range-field-hidden-input` | what the form submits, `data-range="start"` / `"end"` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { DateRangeField } from "@fragiola/primitives-react/date-range-field";
+
+<DateRangeField.Root value={stay} onValueChange={setStay} min={today} startName="check-in" endName="check-out">
+    <DateRangeField.Input range="start" aria-label="Check-in" />
+    <span aria-hidden="true">–</span>
+    <DateRangeField.Input range="end" aria-label="Check-out" />
+</DateRangeField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <DateRangeField.Root v-model:value="stay" :min="today" start-name="check-in" end-name="check-out">
+        <DateRangeField.Input range="start" aria-label="Check-in" />
+        <span aria-hidden="true">–</span>
+        <DateRangeField.Input range="end" aria-label="Check-out" />
+    </DateRangeField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [DateRangeFieldRoot, DateRangeFieldInput, DateFieldSegment],
+    template: `
+        <div dateRangeFieldRoot [(value)]="stay" [min]="today" startName="check-in" endName="check-out">
+            <div dateRangeFieldInput range="start" aria-label="Check-in" #start="dateRangeFieldInput">
+                @for (segment of start.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+            <span aria-hidden="true">–</span>
+            <div dateRangeFieldInput range="end" aria-label="Check-out" #end="dateRangeFieldInput">
+                @for (segment of end.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+        </div>
+    `,
+})
+export class StayDates {
+    protected readonly stay = signal<DateRangeFieldValue | null>(null);
+    protected readonly today = { year: 2026, month: 11, day: 23 };
+}
+```
+
+The Segment is DateField's directive, `[dateFieldSegment]`, re-exported from this entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives.
+Vue binds the value as `v-model:value` with `@value-change`; Angular as `[(value)]` with
+`(valueChangeDetails)` (`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `DateRangeFieldValue \| null` | | the range, controlled |
+| `defaultValue` | `DateRangeFieldValue \| null` | `null` | the initial range, uncontrolled |
+| `onValueChange` | `(value, details: { reason, event }) => void` | | every change of the range |
+| `granularity` | `"day" \| "hour" \| "minute" \| "second"` | `"day"` | the smallest segment; a time granularity makes both ends `PlainDateTime`s |
+| `placeholderValue` | `PlainDate \| PlainDateTime` | today at midnight | what an arrow on an empty segment starts from |
+| `hourCycle` | `12 \| 24` | the locale's | a time granularity's clock |
+| `min` | `PlainDate \| PlainDateTime` | | ends before it are invalid |
+| `max` | `PlainDate \| PlainDateTime` | | ends after it are invalid |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | a range whose start or end is unavailable is invalid |
+| `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `required` | `boolean` | `false` | both hidden inputs are required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |
+| `startName` | `string` | | the start's hidden input name |
+| `endName` | `string` | | the end's hidden input name |
+
+### Input
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `range` | `"start" \| "end"` | required | the end whose segments it holds |
+
+Its children: a function of each segment (Vue: the default slot's `{ segment }`; Angular: `@for`
+over `segments()`); with none, every segment with its own text. Name it with `aria-label`.
+
+### Segment
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `segment` | `DateSegment` | required | one of the Input's segments |
+
+## State and part attributes
+
+As [DateField's](/docs/api/date-field#state-and-part-attributes), named `date-range-field-*`; the
+Input and the hidden inputs add `data-range="start"` / `"end"`, and every part is `data-invalid`
+while the range is.
+
+## Keyboard
+
+As [DateField's](/docs/api/date-field#keyboard), across both ends: digits move on into the end,
+Backspace moves back into the start, ArrowLeft and ArrowRight cross them.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/date-range-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateRange`, `DateRangeField`, `DateRangeFieldInputProps`, `DateRangeFieldRootProps`, `DateRangeFieldRootSharedProps`, `DateRangeFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RangeEnd`, `RenderProp`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-vue/date-range-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputSlots`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateRange`, `DateRangeField`, `DateRangeFieldInputProps`, `DateRangeFieldRootEmits`, `DateRangeFieldRootProps`, `DateRangeFieldRootSharedProps`, `DateRangeFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RangeEnd`, `RenderSlotProps`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-angular/date-range-field` | `ChangeDetails`, `ChangeReason`, `composeRange`, `DATE_RANGE_FIELD`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateRange`, `DateRangeFieldInput`, `DateRangeFieldInputs`, `DateRangeFieldRoot`, `DateRangeFieldRootBase`, `DateRangeFieldRootState`, `DateRangeFieldValue`, `DateSegment`, `edgeOf`, `FieldRange`, `isRangeInvalid`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RangeEnd`, `RangeEndParts`, `RangeGroups`, `rangeIso`, `SegmentGranularity`, `SegmentType`, `ValueChangeEvent` |
