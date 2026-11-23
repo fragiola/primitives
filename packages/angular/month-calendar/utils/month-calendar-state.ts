@@ -12,13 +12,9 @@ import {
     signal,
     untracked,
 } from "@angular/core";
-import { watchDocumentLanguage } from "@fragiola/primitives/date";
-import {
-    currentYearMonth,
-    monthIndex,
-    UNIT_PAGE_SIZE,
-    unitPageStart,
-} from "@fragiola/primitives/month-year";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
+import { today, watchDocumentLanguage } from "@fragiola/primitives/date";
+import { monthIndex } from "@fragiola/primitives/month-year";
 import {
     type ChangeDetails,
     controllable,
@@ -27,14 +23,14 @@ import {
 import { MONTH_CALENDAR_BINDING } from "./month-calendar-binding.ts";
 import {
     isItemRange,
-    itemIndex,
-    itemOf,
     type MonthCalendarComponent,
     type MonthCalendarItem,
     type MonthCalendarKind,
     type MonthCalendarMode,
     type MonthCalendarOptions,
+    type MonthCalendarUnits,
     type MonthCalendarValue,
+    unitsOf,
 } from "./month-calendar-value.ts";
 
 export interface MonthCalendarCellState {
@@ -59,6 +55,8 @@ export interface MonthCalendarInputs {
     isUnavailable: Signal<((item: MonthCalendarItem) => boolean) | undefined>;
     locale: Signal<string | undefined>;
     columns: Signal<number | undefined>;
+    /** A calendar system (spec/calendar-systems.md); `undefined`: the ISO calendar. */
+    calendar: Signal<CalendarSystem | undefined>;
     disabled: Signal<boolean>;
     /** `undefined` when unset: a bound picker's then applies. */
     readOnly: Signal<boolean | undefined>;
@@ -85,7 +83,7 @@ function documentLocale(doc: Document, browser: boolean): string {
 /**
  * The state of a month or year calendar, single or range (spec/month-calendar.md): the focused
  * item and its page, the value (its own, or its picker's or view's when it sits in one with no
- * value of its own), and the range being chosen. Items are numbers (`itemIndex`). Created in a
+ * value of its own), and the range being chosen. Items are numbers (`units().index`). Created in a
  * root directive's injection context.
  */
 export class MonthCalendarState {
@@ -117,6 +115,7 @@ export class MonthCalendarState {
             isUnavailable: this.inputs.isUnavailable(),
             locale: this.inputs.locale(),
             columns: this.inputs.columns(),
+            calendar: this.inputs.calendar(),
         };
         if (!this.bound() || this.binding === null) {
             return own;
@@ -129,13 +128,17 @@ export class MonthCalendarState {
         }
         return merged as MonthCalendarOptions;
     });
+    /** The items' math and names: a calendar system's, or the ISO calendar's. */
+    readonly units = computed<MonthCalendarUnits>(() =>
+        unitsOf(this.kind, this.options().calendar),
+    );
     readonly min = computed(() => {
         const min = this.options().min;
-        return min == null ? null : itemIndex(this.kind, min);
+        return min == null ? null : this.units().index(min);
     });
     readonly max = computed(() => {
         const max = this.options().max;
-        return max == null ? null : itemIndex(this.kind, max);
+        return max == null ? null : this.units().index(max);
     });
     private readonly document = inject(DOCUMENT);
     private readonly browser = inject(PLATFORM_ID) === "browser";
@@ -158,7 +161,18 @@ export class MonthCalendarState {
             this.inputs.readOnly() ??
             (this.bound() && (this.binding?.readOnly() ?? false)),
     );
-    readonly todayIndex: number;
+    // today, read once (as the calendars' today)
+    private readonly todayDate = today();
+    /** Today's month or year (in the calendar system, when one is given). */
+    readonly todayIndex = computed(() => {
+        const system = this.options().calendar;
+        if (system) {
+            return system.units(this.kind).fromDate(this.todayDate);
+        }
+        return this.kind === "month"
+            ? monthIndex(this.todayDate)
+            : this.todayDate.year;
+    });
     private seed: number | null = null;
     private readonly focusedOwn = signal<number | null>(null);
     private readonly pageOwn = signal<number | null>(null);
@@ -166,7 +180,7 @@ export class MonthCalendarState {
     readonly focused = computed(() => this.focusedOwn() ?? this.initialFocus());
     /** The first item of the page shown. */
     readonly pageStart = computed(
-        () => this.pageOwn() ?? unitPageStart(this.initialFocus()),
+        () => this.pageOwn() ?? this.units().pageStart(this.initialFocus()),
     );
     /** A range calendar: the start of a range being chosen, and the item it previews to. */
     readonly anchor = signal<number | null>(null);
@@ -187,8 +201,6 @@ export class MonthCalendarState {
             details: ChangeDetails,
         ) => void,
     ) {
-        const now = currentYearMonth();
-        this.todayIndex = kind === "month" ? monthIndex(now) : now.year;
         afterEveryRender(() => this.applyPendingFocus());
         if (this.browser) {
             const stop = watchDocumentLanguage(this.document, () =>
@@ -232,15 +244,14 @@ export class MonthCalendarState {
             const own =
                 value === null
                     ? null
-                    : itemIndex(
-                          this.kind,
+                    : this.units().index(
                           isItemRange(value) ? value.start : value,
                       );
             const view =
                 this.bound() && this.binding?.focus
                     ? this.binding.focus()
                     : null;
-            return this.clamp(own ?? view ?? this.todayIndex);
+            return this.clamp(own ?? view ?? this.todayIndex());
         });
         return this.seed;
     }
@@ -259,7 +270,7 @@ export class MonthCalendarState {
     }
 
     itemOf(index: number): MonthCalendarItem {
-        return itemOf(this.kind, index);
+        return this.units().item(index);
     }
 
     isOutOfBounds(index: number): boolean {
@@ -275,7 +286,7 @@ export class MonthCalendarState {
 
     isUnavailable(index: number): boolean {
         return (
-            this.options().isUnavailable?.(itemOf(this.kind, index)) ?? false
+            this.options().isUnavailable?.(this.units().item(index)) ?? false
         );
     }
 
@@ -286,13 +297,23 @@ export class MonthCalendarState {
         }
         this.hovered.set(null);
         this.focusedOwn.set(index);
-        this.pageOwn.set(unitPageStart(index));
+        this.pageOwn.set(this.units().pageStart(index));
         return true;
     }
 
+    /** The first item of the next or previous page (a system's year can have 13 months). */
+    private nextStart(delta: 1 | -1): number {
+        const units = this.units();
+        const start = this.pageStart();
+        return delta > 0
+            ? start + units.pageSize(start)
+            : units.pageStart(start - 1);
+    }
+
     canPage(delta: 1 | -1): boolean {
-        const start = this.pageStart() + delta * UNIT_PAGE_SIZE;
-        for (let index = start; index < start + UNIT_PAGE_SIZE; index++) {
+        const start = this.nextStart(delta);
+        const end = start + this.units().pageSize(start);
+        for (let index = start; index < end; index++) {
             if (!this.isOutOfBounds(index)) {
                 return true;
             }
@@ -306,15 +327,17 @@ export class MonthCalendarState {
         if (!this.canPage(delta)) {
             return;
         }
-        const start = this.pageStart() + delta * UNIT_PAGE_SIZE;
-        const target = this.focused() + delta * UNIT_PAGE_SIZE;
+        const start = this.nextStart(delta);
+        const size = this.units().pageSize(start);
+        const target =
+            start + Math.min(this.focused() - this.pageStart(), size - 1);
         // the same place on the new page, else its enabled item nearest to it
         let next = target;
-        for (let distance = 0; distance < UNIT_PAGE_SIZE; distance++) {
+        for (let distance = 0; distance < size; distance++) {
             const found = [target - distance, target + distance].find(
                 (index) =>
                     index >= start &&
-                    index < start + UNIT_PAGE_SIZE &&
+                    index < start + size &&
                     !this.isOutOfBounds(index),
             );
             if (found !== undefined) {
@@ -344,7 +367,7 @@ export class MonthCalendarState {
         }
         this.focusedOwn.set(index);
         if (this.mode === "single") {
-            this.commit(itemOf(this.kind, index));
+            this.commit(this.units().item(index));
             return;
         }
         const anchor = this.anchor();
@@ -356,10 +379,8 @@ export class MonthCalendarState {
             anchor <= index ? [anchor, index] : [index, anchor];
         this.anchor.set(null);
         this.hovered.set(null);
-        this.commit({
-            start: itemOf(this.kind, start),
-            end: itemOf(this.kind, end),
-        });
+        const units = this.units();
+        this.commit({ start: units.item(start), end: units.item(end) });
     }
 
     cancelRange(): void {
@@ -369,16 +390,12 @@ export class MonthCalendarState {
 
     cellState(index: number): MonthCalendarCellState {
         const value = this.value();
+        const units = this.units();
         const range = isItemRange(value)
-            ? {
-                  start: itemIndex(this.kind, value.start),
-                  end: itemIndex(this.kind, value.end),
-              }
+            ? { start: units.index(value.start), end: units.index(value.end) }
             : null;
         const single =
-            value === null || isItemRange(value)
-                ? null
-                : itemIndex(this.kind, value);
+            value === null || isItemRange(value) ? null : units.index(value);
         const anchor = this.anchor();
         const previewTo = this.hovered() ?? this.focused();
         const inRange =
@@ -388,7 +405,7 @@ export class MonthCalendarState {
                 ? this.binding.isSelected(index)
                 : undefined;
         return {
-            today: index === this.todayIndex,
+            today: index === this.todayIndex(),
             selected:
                 byView ?? (this.mode === "single" ? single === index : inRange),
             disabled: this.isOutOfBounds(index),

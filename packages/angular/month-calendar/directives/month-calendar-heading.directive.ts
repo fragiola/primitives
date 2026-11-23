@@ -1,9 +1,4 @@
 import { computed, Directive, inject } from "@angular/core";
-import {
-    formatYear,
-    formatYearSpan,
-    UNIT_PAGE_SIZE,
-} from "@fragiola/primitives/month-year";
 import { MONTH_CALENDAR } from "../utils/month-calendar-state.ts";
 
 /**
@@ -23,15 +18,9 @@ import { MONTH_CALENDAR } from "../utils/month-calendar-state.ts";
 export class MonthCalendarHeading {
     protected readonly calendar = inject(MONTH_CALENDAR);
     /** The year or the page of years it names, from `Intl`. */
-    readonly label = computed(() => {
-        const calendar = this.calendar;
-        const start = calendar.pageStart();
-        return calendar.kind === "month"
-            ? formatYear(calendar.locale(), start / UNIT_PAGE_SIZE)
-            : formatYearSpan(
-                  calendar.locale(),
-                  start,
-                  start + UNIT_PAGE_SIZE - 1,
-              );
-    });
+    readonly label = computed(() =>
+        this.calendar
+            .units()
+            .heading(this.calendar.locale(), this.calendar.pageStart()),
+    );
 }

@@ -7,12 +7,6 @@ import {
     input,
 } from "@angular/core";
 import {
-    formatMonthName,
-    formatYear,
-    formatYearMonth,
-    type PlainYearMonth,
-} from "@fragiola/primitives/month-year";
-import {
     dataValues,
     injectHost,
     ownAttribute,
@@ -21,10 +15,7 @@ import {
     MONTH_CALENDAR,
     type MonthCalendarCellState,
 } from "../utils/month-calendar-state.ts";
-import {
-    itemIndex,
-    type MonthCalendarItem,
-} from "../utils/month-calendar-value.ts";
+import type { MonthCalendarItem } from "../utils/month-calendar-value.ts";
 
 /**
  * One month or year: `<td monthCalendarCell [value]="item" #cell="monthCalendarCell">{{ cell.text()
@@ -62,31 +53,20 @@ export class MonthCalendarCell {
     /** The month or year. */
     readonly value = input.required<MonthCalendarItem>();
     private readonly index = computed(() =>
-        itemIndex(this.calendar.kind, this.value()),
+        this.calendar.units().index(this.value()),
     );
     readonly state = computed<MonthCalendarCellState>(() =>
         this.calendar.cellState(this.index()),
     );
     /** The month's long name or the year, in the locale: the cell's content. */
     readonly text = computed(() =>
-        this.calendar.kind === "month"
-            ? formatMonthName(
-                  this.calendar.locale(),
-                  this.value() as PlainYearMonth,
-                  "long",
-              )
-            : formatYear(this.calendar.locale(), this.value().year),
+        this.calendar.units().text(this.calendar.locale(), this.index()),
     );
     private readonly ownLabel = ownAttribute("aria-label");
     protected readonly label = computed(
         () =>
             this.ownLabel ??
-            (this.calendar.kind === "month"
-                ? formatYearMonth(
-                      this.calendar.locale(),
-                      this.value() as PlainYearMonth,
-                  )
-                : formatYear(this.calendar.locale(), this.value().year)),
+            this.calendar.units().name(this.calendar.locale(), this.index()),
     );
     protected readonly data = computed(() => {
         const state = this.state();

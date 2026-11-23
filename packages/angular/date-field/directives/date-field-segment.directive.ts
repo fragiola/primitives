@@ -84,11 +84,17 @@ export class DateFieldSegment {
             !this.dateField.disabled() &&
             !this.dateField.readOnly(),
     );
+    // a day period and an era take letters
+    private readonly textual = computed(
+        () =>
+            this.segment().type === "dayPeriod" ||
+            this.segment().type === "era",
+    );
     protected readonly numeric = computed(
-        () => this.editable() && this.segment().type !== "dayPeriod",
+        () => this.editable() && !this.textual(),
     );
     protected readonly inputMode = computed(() =>
-        this.segment().type === "dayPeriod" ? "text" : "numeric",
+        this.textual() ? "text" : "numeric",
     );
     protected readonly ariaLabel = computed(
         () =>

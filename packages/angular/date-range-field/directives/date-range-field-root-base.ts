@@ -1,5 +1,8 @@
 import { booleanAttribute, Directive, input, type Signal } from "@angular/core";
-import type { DateFieldState } from "@fragiola/primitives-angular/date-field";
+import type {
+    DateFieldState,
+    DateFieldSystemInputs,
+} from "@fragiola/primitives-angular/date-field";
 import { injectHost } from "@fragiola/primitives-angular/internal";
 import type {
     DateRangeFieldInputs,
@@ -68,9 +71,11 @@ export abstract class DateRangeFieldRootBase {
             | "max"
             | "isDateUnavailable"
         >,
+        system?: DateFieldSystemInputs,
     ): DateRangeFieldInputs {
         return {
             ...own,
+            system,
             hourCycle: this.hourCycle,
             locale: this.locale,
             required: this.required,

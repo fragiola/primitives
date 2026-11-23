@@ -42,13 +42,14 @@ export {
     MonthCalendarState,
 } from "./utils/month-calendar-state.ts";
 export {
+    ISO_UNITS,
     isItemRange,
-    itemIndex,
-    itemOf,
     type MonthCalendarComponent,
     type MonthCalendarItem,
     type MonthCalendarKind,
     type MonthCalendarMode,
     type MonthCalendarOptions,
+    type MonthCalendarUnits,
     type MonthCalendarValue,
+    unitsOf,
 } from "./utils/month-calendar-value.ts";

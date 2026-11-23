@@ -11,12 +11,6 @@ import {
     untracked,
 } from "@angular/core";
 import { bridgeForm } from "@fragiola/primitives/form";
-import {
-    type PlainYear,
-    type PlainYearMonth,
-    toIsoYear,
-    toIsoYearMonth,
-} from "@fragiola/primitives/month-year";
 import type {
     CalendarOptions,
     CalendarValue,
@@ -43,7 +37,9 @@ import {
     type MonthCalendarKind,
     type MonthCalendarMode,
     type MonthCalendarOptions,
+    type MonthCalendarUnits,
     type MonthCalendarValue,
+    unitsOf,
 } from "@fragiola/primitives-angular/month-calendar";
 
 /** The inputs a month or year picker root hands its state. */
@@ -70,25 +66,26 @@ export interface MonthPickerState {
     binding: MonthCalendarBinding;
 }
 
-/** `2026-11` or `2026`. */
-function isoOf(kind: MonthCalendarKind, item: MonthCalendarItem): string {
-    return kind === "month"
-        ? toIsoYearMonth(item as PlainYearMonth)
-        : toIsoYear(item as PlainYear);
+/** `2026-11` or `2026` (a calendar system's: `2026-10-23[u-ca=persian]`). */
+function isoOf(units: MonthCalendarUnits, item: MonthCalendarItem): string {
+    return units.iso(units.index(item));
 }
 
 /**
  * What the form submits: `2026-11`, `2026`, a range as the ISO 8601 interval (`2026-03/2026-06`,
  * `2020/2024`), or empty with no value.
  */
-function formValue(kind: MonthCalendarKind, value: MonthCalendarValue): string {
+function formValue(
+    units: MonthCalendarUnits,
+    value: MonthCalendarValue,
+): string {
     if (value === null) {
         return "";
     }
     if (isItemRange(value)) {
-        return `${isoOf(kind, value.start)}/${isoOf(kind, value.end)}`;
+        return `${isoOf(units, value.start)}/${isoOf(units, value.end)}`;
     }
-    return isoOf(kind, value);
+    return isoOf(units, value);
 }
 
 /**
@@ -117,6 +114,8 @@ export function createMonthPicker(
         emitValue,
     );
     const readOnly = computed(() => inputs.readOnly());
+    // a calendar system's months or years (spec/calendar-systems.md), else the ISO calendar's
+    const units = computed(() => unitsOf(kind, inputs.options().calendar));
     const choose = (next: MonthCalendarValue) => {
         if (untracked(readOnly)) {
             return;
@@ -157,7 +156,7 @@ export function createMonthPicker(
     const required = computed(() => inputs.required());
 
     effect(() => {
-        hidden.value = formValue(kind, state.value());
+        hidden.value = formValue(units(), state.value());
         setInputAttribute(hidden, "name", name() ?? null);
         hidden.required = required();
         hidden.disabled = disabled();
@@ -178,7 +177,7 @@ export function createMonthPicker(
                             });
                             // the browser reset the input after the state: write it back
                             hidden.value = formValue(
-                                kind,
+                                untracked(units),
                                 untracked(state.value),
                             );
                         },

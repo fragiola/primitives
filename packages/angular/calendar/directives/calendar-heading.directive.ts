@@ -5,7 +5,7 @@ import {
     input,
     numberAttribute,
 } from "@angular/core";
-import { addMonths, formatMonthYear } from "@fragiola/primitives/date";
+import { formatMonthYear } from "@fragiola/primitives/date";
 import { CALENDAR } from "../utils/calendar-state.ts";
 
 /**
@@ -29,7 +29,9 @@ export class CalendarHeading {
     readonly month = computed(() =>
         formatMonthYear(
             this.calendar.locale(),
-            addMonths(this.calendar.visibleStart(), this.offset()),
+            this.calendar
+                .math()
+                .addMonths(this.calendar.visibleStart(), this.offset()),
         ),
     );
 }

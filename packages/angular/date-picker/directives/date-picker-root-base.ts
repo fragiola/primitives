@@ -6,6 +6,7 @@ import {
     numberAttribute,
     output,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { PlainDate } from "@fragiola/primitives/date";
 import type { CalendarOptions } from "@fragiola/primitives-angular/calendar";
 import type {
@@ -48,6 +49,8 @@ export abstract class DatePickerRootBase implements OverlayActions {
     readonly visibleMonths = input<number | undefined, unknown>(undefined, {
         transform: optionalNumber,
     });
+    /** A calendar system (spec/calendar-systems.md), passed to the bound calendar. */
+    readonly calendar = input<CalendarSystem | undefined>(undefined);
     /** The form name of its hidden input (a Field's `name` wins; spec/calendar.md, "Forms"). */
     readonly name = input<string | undefined>(undefined);
     /** A native form's validation blocks a submission with no value. */
@@ -75,5 +78,6 @@ export abstract class DatePickerRootBase implements OverlayActions {
         locale: this.locale(),
         firstDayOfWeek: this.firstDayOfWeek(),
         visibleMonths: this.visibleMonths(),
+        calendar: this.calendar(),
     }));
 }

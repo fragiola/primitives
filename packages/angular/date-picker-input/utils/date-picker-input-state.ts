@@ -24,6 +24,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import type {
     CalendarMode,
     CalendarValue,
@@ -32,6 +33,7 @@ import type {
 import {
     type DateFieldData,
     type DateFieldState,
+    type DateFieldSystemInputs,
     documentLocale,
     editReason,
     type FieldValue,
@@ -40,6 +42,7 @@ import {
     type SegmentEditKind,
     SegmentGroup,
     stateData,
+    systemFormat,
 } from "@fragiola/primitives-angular/date-field";
 import type {
     DatePickerComponent,
@@ -74,18 +77,21 @@ export interface DatePickerInputInputs extends DatePickerInputs {
     /** What a placeholder segment's first step gives, and a placeholder time a chosen date takes. */
     placeholderValue: Signal<Partial<PlainDateTime>>;
     hourCycle: Signal<12 | 24 | undefined>;
+    /** The calendar system and time zone of its segments (spec/calendar-systems.md, spec/time-zones.md). */
+    system: DateFieldSystemInputs;
 }
 
 /** A typed picker's ISO text: the date (and time), or the interval `start/end`; empty with none. */
 function pickerIso(
     granularity: SegmentGranularity,
     value: PickerValue,
+    timeZone: TimeZone | undefined,
 ): string {
     return value === null
         ? ""
         : "start" in value
-          ? rangeIso("date", granularity, value)
-          : isoOf("date", granularity, value);
+          ? rangeIso("date", granularity, value, timeZone)
+          : isoOf("date", granularity, value, timeZone);
 }
 
 /** The value of each end's segments (a single date is the start's). */
@@ -149,13 +155,18 @@ export class DatePickerInputState implements RangeGroups {
             kind: "date",
             granularity: this.inputs.granularity(),
             hourCycle: this.inputs.hourCycle(),
+            ...systemFormat(this.inputs.system),
         }),
     );
     private readonly seed = computed(() =>
         segmentValuesOf(this.format(), this.inputs.placeholderValue()),
     );
     private readonly iso = computed(() =>
-        pickerIso(this.inputs.granularity(), this.value()),
+        pickerIso(
+            this.inputs.granularity(),
+            this.value(),
+            this.inputs.system.timeZone(),
+        ),
     );
     /** What the picker's parts read (`DATE_PICKER`). */
     readonly picker: DatePickerState;
@@ -275,7 +286,11 @@ export class DatePickerInputState implements RangeGroups {
                             );
                 // the binding rule: a value only when the entry is complete and valid
                 const next = invalidOf(candidate) ? null : candidate;
-                const after = pickerIso(untracked(inputs.granularity), next);
+                const after = pickerIso(
+                    untracked(inputs.granularity),
+                    next,
+                    untracked(inputs.system.timeZone),
+                );
                 if (after === untracked(this.iso)) {
                     return;
                 }
@@ -328,15 +343,28 @@ export class DatePickerInputState implements RangeGroups {
             }
             const day = untracked(inputs.granularity) === "day";
             const seed = untracked(this.seed);
-            const withTime = (date: PlainDate, group: SegmentGroup) =>
-                day
-                    ? date
-                    : {
-                          year: date.year,
-                          month: date.month,
-                          day: date.day,
-                          ...typedTime(untracked(group.values), seed),
-                      };
+            const format = untracked(this.format);
+            const withTime = (date: PlainDate, group: SegmentGroup) => {
+                if (day) {
+                    return date;
+                }
+                const wall = {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day,
+                    ...typedTime(untracked(group.values), seed),
+                };
+                // a zoned picker's choice is resolved in its zone (spec/time-zones.md)
+                const zone = format.timeZone;
+                return zone
+                    ? zone.resolve(
+                          wall,
+                          format.disambiguation === "reject"
+                              ? "compatible"
+                              : format.disambiguation,
+                      )
+                    : wall;
+            };
             const next: PickerValue =
                 chosen === null
                     ? null

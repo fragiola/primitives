@@ -7,7 +7,6 @@ import {
 } from "@angular/core";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
-import { unitKeyTarget } from "@fragiola/primitives/month-year";
 import {
     injectFlush,
     injectHost,
@@ -70,14 +69,16 @@ export class MonthCalendarGrid {
             this.flush();
             return;
         }
-        const target = unitKeyTarget(event.key, calendar.focused(), {
-            rtl:
-                getDirection(
-                    event.currentTarget as HTMLElement,
-                    this.direction(),
-                ) === "rtl",
-            columns: calendar.columns(),
-        });
+        const target = calendar
+            .units()
+            .keyTarget(event.key, calendar.focused(), {
+                rtl:
+                    getDirection(
+                        event.currentTarget as HTMLElement,
+                        this.direction(),
+                    ) === "rtl",
+                columns: calendar.columns(),
+            });
         if (target === null) {
             return;
         }

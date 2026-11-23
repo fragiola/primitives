@@ -8,7 +8,6 @@ import {
 } from "@angular/core";
 import {
     formatDayNumber,
-    formatFullDate,
     type PlainDate,
     toIsoDate,
 } from "@fragiola/primitives/date";
@@ -70,7 +69,7 @@ export class CalendarCell {
     protected readonly label = computed(
         () =>
             this.ownLabel ??
-            formatFullDate(this.calendar.locale(), this.date()),
+            this.calendar.math().fullDate(this.calendar.locale(), this.date()),
     );
     protected readonly data = computed(() => {
         const state = this.state();

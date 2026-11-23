@@ -5,6 +5,7 @@ import {
     input,
     numberAttribute,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { PlainDate } from "@fragiola/primitives/date";
 import { dataValues } from "@fragiola/primitives-angular/internal";
 import type { CalendarInputs, CalendarState } from "../utils/calendar-state.ts";
@@ -42,6 +43,14 @@ export abstract class CalendarRootBase {
     readonly visibleMonths = input<number | undefined, unknown>(undefined, {
         transform: optionalNumber,
     });
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems` (spec/calendar-systems.md):
+     * the grid shows its months; values stay ISO. Default: the ISO calendar (`[calendar]`; the
+     * root's `calendar` is its state).
+     */
+    readonly calendarSystem = input<CalendarSystem | undefined>(undefined, {
+        alias: "calendar",
+    });
     readonly disabled = input(false, { transform: booleanAttribute });
     /** Default: a bound picker's `readOnly`, else `false`; an explicit `false` wins over the picker's. */
     readonly readOnly = input<boolean | undefined, unknown>(undefined, {
@@ -73,6 +82,7 @@ export abstract class CalendarRootBase {
             locale: this.locale,
             firstDayOfWeek: this.firstDayOfWeek,
             visibleMonths: this.visibleMonths,
+            calendar: this.calendarSystem,
             disabled: this.disabled,
             readOnly: this.readOnly,
         };

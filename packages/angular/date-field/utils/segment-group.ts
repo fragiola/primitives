@@ -8,6 +8,7 @@ import {
 import {
     type DateSegment,
     dateSegments,
+    type EditableSegmentType,
     isSegmentsComplete,
     type SegmentEdit,
     type SegmentFormat,
@@ -223,8 +224,7 @@ export class SegmentGroup implements DateFieldParts {
         element: HTMLElement,
     ): boolean {
         if (
-            segment.type === "literal" ||
-            segment.type === "era" ||
+            !segment.editable ||
             untracked(this.owner.disabled) ||
             event.altKey ||
             event.ctrlKey ||
@@ -235,7 +235,7 @@ export class SegmentGroup implements DateFieldParts {
         const result = segmentKeyDown(
             untracked(this.owner.format),
             untracked(this.values),
-            segment.type,
+            segment.type as EditableSegmentType,
             event.key,
             untracked(this.edit),
             { seed: untracked(this.owner.seed), readOnly: !this.editable() },
@@ -263,11 +263,7 @@ export class SegmentGroup implements DateFieldParts {
         event: Event,
         element: HTMLElement,
     ): void {
-        if (
-            segment.type === "literal" ||
-            segment.type === "era" ||
-            !this.editable()
-        ) {
+        if (!segment.editable || !this.editable()) {
             return;
         }
         const format = untracked(this.owner.format);
@@ -281,7 +277,7 @@ export class SegmentGroup implements DateFieldParts {
             const result = typeSegment(
                 format,
                 next,
-                segment.type,
+                segment.type as EditableSegmentType,
                 character,
                 typing,
                 seed,
