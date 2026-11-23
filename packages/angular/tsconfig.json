@@ -47,6 +47,7 @@
         "radio-group",
         "switch",
         "progress",
+        "autocomplete",
         "avatar",
         "separator",
         "collapsible",

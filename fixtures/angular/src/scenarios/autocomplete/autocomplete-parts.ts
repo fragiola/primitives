@@ -1,0 +1,36 @@
+import {
+    AutocompleteClear,
+    AutocompleteEmpty,
+    AutocompleteGroup,
+    AutocompleteGroupLabel,
+    AutocompleteInput,
+    AutocompleteInputGroup,
+    AutocompleteItem,
+    AutocompleteList,
+    AutocompletePopup,
+    AutocompletePortal,
+    AutocompletePositioner,
+    AutocompleteRoot,
+    AutocompleteSeparator,
+    AutocompleteStatus,
+    AutocompleteTrigger,
+} from "@fragiola/primitives-angular/autocomplete";
+
+/** Every Autocomplete directive, for a scenario's `imports`. */
+export const AUTOCOMPLETE_PARTS = [
+    AutocompleteRoot,
+    AutocompleteInputGroup,
+    AutocompleteInput,
+    AutocompleteTrigger,
+    AutocompleteClear,
+    AutocompleteStatus,
+    AutocompletePortal,
+    AutocompletePositioner,
+    AutocompletePopup,
+    AutocompleteEmpty,
+    AutocompleteList,
+    AutocompleteGroup,
+    AutocompleteGroupLabel,
+    AutocompleteSeparator,
+    AutocompleteItem,
+] as const;

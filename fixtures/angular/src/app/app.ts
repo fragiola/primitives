@@ -9,6 +9,14 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.ts"
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.ts";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.ts";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.ts";
+import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.ts";
+import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.ts";
+import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.ts";
+import { AutocompleteField } from "../scenarios/autocomplete/autocomplete-field.ts";
+import { AutocompleteGroups } from "../scenarios/autocomplete/autocomplete-groups.ts";
+import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inline.ts";
+import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.ts";
+import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.ts";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
 import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -205,6 +213,14 @@ import { ROUTES } from "./routes.ts";
         ComboboxObjects,
         ComboboxRejectedInput,
         ComboboxLifecycle,
+        AutocompleteAsync,
+        AutocompleteBasic,
+        AutocompleteBoth,
+        AutocompleteField,
+        AutocompleteGroups,
+        AutocompleteInline,
+        AutocompleteLifecycle,
+        AutocompleteNone,
         FieldBasic,
         FieldControls,
         FieldValidation,
@@ -336,6 +352,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/combobox/form") { <main class="p-6" scenario-combobox-form></main> }
             @case ("/combobox/field") { <main class="p-6" scenario-combobox-field></main> }
             @case ("/combobox/lifecycle") { <main class="p-6" scenario-combobox-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/autocomplete/basic") { <main class="p-6" scenario-autocomplete-basic></main> }
+            @case ("/autocomplete/both") { <main class="p-6" scenario-autocomplete-both></main> }
+            @case ("/autocomplete/inline") { <main class="p-6" scenario-autocomplete-inline></main> }
+            @case ("/autocomplete/none") { <main class="p-6" scenario-autocomplete-none></main> }
+            @case ("/autocomplete/groups") { <main class="p-6" scenario-autocomplete-groups></main> }
+            @case ("/autocomplete/async") { <main class="p-6" scenario-autocomplete-async></main> }
+            @case ("/autocomplete/field") { <main class="p-6" scenario-autocomplete-field></main> }
+            @case ("/autocomplete/lifecycle") { <main class="p-6" scenario-autocomplete-lifecycle [cancel]="query.cancel"></main> }
             @case ("/select/basic") { <main class="p-6" scenario-select-basic></main> }
             @case ("/select/controlled") { <main class="p-6" scenario-select-controlled></main> }
             @case ("/select/modal") { <main class="p-6" scenario-select-modal></main> }

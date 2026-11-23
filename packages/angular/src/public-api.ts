@@ -6,6 +6,7 @@
 
 export * from "@fragiola/primitives-angular/accordion";
 export * from "@fragiola/primitives-angular/alert-dialog";
+export * from "@fragiola/primitives-angular/autocomplete";
 export * from "@fragiola/primitives-angular/avatar";
 export * from "@fragiola/primitives-angular/button";
 export * from "@fragiola/primitives-angular/calendar";
