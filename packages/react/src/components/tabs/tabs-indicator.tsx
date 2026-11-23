@@ -16,6 +16,11 @@ export interface TabsIndicatorProps extends PartProps<{ orientation: string }> {
      * itself (spec/tabs.md, "Server rendering"). Default `false`.
      */
     renderBeforeHydration?: boolean;
+    /**
+     * The `nonce` of the `renderBeforeHydration` script, so it runs under a Content Security
+     * Policy that allows inline scripts by nonce (spec/tabs.md, "Server rendering").
+     */
+    nonce?: string;
 }
 
 /** The inline script of a server-rendered Indicator (`renderBeforeHydration`). */
@@ -27,6 +32,7 @@ const BEFORE_HYDRATION = `(${placeTabsIndicator.toString()})(document.currentScr
  */
 export function TabsIndicator({
     renderBeforeHydration = false,
+    nonce,
     ...props
 }: TabsIndicatorProps) {
     const context = useRequiredContext(TabsContext, "Tabs.Indicator");
@@ -71,6 +77,7 @@ export function TabsIndicator({
     const script =
         renderBeforeHydration && typeof window === "undefined" ? (
             <script
+                nonce={nonce}
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: the toolkit's own source, no input
                 dangerouslySetInnerHTML={{ __html: BEFORE_HYDRATION }}
             />
