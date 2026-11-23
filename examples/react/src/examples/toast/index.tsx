@@ -1,3 +1,4 @@
+import { Button } from "@fragiola/primitives-react/button";
 import { createToastManager, Toast } from "@fragiola/primitives-react/toast";
 import { styles } from "./styles.ts";
 
@@ -48,20 +49,20 @@ export default function NotificationStack() {
     return (
         <Toast.Provider toastManager={notifications}>
             <div className={styles.buttons}>
-                <button
+                <Button
                     type="button"
                     className={styles.trigger}
                     onClick={sendMessage}
                 >
                     Send message
-                </button>
-                <button
+                </Button>
+                <Button
                     type="button"
                     className={styles.trigger}
                     onClick={warnOffline}
                 >
                     Go offline
-                </button>
+                </Button>
             </div>
             <Toast.Portal>
                 <Toast.Viewport

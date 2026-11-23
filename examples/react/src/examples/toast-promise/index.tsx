@@ -1,3 +1,4 @@
+import { Button } from "@fragiola/primitives-react/button";
 import { Toast } from "@fragiola/primitives-react/toast";
 import { styles } from "./styles.ts";
 
@@ -37,20 +38,20 @@ function Uploads() {
     return (
         <>
             <div className={styles.buttons}>
-                <button
+                <Button
                     type="button"
                     className={styles.trigger}
                     onClick={() => start("report.pdf")}
                 >
                     Upload report.pdf
-                </button>
-                <button
+                </Button>
+                <Button
                     type="button"
                     className={styles.trigger}
                     onClick={() => start("too-large.zip")}
                 >
                     Upload too-large.zip
-                </button>
+                </Button>
             </div>
             <Toast.Portal>
                 <Toast.Viewport
