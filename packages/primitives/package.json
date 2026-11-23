@@ -66,6 +66,12 @@
             "import": "./dist/collection.js",
             "default": "./dist/collection.js"
         },
+        "./color": {
+            "@fragiola/source": "./src/color/index.ts",
+            "types": "./dist/color.d.ts",
+            "import": "./dist/color.js",
+            "default": "./dist/color.js"
+        },
         "./date": {
             "@fragiola/source": "./src/date/index.ts",
             "types": "./dist/date.d.ts",
@@ -261,6 +267,11 @@
                 "types": "./dist/collection.d.ts",
                 "import": "./dist/collection.js",
                 "default": "./dist/collection.js"
+            },
+            "./color": {
+                "types": "./dist/color.d.ts",
+                "import": "./dist/color.js",
+                "default": "./dist/color.js"
             },
             "./date": {
                 "types": "./dist/date.d.ts",

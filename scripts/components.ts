@@ -121,6 +121,7 @@ export const MECHANISMS = [
     "carousel",
     "clipboard",
     "collection",
+    "color",
     "date",
     "direction",
     "focus",
