@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 66 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
+Today, 70 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
 
 | group | components |
 | --- | --- |
@@ -24,6 +24,7 @@ Today, 66 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2
 | inputs | **Label**, **NumberField** (localized text, held buttons, scrub), **OTPField** |
 | dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker**, **DateField**, **TimeField**, **DateRangeField** and **TimeRangeField** (typed in segments, on the toolkit's segment editing and time values), and the pickers' opt-in typed input (**DatePickerInput**, **DateRangePickerInput**); the multiple-date **MultipleCalendar**, **CalendarPreset**, **MonthCalendar**, **YearCalendar** (and their ranges), **MonthPicker**, **YearPicker** (and their ranges) and a calendar's day, month and year views (**CalendarView**); every one of them in 13 calendar systems and the date-time fields and pickers in time zones (the toolkit's `/calendar-systems` and `/time-zone`, injected, computed on `Intl`) |
 | tags and choices | **TagGroup** (a grid of removable, selectable tags), **TagsInput** (tags typed, pasted, edited in place; a form control), **SegmentedControl** (a radio group with a moving Indicator), **Rating** (stars in whole or half steps) |
+| text inputs | **PasswordInput** (a toggle button shows the text, keeping the caret), **SearchField** (Escape and a clear button), **Editable** (a text edited in place, its modes and focus return), **Clipboard** (a copy button, its copied state and a polite announcement) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 

@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); AspectRatio uses none; Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); AspectRatio uses none; Clipboard uses `/clipboard` alone (its copy and its announcement, which no other component imports); Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -78,6 +78,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
 | `@fragiola/primitives/number` | `formatNumber`, `numberFormatOptions`, `NumberFormatOptions`, `parseNumber`, `isNumberText`, `stepNumber`, `clampNumber`, `NumberStepOptions`, `watchAutoRepeat`, `AutoRepeatOptions`, `watchScrub`, `ScrubOptions`, `ScrubPoint` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason`, `DismissEvent` |
+| `@fragiola/primitives/clipboard` | `writeClipboard`, `announceText` |
 | `@fragiola/primitives/pagination` | `paginationRange`, `PaginationItem`, `PaginationRangeOptions`, `pageCount`, `PageCountOptions`, `clampPage` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `watchPointerExit`, `LongPressOptions`, `watchLongPress` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement`, `AnchorRect`, `VirtualAnchor`, `virtualAnchor` |
@@ -180,6 +181,12 @@ alone: a list that does not opt in imports neither. The root entry,
   state (`ScrollAreaState`: the overflow and its edges, `scrolling` per axis, `hovering`, whether
   the viewport needs a tab stop). `thumbGeometry`, `scrollFromStart` and `scrollForThumbOffset`
   are its math ([ScrollArea](/docs/api/scroll-area)).
+- **Clipboard**: `writeClipboard(element, text)` writes the text with the asynchronous Clipboard
+  API of the element's window (`navigator.clipboard.writeText`) and returns its promise, which
+  rejects where the API is missing (an insecure context) or the browser refuses the write: there
+  is no `execCommand` fallback. `announceText(region, text)` replaces a live region's content with
+  a new text node, so the same text said twice is announced twice (`""` empties it)
+  ([Clipboard](/docs/api/clipboard)).
 - **Pagination range**: `paginationRange({ page, count, siblingCount, boundaryCount })` gives the
   pages and ellipses in order (every page while they fit, else a constant number of items with
   the window kept whole near the ends, no ellipsis for a single page); `pageCount({ count, total,

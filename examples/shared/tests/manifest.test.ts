@@ -167,6 +167,9 @@ describe("the manifest", () => {
                 "tags-input",
                 "segmented-control",
                 "rating",
+                "password-input",
+                "search-field",
+                "editable",
                 "date-picker",
                 "calendar",
                 "date-field",
@@ -185,6 +188,7 @@ describe("the manifest", () => {
                 "separator",
                 "scroll-area",
                 "aspect-ratio",
+                "clipboard",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];

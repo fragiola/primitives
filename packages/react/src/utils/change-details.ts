@@ -13,6 +13,8 @@ export type ChangeReason =
     | "input-blur"
     | "input-paste"
     | "clear-press"
+    | "submit-press"
+    | "cancel-press"
     | "chip-remove-press"
     | "trigger-hover"
     | "trigger-focus"
