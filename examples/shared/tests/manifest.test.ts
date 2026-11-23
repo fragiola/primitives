@@ -66,7 +66,11 @@ const RECIPE_OF: Record<string, string> = {
 };
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
-const WITHOUT_SHARED: ReadonlySet<string> = new Set(["aspect-ratio", "avatar", "meter"]);
+const WITHOUT_SHARED: ReadonlySet<string> = new Set([
+    "aspect-ratio",
+    "avatar",
+    "meter",
+]);
 
 describe("the manifest", () => {
     for (const framework of FRAMEWORKS) {
