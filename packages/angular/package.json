@@ -48,6 +48,21 @@
             "types": "./dist/types/fragiola-primitives-angular.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular.mjs"
         },
+        "./date-picker-input": {
+            "@fragiola/source": "./date-picker-input/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-picker-input.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-picker-input.mjs"
+        },
+        "./date-range-field": {
+            "@fragiola/source": "./date-range-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-range-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-range-field.mjs"
+        },
+        "./date-range-picker-input": {
+            "@fragiola/source": "./date-range-picker-input/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-range-picker-input.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-range-picker-input.mjs"
+        },
         "./internal": {
             "@fragiola/source": "./internal/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-internal.d.ts",
@@ -282,6 +297,11 @@
             "@fragiola/source": "./time-field/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-time-field.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-time-field.mjs"
+        },
+        "./time-range-field": {
+            "@fragiola/source": "./time-range-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-time-range-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-time-range-field.mjs"
         },
         "./toast": {
             "@fragiola/source": "./toast/public-api.ts",

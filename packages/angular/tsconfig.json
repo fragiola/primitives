@@ -73,6 +73,10 @@
         "aspect-ratio",
         "date-field",
         "time-field",
+        "date-range-field",
+        "time-range-field",
+        "date-picker-input",
+        "date-range-picker-input",
         "tests",
         "*.config.ts"
     ]
