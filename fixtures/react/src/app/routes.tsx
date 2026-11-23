@@ -68,6 +68,9 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.tsx";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.tsx";
 import { MenuModal } from "../scenarios/menu/menu-modal.tsx";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
+import { MenubarBasic } from "../scenarios/menubar/menubar-basic.tsx";
+import { MenubarModal } from "../scenarios/menubar/menubar-modal.tsx";
+import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.tsx";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
@@ -236,5 +239,8 @@ export const routes: Record<
     "/toggle-group/vertical": ToggleGroupVertical,
     "/toolbar/basic": ToolbarBasic,
     "/toolbar/vertical": ToolbarVertical,
+    "/menubar/basic": MenubarBasic,
+    "/menubar/vertical": MenubarVertical,
+    "/menubar/modal": MenubarModal,
     "/direction/provider": DirectionProviderScenario,
 };
