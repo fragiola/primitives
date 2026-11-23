@@ -1,16 +1,18 @@
 import { isInHoverBridge } from "./hover-bridge.ts";
+import { watchPointerExit } from "./watch-pointer-exit.ts";
 
 export interface HoverBridgeCallbacks {
     /** The pointer moved over the trigger, the popup or the gap between them. */
     inside: () => void;
-    /** The pointer moved anywhere else. */
+    /** The pointer moved anywhere else, or left the document (the window or the iframe). */
     outside: () => void;
 }
 
 /**
  * Follows the pointer while a hover-opened tooltip is open (spec/tooltip.md, "Pointer"): every
  * move of the document's pointer reports whether it is in the hover bridge of `trigger` and
- * `popup` (`isInHoverBridge`), or over the trigger alone while there is no popup yet. It holds no
+ * `popup` (`isInHoverBridge`), or over the trigger alone while there is no popup yet; the pointer
+ * leaving the document at once (`watchPointerExit`) is outside. It holds no
  * state: the framework decides what a move means (cancel or start the close delay). Returns the
  * cleanup.
  */
@@ -34,5 +36,9 @@ export function trackHoverBridge(
         }
     };
     doc.addEventListener("pointermove", onMove);
-    return () => doc.removeEventListener("pointermove", onMove);
+    const stopExit = watchPointerExit(doc, () => callbacks.outside());
+    return () => {
+        doc.removeEventListener("pointermove", onMove);
+        stopExit();
+    };
 }

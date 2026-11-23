@@ -60,4 +60,25 @@ describe("trackHoverBridge", () => {
         trigger.remove();
         other.remove();
     });
+
+    // Epic #49 (#46): the pointer leaving the document at once is outside
+    it("reports the pointer leaving the document as outside", () => {
+        const trigger = document.createElement("button");
+        const popup = document.createElement("div");
+        document.body.append(trigger, popup);
+        const inside = vi.fn();
+        const outside = vi.fn();
+        const stop = trackHoverBridge(trigger, popup, { inside, outside });
+        const event = new MouseEvent("pointerout", {
+            bubbles: true,
+            relatedTarget: null,
+        });
+        Object.defineProperty(event, "pointerType", { value: "mouse" });
+        trigger.dispatchEvent(event);
+        expect(outside).toHaveBeenCalledOnce();
+        expect(inside).not.toHaveBeenCalled();
+        stop();
+        trigger.remove();
+        popup.remove();
+    });
 });
