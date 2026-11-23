@@ -117,5 +117,8 @@ export const ROUTES: readonly string[] = [
     "/toggle-group/vertical",
     "/toolbar/basic",
     "/toolbar/vertical",
+    "/menubar/basic",
+    "/menubar/vertical",
+    "/menubar/modal",
     "/direction/provider",
 ];

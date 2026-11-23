@@ -70,6 +70,9 @@ import { MenuGroups } from "../scenarios/menu/menu-groups.ts";
 import { MenuLifecycle } from "../scenarios/menu/menu-lifecycle.ts";
 import { MenuModal } from "../scenarios/menu/menu-modal.ts";
 import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
+import { MenubarBasic } from "../scenarios/menubar/menubar-basic.ts";
+import { MenubarModal } from "../scenarios/menubar/menubar-modal.ts";
+import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.ts";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
@@ -230,6 +233,9 @@ import { ROUTES } from "./routes.ts";
         ToggleGroupVertical,
         ToolbarBasic,
         ToolbarVertical,
+        MenubarBasic,
+        MenubarVertical,
+        MenubarModal,
         SwitchBasic,
         SwitchControlled,
     ],
@@ -352,6 +358,9 @@ import { ROUTES } from "./routes.ts";
             @case ("/toggle-group/vertical") { <main class="p-6" scenario-toggle-group-vertical></main> }
             @case ("/toolbar/basic") { <main class="p-6" scenario-toolbar-basic></main> }
             @case ("/toolbar/vertical") { <main class="p-6" scenario-toolbar-vertical></main> }
+            @case ("/menubar/basic") { <main class="p-6" scenario-menubar-basic></main> }
+            @case ("/menubar/vertical") { <main class="p-6" scenario-menubar-vertical></main> }
+            @case ("/menubar/modal") { <main class="p-6" scenario-menubar-modal></main> }
             @case ("/direction/provider") { <main class="p-6" scenario-direction-provider [directionProvider]="'rtl'"></main> }
             @default {
                 <main class="p-6">

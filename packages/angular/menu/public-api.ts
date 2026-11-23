@@ -27,6 +27,7 @@ export {
     MenuItem,
     type MenuItemState,
 } from "./directives/menu-item.directive.ts";
+export { menuItems } from "./directives/menu-items.ts";
 export {
     MenuPopup,
     type MenuPopupState,
@@ -59,5 +60,10 @@ export {
     type MenuTriggerState,
 } from "./directives/menu-trigger.directive.ts";
 export { injectMenu } from "./inject/inject-menu.ts";
+export {
+    MENU_BAR,
+    type MenuBar,
+    type MenuBarEntry,
+} from "./utils/menu-bar.ts";
 export { createMenuHandle, type MenuHandle } from "./utils/menu-handle.ts";
 export { MENU_SUBMENU } from "./utils/menu-submenu.ts";

@@ -18,12 +18,17 @@ export interface RovingItemBinding {
  * The host as an item of the nearest roving-focus scope (spec/toolbar.md, "Nested composites"), or
  * `null` outside any, in an injection context: it registers once rendered (never on a server, so
  * every item has `tabindex="-1"` until the items are known), takes the roving `tabindex` and tells
- * the scope when it takes focus.
+ * the scope when it takes focus. `explicit` names the scope instead of the nearest one (a
+ * Menubar's, which its Triggers read from the bar's contract; `null`: none).
  */
 export function injectRovingItem(
     focusable: () => boolean,
+    explicit?: RovingScope | null,
 ): RovingItemBinding | null {
-    const scope = inject(ROVING_SCOPE, { optional: true });
+    const scope =
+        explicit === undefined
+            ? inject(ROVING_SCOPE, { optional: true })
+            : explicit;
     if (scope === null) {
         return null;
     }

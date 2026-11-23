@@ -146,6 +146,11 @@ export class MenuPopup {
                 const items = menuItems(popup);
                 const highlight = level.pendingHighlight;
                 level.pendingHighlight = null;
+                // a bar moving to this menu keeps the focus on its item (spec/menu.md, "In a
+                // Menubar")
+                if (highlight === "keep") {
+                    return;
+                }
                 const target =
                     highlight === "first"
                         ? items[0]
@@ -231,6 +236,11 @@ export class MenuPopup {
                 if (level.nested && event.key === closeKey) {
                     event.preventDefault();
                     level.overlay.setOpen(false, "list-navigation", event);
+                    return;
+                }
+                // the keys a level leaves go to its bar first (spec/menu.md, "In a Menubar")
+                if (level.bar?.menuKeyDown(event, level)) {
+                    event.preventDefault();
                     return;
                 }
                 if (

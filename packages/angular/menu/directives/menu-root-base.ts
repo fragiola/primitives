@@ -18,6 +18,7 @@ import {
     type OverlayActions,
     placementSignal,
 } from "@fragiola/primitives-angular/internal";
+import { MENU_BAR, type MenuBar } from "../utils/menu-bar.ts";
 import { MENU_SUBMENU } from "../utils/menu-submenu.ts";
 
 /** Where the pointer left an open submenu's trigger, for the safe hover area (spec/menu.md). */
@@ -62,20 +63,35 @@ export abstract class MenuRootBase implements OverlayActions {
     readonly parent: MenuRootBase | null = this.nested
         ? inject(MenuRootBase, { skipSelf: true, optional: true })
         : null;
+    /**
+     * The bar the root menu belongs to (spec/menu.md, "In a Menubar"), at every level; or `null`.
+     * A root Menu reads it from the injector around it (its own element provides `null` to its
+     * content); a ContextMenu belongs to no bar.
+     */
+    readonly bar: MenuBar | null = this.parent
+        ? this.parent.bar
+        : this.component === "menu"
+          ? inject(MENU_BAR, { skipSelf: true, optional: true })
+          : null;
     readonly overlay = createOverlayRoot(
         this,
         (event) => this.openChangeDetails.emit(event),
         "primitives-menu",
     );
     readonly placed = placementSignal(
-        this.nested
+        // a vertical bar's menus open at its end side, as submenus (spec/menubar.md)
+        this.nested || untracked(() => this.bar?.orientation()) === "vertical"
             ? { side: "inline-end", align: "start" }
             : { side: "bottom", align: "start" },
     );
     /** What the positioner anchors to instead of the trigger (a context menu's point), or `null`. */
     readonly anchor = signal<Element | VirtualAnchor | null>(null);
-    /** The item to highlight when the popup opens: from the keyboard, the first or the last. */
-    pendingHighlight: "first" | "last" | null = null;
+    /**
+     * What the popup focuses when it opens (spec/menu.md, "Focus" and "In a Menubar"): from the
+     * keyboard, the first or the last item; `keep` leaves the focus where it is (a bar moving to
+     * this menu); `null` focuses the popup.
+     */
+    pendingHighlight: "first" | "last" | "keep" | null = null;
     readonly typeahead = createTypeahead();
     /** Labels given with the `label` input, by item element. */
     readonly labels = new Map<Element, string>();
@@ -140,9 +156,13 @@ export abstract class MenuRootBase implements OverlayActions {
         this.overlay.unmount();
     }
 
-    /** Whether the root menu is modal (a submenu follows its root). */
+    /** Whether the root menu is modal (a submenu follows its root, a menu of a bar the bar). */
     readonly isModal = computed((): boolean =>
-        this.parent ? this.parent.isModal() : this.modal(),
+        this.parent
+            ? this.parent.isModal()
+            : this.bar
+              ? this.bar.modal()
+              : this.modal(),
     );
 
     /** The root level of this menu. */
