@@ -26,14 +26,16 @@ is a [TagGroup](/docs/api/tag-group); suggestions are a [Combobox](/docs/api/com
 - **Refusals**: a duplicate (unless `allowDuplicates`), a part past `max`, or one `validate`
   returns `false` for is refused and reported by `onValueInvalid(text, details)`, with
   `details.cause` (`"duplicate"`, `"max"`, `"invalid"`). The refused text stays in the Input, so
-  the user corrects it instead of retyping it.
+  the user corrects it instead of retyping it; it is offered again by the next typed delimiter,
+  Enter, a paste or a blur, never by any other keystroke.
 - **The tags** take DOM focus (`tabindex="-1"`, out of the tab order), so a screen reader reads the
   tag it is on; they have no role (the app's text with a remove button). The Input is the only tab
   stop (with the ClearTrigger, a native button). At the start of the Input, Backspace and the
   previous arrow focus the last tag; on a tag, Backspace and Delete remove it.
 - **Editing** (`editable`): Enter or a double press on a tag shows its TagInput (always rendered,
   `hidden` until then) with the tag's text selected; Enter commits (an empty text removes the
-  tag), Escape cancels, leaving commits.
+  tag), Escape cancels, leaving commits. A double press inside the TagInput keeps its text; an
+  edit follows its tag when another tag is removed.
 - **The tags in an uncontrolled root**: the app renders one Tag per value, `index` its position.
   An uncontrolled Root gives its value to its children (React: the children function
   `({ value }) => ...`; Vue: the default scoped slot; Angular: `tags()` through `exportAs`).
@@ -48,7 +50,7 @@ is a [TagGroup](/docs/api/tag-group); suggestions are a [Combobox](/docs/api/com
 - **Reasons**: `keyboard`, `input-change`, `input-paste`, `input-blur`, `chip-remove-press`,
   `clear-press`, `none`. The keys are the toolkit's [`/collection`](/docs/api/toolkit)
   (`tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`), the adding and editing rules `/form`
-  (`takeTags`, `editTag`).
+  (`takeTags`, `typesDelimiter`, `editTag`).
 
 ## Anatomy
 

@@ -1,4 +1,4 @@
-import { defineComponent } from "vue";
+import { defineComponent, nextTick } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
     type PartComponent,
@@ -43,7 +43,9 @@ export const TagsInputTagRemove: PartComponent<
                     onMousedown: (event: MouseEvent) => event.preventDefault(),
                     onClick: (event: MouseEvent) => {
                         context.remove(tag.index(), "chip-remove-press", event);
-                        context.focusInput();
+                        // once the tags that are left render: an edit the removal moved ends
+                        // there, by the blur of its own TagInput
+                        void nextTick().then(() => context.focusInput());
                     },
                 });
             };

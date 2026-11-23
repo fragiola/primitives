@@ -9,6 +9,7 @@ import {
     type TagRefusal,
     type TagRules,
     takeTags,
+    typesDelimiter,
     VISUALLY_HIDDEN_INPUT_STYLE,
 } from "@fragiola/primitives/form";
 import {
@@ -275,11 +276,16 @@ export const TagsInputRoot: PublicComponent<
             const onInputInput = (event: Event) => {
                 const target = event.target as HTMLInputElement;
                 const next = target.value;
-                const { delimiter } = rules();
+                // only an input that typed the delimiter offers the text: a refused text left in
+                // the Input is not offered again on every keystroke (spec/tags-input.md, "Adding
+                // tags")
                 if (
-                    delimiter !== null &&
-                    delimiter !== "" &&
-                    next.includes(delimiter)
+                    typesDelimiter(
+                        text.value,
+                        next,
+                        props.delimiter,
+                        (event as Partial<InputEvent>).data ?? null,
+                    )
                 ) {
                     offer(next, false, "input-change", event);
                 } else {
@@ -349,6 +355,15 @@ export const TagsInputRoot: PublicComponent<
                 if (index < 0 || index >= current.length) {
                     return;
                 }
+                // an edit follows its tag: a removal before it moves it down, its own ends it
+                // (spec/tags-input.md, "Editing a tag")
+                const edit = editing.value;
+                if (edit !== null && edit.index >= index) {
+                    editing.value =
+                        edit.index === index
+                            ? null
+                            : { index: edit.index - 1, text: edit.text };
+                }
                 own.set(
                     current.filter((_, position) => position !== index),
                     { reason, event },
@@ -356,7 +371,13 @@ export const TagsInputRoot: PublicComponent<
             };
             const startEdit = (index: number) => {
                 const current = value.value[index];
-                if (!props.editable || disabled() || current === undefined) {
+                if (
+                    !props.editable ||
+                    disabled() ||
+                    current === undefined ||
+                    // a double press inside the open TagInput keeps its text
+                    editing.value?.index === index
+                ) {
                     return;
                 }
                 editing.value = { index, text: current };

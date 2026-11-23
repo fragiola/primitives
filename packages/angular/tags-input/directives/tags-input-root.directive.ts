@@ -23,6 +23,7 @@ import {
     type TagRefusal,
     type TagRules,
     takeTags,
+    typesDelimiter,
     VISUALLY_HIDDEN_INPUT_STYLE,
 } from "@fragiola/primitives/form";
 import { fieldControl } from "@fragiola/primitives-angular/field";
@@ -322,14 +323,20 @@ export class TagsInputRoot {
         this.typed.set(taken.text, { reason, event });
     }
 
-    /** The Input's text changed; a typed delimiter ends the tags before it. */
+    /**
+     * The Input's text changed; a typed delimiter ends the tags before it. Only an input that
+     * typed the delimiter offers the text: a refused text left in the Input is not offered again
+     * on every keystroke (spec/tags-input.md, "Adding tags").
+     */
     inputChanged(event: Event): void {
         const next = (event.target as HTMLInputElement).value;
-        const delimiter = untracked(this.delimiter);
         if (
-            delimiter !== null &&
-            delimiter !== "" &&
-            next.includes(delimiter)
+            typesDelimiter(
+                untracked(this.text),
+                next,
+                untracked(this.delimiter),
+                (event as Partial<InputEvent>).data ?? null,
+            )
         ) {
             this.offer(next, false, "input-change", event);
         } else {
@@ -398,6 +405,16 @@ export class TagsInputRoot {
         if (index < 0 || index >= current.length) {
             return;
         }
+        // an edit follows its tag: a removal before it moves it down, its own ends it
+        // (spec/tags-input.md, "Editing a tag")
+        const edit = untracked(this.editing);
+        if (edit !== null && edit.index >= index) {
+            this.editing.set(
+                edit.index === index
+                    ? null
+                    : { index: edit.index - 1, text: edit.text },
+            );
+        }
         this.selection.set(
             current.filter((_, position) => position !== index),
             { reason, event },
@@ -405,13 +422,14 @@ export class TagsInputRoot {
         this.flush();
     }
 
-    /** Starts editing the tag at `index` (`editable`). */
+    /** Starts editing the tag at `index` (`editable`); a double press inside its edit keeps it. */
     startEdit(index: number): void {
         const current = untracked(this.tags)[index];
         if (
             !untracked(this.editable) ||
             untracked(this.isDisabled) ||
-            current === undefined
+            current === undefined ||
+            untracked(this.editing)?.index === index
         ) {
             return;
         }

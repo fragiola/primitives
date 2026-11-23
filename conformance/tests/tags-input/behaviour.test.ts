@@ -89,6 +89,30 @@ test.describe("tags-input / basic", () => {
         await expect(input).toBeFocused();
     });
 
+    test("a refused text is offered again only by a typed delimiter", async ({
+        page,
+    }) => {
+        const input = textbox(page, "Tags");
+        // one input: typed key by key, "react," would already be refused
+        await input.fill("react,vue");
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "invalid", "duplicate");
+        await expect(input).toHaveValue("react,vue");
+        await page.getByRole("button", { name: "Remove react" }).click();
+        await expectOutput(page, "value", "vue");
+        await expect(input).toBeFocused();
+        await page.keyboard.press("End");
+        // a character only changes the text: "react", now no duplicate, is not added
+        await page.keyboard.type("x");
+        await expect(input).toHaveValue("react,vuex");
+        await expectOutput(page, "value", "vue");
+        await expectOutput(page, "reason", "chip-remove-press");
+        await page.keyboard.type(",");
+        await expectOutput(page, "value", "vue,react,vuex");
+        await expectOutput(page, "reason", "input-change");
+        await expect(input).toHaveValue("");
+    });
+
     test("Backspace at the start focuses the last tag, then removes it", async ({
         page,
     }) => {
@@ -265,6 +289,32 @@ test.describe("tags-input / edit", () => {
         await page.keyboard.press("Escape");
         await expect(tag(page, "one")).toBeFocused();
         await expectOutput(page, "value", "none");
+    });
+
+    test("a double press inside the edit keeps its text", async ({ page }) => {
+        await tagText(page, "one").dblclick();
+        await page.keyboard.type("uno");
+        await editor(page).dblclick();
+        await expect(editor(page)).toBeFocused();
+        await expect(editor(page)).toHaveValue("uno");
+        await page.keyboard.press("End");
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "value", "uno,two,three");
+    });
+
+    test("an edit follows its tag through the removal of another", async ({
+        page,
+    }) => {
+        await tagText(page, "two").click();
+        await page.keyboard.press("Enter");
+        await page.keyboard.type("deux");
+        await page.getByRole("button", { name: "Remove one" }).click();
+        // the edit of "two" ends by the blur, on "two", not on the tag now at its place
+        await expectOutput(page, "value", "deux,three");
+        await expectOutput(page, "reason", "input-blur");
+        await expect(editor(page)).toHaveCount(0);
+        await expect(textbox(page, "Tags")).toBeFocused();
+        await expect(tagText(page, "three")).toBeVisible();
     });
 
     test("a refused edit goes on; an empty edit removes the tag", async ({

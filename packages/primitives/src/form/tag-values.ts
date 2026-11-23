@@ -99,6 +99,33 @@ export function takeTags(
     };
 }
 
+/** How many times `delimiter` (not empty) is in `text`. */
+function occurrences(text: string, delimiter: string): number {
+    return text.split(delimiter).length - 1;
+}
+
+/**
+ * Whether an input that changed the Input's text from `previous` to `next` typed the delimiter
+ * (spec/tags-input.md, "Adding tags"): `next` holds it and either the inserted text (an
+ * `InputEvent`'s `data`) holds it or `next` holds it more times than `previous`. Any other input
+ * (a character, a deletion) only changes the text: the refused texts left in the Input are not
+ * offered again on every keystroke.
+ */
+export function typesDelimiter(
+    previous: string,
+    next: string,
+    delimiter: string | null,
+    inserted?: string | null,
+): boolean {
+    if (delimiter === null || delimiter === "" || !next.includes(delimiter)) {
+        return false;
+    }
+    if (inserted?.includes(delimiter)) {
+        return true;
+    }
+    return occurrences(next, delimiter) > occurrences(previous, delimiter);
+}
+
 /** What ending a tag's edit gives (`editTag`). */
 export type EditedTag =
     | { type: "unchanged" }

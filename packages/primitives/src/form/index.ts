@@ -61,5 +61,6 @@ export {
     type TagRules,
     type TakenTags,
     takeTags,
+    typesDelimiter,
 } from "./tag-values.ts";
 export { VISUALLY_HIDDEN_INPUT_STYLE } from "./visually-hidden.ts";

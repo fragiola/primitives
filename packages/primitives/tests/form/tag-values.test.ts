@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { editTag, type TagRules, takeTags } from "../../src/form/tag-values.ts";
+import {
+    editTag,
+    type TagRules,
+    takeTags,
+    typesDelimiter,
+} from "../../src/form/tag-values.ts";
 
 const rules: TagRules = {
     delimiter: ",",
@@ -84,6 +89,31 @@ describe("takeTags", () => {
     it("gives the same value back when nothing is added", () => {
         const value = ["a"];
         expect(takeTags(value, "  ", rules, true).value).toBe(value);
+    });
+});
+
+describe("typesDelimiter", () => {
+    it("is true when the input added a delimiter", () => {
+        expect(typesDelimiter("svelte", "svelte,", ",")).toBe(true);
+        expect(typesDelimiter("react,vue", "react,vue,", ",", ",")).toBe(true);
+        expect(typesDelimiter("a;", "a;;", ";;")).toBe(true);
+    });
+
+    it("is true when the inserted text holds it, even with no more delimiters", () => {
+        // the selection ",b" of "a,b" replaced by a typed ","
+        expect(typesDelimiter("a,b", "a,", ",", ",")).toBe(true);
+    });
+
+    it("is false for any other input, though the text holds delimiters", () => {
+        expect(typesDelimiter("react,vue", "react,vuex", ",", "x")).toBe(false);
+        expect(typesDelimiter("react,vue", "react,vu", ",", null)).toBe(false);
+        expect(typesDelimiter("react,vue", "react,vuex", ",")).toBe(false);
+    });
+
+    it("is false without a delimiter, or when the text holds none", () => {
+        expect(typesDelimiter("a", "a,", null, ",")).toBe(false);
+        expect(typesDelimiter("a", "a,", "", ",")).toBe(false);
+        expect(typesDelimiter("a,", "a", ",", null)).toBe(false);
     });
 });
 

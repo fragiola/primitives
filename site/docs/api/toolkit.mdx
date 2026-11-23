@@ -70,7 +70,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |
-| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType`, `takeTags`, `editTag`, `TagRules`, `TakenTags`, `RefusedTag`, `TagRefusal`, `EditedTag` |
+| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType`, `takeTags`, `typesDelimiter`, `editTag`, `TagRules`, `TakenTags`, `RefusedTag`, `TagRefusal`, `EditedTag` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/image` | `watchImageStatus`, `ImageLoadingStatus`, `ImageSourceOptions` |
@@ -197,8 +197,9 @@ alone: a list that does not opt in imports neither. The root entry,
   `firstInDocumentOrder`, `focusFieldControl`, and the server errors (`formErrorsFor`,
   `withoutFormErrors`). A tags input's rules (Epic #91): `takeTags(value, text, rules, whole)`
   offers a text as tags (split by the delimiter, trimmed, refused as a duplicate, past `max` or by
-  `validate`, the refused texts and the typed rest left for the input), `editTag(value, index,
-  text, rules)` ends a tag's edit ([TagsInput](/docs/api/tags-input)).
+  `validate`, the refused texts and the typed rest left for the input), `typesDelimiter(previous,
+  next, delimiter, inserted)` tells whether an input typed the delimiter (only then is a typed text
+  offered), `editTag(value, index, text, rules)` ends a tag's edit ([TagsInput](/docs/api/tags-input)).
 - **Direction**: `getDirection(element, provided)`, the direction a provider gives, else the
   element's computed `direction`.
 - **Number**: a number field's text and steps (Epic #52). `formatNumber(value, { locale, format })`

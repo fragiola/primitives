@@ -9,6 +9,7 @@ import {
     type TagRefusal,
     type TagRules,
     takeTags,
+    typesDelimiter,
     VISUALLY_HIDDEN_INPUT_STYLE,
 } from "@fragiola/primitives/form";
 import {
@@ -226,8 +227,17 @@ export function TagsInputRoot(props: TagsInputRootProps) {
     const onInputChange = useCallback(
         (event: FormEvent<HTMLInputElement>) => {
             const next = event.currentTarget.value;
-            const { delimiter: current } = latest.current.rules;
-            if (current !== null && current !== "" && next.includes(current)) {
+            const native = event.nativeEvent;
+            // only an input that typed the delimiter offers the text: a refused text left in the
+            // Input is not offered again on every keystroke (spec/tags-input.md, "Adding tags")
+            if (
+                typesDelimiter(
+                    latest.current.text,
+                    next,
+                    latest.current.rules.delimiter,
+                    (native as Partial<InputEvent>).data ?? null,
+                )
+            ) {
                 offer(next, false, "input-change", event.nativeEvent);
             } else {
                 setText(next, {
@@ -299,19 +309,35 @@ export function TagsInputRoot(props: TagsInputRootProps) {
             if (index < 0 || index >= current.length) {
                 return;
             }
-            flushSync(() =>
+            // an edit follows its tag: a removal before it moves it down, its own ends it
+            // (spec/tags-input.md, "Editing a tag")
+            const edit = editingRef.current;
+            flushSync(() => {
+                if (edit !== null && edit.index >= index) {
+                    setEditing(
+                        edit.index === index
+                            ? null
+                            : { index: edit.index - 1, text: edit.text },
+                    );
+                }
                 setValue(
                     current.filter((_, position) => position !== index),
                     { reason, event },
-                ),
-            );
+                );
+            });
         },
-        [setValue],
+        [setValue, setEditing],
     );
     const startEdit = useCallback(
         (index: number) => {
             const current = latest.current.value[index];
-            if (!editable || disabled || current === undefined) {
+            if (
+                !editable ||
+                disabled ||
+                current === undefined ||
+                // a double press inside the open TagInput keeps its text
+                editingRef.current?.index === index
+            ) {
                 return;
             }
             setEditing({ index, text: current });

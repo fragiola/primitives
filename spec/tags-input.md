@@ -102,8 +102,13 @@ added by one action.
 
 - **Enter** in the Input offers its whole text and keeps the form from submitting; with an empty
   (or blank) text it does nothing, so the form submits as from any text input.
-- **A typed delimiter**: when the Input's text (after an input) holds the delimiter, the parts
-  before the last delimiter are offered, and the text after it stays, untrimmed.
+- **A typed delimiter**: when an input typed the delimiter (the text it inserted holds it, or the
+  Input's text holds it more times than before: `typesDelimiter` in `/form`), the parts before
+  the last delimiter are offered, and the text after it stays, untrimmed. Any other input (a
+  character, a deletion) only changes the text, even when the text holds the delimiter: the
+  refused parts left in the Input are offered again only by the next typed delimiter, Enter, a
+  paste with the delimiter or a blur, never by every keystroke (nor added silently once they
+  would be accepted, after a tag was removed).
 - **A paste** whose text holds the delimiter is not pasted: the Input's text with the pasted text
   in place of its selection is offered whole (reason `input-paste`). A paste with no delimiter is
   an ordinary paste.
@@ -121,6 +126,15 @@ and TagRemove get `hidden`), with the tag's text, focused and selected. In the T
 - **Escape** drops the edit; the Tag is focused.
 - **Leaving it** ends the edit as Enter does (reason `input-blur`), without moving the focus; a
   refused text is reported and dropped.
+- **A double press inside it** (it bubbles to its Tag) is the TagInput's own (it selects a word):
+  a double press on the Tag being edited does not start its edit again, so the typed text stays.
+
+**An edit follows its tag.** While a tag is edited, a removal of another tag (a TagRemove press:
+its `mousedown` is prevented, so the TagInput keeps the focus until the press moves it to the
+Input) moves the edit with its tag: removing a tag before it moves the edit down by one, with its
+typed text; removing a tag after it leaves it. Removing the edited tag itself ends its edit. The
+edit then ends, as any, by its own rules: the press focuses the Input, so the TagInput's blur ends
+it on its tag (reason `input-blur`).
 
 ## State attributes and ARIA
 
@@ -246,6 +260,11 @@ Checks:
 9. A click on "Clear tags" removes every tag and the text (`value: none`, `reason: clear-press`),
    focuses the textbox, and the ClearTrigger is hidden.
 10. Axe finds no violation, with tags and empty.
+11. On a new page: filling the textbox with "react,vue" (one input) and Enter refuses both (`invalid: duplicate`) and leaves
+    "react,vue" in the textbox; a click on "Remove react" (`value: vue`); End and typing "x" only
+    changes the text ("react,vuex"; `value: vue`, `reason: chip-remove-press`: the refused
+    "react" is not offered by a character); typing "," offers both (`value: vue,react,vuex`,
+    `reason: input-change`) and empties the textbox.
 
 ### `/tags-input/basic?dir=rtl`
 
@@ -289,6 +308,12 @@ Checks:
 5. Editing "one" to "uno" and a click on "After" ends the edit (`value: uno,three`,
    `reason: input-blur`).
 6. Axe finds no violation while editing.
+7. On a new page: a double click on "one", typing "uno", and a double click in the textbox
+   "Edit tag" keeps "uno" in it (focused); End and Enter give `value: uno,two,three`.
+8. On a new page: editing "two" to "deux" (a click on "two", Enter, typing) and a click on
+   "Remove one" removes "one" and ends the edit on "deux", not on the tag now at its place
+   (`value: deux,three`, `reason: input-blur`); no textbox "Edit tag" is shown, the textbox
+   "Tags" is focused and the tag "three" is kept.
 
 ### `/tags-input/blur`
 
