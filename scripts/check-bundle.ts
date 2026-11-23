@@ -13,7 +13,9 @@
 // file, the chunks it imports and the other entries it imports (`@fragiola/primitives-<framework>/
 // <name>`), through their source maps. An entry holding another component's code fails, unless
 // that component is one it is built on (ENTRY_DEPENDENCIES): Dialog's code inside Tabs, invisible
-// to the two-component app, fails here. The utility entries (the direction provider, the render
+// to the two-component app, fails here. So does an entry importing a toolkit mechanism kept for
+// other components (MECHANISM_USERS: the date and time fields' `/segments` and `/time`, which the
+// calendars and pickers never import, Epic #73). The utility entries (the direction provider, the render
 // utilities: UTILITIES) are read alone the same way and may hold no component's code at all (D8:
 // a global provider references no component).
 // Source maps against folders, never names (a shared helper named like a component is not a leak):
@@ -80,6 +82,7 @@ export const ENTRY_DEPENDENCIES: Readonly<
     combobox: ["field"],
     "combobox-virtual": ["combobox", "field"],
     "context-menu": ["menu"],
+    "date-field": ["field"],
     "date-picker": ["calendar", "field"],
     "date-range-picker": ["calendar", "date-picker", "field"],
     drawer: ["dialog"],
@@ -97,8 +100,40 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "select-virtual": ["select", "field"],
     slider: ["field"],
     switch: ["field"],
+    "time-field": ["date-field", "field"],
     "toggle-group": ["toggle"],
 };
+
+/**
+ * The toolkit mechanisms only some component entries may import (D8: heavy optional parts stay
+ * out of the components that do not need them). The segment editing and the time values are the
+ * date and time fields' (Epic #73): the calendars and the pickers never import them, so their
+ * entries stay as they were.
+ */
+export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
+    segments: ["date-field", "time-field"],
+    time: ["date-field", "time-field"],
+};
+
+/**
+ * The toolkit mechanisms an entry imports (`@fragiola/primitives/<mechanism>`, with the entries
+ * of its own package it imports) that MECHANISM_USERS keeps from it.
+ */
+export function mechanismLeaks(
+    component: string,
+    mechanisms: readonly string[],
+    users: Readonly<Record<string, readonly string[]>> = MECHANISM_USERS,
+): string[] {
+    return mechanisms
+        .filter((name) => {
+            const allowed = users[name];
+            return allowed !== undefined && !allowed.includes(component);
+        })
+        .map(
+            (name) => `/${component}: imports the toolkit mechanism "/${name}"`,
+        )
+        .sort();
+}
 
 /**
  * The leaks of one component entry read alone: `sources` are the sources of its file and of
@@ -156,9 +191,10 @@ function entryFile(framework: FrameworkName, name: string): string {
 function readEntry(
     framework: FrameworkName,
     component: string,
-): { sources: string[]; imports: string[] } {
+): { sources: string[]; imports: string[]; mechanisms: string[] } {
     const sources = new Set<string>();
     const imports = new Set<string>();
+    const mechanisms = new Set<string>();
     const seen = new Set<string>();
     const pending = [entryFile(framework, component)];
     const self = new RegExp(`^@fragiola/primitives-${framework}/(.+)$`);
@@ -175,6 +211,13 @@ function readEntry(
             const specifier = match[1] as string;
             if (specifier.startsWith(".")) {
                 pending.push(resolve(dirname(file), specifier));
+                continue;
+            }
+            const mechanism = /^@fragiola\/primitives\/([a-z-]+)$/.exec(
+                specifier,
+            )?.[1];
+            if (mechanism !== undefined) {
+                mechanisms.add(mechanism);
                 continue;
             }
             const entry = self.exec(specifier)?.[1];
@@ -204,7 +247,11 @@ function readEntry(
             );
         }
     }
-    return { sources: [...sources], imports: [...imports] };
+    return {
+        sources: [...sources],
+        imports: [...imports],
+        mechanisms: [...mechanisms],
+    };
 }
 
 export interface GuardRules {
@@ -399,7 +446,13 @@ function main(): void {
             problems.push(`${framework}: ${leak}`);
         }
         for (const component of COMPONENTS) {
-            const { sources, imports } = readEntry(framework, component);
+            const { sources, imports, mechanisms } = readEntry(
+                framework,
+                component,
+            );
+            for (const leak of mechanismLeaks(component, mechanisms)) {
+                problems.push(`${framework}: ${leak}`);
+            }
             if (
                 !sources.some((source) => ownerOf(source)?.kind === "component")
             ) {
@@ -417,7 +470,13 @@ function main(): void {
             }
         }
         for (const utility of UTILITIES) {
-            const { sources, imports } = readEntry(framework, utility);
+            const { sources, imports, mechanisms } = readEntry(
+                framework,
+                utility,
+            );
+            for (const leak of mechanismLeaks(utility, mechanisms)) {
+                problems.push(`${framework}: ${leak}`);
+            }
             for (const leak of entryLeaks(
                 framework,
                 utility,
@@ -436,7 +495,7 @@ function main(): void {
         process.exit(1);
     }
     console.log(
-        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on, and the ${UTILITIES.length} utility entries no component's code`,
+        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on (and imports ${Object.keys(MECHANISM_USERS).join(" and ")} only in ${[...new Set(Object.values(MECHANISM_USERS).flat())].join(" and ")}), and the ${UTILITIES.length} utility entries no component's code`,
     );
 }
 
