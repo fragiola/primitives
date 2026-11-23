@@ -1,4 +1,3 @@
-import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
 import { computed, defineComponent, provide, shallowRef, watch } from "vue";
@@ -30,7 +29,9 @@ export const CalendarGrid: PartComponent<
             const direction = useProvidedDirection();
             const context = useRequiredContext(CalendarKey, "Calendar.Grid");
             const month = computed(() =>
-                addMonths(context.visibleStart.value, props.offset),
+                context
+                    .math()
+                    .addMonths(context.visibleStart.value, props.offset),
             );
             provide(CalendarGridKey, month);
             const element = shallowRef<HTMLElement | null>(null);
@@ -65,10 +66,9 @@ export const CalendarGrid: PartComponent<
                     context.select(context.focusedDate.value);
                     return;
                 }
-                const target = calendarKeyTarget(
-                    event.key,
-                    context.focusedDate.value,
-                    {
+                const target = context
+                    .math()
+                    .keyTarget(event.key, context.focusedDate.value, {
                         rtl:
                             getDirection(
                                 event.currentTarget as Element,
@@ -76,8 +76,7 @@ export const CalendarGrid: PartComponent<
                             ) === "rtl",
                         firstDayOfWeek: context.firstDay(),
                         shiftKey: event.shiftKey,
-                    },
-                );
+                    });
                 if (target === null) {
                     return;
                 }

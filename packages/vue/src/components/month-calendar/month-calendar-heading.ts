@@ -1,8 +1,3 @@
-import {
-    formatYear,
-    formatYearSpan,
-    UNIT_PAGE_SIZE,
-} from "@fragiola/primitives/month-year";
 import { defineComponent } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
@@ -34,15 +29,9 @@ export const MonthCalendarHeading: PartComponent<
                 "MonthCalendar.Heading",
             );
             return () => {
-                const start = context.pageStart.value;
-                const label =
-                    context.kind === "month"
-                        ? formatYear(context.locale(), start / UNIT_PAGE_SIZE)
-                        : formatYearSpan(
-                              context.locale(),
-                              start,
-                              start + UNIT_PAGE_SIZE - 1,
-                          );
+                const label = context
+                    .units()
+                    .heading(context.locale(), context.pageStart.value);
                 const state = { label };
                 return renderPart(
                     "h2",

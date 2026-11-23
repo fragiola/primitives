@@ -1,10 +1,4 @@
 import {
-    formatMonthName,
-    formatYear,
-    formatYearMonth,
-    type PlainYearMonth,
-} from "@fragiola/primitives/month-year";
-import {
     defineComponent,
     mergeProps,
     type PropType,
@@ -23,7 +17,7 @@ import {
     type MonthCalendarCellState,
     MonthCalendarKey,
 } from "./month-calendar-context.ts";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 export interface MonthCalendarCellProps {
     /** The month or year. */
@@ -52,7 +46,7 @@ export const MonthCalendarCell: PartComponent<
             );
             const element = shallowRef<HTMLElement | null>(null);
             const setElement = elementSetter(element);
-            const index = () => itemIndex(context.kind, props.value);
+            const index = () => context.units().index(props.value);
             const state = () => context.cellState(index());
             watch(
                 () => [element.value, index(), state().focused] as const,
@@ -78,16 +72,9 @@ export const MonthCalendarCell: PartComponent<
                 const cell = state();
                 const key = index();
                 const locale = context.locale();
-                const month = context.kind === "month";
+                const units = context.units();
                 const consumer = mergeProps(
-                    {
-                        "aria-label": month
-                            ? formatYearMonth(
-                                  locale,
-                                  props.value as PlainYearMonth,
-                              )
-                            : formatYear(locale, props.value.year),
-                    },
+                    { "aria-label": units.name(locale, key) },
                     attrs,
                 );
                 return renderPart(
@@ -141,13 +128,7 @@ export const MonthCalendarCell: PartComponent<
                     },
                     () =>
                         slots.default?.({ state: cell }) ??
-                        (month
-                            ? formatMonthName(
-                                  locale,
-                                  props.value as PlainYearMonth,
-                                  "long",
-                              )
-                            : formatYear(locale, props.value.year)),
+                        units.text(locale, key),
                 );
             };
         },

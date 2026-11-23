@@ -1,9 +1,4 @@
-import {
-    currentYearMonth,
-    monthIndex,
-    UNIT_PAGE_SIZE,
-    unitPageStart,
-} from "@fragiola/primitives/month-year";
+import { currentYearMonth, monthIndex } from "@fragiola/primitives/month-year";
 import { computed, inject, shallowRef, useId, watch } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
@@ -15,12 +10,11 @@ import type {
 } from "./month-calendar-context.ts";
 import {
     isItemRange,
-    itemIndex,
-    itemOf,
     type MonthCalendarKind,
     type MonthCalendarMode,
     type MonthCalendarOptions,
     type MonthCalendarValue,
+    unitsOf,
 } from "./month-calendar-value.ts";
 import { useDocumentLocale } from "./use-document-locale.ts";
 
@@ -34,7 +28,7 @@ export interface MonthCalendarStateProps extends MonthCalendarOptions {
 /**
  * The state of a month or year calendar, single or range (spec/month-calendar.md): the focused
  * item and its page, the value (its own, or its picker's or view's when it sits in one with no
- * value of its own), and the range being chosen. Items are numbers (`itemIndex`).
+ * value of its own), and the range being chosen. Items are numbers (`units.index`).
  */
 export function useMonthCalendar(
     component: MonthCalendarComponent,
@@ -67,20 +61,34 @@ export function useMonthCalendar(
         const bound = binding.value;
         return bound ? bound.value() : own.value.value;
     });
+    // a calendar system's months or years (spec/calendar-systems.md), else the ISO calendar's
+    const system = () => option("calendar");
+    const units = () => unitsOf(kind, system());
     const minIndex = () => {
         const min = option("min");
-        return min == null ? null : itemIndex(kind, min);
+        return min == null ? null : units().index(min);
     };
     const maxIndex = () => {
         const max = option("max");
-        return max == null ? null : itemIndex(kind, max);
+        return max == null ? null : units().index(max);
     };
     const locale = useDocumentLocale(() => option("locale"));
     const columns = () => Math.max(1, Math.floor(option("columns") ?? 3));
     const disabled = () => props.disabled ?? false;
     const readOnly = () => props.readOnly ?? binding.value?.readOnly() ?? false;
-    const now = currentYearMonth();
-    const todayIndex = kind === "month" ? monthIndex(now) : now.year;
+    const todayIndex = (() => {
+        const calendar = system();
+        if (calendar) {
+            const now = new Date();
+            return calendar.units(kind).fromDate({
+                year: now.getFullYear(),
+                month: now.getMonth() + 1,
+                day: now.getDate(),
+            });
+        }
+        const now = currentYearMonth();
+        return kind === "month" ? monthIndex(now) : now.year;
+    })();
     const isOutOfBounds = (index: number) => {
         const min = minIndex();
         const max = maxIndex();
@@ -106,17 +114,17 @@ export function useMonthCalendar(
             current === null
                 ? null
                 : isItemRange(current)
-                  ? itemIndex(kind, current.start)
-                  : itemIndex(kind, current);
+                  ? units().index(current.start)
+                  : units().index(current);
         return clamp(own ?? binding.value?.focus?.() ?? todayIndex);
     };
     const focused = shallowRef(seed());
-    const pageStart = shallowRef(unitPageStart(focused.value));
+    const pageStart = shallowRef(units().pageStart(focused.value));
     const anchor = shallowRef<number | null>(null);
     const hovered = shallowRef<number | null>(null);
     const baseId = useId();
     const isUnavailable = (index: number) =>
-        option("isUnavailable")?.(itemOf(kind, index)) ?? false;
+        option("isUnavailable")?.(units().item(index)) ?? false;
     const commit = (next: MonthCalendarValue) => {
         const picker = binding.value;
         if (picker) {
@@ -139,7 +147,7 @@ export function useMonthCalendar(
             if (open) {
                 const start = seed();
                 focused.value = start;
-                pageStart.value = unitPageStart(start);
+                pageStart.value = units().pageStart(start);
             }
         },
         { flush: "sync" },
@@ -148,11 +156,16 @@ export function useMonthCalendar(
         const current = value.value;
         return isItemRange(current)
             ? {
-                  start: itemIndex(kind, current.start),
-                  end: itemIndex(kind, current.end),
+                  start: units().index(current.start),
+                  end: units().index(current.end),
               }
             : null;
     };
+    // the first item of the next or previous page (a system's year can have 13 months)
+    const nextStart = (delta: 1 | -1) =>
+        delta > 0
+            ? pageStart.value + units().pageSize(pageStart.value)
+            : units().pageStart(pageStart.value - 1);
     const focusPending = {
         current:
             (binding.value?.focusOnMount() ?? false) &&
@@ -171,7 +184,8 @@ export function useMonthCalendar(
         readOnly,
         headingId: `${baseId}-heading`,
         gridId: `${baseId}-grid`,
-        itemOf: (index) => itemOf(kind, index),
+        units,
+        itemOf: (index) => units().item(index),
         cellState(index): MonthCalendarCellState {
             const span = range();
             const inRange =
@@ -180,7 +194,7 @@ export function useMonthCalendar(
             const single =
                 current === null || isItemRange(current)
                     ? null
-                    : itemIndex(kind, current);
+                    : units().index(current);
             const previewTo = hovered.value ?? focused.value;
             const start = anchor.value;
             return {
@@ -206,12 +220,13 @@ export function useMonthCalendar(
             }
             hovered.value = null;
             focused.value = index;
-            pageStart.value = unitPageStart(index);
+            pageStart.value = units().pageStart(index);
             return true;
         },
         canPage(delta) {
-            const start = pageStart.value + delta * UNIT_PAGE_SIZE;
-            for (let index = start; index < start + UNIT_PAGE_SIZE; index++) {
+            const start = nextStart(delta);
+            const end = start + units().pageSize(start);
+            for (let index = start; index < end; index++) {
                 if (!isOutOfBounds(index)) {
                     return true;
                 }
@@ -222,15 +237,17 @@ export function useMonthCalendar(
             if (!context.canPage(delta)) {
                 return;
             }
-            const start = pageStart.value + delta * UNIT_PAGE_SIZE;
-            const target = focused.value + delta * UNIT_PAGE_SIZE;
+            const start = nextStart(delta);
+            const size = units().pageSize(start);
+            const target =
+                start + Math.min(focused.value - pageStart.value, size - 1);
             // the same place on the new page, else its enabled item nearest to it
             let next = target;
-            for (let distance = 0; distance < UNIT_PAGE_SIZE; distance++) {
+            for (let distance = 0; distance < size; distance++) {
                 const found = [target - distance, target + distance].find(
                     (index) =>
                         index >= start &&
-                        index < start + UNIT_PAGE_SIZE &&
+                        index < start + size &&
                         !isOutOfBounds(index),
                 );
                 if (found !== undefined) {
@@ -247,7 +264,7 @@ export function useMonthCalendar(
             }
             focused.value = index;
             if (mode === "single") {
-                commit(itemOf(kind, index));
+                commit(units().item(index));
                 return;
             }
             const start = anchor.value;
@@ -259,7 +276,7 @@ export function useMonthCalendar(
                 start <= index ? [start, index] : [index, start];
             anchor.value = null;
             hovered.value = null;
-            commit({ start: itemOf(kind, low), end: itemOf(kind, high) });
+            commit({ start: units().item(low), end: units().item(high) });
         },
         anchor,
         cancelRange() {

@@ -12,6 +12,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import {
     computed,
     defineComponent,
@@ -43,6 +44,10 @@ import {
     type DateFieldState,
 } from "../date-field/date-field-context.ts";
 import type { DateFieldValue } from "../date-field/date-field-root.ts";
+import {
+    type DateFieldSystemProps,
+    dateFieldSystemProps,
+} from "../date-field/date-field-root-base.ts";
 import {
     composeSegments,
     type FieldValue,
@@ -78,7 +83,8 @@ import {
 
 /** The props both typed picker roots share: the picker's, and the segments' (spec/calendar.md). */
 export interface DatePickerInputRootSharedProps
-    extends DatePickerRootSharedProps {
+    extends DatePickerRootSharedProps,
+        DateFieldSystemProps {
     /** `day` (the default), or `hour`, `minute`, `second`: the time is typed, the calendar chooses the date. */
     granularity?: SegmentGranularity;
     /** What a placeholder segment's first step gives, and a placeholder time a chosen date takes; default: today at midnight. */
@@ -94,12 +100,13 @@ type PickerValue = FieldValue | FieldRange | null;
 function pickerIso(
     granularity: SegmentGranularity,
     value: PickerValue | undefined,
+    timeZone: TimeZone | undefined,
 ): string {
     return value == null
         ? ""
         : "start" in value
-          ? rangeIso("date", granularity, value)
-          : isoOf("date", granularity, value);
+          ? rangeIso("date", granularity, value, timeZone)
+          : isoOf("date", granularity, value, timeZone);
 }
 
 /** The value of each end's segments (a single date is the start's). */
@@ -142,6 +149,7 @@ export const datePickerInputRootProps = {
         default: undefined,
     },
     hourCycle: { type: Number as PropType<12 | 24>, default: undefined },
+    ...dateFieldSystemProps,
 };
 
 /**
@@ -179,6 +187,10 @@ export function defineDatePickerInputRoot(
                     kind: "date",
                     granularity: props.granularity,
                     hourCycle: props.hourCycle,
+                    calendar: props.calendar,
+                    timeZone: props.timeZone,
+                    hideTimeZone: props.hideTimeZone,
+                    disambiguation: props.disambiguation,
                 }),
             );
             // today, read once when the picker renders (as the calendars' today)
@@ -193,7 +205,7 @@ export function defineDatePickerInputRoot(
             const min = () => props.min ?? undefined;
             const max = () => props.max ?? undefined;
             const iso = computed(() =>
-                pickerIso(props.granularity, own.value.value),
+                pickerIso(props.granularity, own.value.value, props.timeZone),
             );
             // the last value the segments reported, and the value as of the last change
             let reported: string | null = null;
@@ -254,8 +266,15 @@ export function defineDatePickerInputRoot(
                             : composeRange(groups, end, composed, compose);
                     // the binding rule: a value only when the entry is complete and valid
                     const next = invalidOf(candidate) ? null : candidate;
-                    const after = pickerIso(props.granularity, next);
-                    if (after === pickerIso(props.granularity, current)) {
+                    const after = pickerIso(
+                        props.granularity,
+                        next,
+                        props.timeZone,
+                    );
+                    if (
+                        after ===
+                        pickerIso(props.granularity, current, props.timeZone)
+                    ) {
                         return;
                     }
                     reported = after;
@@ -340,15 +359,28 @@ export function defineDatePickerInputRoot(
                 required: () => props.required,
             });
             // the calendar chooses the date part: the typed time is kept
-            const withTime = (date: PlainDate, group: SegmentGroup) =>
-                props.granularity === "day"
-                    ? date
-                    : {
-                          year: date.year,
-                          month: date.month,
-                          day: date.day,
-                          ...typedTime(group.values.value, seed.value),
-                      };
+            const withTime = (date: PlainDate, group: SegmentGroup) => {
+                if (props.granularity === "day") {
+                    return date;
+                }
+                const wall = {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day,
+                    ...typedTime(group.values.value, seed.value),
+                };
+                // a zoned picker's choice is resolved in its zone (spec/time-zones.md)
+                const zone = format.value.timeZone;
+                const { disambiguation } = format.value;
+                return zone
+                    ? zone.resolve(
+                          wall,
+                          disambiguation === "reject"
+                              ? "compatible"
+                              : disambiguation,
+                      )
+                    : wall;
+            };
             provide(PickerBindingKey, {
                 mode,
                 open: () => root.open.value,
@@ -376,6 +408,7 @@ export function defineDatePickerInputRoot(
                     locale: localeOf(),
                     firstDayOfWeek: props.firstDayOfWeek,
                     visibleMonths: props.visibleMonths,
+                    calendar: props.calendar,
                 }),
                 readOnly,
             });
@@ -456,6 +489,7 @@ export function defineDatePickerInputRoot(
                                 element.value = pickerIso(
                                     props.granularity,
                                     own.value.value,
+                                    props.timeZone,
                                 );
                             },
                             invalid: groups.start.firstSegment,

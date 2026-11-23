@@ -14,6 +14,10 @@ import {
 import type { DateFieldState } from "../date-field/date-field-context.ts";
 import type { DateFieldValue } from "../date-field/date-field-root.ts";
 import {
+    type DateFieldSystemProps,
+    dateFieldSystemProps,
+} from "../date-field/date-field-root-base.ts";
+import {
     type DateRangeFieldRootSharedProps,
     dateRangeFieldSharedProps,
     type FieldRange,
@@ -25,7 +29,9 @@ export type DateRangeFieldValue =
     | DateRange
     | { readonly start: PlainDateTime; readonly end: PlainDateTime };
 
-export interface DateRangeFieldRootProps extends DateRangeFieldRootSharedProps {
+export interface DateRangeFieldRootProps
+    extends DateRangeFieldRootSharedProps,
+        DateFieldSystemProps {
     /** `{ start, end }`; `null` while a segment of either end is a placeholder (`v-model:value`). */
     value?: DateRangeFieldValue | null;
     defaultValue?: DateRangeFieldValue | null;
@@ -63,6 +69,7 @@ export const DateRangeFieldRoot: PartComponent<
         inheritAttrs: false,
         props: {
             ...dateRangeFieldSharedProps,
+            ...dateFieldSystemProps,
             value: { type: VALUE, default: undefined },
             defaultValue: { type: VALUE, default: null },
             granularity: {

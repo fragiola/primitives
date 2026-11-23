@@ -153,6 +153,7 @@ export function defineDatePickerRoot(
                     locale: props.locale,
                     firstDayOfWeek: props.firstDayOfWeek,
                     visibleMonths: props.visibleMonths,
+                    calendar: props.calendar,
                 }),
                 readOnly,
             });

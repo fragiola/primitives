@@ -1,13 +1,8 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import {
     bridgeForm,
     VISUALLY_HIDDEN_INPUT_STYLE,
 } from "@fragiola/primitives/form";
-import {
-    type PlainYear,
-    type PlainYearMonth,
-    toIsoYear,
-    toIsoYearMonth,
-} from "@fragiola/primitives/month-year";
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import {
     computed,
@@ -40,7 +35,9 @@ import {
     type MonthCalendarItem,
     type MonthCalendarKind,
     type MonthCalendarMode,
+    type MonthCalendarUnits,
     type MonthCalendarValue,
+    unitsOf,
 } from "../month-calendar/month-calendar-value.ts";
 
 /** The props every month and year picker root shares (each adds its own typed value). */
@@ -49,6 +46,12 @@ export interface MonthPickerRootSharedProps extends OverlayRootProps {
     locale?: string;
     /** Items per row, passed to the bound calendar (default 3). */
     columns?: number;
+    /**
+     * A calendar system (spec/calendar-systems.md), passed to the bound calendar: the values are
+     * its months or years, and the form submits their first day's ISO date with the system
+     * (`2026-10-23[u-ca=persian]`).
+     */
+    calendar?: CalendarSystem;
     /** The hidden input's name (a Field's `name` wins); without one, no input is rendered. */
     name?: string;
     /** A form submission needs a value. */
@@ -83,25 +86,26 @@ export const monthPickerRootEmits = {
     valueChange: (_value: MonthCalendarValue, _details: ChangeDetails) => true,
 };
 
-/** `2026-11` or `2026`. */
-function isoOf(kind: MonthCalendarKind, item: MonthCalendarItem): string {
-    return kind === "month"
-        ? toIsoYearMonth(item as PlainYearMonth)
-        : toIsoYear(item as PlainYear);
+/** `2026-11` or `2026` (a calendar system's: `2026-10-23[u-ca=persian]`). */
+function isoOf(units: MonthCalendarUnits, item: MonthCalendarItem): string {
+    return units.iso(units.index(item));
 }
 
 /**
  * What the form submits: `2026-11`, `2026`, a range as the ISO 8601 interval (`2026-03/2026-06`,
  * `2020/2024`), or empty with no value.
  */
-function formValue(kind: MonthCalendarKind, value: MonthCalendarValue): string {
+function formValue(
+    units: MonthCalendarUnits,
+    value: MonthCalendarValue,
+): string {
     if (value === null) {
         return "";
     }
     if (isItemRange(value)) {
-        return `${isoOf(kind, value.start)}/${isoOf(kind, value.end)}`;
+        return `${isoOf(units, value.start)}/${isoOf(units, value.end)}`;
     }
-    return isoOf(kind, value);
+    return isoOf(units, value);
 }
 
 /**
@@ -179,6 +183,7 @@ export function defineMonthPickerRoot(
                     isUnavailable: props.isUnavailable,
                     locale: props.locale,
                     columns: props.columns,
+                    calendar: props.calendar,
                 }),
                 readOnly,
             });
@@ -197,7 +202,7 @@ export function defineMonthPickerRoot(
                                 field.reset();
                                 value.set(initial, { reason: "none" });
                                 element.value = formValue(
-                                    kind,
+                                    unitsOf(kind, props.calendar),
                                     value.value.value ?? null,
                                 );
                             },
@@ -221,7 +226,10 @@ export function defineMonthPickerRoot(
                               "aria-hidden": "true",
                               tabindex: -1,
                               name: submitted,
-                              value: formValue(kind, current.value),
+                              value: formValue(
+                                  unitsOf(kind, props.calendar),
+                                  current.value,
+                              ),
                               required: props.required,
                               disabled: disabled(),
                               style: VISUALLY_HIDDEN_INPUT_STYLE,

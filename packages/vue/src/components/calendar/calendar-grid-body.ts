@@ -1,8 +1,4 @@
-import {
-    monthGrid,
-    type PlainDate,
-    toIsoDate,
-} from "@fragiola/primitives/date";
+import { type PlainDate, toIsoDate } from "@fragiola/primitives/date";
 import { defineComponent, h, inject, type VNode } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
@@ -41,11 +37,9 @@ export const CalendarGridBody: PublicComponent<
             const month = inject(CalendarGridKey, null);
             return () => {
                 const shown = month?.value ?? context.visibleStart.value;
-                const weeks = monthGrid(
-                    shown.year,
-                    shown.month,
-                    context.firstDay(),
-                );
+                const weeks = context
+                    .math()
+                    .monthGrid(shown, context.firstDay());
                 return renderPart(
                     "tbody",
                     { attrs, slots },

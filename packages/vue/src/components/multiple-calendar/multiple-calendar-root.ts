@@ -121,6 +121,9 @@ export const MultipleCalendarRoot: PartComponent<
                     get visibleMonths() {
                         return props.visibleMonths;
                     },
+                    get calendar() {
+                        return props.calendar;
+                    },
                     get disabled() {
                         return props.disabled;
                     },

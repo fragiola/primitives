@@ -1,6 +1,5 @@
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
-import { unitKeyTarget } from "@fragiola/primitives/month-year";
 import { defineComponent, shallowRef, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
@@ -60,14 +59,16 @@ export const MonthCalendarGrid: PartComponent<
                     context.select(context.focused.value);
                     return;
                 }
-                const target = unitKeyTarget(event.key, context.focused.value, {
-                    rtl:
-                        getDirection(
-                            event.currentTarget as Element,
-                            direction(),
-                        ) === "rtl",
-                    columns: context.columns(),
-                });
+                const target = context
+                    .units()
+                    .keyTarget(event.key, context.focused.value, {
+                        rtl:
+                            getDirection(
+                                event.currentTarget as Element,
+                                direction(),
+                            ) === "rtl",
+                        columns: context.columns(),
+                    });
                 if (target === null) {
                     return;
                 }
