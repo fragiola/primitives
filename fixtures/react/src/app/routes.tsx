@@ -42,6 +42,17 @@ import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.tsx";
 import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.tsx";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
+import { ColorAreaBasic } from "../scenarios/color-area/color-area-basic.tsx";
+import { ColorAreaRgb } from "../scenarios/color-area/color-area-rgb.tsx";
+import { ColorFieldBasic } from "../scenarios/color-field/color-field-basic.tsx";
+import { ColorFieldChannel } from "../scenarios/color-field/color-field-channel.tsx";
+import { ColorFieldField } from "../scenarios/color-field/color-field-field.tsx";
+import { ColorSliderAlpha } from "../scenarios/color-slider/color-slider-alpha.tsx";
+import { ColorSliderBasic } from "../scenarios/color-slider/color-slider-basic.tsx";
+import { ColorSliderSpace } from "../scenarios/color-slider/color-slider-space.tsx";
+import { ColorSliderVertical } from "../scenarios/color-slider/color-slider-vertical.tsx";
+import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.tsx";
+import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.tsx";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.tsx";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.tsx";
@@ -324,6 +335,19 @@ export const routes: Record<
     "/switch/basic": SwitchBasic,
     "/switch/controlled": SwitchControlled,
     "/button/basic": ButtonBasic,
+    "/color-slider/basic": ColorSliderBasic,
+    "/color-slider/alpha": ColorSliderAlpha,
+    "/color-slider/vertical": ColorSliderVertical,
+    "/color-slider/rtl": ColorSliderBasic,
+    "/color-slider/space": ColorSliderSpace,
+    "/color-area/basic": ColorAreaBasic,
+    "/color-area/rtl": ColorAreaBasic,
+    "/color-area/rgb": ColorAreaRgb,
+    "/color-wheel/basic": ColorWheelBasic,
+    "/color-wheel/disabled": ColorWheelDisabled,
+    "/color-field/basic": ColorFieldBasic,
+    "/color-field/channel": ColorFieldChannel,
+    "/color-field/field": ColorFieldField,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,

@@ -136,7 +136,8 @@ Checks: value 0.5, min 0, max 1, `aria-valuetext` `"50 %"` (de-DE), the Output t
 
 ### `/color-slider/vertical`
 
-A vertical ColorSlider, `channel` `"brightness"`, `defaultValue` `"hsb(210, 50%, 30%)"`, Thumb
+A vertical ColorSlider, `channel` `"brightness"`, `defaultValue` `"hsb(210, 50%, 30%)"`, `locale`
+`"en-US"`, Thumb
 `aria-label` **"Brightness"**, 200 px high.
 
 Checks: `aria-orientation="vertical"`; ArrowUp → 31, ArrowRight → 32, ArrowDown → 31; a press at
@@ -153,7 +154,7 @@ runs `to left`.
 
 Three ColorSliders on one value the fixture holds, starting at `"#336699"`: `channel` `"red"`
 (Thumb **"Red"**), `"hue"` with `colorSpace` `"hsl"` (**"Hue"**) and `"lightness"` (**"Lightness"**),
-each with the shared value and `onValueChange` setting it. Output: `value: ...`.
+each with the shared value, `locale` `"en-US"` and `onValueChange` setting it. Output: `value: ...`.
 
 Checks:
 
