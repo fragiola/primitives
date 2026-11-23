@@ -14,6 +14,7 @@ export const COMPONENTS = [
     "button",
     "calendar",
     "calendar-preset",
+    "calendar-view",
     "checkbox",
     "checkbox-group",
     "collapsible",
@@ -38,6 +39,10 @@ export const COMPONENTS = [
     "menu",
     "menubar",
     "meter",
+    "month-calendar",
+    "month-picker",
+    "month-range-calendar",
+    "month-range-picker",
     "multiple-calendar",
     "navigation-menu",
     "number-field",
@@ -62,6 +67,10 @@ export const COMPONENTS = [
     "toggle-group",
     "toolbar",
     "tooltip",
+    "year-calendar",
+    "year-picker",
+    "year-range-calendar",
+    "year-range-picker",
 ] as const;
 
 export type ComponentName = (typeof COMPONENTS)[number];
