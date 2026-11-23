@@ -1,7 +1,6 @@
 import type { PlainDate } from "../date/plain-date.ts";
 import type { PlainDateTime } from "../time/plain-date-time.ts";
 import type { PlainTime } from "../time/plain-time.ts";
-import type { ZonedDateTime } from "../time-zone/zoned-date-time.ts";
 import type {
     EditableSegmentType,
     HourCycle,
@@ -39,40 +38,10 @@ export const SEGMENT_PAGE_STEPS: Readonly<Record<EditableSegmentType, number>> =
         dayPeriod: 1,
     };
 
-/**
- * The calendar system's arithmetic year of the values (spec/calendar-systems.md, "In the fields"):
- * the year segment is an era's year where the era is edited (the current era while it is a
- * placeholder), else the system's year; `undefined` while the year is a placeholder.
- */
-export function calendarYear(
-    format: SegmentFormat,
-    values: SegmentValues,
-): number | undefined {
-    const { calendar } = format;
-    if (values.year === undefined || calendar === undefined) {
-        return values.year;
-    }
-    return format.eras
-        ? calendar.yearOfEra(values.era ?? format.eras.length - 1, values.year)
-        : values.year;
-}
-
-/**
- * The days of the values' month; a month with no year set counts as in a leap year (February has
- * 29; a calendar system's longest year).
- */
-function monthDays(format: SegmentFormat, values: SegmentValues): number {
-    const { calendar } = format;
-    const month = values.month ?? 1;
-    if (calendar) {
-        const year = calendarYear(format, values) ?? calendar.referenceYear();
-        return calendar.daysInMonth(
-            year,
-            Math.min(month, calendar.monthsInYear(year)),
-        );
-    }
+/** The days of a month; a month with no year set counts as in a leap year (February has 29). */
+function monthDays(year: number | undefined, month: number): number {
     const date = new Date(0);
-    date.setUTCFullYear(values.year ?? 2000, month, 0);
+    date.setUTCFullYear(year ?? 2000, month, 0);
     return date.getUTCDate();
 }
 
@@ -95,29 +64,23 @@ export function segmentRange(
     values: SegmentValues,
     type: EditableSegmentType,
 ): SegmentRange {
-    const { calendar } = format;
+    // a calendar system's era, months and days are its hooks' (`/calendar-systems`)
+    const system = format.calendar?.segmentRange(format, values, type);
+    if (system) {
+        return system;
+    }
     switch (type) {
-        case "era":
-            return { min: 0, max: (format.eras?.length ?? 1) - 1, digits: 0 };
         case "year":
             return { min: 1, max: 9999, digits: 4 };
         case "month":
-            return {
-                min: 1,
-                // a calendar system's months in the year (13 in a Hebrew leap year)
-                max: calendar
-                    ? calendar.monthsInYear(
-                          calendarYear(format, values) ??
-                              calendar.referenceYear(),
-                      )
-                    : 12,
-                digits: 2,
-            };
+            return { min: 1, max: 12, digits: 2 };
         case "day":
             return {
                 min: 1,
                 max:
-                    values.month === undefined ? 31 : monthDays(format, values),
+                    values.month === undefined
+                        ? 31
+                        : monthDays(values.year, values.month),
                 digits: 2,
             };
         case "hour":
@@ -125,6 +88,8 @@ export function segmentRange(
         case "minute":
         case "second":
             return { min: 0, max: 59, digits: 2 };
+        // an era is edited only in a calendar system (its hook gives the range)
+        case "era":
         case "dayPeriod":
             return { min: 0, max: 1, digits: 0 };
     }
@@ -184,26 +149,6 @@ export function shownValue(
 }
 
 /**
- * The day clamped into its month, once the month (or the year, or the era) changed; in a calendar
- * system the month too into its year (a Hebrew common year has 12).
- */
-function clampDay(format: SegmentFormat, values: SegmentValues): SegmentValues {
-    let next = values;
-    const { calendar } = format;
-    if (calendar && next.month !== undefined) {
-        const months = segmentRange(format, next, "month").max;
-        if (next.month > months) {
-            next = { ...next, month: months };
-        }
-    }
-    if (next.day === undefined || next.month === undefined) {
-        return next;
-    }
-    const last = monthDays(format, next);
-    return next.day > last ? { ...next, day: last } : next;
-}
-
-/**
  * Sets a segment to a value in the unit it shows (an hour in its cycle, kept in its half of the
  * day; a day period moves a set hour into its half), or clears it with `undefined`. A day past
  * its month's end is clamped into it.
@@ -239,9 +184,17 @@ export function setSegment(
         return next;
     }
     next[type] = shown;
-    return type === "month" || type === "year" || type === "era"
-        ? clampDay(format, next)
-        : next;
+    if (type === "month" || type === "year" || type === "era") {
+        // the month clamped into its year (a calendar system's: a Hebrew common year has 12),
+        // then the day into its month
+        for (const field of ["month", "day"] as const) {
+            const { max } = segmentRange(format, next, field);
+            if ((next[field] ?? 0) > max) {
+                next[field] = max;
+            }
+        }
+    }
+    return next;
 }
 
 /**
@@ -316,27 +269,11 @@ export function segmentValuesOf(
     if (input == null) {
         return {};
     }
-    const { calendar, timeZone } = format;
-    let value: Partial<PlainDateTime> & { era?: number } = input;
-    // a zoned value from another zone shows in the field's (spec/time-zones.md)
-    if (timeZone && "offset" in input && "timeZone" in input) {
-        value = timeZone.convert(input as ZonedDateTime);
-    }
-    if (
-        calendar &&
-        value.year !== undefined &&
-        value.month !== undefined &&
-        value.day !== undefined
-    ) {
-        const fields = calendar.fields(value as PlainDate);
-        value = {
-            ...value,
-            era: fields.era,
-            year: format.eras ? fields.eraYear : fields.year,
-            month: fields.month,
-            day: fields.day,
-        };
-    }
+    // a zoned value from another zone shows in the field's (spec/time-zones.md), a date in its
+    // calendar system's fields (their hooks)
+    const wall = format.timeZone?.wallTime(input) ?? input;
+    const value: Partial<PlainDateTime> & { era?: number } =
+        format.calendar?.segmentValuesOf(format, wall) ?? wall;
     const result: { -readonly [key in EditableSegmentType]?: number } = {};
     for (const type of format.types) {
         if (type === "dayPeriod") {
@@ -355,19 +292,18 @@ export function segmentValuesOf(
 
 /**
  * The date of complete values (`null` while a date segment is a placeholder); with a calendar
- * system's `format`, the ISO date of its fields.
+ * system's `format`, the ISO date of its fields (its hook).
  */
 export function segmentsToDate(
     values: SegmentValues,
     format?: SegmentFormat,
 ): PlainDate | null {
-    const { month, day } = values;
-    const year = format ? calendarYear(format, values) : values.year;
-    if (year === undefined || month === undefined || day === undefined) {
-        return null;
+    if (format?.calendar) {
+        return format.calendar.segmentsToDate(format, values);
     }
-    return format?.calendar
-        ? format.calendar.fromFields({ year, month, day })
+    const { year, month, day } = values;
+    return year === undefined || month === undefined || day === undefined
+        ? null
         : { year, month, day };
 }
 
@@ -394,16 +330,9 @@ export function segmentsToDateTime(
 ): PlainDateTime | null {
     const date = segmentsToDate(values, format);
     const time = segmentsToTime(values);
-    if (date === null || time === null) {
-        return null;
-    }
-    const wall = { ...date, ...time };
-    if (!format?.timeZone) {
-        return wall;
-    }
-    try {
-        return format.timeZone.resolve(wall, format.disambiguation);
-    } catch {
-        return null;
-    }
+    return date === null || time === null
+        ? null
+        : format?.timeZone
+          ? format.timeZone.segmentsToDateTime(format, date, time)
+          : { ...date, ...time };
 }
