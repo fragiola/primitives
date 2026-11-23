@@ -17,11 +17,14 @@ export interface ComboboxListState {
 
 /**
  * With the Root's `items`, the default slot renders each matching entry (an item, or a group whose
- * `items` are its matching items); without them, it renders once with the state.
+ * `items` are its matching items); without them, it renders once with the state. `entry` is the
+ * consumer's own type, named by the slot's annotation
+ * (`v-slot="{ entry }: { entry: Country }"`), as React's render function infers it from its
+ * parameter: `never` until annotated, so any annotation binds with no cast.
  */
 export interface ComboboxListSlots {
     default?: (scope: {
-        entry: unknown;
+        entry: never;
         index: number;
         state: ComboboxListState;
     }) => VNode[];

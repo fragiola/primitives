@@ -7,9 +7,14 @@ import {
 } from "../../utils/public-component.ts";
 import { ComboboxKey } from "./combobox-context.ts";
 
-/** The default slot renders the value: an item or `null`, or the list of items with `multiple`. */
+/**
+ * The default slot renders the value: an item or `null`, or the list of items with `multiple`.
+ * `value` is the consumer's own type, named by the slot's annotation
+ * (`v-slot="{ value }: { value: Country[] }"`), as React's render function infers it from its
+ * parameter: `never` until annotated, so any annotation binds with no cast.
+ */
 export interface ComboboxValueSlots {
-    default?: (scope: { value: unknown }) => VNode[];
+    default?: (scope: { value: never }) => VNode[];
 }
 
 /**
