@@ -31,6 +31,7 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [combobox.md](combobox.md) | Combobox (D10) |
 | [autocomplete.md](autocomplete.md) | Autocomplete (the value is the text; the APG's four autocomplete behaviours) |
 | [listbox.md](listbox.md) | Listbox (on the toolkit's collections mechanism, `/selection`) |
+| [virtual-lists.md](virtual-lists.md) | ListboxVirtual, SelectVirtual, ComboboxVirtual and AutocompleteVirtual (the opt-in virtual and async lists, on the toolkit's `/virtual` and `/async-list`), and each framework's `useAsyncList` |
 | [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
 | [progress.md](progress.md) | Progress |
 | [avatar.md](avatar.md) | Avatar |
