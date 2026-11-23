@@ -22,7 +22,7 @@ Today, 49 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1 an
 | forms | **Field**, **Fieldset**, **Form**, **Button**, **Checkbox** and **CheckboxGroup**, **RadioGroup** and **Radio**, **Switch**, **Slider**, **Select**, **Combobox**, **Autocomplete**, **Listbox** (on the collections mechanism) |
 | virtual and async lists | **ListboxVirtual**, **SelectVirtual**, **ComboboxVirtual**, **AutocompleteVirtual** (opt-in entries on the toolkit's virtualizer), and each framework's async list |
 | inputs | **Label**, **NumberField** (localized text, held buttons, scrub), **OTPField** |
-| dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker**, **DateField**, **TimeField**, **DateRangeField** and **TimeRangeField** (typed in segments, on the toolkit's segment editing and time values), and the pickers' opt-in typed input (**DatePickerInput**, **DateRangePickerInput**) |
+| dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker**, **DateField**, **TimeField**, **DateRangeField** and **TimeRangeField** (typed in segments, on the toolkit's segment editing and time values), and the pickers' opt-in typed input (**DatePickerInput**, **DateRangePickerInput**); the multiple-date **MultipleCalendar**, **CalendarPreset**, **MonthCalendar**, **YearCalendar** (and their ranges), **MonthPicker**, **YearPicker** (and their ranges) and a calendar's day, month and year views (**CalendarView**) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 
