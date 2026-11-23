@@ -113,6 +113,11 @@
             "types": "./dist/types/fragiola-primitives-angular-checkbox-group.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-checkbox-group.mjs"
         },
+        "./clipboard": {
+            "@fragiola/source": "./clipboard/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-clipboard.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-clipboard.mjs"
+        },
         "./collapsible": {
             "@fragiola/source": "./collapsible/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-collapsible.d.ts",
@@ -172,6 +177,11 @@
             "@fragiola/source": "./drawer/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-drawer.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-drawer.mjs"
+        },
+        "./editable": {
+            "@fragiola/source": "./editable/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-editable.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-editable.mjs"
         },
         "./field": {
             "@fragiola/source": "./field/public-api.ts",
@@ -268,6 +278,11 @@
             "types": "./dist/types/fragiola-primitives-angular-pagination.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-pagination.mjs"
         },
+        "./password-input": {
+            "@fragiola/source": "./password-input/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-password-input.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-password-input.mjs"
+        },
         "./popover": {
             "@fragiola/source": "./popover/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-popover.d.ts",
@@ -302,6 +317,11 @@
             "@fragiola/source": "./scroll-area/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-scroll-area.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-scroll-area.mjs"
+        },
+        "./search-field": {
+            "@fragiola/source": "./search-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-search-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-search-field.mjs"
         },
         "./segmented-control": {
             "@fragiola/source": "./segmented-control/public-api.ts",

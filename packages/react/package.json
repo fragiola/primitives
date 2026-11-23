@@ -123,6 +123,12 @@
             "import": "./dist/checkbox-group.js",
             "default": "./dist/checkbox-group.js"
         },
+        "./clipboard": {
+            "@fragiola/source": "./src/components/clipboard/index.ts",
+            "types": "./dist/clipboard.d.ts",
+            "import": "./dist/clipboard.js",
+            "default": "./dist/clipboard.js"
+        },
         "./collapsible": {
             "@fragiola/source": "./src/components/collapsible/index.ts",
             "types": "./dist/collapsible.d.ts",
@@ -194,6 +200,12 @@
             "types": "./dist/drawer.d.ts",
             "import": "./dist/drawer.js",
             "default": "./dist/drawer.js"
+        },
+        "./editable": {
+            "@fragiola/source": "./src/components/editable/index.ts",
+            "types": "./dist/editable.d.ts",
+            "import": "./dist/editable.js",
+            "default": "./dist/editable.js"
         },
         "./field": {
             "@fragiola/source": "./src/components/field/index.ts",
@@ -309,6 +321,12 @@
             "import": "./dist/pagination.js",
             "default": "./dist/pagination.js"
         },
+        "./password-input": {
+            "@fragiola/source": "./src/components/password-input/index.ts",
+            "types": "./dist/password-input.d.ts",
+            "import": "./dist/password-input.js",
+            "default": "./dist/password-input.js"
+        },
         "./popover": {
             "@fragiola/source": "./src/components/popover/index.ts",
             "types": "./dist/popover.d.ts",
@@ -350,6 +368,12 @@
             "types": "./dist/scroll-area.d.ts",
             "import": "./dist/scroll-area.js",
             "default": "./dist/scroll-area.js"
+        },
+        "./search-field": {
+            "@fragiola/source": "./src/components/search-field/index.ts",
+            "types": "./dist/search-field.d.ts",
+            "import": "./dist/search-field.js",
+            "default": "./dist/search-field.js"
         },
         "./segmented-control": {
             "@fragiola/source": "./src/components/segmented-control/index.ts",
@@ -564,6 +588,11 @@
                 "import": "./dist/checkbox-group.js",
                 "default": "./dist/checkbox-group.js"
             },
+            "./clipboard": {
+                "types": "./dist/clipboard.d.ts",
+                "import": "./dist/clipboard.js",
+                "default": "./dist/clipboard.js"
+            },
             "./collapsible": {
                 "types": "./dist/collapsible.d.ts",
                 "import": "./dist/collapsible.js",
@@ -623,6 +652,11 @@
                 "types": "./dist/drawer.d.ts",
                 "import": "./dist/drawer.js",
                 "default": "./dist/drawer.js"
+            },
+            "./editable": {
+                "types": "./dist/editable.d.ts",
+                "import": "./dist/editable.js",
+                "default": "./dist/editable.js"
             },
             "./field": {
                 "types": "./dist/field.d.ts",
@@ -719,6 +753,11 @@
                 "import": "./dist/pagination.js",
                 "default": "./dist/pagination.js"
             },
+            "./password-input": {
+                "types": "./dist/password-input.d.ts",
+                "import": "./dist/password-input.js",
+                "default": "./dist/password-input.js"
+            },
             "./popover": {
                 "types": "./dist/popover.d.ts",
                 "import": "./dist/popover.js",
@@ -753,6 +792,11 @@
                 "types": "./dist/scroll-area.d.ts",
                 "import": "./dist/scroll-area.js",
                 "default": "./dist/scroll-area.js"
+            },
+            "./search-field": {
+                "types": "./dist/search-field.d.ts",
+                "import": "./dist/search-field.js",
+                "default": "./dist/search-field.js"
             },
             "./segmented-control": {
                 "types": "./dist/segmented-control.d.ts",
