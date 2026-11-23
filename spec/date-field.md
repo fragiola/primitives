@@ -9,9 +9,10 @@
 
 Both are form controls: they work in a native `<form>` (they submit an ISO value, validate and
 reset) and in a [Field](field.md). A date chosen on a month grid is a [Calendar](calendar.md); a
-picker that opens one is a [DatePicker](calendar.md). The range fields and the picker inputs
-(a DateField inside a DatePicker) are Stage 3's next Epic; calendar systems and time zones its
-last one (`docs/handoff.md` §5).
+picker that opens one is a [DatePicker](calendar.md). The range fields are
+[date-range-field.md](date-range-field.md) and the pickers' typed input (DateField segments inside
+a DatePicker) is [calendar.md](calendar.md#typed-input-datepickerinput-daterangepickerinput)
+(Epic #76); calendar systems and time zones are Stage 3's last Epic (`docs/handoff.md` §5).
 
 **Scope: stage 3** (Epic #73; Issue #71: the toolkit's segment editing and time values, and
 DateField; Issue #72: TimeField and DateField's time granularities). **The APG has no date field
