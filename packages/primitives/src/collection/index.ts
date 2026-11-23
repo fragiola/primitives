@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, accordions, menus and radio groups, the roving focus of toolbars, toggle groups and menu bars, a tab's activation direction, typeahead, the combobox's item helpers and chip keys, the Tabs Indicator's placement before hydration.
+// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, accordions, menus and radio groups, the roving focus of toolbars, toggle groups and menu bars, a tab's activation direction, typeahead, the combobox's item helpers and chip keys, the tag groups' and tags inputs' keys, the Tabs Indicator's placement before hydration.
 
 export {
     type ActivationDirection,
@@ -58,4 +58,15 @@ export {
     type TabsIndicatorBox,
     tabsIndicatorBox,
 } from "./tabs-indicator.ts";
+export {
+    removalFocusIndex,
+    type TagGroupKeyAction,
+    type TagGroupKeyOptions,
+    type TagKeyEvent,
+    type TagsInputInputKeyAction,
+    type TagsInputTagKeyAction,
+    tagGroupKeyTarget,
+    tagsInputInputKeyTarget,
+    tagsInputTagKeyTarget,
+} from "./tag-keys.ts";
 export { createTypeahead } from "./typeahead.ts";
