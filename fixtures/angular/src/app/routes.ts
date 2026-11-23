@@ -144,4 +144,12 @@ export const ROUTES: readonly string[] = [
     "/menubar/vertical",
     "/menubar/modal",
     "/direction/provider",
+    "/listbox-virtual/basic",
+    "/listbox-virtual/async",
+    "/select-virtual/basic",
+    "/select-virtual/async",
+    "/combobox-virtual/basic",
+    "/combobox-virtual/async",
+    "/autocomplete-virtual/basic",
+    "/autocomplete-virtual/async",
 ];

@@ -39,13 +39,17 @@ other component imports it), OTPField uses `/form` (its value rules), `/collecti
 `/direction`; Meter uses `/range` alone, Label `/form` alone (its press). Listbox adds
 `/selection`, the collections mechanism (its list model, selection rules and key map; no other
 component imports it yet), to `/collection` (typeahead), `/direction` and `/form`; Autocomplete
-uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`). The root entry,
+uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`). The virtual
+lists ([ListboxVirtual](/docs/api/listbox-virtual) and the others) add `/virtual` to their
+component's mechanisms, and the [async list](/docs/api/async-list) utility uses `/async-list`
+alone: a list that does not opt in imports neither. The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
 
 | entry | exports |
 | --- | --- |
+| `@fragiola/primitives/async-list` | `createAsyncList`, `AsyncList`, `AsyncListOptions`, `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListState`, `AsyncListStatus` |
 | `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
@@ -65,6 +69,7 @@ uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`).
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
+| `@fragiola/primitives/virtual` | `createVirtualizer`, `Virtualizer`, `VirtualizerOptions`, `VirtualAlign`, `scrollContainer`, `virtualLayout`, `VirtualLayoutOptions`, `VirtualRange`, `VirtualRow`, `rowStarts`, `rowAt`, `activeSticky`, `pageIndex` |
 
 ## The mechanisms
 
@@ -178,5 +183,28 @@ uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`).
   and no `srcSet` is an `error`. A cached image reports at once, synchronously and with no
   `loading`: `loaded`, or `error` when it has no size. It returns the cleanup, after which no status is reported. Avatar's Image is
   built on it.
+- **Virtual**: the virtualizer of the virtual lists, written in-house.
+  `virtualLayout({ count, size, gap, offset, viewport, overscan, pinned, sticky })` is pure: the
+  rows to render for a scroll position (the rows in view, `overscan` rows beyond each end, the
+  `pinned` rows and the `sticky` row of the group in view), each `{ index, start, size,
+  spaceBefore, sticky }`, with the list's `totalSize`, the room after the last row (`spaceAfter`)
+  and the first and last rows in view. `rowStarts`, `rowAt`, `activeSticky` and `pageIndex` (the
+  row a page away, by the sizes) are its pieces. `createVirtualizer(options)` runs it over the
+  DOM: `attach(list, scroller?)` watches the scroll container (the list when it scrolls, else its
+  nearest scrolling ancestor, `scrollContainer`), its size and the list's `row-gap`;
+  `measure(index, element)` measures a rendered row now and on every resize (without it, every
+  row is `estimateSize`); `scrollToIndex(index, align)` (`auto`, `start`, `center`, `end`)
+  scrolls to a row and updates the range at once; `update(options)`, `range()`,
+  `pageIndex(from, delta)`; `onChange` asks for a new render only when the rows or their room
+  change. A measured row above the view that changes size moves the scroll position by the
+  change, so the rows in view stay still. Sizes are layout sizes (`offsetHeight`), which a
+  popup's opening scale never changes.
+- **Async list**: `createAsyncList({ load, filterText, onChange })`, framework-free: `reload()`
+  loads the first page, `loadMore()` the next one (with the cursor the previous page returned;
+  nothing while one loads or when there is none), `setFilterText(text)` the first page for a new
+  text, `abort()` the load in flight; `state()` is `{ items, filterText, status, error,
+  hasMore }`. The loader gets `{ signal, filterText, cursor }` and returns `{ items, cursor? }`; a
+  new load aborts the one in flight and a stale page is never used. Each framework wraps it in
+  its own state ([async list](/docs/api/async-list)).
 - **Id, date**: document-unique ids, and plain dates with their math and locale data from `Intl`
   (imported only by the calendar and picker entries).

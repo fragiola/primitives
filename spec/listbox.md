@@ -13,7 +13,7 @@ listbox (its reference checkout, 1.9, ships Select and Combobox, whose lists are
 the APG says nothing, Select's and Combobox's parts and names are the API pattern, and this spec
 says which option it took and why (D4; `docs/decisions.md`, "Collections").
 
-Out of scope: virtualization and async lists (the next Epic), grid and tree collections (D5:
+Out of scope here: virtualization and async lists (the opt-in ListboxVirtual, [virtual-lists.md](virtual-lists.md)), grid and tree collections (D5:
 `@fragiola/data-grid`, `@fragiola/tree`), drag and drop (`@fragiola/dnd`), `aria-activedescendant`
 focus (an input that keeps the focus is Combobox's and Autocomplete's), item actions
 (`onAction`), `disallowEmptySelection`, `readOnly`, and an option's description.

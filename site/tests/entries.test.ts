@@ -39,11 +39,22 @@ describe("the framework packages' entries", () => {
             const entry = read(`packages/${pkg}/src/index.ts`)
                 .split("\n")
                 .filter((line) => line !== "" && !line.startsWith("//"));
+            // Biome sorts the re-exports by path, segment by segment: `./async-list` comes before
+            // `./components`, `./components/autocomplete` before `./components/autocomplete-virtual`
+            const bySegments = (a: string, b: string) => {
+                const left = a.split("/");
+                const right = b.split("/");
+                for (let i = 0; i < Math.min(left.length, right.length); i++) {
+                    const x = left[i] as string;
+                    const y = right[i] as string;
+                    if (x !== y) return x < y ? -1 : 1;
+                }
+                return left.length - right.length;
+            };
             expect(entry).toEqual(
-                ENTRIES.map(
-                    (name) =>
-                        `export * from "./${entrySource(name).slice("src/".length)}";`,
-                ),
+                ENTRIES.map((name) => entrySource(name).slice("src/".length))
+                    .sort(bySegments)
+                    .map((source) => `export * from "./${source}";`),
             );
         });
     }

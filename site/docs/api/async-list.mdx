@@ -1,0 +1,135 @@
+---
+title: Async list
+description: useAsyncList or injectAsyncList loads a list's pages through your loader, filtered by a text, aborting a stale load, for the virtual lists.
+---
+
+A list whose items come from a loader, page by page: `useAsyncList` (React, Vue) and
+`injectAsyncList` (Angular) keep the items, the status and the error in the framework's state,
+and give `loadMore` and `setFilterText` to the virtual lists
+([ListboxVirtual](/docs/api/listbox-virtual), [SelectVirtual](/docs/api/select-virtual),
+[ComboboxVirtual](/docs/api/combobox-virtual),
+[AutocompleteVirtual](/docs/api/autocomplete-virtual)). Base UI leaves async loading to the
+consumer; React Aria's `useAsyncList` was read for the behaviour (no sorting here).
+
+It is a utility in its own entry, `/async-list`, which references no component, on the toolkit's
+[`/async-list`](/docs/api/toolkit) mechanism: you bring the fetching, it brings the order of the
+pages.
+
+## Behaviour
+
+- **The loader** gets `{ signal, filterText, cursor }` and returns `{ items, cursor? }`: `cursor`
+  is `undefined` for the first page, else the one the previous page returned; a page with no
+  cursor (or `null`) is the last (`hasMore` false).
+- **The first page loads once mounted** (Angular: after the first render). The first render, on a
+  server too, has `status` `loading` and no items.
+- **`loadMore()`** loads the next page and appends it; it does nothing while a page loads or when
+  there is none. Wire it to a virtual list's `onLoadMore`.
+- **`setFilterText(text)`** loads the first page for the text; **`reload()`** the first page
+  again. The items stay until the new page arrives.
+- **A new load aborts the one in flight** (its `signal`), and a stale page is never used,
+  whichever arrives first: typing `1` then `12` never shows the page of `1`.
+- **An error** sets `status` to `error` and `error` to what the loader threw; the items stay.
+- **Destroyed**: the load in flight is aborted.
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { useAsyncList } from "@fragiola/primitives-react/async-list";
+
+const list = useAsyncList<Item, number>({
+    load: async ({ signal, filterText, cursor = 0 }) => {
+        const response = await fetch(`/api/items?q=${encodeURIComponent(filterText)}&from=${cursor}`, { signal });
+        const page: { items: Item[]; next: number | null } = await response.json();
+        return { items: page.items, cursor: page.next };
+    },
+});
+
+<ListboxVirtual.Root aria-label="Items" items={list.items} loading={list.loading} onLoadMore={list.loadMore}>
+    {(item) => <Listbox.Item value={item.value}>{item.label}</Listbox.Item>}
+</ListboxVirtual.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { useAsyncList } from "@fragiola/primitives-vue/async-list";
+
+// a reactive object: list.items, list.loading, ... in the template
+const list = useAsyncList<Item, number>({ load: loadItems });
+</script>
+
+<template>
+    <ListboxVirtual.Root aria-label="Items" :items="list.items" :loading="list.loading" @load-more="list.loadMore">
+        <template #default="{ item }">
+            <Listbox.Item :value="item.value">{{ item.label }}</Listbox.Item>
+        </template>
+    </ListboxVirtual.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+import { injectAsyncList } from "@fragiola/primitives-angular/async-list";
+
+@Component({
+    imports: [ListboxVirtualRoot, ListboxVirtualRow, ListboxItem],
+    template: `
+        <div listboxVirtualRoot #rows="listboxVirtualRoot" aria-label="Items"
+            [items]="list.items()" [loading]="list.loading()" (loadMore)="list.loadMore()">
+            @for (row of rows.rows(); track row.index) {
+                <div listboxItem [listboxVirtualRow]="row" [value]="row.item.value">{{ row.item.label }}</div>
+            }
+        </div>
+    `,
+})
+export class ItemList {
+    // in an injection context (a field initializer or a constructor): signals and functions
+    protected readonly list = injectAsyncList<Item, number>({ load: loadItems });
+}
+```
+
+A load in flight is an Angular pending task, so a server render waits for the first page.
+
+</Framework>
+
+## Props
+
+### Options
+
+| option | type | default | description |
+| --- | --- | --- | --- |
+| `load` | `({ signal, filterText, cursor }) => Promise<{ items, cursor? }>` | | required: loads a page (`AsyncListLoad`) |
+| `filterText` | `string` | `""` | the first filter text |
+
+### Result
+
+| name | type | description |
+| --- | --- | --- |
+| `items` | `Item[]` | the items of every page loaded |
+| `filterText` | `string` | the text the items were asked for |
+| `status` | `"idle" \| "loading" \| "loading-more" \| "error"` | `loading`: the first page (or a new text); `loading-more`: the next one |
+| `loading` | `boolean` | `status` is `loading` or `loading-more`: a virtual list's `loading` |
+| `error` | `unknown` | what the last failed load threw, else `undefined` |
+| `hasMore` | `boolean` | the last page gave a cursor |
+| `reload()` | `() => void` | loads the first page again |
+| `loadMore()` | `() => void` | loads the next page: a virtual list's `onLoadMore` |
+| `setFilterText(text)` | `(text: string) => void` | loads the first page for a new text |
+
+React returns them in its state (a new object on each change), Vue as a reactive object, Angular
+as signals (`items()`, `loading()`, ...) and plain functions.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/async-list` | `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListResult`, `AsyncListState`, `AsyncListStatus`, `UseAsyncListOptions`, `useAsyncList` |
+| `@fragiola/primitives-vue/async-list` | `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListResult`, `AsyncListState`, `AsyncListStatus`, `UseAsyncListOptions`, `useAsyncList` |
+| `@fragiola/primitives-angular/async-list` | `AsyncListLoad`, `AsyncListPage`, `AsyncListRef`, `AsyncListRequest`, `AsyncListStatus`, `InjectAsyncListOptions`, `injectAsyncList` |

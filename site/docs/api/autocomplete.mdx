@@ -36,6 +36,12 @@ text is a value too. A value that must be one of the items is a
   [Field](/docs/api/field), the Input takes the field's ids and states.
 - **Shared with Combobox**: through each framework's shared code and the toolkit, never through
   Combobox's entry, so an app with Autocomplete alone ships no Combobox code.
+- **Long and loaded lists**: for thousands of items, or items loaded page by page, use
+  [AutocompleteVirtual](/docs/api/autocomplete-virtual): **AutocompleteVirtual.List**
+  (`/autocomplete-virtual`) replaces the List and renders only the matching suggestions in view,
+  with the same keys over every match. Its pages can come from a loader through the [async
+  list](/docs/api/async-list) (`loading`, `onLoadMore`). It is opt-in: this entry ships no
+  virtualizer.
 
 ## Anatomy
 

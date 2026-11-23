@@ -28,6 +28,8 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/range` | range math (`snapToStep`, `valueToPercent`, thumbs) and `sliderKeyTarget` |
 | `@fragiola/primitives/number` | a number field's localized text (`formatNumber`, `parseNumber`, `isNumberText`: grouping, decimal separators, non-Latin digits, currency and percent), `stepNumber`, `clampNumber`, the press-and-hold `watchAutoRepeat` and the `watchScrub` of a scrub area |
 | `@fragiola/primitives/selection` | the collections mechanism: the list model (`createListModel`), the selection rules (`applySelection`: `none`, `single`, `multiple`, the APG's toggle and replace models, ranges, select all) and the listbox's key map (`listKeyTarget`, `listPressSelection`, `pageTarget`) |
+| `@fragiola/primitives/virtual` | the virtualizer: `createVirtualizer` (the rows of a long list for its scroll position: fixed or measured sizes, overscan, pinned rows, sticky group labels, `scrollToIndex`, `pageIndex`), the pure `virtualLayout`, `scrollContainer` |
+| `@fragiola/primitives/async-list` | `createAsyncList`: the first page, the next pages and a filter text's pages through a loader, a stale load aborted, the loading and error states |
 | `@fragiola/primitives/form` | `bridgeForm`, `validateField`, the field's state and change rules, `onSubmitAttempt`, a Label's press (`preventLabelSelection`, `labelFocusTarget`), an OTP field's value (`normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpPattern`) |
 | `@fragiola/primitives/date` | `PlainDate` (`{ year, month, day }`, no time zone) and its math, `monthGrid`, `calendarKeyTarget`, the locale data from `Intl` |
 | `@fragiola/primitives/id` | `createId` |

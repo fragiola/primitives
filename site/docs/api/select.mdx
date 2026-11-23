@@ -39,6 +39,11 @@ submits, resets and validates as a `<select>` would. A list the user filters by 
 - **Forms**: a visually hidden input carries `name` and the value (`""` with none). `required`
   blocks the submission and focuses the trigger; a form reset returns an uncontrolled Select to
   `defaultValue`. In a [Field](/docs/api/field), the trigger takes the field's ids and states.
+- **Long and loaded lists**: for thousands of items, or items loaded page by page, use
+  [SelectVirtual](/docs/api/select-virtual): **SelectVirtual.List** (`/select-virtual`) replaces
+  the List and renders only the Root's `items` in view, with the same keys and typeahead over
+  every item. Its pages can come from a loader through the [async list](/docs/api/async-list)
+  (`loading`, `onLoadMore`). It is opt-in: this entry ships no virtualizer.
 
 ## Anatomy
 

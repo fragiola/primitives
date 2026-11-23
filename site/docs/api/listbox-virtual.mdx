@@ -1,0 +1,233 @@
+---
+title: ListboxVirtual
+description: A Listbox over thousands of options that renders only the ones in view, with the keys, the typeahead, ranges and select all over every option, and async pages.
+---
+
+A [Listbox](/docs/api/listbox) for a long or loaded list: **ListboxVirtual.Root** takes every
+option as `items` and renders only the ones in view (with 10 000 items, a few dozen options in
+the DOM), while the keys, the typeahead, the ranges, select all and the form reach every item.
+Its pages can come from a loader through [`useAsyncList`](/docs/api/async-list). It is opt-in, in
+an entry of its own, `/listbox-virtual`: a Listbox that does not use it ships no virtualizer.
+
+The APG has no virtual list pattern; it only says that a set whose options are not all in the DOM
+gives each option `aria-setsize` and `aria-posinset`. Everything else is the
+[Listbox](/docs/api/listbox)'s (the APG [listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)): a virtual list
+behaves as the same list rendered whole.
+
+## Behaviour
+
+- **The Listbox's part**: the Root is a Listbox Root (`data-primitives-part="listbox-root"`, the
+  same roles and state attributes), so a Listbox recipe and its selectors apply. Its options are
+  `Listbox.Item`s that you render for each row in view.
+- **Only the rows in view are rendered**, plus `overscan` rows beyond each end and the **pinned**
+  rows: the focused option and the tab stop (the first selected, else the first). Scrolling the
+  focused option out of view keeps it in the DOM and focused.
+- **The keys over every item**: the arrows, Home, End, PageUp and PageDown (a page by the rows'
+  sizes), the typeahead over every label, Shift and Ctrl ranges and Ctrl+A. A key scrolls its
+  target into view, renders it within the event and focuses it.
+- **The place in the set**: each rendered option has `aria-setsize` (the number of items),
+  `aria-posinset` (its index + 1) and `data-index`.
+- **Sizes**: each row starts at `itemSize` (36 px) and is measured once rendered (`measure`), so
+  rows may differ; `measure={false}` keeps every row at `itemSize` (fixed sizes). A measured row
+  above the view that changes size keeps the rows in view still.
+- **Loading**: `loading` sets `data-loading` and `aria-busy="true"` on the Root; `onLoadMore`
+  runs when the last row comes into view while not `loading` (load more on scroll end).
+- **Forms**: the hidden inputs carry every selected value, rendered or not.
+- **Vertical only**: a virtual list has no `orientation`, and no groups or separators (a flat
+  list).
+
+### The row style
+
+The rows keep the list's flow layout: no wrapper and no spacer element. Each rendered option gets,
+inline, the room of the unrendered rows before it as `margin-block-start` (the last one, the room
+after it as `margin-block-end`), `flex-shrink: 0` and `overflow-anchor: none`; the list's
+`row-gap` is read and counted. So:
+
+- lay the options out in a **flex or grid column**, with **no margin of their own** (space them
+  with their padding or the list's `gap`);
+- give the Root a height and `overflow-y: auto` (it is its own scroll container), or put it in an
+  element that scrolls;
+- set `itemSize` to the typical row height, so the scrollbar is right before the rows are
+  measured.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `listbox-root` | the `listbox`, a Listbox Root that renders its options from `items` |
+| (options) | `div` | `listbox-item` | your `Listbox.Item` for each row in view |
+| (hidden inputs) | `input` | `listbox-input` | the Root's last children: what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Listbox, ListboxVirtual } from "@fragiola/primitives-react/listbox-virtual";
+
+const ITEMS = Array.from({ length: 10_000 }, (_, i) => ({
+    value: `item-${i + 1}`,
+    label: `Item ${i + 1}`,
+}));
+
+<ListboxVirtual.Root
+    aria-label="Items"
+    items={ITEMS}
+    multiple
+    name="items"
+    className="flex max-h-80 flex-col overflow-y-auto"
+>
+    {(item) => (
+        <Listbox.Item value={item.value} disabled={item.disabled}>
+            {item.label}
+            <Listbox.ItemIndicator>✓</Listbox.ItemIndicator>
+        </Listbox.Item>
+    )}
+</ListboxVirtual.Root>;
+```
+
+With [`useAsyncList`](/docs/api/async-list), the items come from a loader, page by page:
+
+```tsx
+import { useAsyncList } from "@fragiola/primitives-react/async-list";
+
+const list = useAsyncList({ load: loadItems });
+
+<ListboxVirtual.Root
+    aria-label="Items"
+    items={list.items}
+    loading={list.loading}
+    onLoadMore={list.loadMore}
+>
+    {(item) => <Listbox.Item value={item.value}>{item.label}</Listbox.Item>}
+</ListboxVirtual.Root>;
+```
+
+The render function gets each row's item and index, and returns a `Listbox.Item` with the item's
+`value` (and `disabled`); the Root adds the row's attributes and style to it.
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Listbox, ListboxVirtual } from "@fragiola/primitives-vue/listbox-virtual";
+import { useAsyncList } from "@fragiola/primitives-vue/async-list";
+
+const list = useAsyncList({ load: loadItems });
+const value = ref<string | null>(null);
+</script>
+
+<template>
+    <ListboxVirtual.Root
+        v-model:value="value"
+        aria-label="Items"
+        :items="list.items"
+        :loading="list.loading"
+        class="flex max-h-80 flex-col overflow-y-auto"
+        @load-more="list.loadMore"
+    >
+        <template #default="{ item }">
+            <Listbox.Item :value="item.value" :disabled="item.disabled">{{ item.label }}</Listbox.Item>
+        </template>
+    </ListboxVirtual.Root>
+</template>
+```
+
+The default scoped slot gets `{ item, index }` for each row in view and renders one
+`Listbox.Item`.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+import { ListboxItem, type ListboxValue, ListboxVirtualRoot, ListboxVirtualRow } from "@fragiola/primitives-angular/listbox-virtual";
+import { injectAsyncList } from "@fragiola/primitives-angular/async-list";
+
+@Component({
+    imports: [ListboxVirtualRoot, ListboxVirtualRow, ListboxItem],
+    template: `
+        <div
+            listboxVirtualRoot
+            #list="listboxVirtualRoot"
+            aria-label="Items"
+            class="flex max-h-80 flex-col overflow-y-auto"
+            [items]="items.items()"
+            [loading]="items.loading()"
+            (loadMore)="items.loadMore()"
+            [(value)]="value"
+        >
+            @for (row of list.rows(); track row.index) {
+                <div listboxItem [listboxVirtualRow]="row" [value]="row.item.value" [disabled]="row.item.disabled">
+                    {{ row.item.label }}
+                </div>
+            }
+        </div>
+    `,
+})
+export class ItemList {
+    protected readonly items = injectAsyncList({ load: loadItems });
+    protected readonly value = signal<ListboxValue>(null);
+}
+```
+
+The Root's `rows()` (through `exportAs`) are the rows to render; each `[listboxItem]` takes the
+`[listboxVirtualRow]` of its row, which sets its place in the set, its room and its measurement.
+The entry re-exports the Listbox entry, so one import gives both.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `@load-more`), and Angular as inputs and outputs (`[(value)]`,
+`(valueChangeDetails)`, `(loadMore)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `items` | `{ value: string; label: string; disabled?: boolean }[]` | | required: every option, in the list's order (the labels typeahead matches, the disabled options a range skips) |
+| `multiple` | `boolean` | `false` | several options can be selected (`aria-multiselectable`) |
+| `value` | `string \| null`, or `string[]` | | the value, controlled |
+| `defaultValue` | `string \| null`, or `string[]` | `null`, or `[]` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason }) => void` | | every change (`item-press`, `keyboard`, `none` for a form reset) |
+| `selectionBehavior` | `"toggle" \| "replace"` | `"toggle"` | the APG's recommended model, or the alternative one where the selection follows the focus |
+| `loopFocus` | `boolean` | `true` | the arrows wrap at the ends |
+| `disabled` | `boolean` | `false` | every option is disabled and none takes focus |
+| `name` | `string` | | the hidden inputs' name (a field's wins) |
+| `required` | `boolean` | `false` | the form cannot submit with nothing selected |
+| `itemSize` | `number \| (index: number) => number` | `36` | a row's size in px before it is measured (every row's with `measure` off): the typical row height |
+| `measure` | `boolean` | `true` | measure the rendered rows; `false`: fixed sizes |
+| `overscan` | `number` | `4` | the rows rendered beyond each end of the view |
+| `loading` | `boolean` | `false` | the list is loading: `data-loading`, `aria-busy="true"` |
+| `onLoadMore` | `() => void` | | the last row came into view while not `loading`: load the next page (Vue `@load-more`, Angular `(loadMore)`) |
+
+React's `children` and Vue's default slot render each row (an Angular template renders
+`rows()`).
+
+## State and part attributes
+
+Everything of the [Listbox](/docs/api/listbox)'s Root and Items, plus:
+
+| part | attributes |
+| --- | --- |
+| Root | `data-loading` and `aria-busy="true"` while `loading`; `aria-orientation="vertical"` |
+| each rendered option | `aria-setsize` (the number of items), `aria-posinset` (its index + 1), `data-index` (its index); inline `margin-block-start` / `margin-block-end` when unrendered rows come before / after it, `flex-shrink: 0`, `overflow-anchor: none` |
+
+## Keyboard
+
+The [Listbox](/docs/api/listbox)'s keys, over every item: PageUp and PageDown move a page by the
+rows' sizes, and the target of a key is scrolled into view and focused.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/listbox-virtual` | `ChangeDetails`, `ChangeReason`, `Listbox`, `ListboxVirtual`, `ListboxVirtualItem`, `ListboxVirtualRootMultipleProps`, `ListboxVirtualRootProps`, `ListboxVirtualRootSingleProps`, `RenderProp`, `SelectionBehavior`, `SelectionMode`, `VirtualListProps` |
+| `@fragiola/primitives-vue/listbox-virtual` | `ChangeDetails`, `ChangeReason`, `Listbox`, `ListboxVirtual`, `ListboxVirtualItem`, `ListboxVirtualRootEmits`, `ListboxVirtualRootProps`, `ListboxVirtualRootSlots`, `RenderSlotProps`, `SelectionBehavior`, `SelectionMode`, `VirtualListEmits`, `VirtualListProps` |
+| `@fragiola/primitives-angular/listbox-virtual` | `*` (every export of the Listbox entry), `ListboxVirtualItem`, `ListboxVirtualRoot`, `ListboxVirtualRow`, `VirtualItemSize`, `VirtualRowData` |

@@ -5,7 +5,7 @@ export default {
     description:
         "A six-digit sign-in code, one slot per digit: typing moves forward, Backspace moves back, a paste fills every slot, and the complete code is reported.",
     category: "forms",
-    order: 17,
+    order: 19,
     features: [
         "OTPField.Root",
         "OTPField.Input",

@@ -37,6 +37,11 @@ These are decided (D10): the APG allows them or says nothing about them.
   is, [change details](/docs/concepts/primitive-contract)), `onOpenChangeComplete(open)` reports
   the end of each transition, the actions `close()` and `unmount()` act from code, and the
   Portal's `keepMounted` keeps the Positioner in the page while closed (`hidden`, `data-closed`).
+- **Long and loaded lists**: for thousands of items, or items loaded page by page, use
+  [ComboboxVirtual](/docs/api/combobox-virtual): **ComboboxVirtual.List** (`/combobox-virtual`)
+  replaces the List and renders only the matching items in view, with the same keys over every
+  match. Its pages can come from a loader through the [async list](/docs/api/async-list)
+  (`loading`, `onLoadMore`). It is opt-in: this entry ships no virtualizer.
 
 ## Anatomy
 

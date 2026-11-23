@@ -8,6 +8,7 @@ export const COMPONENTS = [
     "accordion",
     "alert-dialog",
     "autocomplete",
+    "autocomplete-virtual",
     "avatar",
     "button",
     "calendar",
@@ -15,6 +16,7 @@ export const COMPONENTS = [
     "checkbox-group",
     "collapsible",
     "combobox",
+    "combobox-virtual",
     "context-menu",
     "date-picker",
     "date-range-picker",
@@ -25,6 +27,7 @@ export const COMPONENTS = [
     "form",
     "label",
     "listbox",
+    "listbox-virtual",
     "menu",
     "menubar",
     "meter",
@@ -37,6 +40,7 @@ export const COMPONENTS = [
     "radio-group",
     "range-calendar",
     "select",
+    "select-virtual",
     "separator",
     "slider",
     "switch",
@@ -56,7 +60,7 @@ export type ComponentName = (typeof COMPONENTS)[number];
  * `src/<name>/`, Angular in its secondary entry point `packages/angular/<name>/`. The bundle guard
  * reads each alone and fails when it holds any component's code.
  */
-export const UTILITIES = ["direction", "render"] as const;
+export const UTILITIES = ["async-list", "direction", "render"] as const;
 
 export type UtilityName = (typeof UTILITIES)[number];
 
@@ -78,6 +82,7 @@ export function entrySource(name: ComponentName | UtilityName): string {
  * (`packages/primitives/tests/guard.test.ts` checks the folders against them).
  */
 export const MECHANISMS = [
+    "async-list",
     "collection",
     "date",
     "direction",
@@ -97,6 +102,7 @@ export const MECHANISMS = [
     "scroll-lock",
     "selection",
     "swipe",
+    "virtual",
 ] as const;
 
 export type MechanismName = (typeof MECHANISMS)[number];

@@ -10,8 +10,11 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
 
 - **Thirty-nine components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
   Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Autocomplete, Listbox, Calendar,
-  RangeCalendar, DatePicker, DateRangePicker, Progress, Meter, Avatar and Separator ship today, with two entries that are no component: the
-  [direction provider](/docs/api/direction) and the [render utilities](/docs/api/render).
+  RangeCalendar, DatePicker, DateRangePicker, Progress, Meter, Avatar and Separator ship today, with the opt-in virtual lists of Listbox,
+  Select, Combobox and Autocomplete ([ListboxVirtual](/docs/api/listbox-virtual), [SelectVirtual](/docs/api/select-virtual),
+  [ComboboxVirtual](/docs/api/combobox-virtual), [AutocompleteVirtual](/docs/api/autocomplete-virtual)) and three entries that are no
+  component: the [direction provider](/docs/api/direction), the [render utilities](/docs/api/render) and the
+  [async list](/docs/api/async-list).
 - **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
   with no time and no time zone. No date field to type a date in parts, no time field, no
   multiple-date calendar, no month or year pickers and no presets yet. They come with stage 3.
@@ -21,8 +24,7 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
   `submit` event and its `FormData`) and `actionsRef`. A form reset does not reset a field's
   states, as in Base UI.
 - **Listbox leaves out** `aria-activedescendant` focus (DOM focus moves to the options), item
-  actions, `disallowEmptySelection`, `readOnly`, virtualization and async lists (the next stage),
-  and grid and tree collections (Fragiola's data-grid and tree libraries). A press on a
+  actions, `disallowEmptySelection`, `readOnly`, and grid and tree collections (Fragiola's data-grid and tree libraries). A press on a
   `Field.Label` does not focus a Listbox (a `div` is not labelable). Nor a radio outside a group
   or a read-only RadioGroup.
 - **Autocomplete leaves out** Base UI's `inline` (a list with no popup), `keepHighlight`,
@@ -35,9 +37,14 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
   covers a pattern; uppercase in your `onValueChange`), `form` and its own `Separator`.
 - **Avatar leaves out** Base UI's `keepMounted` on the Image and its enter and exit transitions:
   the image only shows once loaded.
-- **Combobox and Select**: no virtualization or async lists, no `readOnly` or `autoHighlight`, no
+- **Combobox and Select**: no `readOnly` or `autoHighlight`, no
   input inside the popup; a Select chooses one value (no `multiple`, scroll arrows or
   `alignItemWithTrigger`), and a Combobox has no `modal` option.
+- **The virtual lists** are flat and vertical: no virtual groups (Group, GroupLabel and Separator
+  are not rendered in them), no horizontal list, grid or tree, no virtual Menu or command palette.
+  Their rows need a flex or grid column with no margin of their own (the virtualizer writes the
+  rows' margins), and `itemSize` should be the typical row height, so the scrollbar is right
+  before the rows are measured. The async list has no sorting.
 - **No hover card or toast** yet: they come with later stages. Value changes
   (`onValueChange`, `onCheckedChange`) cannot be canceled; only open changes can.
 - **Drawer leaves out** Base UI's `Provider` and indent effect, the `SwipeArea` (swipe to open),
