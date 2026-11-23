@@ -37,6 +37,10 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [toggle-group.md](toggle-group.md) | ToggleGroup (on Toggle) |
 | [toolbar.md](toolbar.md) | Toolbar (with nested composites in its roving focus) |
 | [menubar.md](menubar.md) | Menubar (a bar of Menu triggers, on Menu) |
+| [label.md](label.md) | Label (a standalone `<label>` for a control outside a Field) |
+| [number-field.md](number-field.md) | NumberField (a spinbutton with localized text, auto repeat and scrub) |
+| [meter.md](meter.md) | Meter |
+| [otp-field.md](otp-field.md) | OTPField (a one-time code, one input per slot) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
 The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
@@ -57,7 +61,9 @@ the toolkit's swipe mechanism and Drawer; Issue #37, NavigationMenu), which comp
 Stage 2 starts with the toggles and bars (Epic #49, Issue #47: Toggle, ToggleGroup and Toolbar,
 on the toolkit's roving focus, with the rule of [nested composites](toolbar.md#nested-composites);
 Issue #48: Menubar, a bar of Menu triggers on the same roving focus, with the contract of a parent
-bar that Menu reads, [menu.md](menu.md#in-a-menubar)).
+bar that Menu reads, [menu.md](menu.md#in-a-menubar)); then the inputs (Epic #52, Issue #50: Label,
+NumberField and Meter, on the toolkit's new `/number` mechanism for localized number text, stepping,
+auto repeat and scrub; Issue #51: OTPField, whose input model [otp-field.md](otp-field.md) decides).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -127,14 +133,16 @@ The vocabulary is shared by every component:
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; an indeterminate Progress |
-| `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present) |
+| `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present); `data-complete` also on every part of an OTPField whose code is `length` long |
+| `data-scrubbing` | every part of a NumberField while its ScrubArea scrubs |
 | `data-required` | a required form control |
+| `data-readonly` (inputs) | a read-only NumberField's or OTPField's parts |
 | `data-placeholder` | a Select showing its placeholder |
 | `data-instant` | a tooltip that opened with no delay |
 | `data-dragging` | a slider while a pointer drags a thumb |
-| `data-index` | a slider thumb's value index (a value) |
+| `data-index` | a slider thumb's value index; an OTPField slot's index (a value) |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation) |
-| `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus |
+| `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTPField slot that holds a character |
 
 ### No text, and the one exception
 
@@ -160,14 +168,19 @@ The reasons are shared:
 | `focus-out` | focus left a non-modal overlay |
 | `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox |
+| `input-change` | typing opened or changed a combobox; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did) |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
-| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
+| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; a NumberField's text was emptied; an OTPField slot's character was deleted by the input itself |
+| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md) |
+| `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md) |
 | `clear-press` | a combobox's Clear was pressed |
 | `chip-remove-press` | a combobox chip's remove button was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's, or removed an OTPField's characters (Backspace, Delete) |
+| `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
+| `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
+| `scrub` | a NumberField's ScrubArea stepped its value |
 | `track-press` | a press on a slider's control moved a thumb |
 | `drag` | a pointer drag moved a slider's thumb |
 | `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md) |
@@ -206,13 +219,15 @@ Checkbox, Slider and Select.
 ### Forms
 
 The form controls (Select, Checkbox, Switch, RadioGroup, Slider, Combobox, DatePicker,
-DateRangePicker) take `name` and render a **hidden input** that
+DateRangePicker, NumberField, OTPField) take `name` and render a **hidden input** that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
 (`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
-`hidden-input`, since its `input` is the visible Input).
+`hidden-input`, since its `input` is the visible Input; NumberField and OTPField: `hidden-input` too).
+Outside a Field, a control is named by a [Label](label.md) (`for`, or wrapping it), or by the
+consumer's `aria-label` / `aria-labelledby`.
 
 When the browser validates a native form and a control's hidden input is the form's first
 invalid control, focus goes to the primitive (its trigger or button) and the browser neither
@@ -222,7 +237,7 @@ the toolkit's form bridge cancels the later controls' `invalid` events of that v
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
-DatePicker or a DateRangePicker gives the control:
+DatePicker, a DateRangePicker, a NumberField or an OTPField gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
@@ -405,6 +420,12 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Menubar | `<Menubar>` around `Menu.Root`s (one component, as ToggleGroup) | `<Menubar>` around `Menu.Root`s | `[menubar]` (class `Menubar`) around `[menuRoot]`s; the inputs `orientation`, `loopFocus`, `modal`, `disabled` |
 | the parent-bar contract Menu reads (spec/menu.md, "In a Menubar") | a context in `components/menu/menu-bar-context.ts`, provided by `Menubar` | `provide` / `inject` of a key in `components/menu/menu-bar-context.ts` | an `InjectionToken` in `packages/angular/menu/utils/menu-bar.ts`, provided by `[menubar]` |
 | Select's new parts | `Select.Group`, `Select.GroupLabel`, `Select.Separator`, `Select.ItemText` | the same | `[selectGroup]`, `[selectGroupLabel]`, `[selectSeparator]`, `[selectItemText]` |
+| Label | `<Label htmlFor="email">` (one component, as Toggle) | `<Label for="email">` | `<label label for="email">` (selector `label[label]`, class `Label`) |
+| NumberField's value (a number or `null`) | `value` + `onValueChange(value, details)` (`defaultValue`) on `NumberField.Root` | `v-model:value` (`default-value`, `@value-change="(value, details) => ..."`) | `[(value)]` on `[numberFieldRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
+| NumberField's parts | `NumberField.Root`, `.Group`, `.Input`, `.Increment`, `.Decrement`, `.ScrubArea`, `.ScrubAreaCursor` | the same | `[numberFieldRoot]`, `[numberFieldGroup]`, `input[numberFieldInput]`, `button[numberFieldIncrement]`, `button[numberFieldDecrement]`, `[numberFieldScrubArea]`, structural `*numberFieldScrubAreaCursor` (rendered only while a locked scrub runs, its view moved to `body`) |
+| Meter's parts | `Meter.Root`, `.Label`, `.Value`, `.Track`, `.Indicator` | the same | `[meterRoot]`, `[meterLabel]`, `[meterValue]` (`formattedValue()`, `value()` through `exportAs`), `[meterTrack]`, `[meterIndicator]` |
+| OTPField's value (a string) and events | `value` + `onValueChange(value, details)` (`defaultValue`), `onValueComplete`, `onValueInvalid` on `OTPField.Root` | `v-model:value` (`default-value`, `@value-change`, `@value-complete`, `@value-invalid`) | `[(value)]` on `[otpFieldRoot]` (`defaultValue`; `valueChangeDetails`, `valueComplete` and `valueInvalid` outputs, each `{ value, details }`) |
+| OTPField's parts | `OTPField.Root`, `OTPField.Input` | the same | `[otpFieldRoot]`, `input[otpFieldInput]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
