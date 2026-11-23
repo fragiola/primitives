@@ -68,6 +68,11 @@
             "types": "./dist/types/fragiola-primitives-angular-autocomplete.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-autocomplete.mjs"
         },
+        "./autocomplete-virtual": {
+            "@fragiola/source": "./autocomplete-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-autocomplete-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-autocomplete-virtual.mjs"
+        },
         "./avatar": {
             "@fragiola/source": "./avatar/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-avatar.d.ts",
@@ -102,6 +107,11 @@
             "@fragiola/source": "./combobox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-combobox.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-combobox.mjs"
+        },
+        "./combobox-virtual": {
+            "@fragiola/source": "./combobox-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-combobox-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-combobox-virtual.mjs"
         },
         "./context-menu": {
             "@fragiola/source": "./context-menu/public-api.ts",
@@ -152,6 +162,11 @@
             "@fragiola/source": "./listbox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-listbox.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-listbox.mjs"
+        },
+        "./listbox-virtual": {
+            "@fragiola/source": "./listbox-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-listbox-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-listbox-virtual.mjs"
         },
         "./menu": {
             "@fragiola/source": "./menu/public-api.ts",
@@ -213,6 +228,11 @@
             "types": "./dist/types/fragiola-primitives-angular-select.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-select.mjs"
         },
+        "./select-virtual": {
+            "@fragiola/source": "./select-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-select-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-select-virtual.mjs"
+        },
         "./separator": {
             "@fragiola/source": "./separator/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-separator.d.ts",
@@ -252,6 +272,11 @@
             "@fragiola/source": "./tooltip/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tooltip.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tooltip.mjs"
+        },
+        "./async-list": {
+            "@fragiola/source": "./async-list/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-async-list.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-async-list.mjs"
         },
         "./direction": {
             "@fragiola/source": "./direction/public-api.ts",

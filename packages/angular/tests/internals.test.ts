@@ -13,6 +13,7 @@ import {
     dataValue,
     dataValues,
 } from "../internal/utils/state-attributes.ts";
+import { reachableRows } from "../internal/utils/virtual-rows.ts";
 
 describe("dataValue", () => {
     it("gives an empty attribute for true, none (null) for false, and strings as values", () => {
@@ -161,5 +162,12 @@ describe("OverlayHandleStore", () => {
         expect(store.root()).toBeNull();
         store.detach(second);
         expect(store.root()).toBeNull();
+    });
+});
+
+describe("reachableRows", () => {
+    it("pins the ends, the highlighted row with its neighbours and the selected row", () => {
+        expect(reachableRows(100, undefined, -1)).toEqual([0, 99]);
+        expect(reachableRows(100, 50, 7)).toEqual([0, 99, 49, 50, 51, 7]);
     });
 });

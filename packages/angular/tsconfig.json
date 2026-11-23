@@ -61,6 +61,11 @@
         "number-field",
         "otp-field",
         "listbox",
+        "listbox-virtual",
+        "select-virtual",
+        "combobox-virtual",
+        "autocomplete-virtual",
+        "async-list",
         "tests",
         "*.config.ts"
     ]
