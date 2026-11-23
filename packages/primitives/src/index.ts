@@ -4,6 +4,7 @@
 
 export * from "./async-list/index.ts";
 export * from "./calendar-systems/index.ts";
+export * from "./clipboard/index.ts";
 export * from "./collection/index.ts";
 export * from "./date/index.ts";
 export * from "./direction/index.ts";
