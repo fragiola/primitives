@@ -22,4 +22,5 @@ export * from "./range/index.ts";
 export * from "./scroll-lock/index.ts";
 export * from "./selection/index.ts";
 export * from "./swipe/index.ts";
+export * from "./toast/index.ts";
 export * from "./virtual/index.ts";
