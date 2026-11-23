@@ -17,6 +17,11 @@ export function roundTo(value: number, decimals: number): number {
     return Math.round(value * factor) / factor + 0;
 }
 
+/** A channel from 0 to 1 as a byte; the float noise of `0.5 - 0.4` (25.4999…) cut first. */
+function byte(value: number): number {
+    return Math.round(Number((value * 255).toFixed(6)));
+}
+
 function rgbOf(
     red: number,
     green: number,
@@ -25,9 +30,9 @@ function rgbOf(
 ): RgbColor {
     return {
         space: "rgb",
-        red: Math.round(red * 255),
-        green: Math.round(green * 255),
-        blue: Math.round(blue * 255),
+        red: byte(red),
+        green: byte(green),
+        blue: byte(blue),
         alpha,
     };
 }

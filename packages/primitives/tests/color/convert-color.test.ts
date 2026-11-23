@@ -6,6 +6,7 @@ import type {
     RgbColor,
 } from "../../src/color/color-value.ts";
 import { convertColor } from "../../src/color/convert-color.ts";
+import { formatColor } from "../../src/color/format-color.ts";
 
 const rgb = (
     red: number,
@@ -205,6 +206,18 @@ describe("convertColor", () => {
         expect(worst.hsb).toBeLessThanOrEqual(0.01 + 1e-9);
         // hsl's saturation is amplified near white and black, where it barely shows
         expect(worst.hsl).toBeLessThan(0.2);
+    });
+
+    it("rounds a byte half up, through the float noise", () => {
+        // 0.5 - 0.4 is 0.0999…: 25.4999… of 255, a half that must round up
+        const blue: HslColor = {
+            space: "hsl",
+            hue: 210,
+            saturation: 80,
+            lightness: 50,
+            alpha: 1,
+        };
+        expect(formatColor(convertColor(blue, "rgb"), "hex")).toBe("#1a80e6");
     });
 
     it("keeps the alpha", () => {
