@@ -63,6 +63,12 @@
             "import": "./dist/alert-dialog.js",
             "default": "./dist/alert-dialog.js"
         },
+        "./autocomplete": {
+            "@fragiola/source": "./src/components/autocomplete/index.ts",
+            "types": "./dist/autocomplete.d.ts",
+            "import": "./dist/autocomplete.js",
+            "default": "./dist/autocomplete.js"
+        },
         "./avatar": {
             "@fragiola/source": "./src/components/avatar/index.ts",
             "types": "./dist/avatar.d.ts",
@@ -321,6 +327,11 @@
                 "types": "./dist/alert-dialog.d.ts",
                 "import": "./dist/alert-dialog.js",
                 "default": "./dist/alert-dialog.js"
+            },
+            "./autocomplete": {
+                "types": "./dist/autocomplete.d.ts",
+                "import": "./dist/autocomplete.js",
+                "default": "./dist/autocomplete.js"
             },
             "./avatar": {
                 "types": "./dist/avatar.d.ts",

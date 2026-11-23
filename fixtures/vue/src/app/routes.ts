@@ -5,6 +5,14 @@ import AccordionMultiple from "../scenarios/accordion/accordion-multiple.vue";
 import AlertDialogBasic from "../scenarios/alert-dialog/alert-dialog-basic.vue";
 import AlertDialogDetached from "../scenarios/alert-dialog/alert-dialog-detached.vue";
 import AlertDialogLifecycle from "../scenarios/alert-dialog/alert-dialog-lifecycle.vue";
+import AutocompleteAsync from "../scenarios/autocomplete/autocomplete-async.vue";
+import AutocompleteBasic from "../scenarios/autocomplete/autocomplete-basic.vue";
+import AutocompleteBoth from "../scenarios/autocomplete/autocomplete-both.vue";
+import AutocompleteField from "../scenarios/autocomplete/autocomplete-field.vue";
+import AutocompleteGroups from "../scenarios/autocomplete/autocomplete-groups.vue";
+import AutocompleteInline from "../scenarios/autocomplete/autocomplete-inline.vue";
+import AutocompleteLifecycle from "../scenarios/autocomplete/autocomplete-lifecycle.vue";
+import AutocompleteNone from "../scenarios/autocomplete/autocomplete-none.vue";
 import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
 import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
@@ -199,6 +207,14 @@ export const routes: Record<string, Component> = {
     "/combobox/form": ComboboxForm,
     "/combobox/field": ComboboxField,
     "/combobox/lifecycle": ComboboxLifecycle,
+    "/autocomplete/basic": AutocompleteBasic,
+    "/autocomplete/both": AutocompleteBoth,
+    "/autocomplete/inline": AutocompleteInline,
+    "/autocomplete/none": AutocompleteNone,
+    "/autocomplete/groups": AutocompleteGroups,
+    "/autocomplete/async": AutocompleteAsync,
+    "/autocomplete/field": AutocompleteField,
+    "/autocomplete/lifecycle": AutocompleteLifecycle,
     "/select/basic": SelectBasic,
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
