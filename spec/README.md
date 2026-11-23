@@ -36,6 +36,7 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [toggle.md](toggle.md) | Toggle |
 | [toggle-group.md](toggle-group.md) | ToggleGroup (on Toggle) |
 | [toolbar.md](toolbar.md) | Toolbar (with nested composites in its roving focus) |
+| [menubar.md](menubar.md) | Menubar (a bar of Menu triggers, on Menu) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
 The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
@@ -54,7 +55,9 @@ Issue #34: AlertDialog, ContextMenu, Menu's checkbox and radio items, and Select
 separators, item text and optional `items`); then Drawer and NavigationMenu (Epic #38: Issue #36,
 the toolkit's swipe mechanism and Drawer; Issue #37, NavigationMenu), which complete stage 1.
 Stage 2 starts with the toggles and bars (Epic #49, Issue #47: Toggle, ToggleGroup and Toolbar,
-on the toolkit's roving focus, with the rule of [nested composites](toolbar.md#nested-composites)).
+on the toolkit's roving focus, with the rule of [nested composites](toolbar.md#nested-composites);
+Issue #48: Menubar, a bar of Menu triggers on the same roving focus, with the contract of a parent
+bar that Menu reads, [menu.md](menu.md#in-a-menubar)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -156,13 +159,13 @@ The reasons are shared:
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
 | `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
-| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key) |
+| `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
 | `input-change` | typing opened or changed a combobox |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty |
 | `clear-press` | a combobox's Clear was pressed |
 | `chip-remove-press` | a combobox chip's remove button was pressed |
-| `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's |
+| `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
 | `keyboard` | a key changed a slider's value |
 | `track-press` | a press on a slider's control moved a thumb |
@@ -399,6 +402,8 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | a ToggleGroup's value (an array of strings) | `value` + `onValueChange(value, details)` (`defaultValue`) on `ToggleGroup` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[toggleGroup]` (`defaultValue`; `valueChangeDetails` output), as Accordion's |
 | Toolbar's parts | `Toolbar.Root`, `Toolbar.Button`, `Toolbar.Link`, `Toolbar.Input`, `Toolbar.Group`, `Toolbar.Separator` | the same | `[toolbarRoot]`, `button[toolbarButton]`, `a[toolbarLink]`, `input[toolbarInput]`, `[toolbarGroup]`, `[toolbarSeparator]` |
 | the roving focus a composite provides (spec/toolbar.md, "Nested composites") | a context in the package's shared code (`utils/`, `hooks/`), provided by a Toolbar.Root or a ToggleGroup with none around it | `provide` / `inject` of a key in `utils/` or `composables/` | an `InjectionToken` in `/internal`, provided by `[toolbarRoot]` or a `[toggleGroup]` with none around it |
+| Menubar | `<Menubar>` around `Menu.Root`s (one component, as ToggleGroup) | `<Menubar>` around `Menu.Root`s | `[menubar]` (class `Menubar`) around `[menuRoot]`s; the inputs `orientation`, `loopFocus`, `modal`, `disabled` |
+| the parent-bar contract Menu reads (spec/menu.md, "In a Menubar") | a context in `components/menu/menu-bar-context.ts`, provided by `Menubar` | `provide` / `inject` of a key in `components/menu/menu-bar-context.ts` | an `InjectionToken` in `packages/angular/menu/utils/menu-bar.ts`, provided by `[menubar]` |
 | Select's new parts | `Select.Group`, `Select.GroupLabel`, `Select.Separator`, `Select.ItemText` | the same | `[selectGroup]`, `[selectGroupLabel]`, `[selectSeparator]`, `[selectItemText]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`

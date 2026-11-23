@@ -5,7 +5,8 @@
 A menu of actions opened by a button (APG `menu-button` with a `menu`), with nested submenus,
 checkbox items and groups of radio items (APG `menuitemcheckbox`, `menuitemradio`, Issue #34). A
 menu opened from an area at the pointer is a [ContextMenu](context-menu.md), built on these parts.
-Menubars are out of scope. A list for choosing a form value is a Select or a Combobox.
+A bar of menus is a [Menubar](menubar.md), whose items are these Roots' Triggers ("In a
+Menubar"). A list for choosing a form value is a Select or a Combobox.
 
 Every part's part attribute names the component it belongs to: `menu-*` inside a `Menu.Root`,
 `context-menu-*` inside a `ContextMenu.Root` (read from the Root, as the calendar family's shared
@@ -380,6 +381,38 @@ a Portal with `keepMounted` holding a Positioner (the kept-mounted part) and a P
 items **"Edit"** and **"Delete"**.
 
 Checks: the common checks (no "Close with actions").
+
+## In a Menubar
+
+A `Menu.Root` whose Trigger sits in a [Menubar](menubar.md) is one of the bar's menus (Epic #49,
+Issue #48). Menu holds only the **contract of a parent bar**, each framework's context in the
+menu's own folder (React and Vue `components/menu/menu-bar-context.ts`, Angular
+`packages/angular/menu/utils/menu-bar.ts`), which the Menubar provides; the bar's decisions are
+Menubar's code, so `/menu` alone ships none of it (`ENTRY_DEPENDENCIES`: `menubar` on `menu`). A
+Root that finds the contract:
+
+- **Root**: follows the bar's `modal` (its own is ignored, as a submenu's); keeps the bar for its
+  Trigger, Positioner and Popup, and hides it from the Roots inside its content (a Menu opened
+  from one of its items is no menu of the bar).
+- **Trigger**: renders `role="menuitem"` and the bar's roving `tabindex` (it registers with the
+  bar's roving-focus scope, and tells the bar when it takes focus); registers its menu with the
+  bar, so the bar can open, close and focus into it; is disabled by its own `disabled` or the
+  bar's, as `aria-disabled="true"` (never the native `disabled`; the consumer's click handler does
+  not run while disabled); and **hands its keys, its press and its pointer entering to the bar**
+  instead of handling them itself (the Trigger's table under "Keyboard" is the bar's there,
+  spec/menubar.md). Its Space key up still does nothing (no click on key up).
+- **Positioner**: defaults to `side="inline-end"` in a vertical bar (`bottom` in a horizontal one).
+- **Popup**, at every level of the bar's menu: a key the level does not handle itself (not its
+  arrows, Home, End, Enter, Space, Tab, a submenu's close key, nor a typeahead match) is offered
+  to the bar before typeahead, with the level (root or submenu); the bar handles it or leaves it.
+  The SubmenuTrigger's open key is the SubmenuTrigger's, as always (it never reaches the popup).
+- **The opening focus**: an opening the bar asks for may **keep the focus where it is** (the
+  pending highlight `keep`, beside `first`, `last` and none): the popup and its items take no
+  focus, and the bar's item keeps it (APG: a move between menus keeps the focus on the bar).
+- `closeAll` accepts the reason `list-navigation` (the bar closing a menu as it moves on).
+
+Outside a bar nothing changes: a Trigger alone, or in a [Toolbar](toolbar.md), has none of the
+above (it joins no roving scope).
 
 ## Differences from Base UI
 

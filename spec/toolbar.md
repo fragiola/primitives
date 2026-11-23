@@ -6,7 +6,8 @@ A container for a set of controls (buttons, toggles, links, a text input) that i
 stop**, with the arrow keys moving between its controls (APG `toolbar`). The controls of a
 [ToggleGroup](toggle-group.md) inside it, and a [Toggle](toggle.md) placed in it directly, are
 the toolbar's own items: the whole toolbar stays one tab stop (Base UI's Toolbar; "Nested
-composites"). A menu bar is Menubar (Issue #48), which reuses the same roving focus.
+composites"). A menu bar is a [Menubar](menubar.md) (Issue #48), which reuses the same roving
+focus.
 
 **Scope: stage 2** (Epic #49, Issue #47). The APG `toolbar` pattern decides the role, the keys,
 the roving tab stop and the disabled controls; Base UI's `Toolbar` (1.9) decides the parts, the
@@ -86,8 +87,9 @@ before the implementations):
 5. **A disabled scope disables its items.** A disabled Toolbar.Root or Toolbar.Group disables the
    items registered inside it, a ToggleGroup's Toggles included.
 
-Another composite of this library (Menubar, Issue #48) follows the same rule: its items register
-with the nearest scope, and it opens a scope only when none is around it.
+A [Menubar](menubar.md) (Issue #48) is no nested composite of a toolbar: it is a composite widget
+of its own (`role="menubar"`, which the APG never places in a toolbar), with its own scope that
+no toolbar item joins and that joins no toolbar's; its items are its Menu Triggers only.
 
 ## State attributes and ARIA
 
