@@ -8,9 +8,14 @@
 
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
-import { PRIMITIVES_PACKAGES } from "../src/framework.ts";
+import { PRIMITIVES_PACKAGES, TOOLKIT_PACKAGE } from "../src/framework.ts";
 import { DEFAULT_HEIGHT } from "../src/meta-types.ts";
-import { type ExamplesApp, fileOf, loadExamples } from "./examples-lib.ts";
+import {
+    type ExamplesApp,
+    fileOf,
+    importsOf,
+    loadExamples,
+} from "./examples-lib.ts";
 
 export interface ManifestFile {
     lang: string;
@@ -39,9 +44,19 @@ export interface Manifest {
     examples: ManifestExample[];
 }
 
+/** Whether an example's files import a toolkit entry themselves (`@fragiola/primitives/time-zone`). */
+function importsToolkit(app: ExamplesApp, files: readonly string[]): boolean {
+    return files.some((file) =>
+        importsOf(readFileSync(fileOf(app, file), "utf-8")).some((specifier) =>
+            specifier.startsWith(`${TOOLKIT_PACKAGE}/`),
+        ),
+    );
+}
+
 /**
  * The manifest of one framework's app. Every example installs its framework's primitives package
- * (which brings the toolkit); there is no registry.
+ * (which brings the toolkit), and the toolkit itself when it imports one of its entries (a
+ * calendar system, a time zone); there is no registry.
  */
 export async function buildManifest(app: ExamplesApp): Promise<Manifest> {
     const entries = await loadExamples(app);
@@ -74,7 +89,10 @@ export async function buildManifest(app: ExamplesApp): Promise<Manifest> {
             height: meta.height ?? DEFAULT_HEIGHT[meta.category],
             files,
             registry: [],
-            packages: [PRIMITIVES_PACKAGES[app.framework]],
+            packages: [
+                PRIMITIVES_PACKAGES[app.framework],
+                ...(importsToolkit(app, files) ? [TOOLKIT_PACKAGE] : []),
+            ],
         }),
     );
     return { files, examples };

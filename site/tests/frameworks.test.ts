@@ -9,6 +9,7 @@ import {
 import {
     FRAMEWORKS,
     PRIMITIVES_PACKAGES,
+    TOOLKIT_PACKAGE,
 } from "../../examples/shared/src/framework.ts";
 import { FRAMEWORKS as PACKAGE_FRAMEWORKS } from "../../scripts/components.ts";
 import {
@@ -63,6 +64,10 @@ describe("the frameworks of project.json", () => {
             expect(
                 manifest.dependencies?.[PRIMITIVES_PACKAGES[framework]],
             ).toBe("workspace:*");
+            // the calendar systems and time zones an example injects (Epic #82)
+            expect(manifest.dependencies?.[TOOLKIT_PACKAGE]).toBe(
+                "workspace:*",
+            );
             // exact versions only
             for (const [name, version] of Object.entries({
                 ...manifest.dependencies,
@@ -87,6 +92,9 @@ describe("the frameworks of project.json", () => {
         expect(manifestOf("angular").devDependencies?.typescript).toBe("6.0.3");
     });
 });
+
+/** The examples that import a toolkit entry themselves (a calendar system, a time zone). */
+const TOOLKIT_EXAMPLES = ["calendar-system", "date-field-time-zone"];
 
 describe("the embeds", () => {
     it("are built under <base>/embed/<framework>/", () => {
@@ -118,12 +126,14 @@ describe("the embeds", () => {
             "button",
             "calendar",
             "calendar-preset",
+            "calendar-system",
             "checkbox",
             "collapsible",
             "combobox",
             "combobox-virtual",
             "context-menu",
             "date-field",
+            "date-field-time-zone",
             "date-picker",
             "date-picker-input",
             "date-range-field",
@@ -218,6 +228,8 @@ describe("the embeds", () => {
                 "calendar-preset",
                 "month-picker",
                 "year-range-picker",
+                "calendar-system",
+                "date-field-time-zone",
                 "progress",
                 "meter",
                 "avatar",
@@ -230,6 +242,10 @@ describe("the embeds", () => {
                     PRIMITIVES_PACKAGES[
                         framework as keyof typeof PRIMITIVES_PACKAGES
                     ],
+                    // an injected calendar system or time zone: the toolkit too
+                    ...(TOOLKIT_EXAMPLES.includes(example.id)
+                        ? [TOOLKIT_PACKAGE]
+                        : []),
                 ]);
                 expect(example.registry).toEqual([]);
             }

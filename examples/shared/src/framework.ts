@@ -24,6 +24,12 @@ export const PRIMITIVES_PACKAGES: Record<Framework, string> = {
     angular: "@fragiola/primitives-angular",
 };
 
+/**
+ * The toolkit, which an example also installs when it imports one of its entries itself: a
+ * calendar system or a time zone, injected into a component (`calendar={persian}`).
+ */
+export const TOOLKIT_PACKAGE = "@fragiola/primitives";
+
 export function isFramework(value: unknown): value is Framework {
     return FRAMEWORKS.includes(value as Framework);
 }
