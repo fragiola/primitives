@@ -102,6 +102,12 @@ import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNonce } from "../scenarios/tabs/tabs-nonce.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
+import { ToggleBasic } from "../scenarios/toggle/toggle-basic.tsx";
+import { ToggleControlled } from "../scenarios/toggle/toggle-controlled.tsx";
+import { ToggleGroupBasic } from "../scenarios/toggle-group/toggle-group-basic.tsx";
+import { ToggleGroupVertical } from "../scenarios/toggle-group/toggle-group-vertical.tsx";
+import { ToolbarBasic } from "../scenarios/toolbar/toolbar-basic.tsx";
+import { ToolbarVertical } from "../scenarios/toolbar/toolbar-vertical.tsx";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.tsx";
 import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.tsx";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.tsx";
@@ -224,5 +230,11 @@ export const routes: Record<
     "/progress/basic": ProgressBasic,
     "/avatar/basic": AvatarBasic,
     "/separator/basic": SeparatorBasic,
+    "/toggle/basic": ToggleBasic,
+    "/toggle/controlled": ToggleControlled,
+    "/toggle-group/basic": ToggleGroupBasic,
+    "/toggle-group/vertical": ToggleGroupVertical,
+    "/toolbar/basic": ToolbarBasic,
+    "/toolbar/vertical": ToolbarVertical,
     "/direction/provider": DirectionProviderScenario,
 };
