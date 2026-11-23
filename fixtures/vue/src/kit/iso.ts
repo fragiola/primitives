@@ -42,3 +42,16 @@ export function isoDateTime(
         ? iso(value)
         : `${iso(value)}T${isoTime({ hour: value.hour, minute: value.minute ?? 0, second: value.second ?? 0 })}`;
 }
+
+/** `09:00..17:00`: a time range (spec/date-range-field.md, "Scenarios"). */
+export function isoTimeRange(
+    range:
+        | {
+              start: { hour: number; minute: number; second: number };
+              end: { hour: number; minute: number; second: number };
+          }
+        | null
+        | undefined,
+): string | undefined {
+    return range ? `${isoTime(range.start)}..${isoTime(range.end)}` : undefined;
+}
