@@ -9,6 +9,14 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.ts"
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.ts";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.ts";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.ts";
+import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.ts";
+import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.ts";
+import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.ts";
+import { AutocompleteField } from "../scenarios/autocomplete/autocomplete-field.ts";
+import { AutocompleteGroups } from "../scenarios/autocomplete/autocomplete-groups.ts";
+import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inline.ts";
+import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.ts";
+import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.ts";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
 import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
@@ -63,6 +71,12 @@ import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { LabelControls } from "../scenarios/label/label-controls.ts";
+import { ListboxField } from "../scenarios/listbox/listbox-field.ts";
+import { ListboxGroups } from "../scenarios/listbox/listbox-groups.ts";
+import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.ts";
+import { ListboxMultiple } from "../scenarios/listbox/listbox-multiple.ts";
+import { ListboxReplace } from "../scenarios/listbox/listbox-replace.ts";
+import { ListboxSingle } from "../scenarios/listbox/listbox-single.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
@@ -199,6 +213,14 @@ import { ROUTES } from "./routes.ts";
         ComboboxObjects,
         ComboboxRejectedInput,
         ComboboxLifecycle,
+        AutocompleteAsync,
+        AutocompleteBasic,
+        AutocompleteBoth,
+        AutocompleteField,
+        AutocompleteGroups,
+        AutocompleteInline,
+        AutocompleteLifecycle,
+        AutocompleteNone,
         FieldBasic,
         FieldControls,
         FieldValidation,
@@ -233,6 +255,12 @@ import { ROUTES } from "./routes.ts";
         ButtonBasic,
         FieldSettings,
         LabelControls,
+        ListboxField,
+        ListboxGroups,
+        ListboxHorizontal,
+        ListboxMultiple,
+        ListboxReplace,
+        ListboxSingle,
         MeterBasic,
         NumberFieldBasic,
         NumberFieldField,
@@ -324,6 +352,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/combobox/form") { <main class="p-6" scenario-combobox-form></main> }
             @case ("/combobox/field") { <main class="p-6" scenario-combobox-field></main> }
             @case ("/combobox/lifecycle") { <main class="p-6" scenario-combobox-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/autocomplete/basic") { <main class="p-6" scenario-autocomplete-basic></main> }
+            @case ("/autocomplete/both") { <main class="p-6" scenario-autocomplete-both></main> }
+            @case ("/autocomplete/inline") { <main class="p-6" scenario-autocomplete-inline></main> }
+            @case ("/autocomplete/none") { <main class="p-6" scenario-autocomplete-none></main> }
+            @case ("/autocomplete/groups") { <main class="p-6" scenario-autocomplete-groups></main> }
+            @case ("/autocomplete/async") { <main class="p-6" scenario-autocomplete-async></main> }
+            @case ("/autocomplete/field") { <main class="p-6" scenario-autocomplete-field></main> }
+            @case ("/autocomplete/lifecycle") { <main class="p-6" scenario-autocomplete-lifecycle [cancel]="query.cancel"></main> }
             @case ("/select/basic") { <main class="p-6" scenario-select-basic></main> }
             @case ("/select/controlled") { <main class="p-6" scenario-select-controlled></main> }
             @case ("/select/modal") { <main class="p-6" scenario-select-modal></main> }
@@ -368,6 +404,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
             @case ("/label/controls") { <main class="p-6" scenario-label-controls></main> }
+            @case ("/listbox/single") { <main class="p-6" scenario-listbox-single></main> }
+            @case ("/listbox/multiple") { <main class="p-6" scenario-listbox-multiple></main> }
+            @case ("/listbox/replace") { <main class="p-6" scenario-listbox-replace></main> }
+            @case ("/listbox/groups") { <main class="p-6" scenario-listbox-groups></main> }
+            @case ("/listbox/horizontal") { <main class="p-6" scenario-listbox-horizontal></main> }
+            @case ("/listbox/field") { <main class="p-6" scenario-listbox-field></main> }
             @case ("/meter/basic") { <main class="p-6" scenario-meter-basic></main> }
             @case ("/number-field/basic") { <main class="p-6" scenario-number-field-basic></main> }
             @case ("/number-field/field") { <main class="p-6" scenario-number-field-field></main> }

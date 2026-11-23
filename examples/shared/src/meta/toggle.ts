@@ -5,7 +5,7 @@ export default {
     description:
         "Toggle buttons on a track: a controlled Favourite, a Mute pressed at first and a disabled Download; a click, Enter or Space presses and releases one, and its name never changes with the state.",
     category: "forms",
-    order: 11,
+    order: 13,
     features: [
         "Toggle",
         "pressed",

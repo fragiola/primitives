@@ -5,7 +5,7 @@ export default {
     description:
         "A Form with a required RadioGroup and a Switch, each in a Field: the arrows move through the radios and check them, Space toggles the switch, and saving with no channel chosen focuses the first radio and shows the error.",
     category: "forms",
-    order: 8,
+    order: 10,
     features: [
         "RadioGroup",
         "Radio.Root",

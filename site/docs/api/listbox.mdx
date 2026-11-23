@@ -1,0 +1,197 @@
+---
+title: Listbox
+description: A list of options on the page, for one value or several, with the APG's two selection models, ranges and select all, as a form control.
+---
+
+A list of options that stays on the page, for choosing **one** value or **several** (the APG
+[listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)). It is a form control: it
+submits, resets and validates, alone or in a [Field](/docs/api/field). A list that pops up from a
+button is a [Select](/docs/api/select); a list filtered by a text input, a
+[Combobox](/docs/api/combobox) or an [Autocomplete](/docs/api/autocomplete).
+
+<Example id="listbox" />
+
+## Behaviour
+
+Base UI has no Listbox: the APG decides the roles, the keys and the selection models; Select's
+parts and names are the API pattern.
+
+- **Focus on the options**: DOM focus moves to the options (one tab stop, a roving `tabindex`).
+  Tab enters on the first selected option, else the first one; while the focus stays inside, the
+  tab stop is the focused option (`data-highlighted`).
+- **The keys**: the arrows along `orientation` (mirrored in RTL when horizontal), Home, End,
+  PageUp and PageDown (a page of the scroll container), and typeahead on the options' text.
+  `loopFocus` wraps at the ends.
+- **Two selection models** (`selectionBehavior`): `"toggle"`, the APG's recommended one, never
+  selects on a move (Space and Enter select or toggle); `"replace"`, the alternative one, makes the
+  selection follow the focus (Ctrl moves without selecting, Ctrl+Space toggles).
+- **Ranges and select all** (`multiple`): Shift with an arrow moves and toggles, Shift+Space
+  selects from the anchor (the last option toggled), Ctrl+Shift+Home / End select to an end,
+  Ctrl+A selects every option (or none, when they all are); Shift and a press select a range,
+  Ctrl and a press toggle (the replace model).
+- **Disabled options** take focus, never the selection; ranges and select all skip them.
+- **The value** is a string or `null`, or with `multiple` an array of strings in the list's order.
+- **Forms**: a visually hidden input carries the value and `required` (with `multiple`, one
+  hidden input per value). A form reset returns an uncontrolled list to `defaultValue`. In a
+  [Field](/docs/api/field), the list is the field's control: named and described by it,
+  `aria-invalid` on the Root.
+- **The collections mechanism**: the list model, the selection rules and the key map are the
+  toolkit's [`/selection`](/docs/api/toolkit) entry, which Menu, Tabs or Dialog never import.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `listbox-root` | the `listbox`; holds the state |
+| Item | `div` | `listbox-item` | an `option` |
+| ItemIndicator | `span` | `listbox-item-indicator` | rendered only while its item is selected |
+| Group | `div` | `listbox-group` | a `group` of items |
+| GroupLabel | `div` | `listbox-group-label` | names its Group |
+| Separator | `div` | `listbox-separator` | between items or groups |
+| (hidden inputs) | `input` | `listbox-input` | the Root's last children: what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Listbox } from "@fragiola/primitives-react/listbox";
+
+<span id="toppings">Toppings</span>
+<Listbox.Root aria-labelledby="toppings" multiple name="toppings" defaultValue={["cheese"]}>
+    <Listbox.Item value="cheese">
+        Cheese
+        <Listbox.ItemIndicator>✓</Listbox.ItemIndicator>
+    </Listbox.Item>
+    <Listbox.Item value="olives">
+        Olives
+        <Listbox.ItemIndicator>✓</Listbox.ItemIndicator>
+    </Listbox.Item>
+</Listbox.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <span id="fruit">Fruit</span>
+    <Listbox.Root v-model:value="fruit" aria-labelledby="fruit" name="fruit">
+        <Listbox.Item v-for="item in FRUITS" :key="item.value" :value="item.value" :disabled="item.disabled">
+            {{ item.label }}<Listbox.ItemIndicator>✓</Listbox.ItemIndicator>
+        </Listbox.Item>
+    </Listbox.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ListboxRoot, ListboxItem, ListboxItemIndicator],
+    template: `
+        <span id="fruit">Fruit</span>
+        <div listboxRoot aria-labelledby="fruit" name="fruit" [(value)]="fruit">
+            @for (item of fruits; track item.value) {
+                <div listboxItem [value]="item.value" [disabled]="item.disabled">
+                    {{ item.label }}<span *listboxItemIndicator>✓</span>
+                </div>
+            }
+        </div>
+    `,
+})
+export class FruitList {
+    protected readonly fruits = FRUITS;
+    protected readonly fruit = signal<ListboxValue>(null);
+}
+```
+
+`*listboxItemIndicator` is structural (rendered only while its item is selected);
+`*listboxItemIndicator="true"` keeps it mounted. `#list="listboxRoot"` gives `list.state()`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`), and Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)` with
+`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `multiple` | `boolean` | `false` | several options can be selected (`aria-multiselectable`) |
+| `value` | `string \| null`, or `string[]` | | the value, controlled |
+| `defaultValue` | `string \| null`, or `string[]` | `null`, or `[]` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason }) => void` | | every change (`item-press`, `keyboard`, `none` for a form reset) |
+| `selectionBehavior` | `"toggle" \| "replace"` | `"toggle"` | the APG's recommended model, or the alternative one where the selection follows the focus |
+| `orientation` | `"horizontal" \| "vertical"` | `"vertical"` | `aria-orientation`; a horizontal list moves with ArrowLeft and ArrowRight |
+| `loopFocus` | `boolean` | `true` | the arrows wrap at the ends |
+| `disabled` | `boolean` | `false` | every option is disabled and none takes focus |
+| `name` | `string` | | the hidden inputs' name (a field's wins) |
+| `required` | `boolean` | `false` | the form cannot submit with nothing selected |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the value it selects |
+| `disabled` | `boolean` | `false` | takes focus, never the selection |
+| `label` | `string` | its text content | the text typeahead matches |
+
+### ItemIndicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `keepMounted` | `boolean` | `false` | rendered in every state (Angular: `*listboxItemIndicator="true"`) |
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id its Group's `aria-labelledby` points at |
+
+### Separator
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="listbox"`, `aria-orientation`, `aria-multiselectable`, `aria-required`, `aria-disabled`, `data-orientation`, `data-multiple`, `data-disabled`; in a Field, the field's states |
+| Item | `role="option"`, `tabindex` (`0` on the tab stop), `aria-selected` (`"true"` or `"false"`), `aria-disabled`, `data-selected`, `data-highlighted` (the focused option), `data-disabled` |
+| ItemIndicator | `aria-hidden="true"` |
+| Group | `role="group"`, `aria-labelledby` |
+| Separator | `role="presentation"`, `data-orientation` (across the list) |
+
+## Keyboard
+
+| key | toggle model | replace model |
+| --- | --- | --- |
+| arrows, Home, End, PageUp, PageDown, typeahead | move the focus | move the focus and select the option alone |
+| Ctrl + a move | | move the focus only |
+| Space, Enter | select (single) or toggle (multiple) | select the option alone |
+| Ctrl + Space | | toggle (multiple) |
+| Shift + an arrow | move and toggle (multiple) | move and toggle (multiple) |
+| Shift + Space | select from the anchor, added | select from the anchor, replacing |
+| Ctrl + Shift + Home / End | select to the first / last, added | select to the first / last, replacing |
+| Ctrl + A | select all, or none when all are | the same |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/listbox` | `ChangeDetails`, `ChangeReason`, `Listbox`, `ListboxItemIndicatorProps`, `ListboxItemProps`, `ListboxItemState`, `ListboxRootMultipleProps`, `ListboxRootProps`, `ListboxRootSingleProps`, `ListboxRootState`, `RenderProp`, `SelectionBehavior`, `SelectionMode` |
+| `@fragiola/primitives-vue/listbox` | `ChangeDetails`, `ChangeReason`, `Listbox`, `ListboxItemIndicatorProps`, `ListboxItemIndicatorState`, `ListboxItemProps`, `ListboxItemState`, `ListboxRootEmits`, `ListboxRootProps`, `ListboxRootState`, `RenderSlotProps`, `SelectionBehavior`, `SelectionMode` |
+| `@fragiola/primitives-angular/listbox` | `ChangeDetails`, `ChangeReason`, `ListboxGroup`, `ListboxGroupLabel`, `ListboxItem`, `ListboxItemEntry`, `ListboxItemIndicator`, `ListboxItemState`, `ListboxOrientation`, `ListboxRoot`, `ListboxRootState`, `ListboxSeparator`, `ListboxValue`, `SelectionBehavior`, `SelectionMode`, `ValueChangeEvent` |

@@ -194,6 +194,14 @@
                     "path": "api/combobox"
                 },
                 {
+                    "label": "Autocomplete",
+                    "path": "api/autocomplete"
+                },
+                {
+                    "label": "Listbox",
+                    "path": "api/listbox"
+                },
+                {
                     "label": "Calendar",
                     "path": "api/calendar"
                 },

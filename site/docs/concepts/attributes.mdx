@@ -34,24 +34,24 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-open` | an open overlay (a popup, its positioner, its arrow, a dialog's backdrop and viewport); an open collapsible, accordion item and their parts |
 | `data-closed` | a rendered overlay part that is not open (its exit runs, or the Portal's `keepMounted` keeps it, `hidden`); a closed collapsible, accordion item and their parts (with `data-open`: exactly one is present) |
 | `data-panel-open` | a collapsible's or an accordion's trigger while its panel is open |
-| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's or a date picker's trigger, a Combobox's input, input group and trigger too, a context menu's area) |
+| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's or a date picker's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts (or is hidden) once its animations end: an overlay, a tabs panel, a collapsible or accordion panel |
-| `data-selected` | a selected tab and its panel, a selected select or combobox option, a chosen calendar date |
+| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a chosen calendar date |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
 | `data-readonly` | a read-only number field's or OTP field's parts (and a read-only calendar or switch) |
 | `data-pressed` | a pressed toggle |
-| `data-multiple` | a toggle group with `multiple` |
+| `data-multiple` | a toggle group or a listbox with `multiple` |
 | `data-placeholder` | a Select showing its placeholder |
-| `data-empty` | a combobox list with no item |
+| `data-empty` | a combobox's or an autocomplete's list with no item |
 | `data-dragging` | a slider while a pointer drags a thumb |
 | `data-index` | a slider thumb's value index; an OTP field slot's index (a value) |
 | `data-required` | a required checkbox, switch or radio group, and its radios; every part of a required number field or OTP field |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTP field slot that holds a character |
-| `data-highlighted` | the menu item, select or combobox option the keyboard or the pointer points at |
+| `data-highlighted` | the menu item, select, combobox or autocomplete option the keyboard or the pointer points at; a listbox's focused option |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group) |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport (a dialog or alert dialog inside another's popup) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |

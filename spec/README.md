@@ -29,6 +29,8 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [slider.md](slider.md) | Slider |
 | [select.md](select.md) | Select |
 | [combobox.md](combobox.md) | Combobox (D10) |
+| [autocomplete.md](autocomplete.md) | Autocomplete (the value is the text; the APG's four autocomplete behaviours) |
+| [listbox.md](listbox.md) | Listbox (on the toolkit's collections mechanism, `/selection`) |
 | [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
 | [progress.md](progress.md) | Progress |
 | [avatar.md](avatar.md) | Avatar |
@@ -63,7 +65,10 @@ on the toolkit's roving focus, with the rule of [nested composites](toolbar.md#n
 Issue #48: Menubar, a bar of Menu triggers on the same roving focus, with the contract of a parent
 bar that Menu reads, [menu.md](menu.md#in-a-menubar)); then the inputs (Epic #52, Issue #50: Label,
 NumberField and Meter, on the toolkit's new `/number` mechanism for localized number text, stepping,
-auto repeat and scrub; Issue #51: OTPField, whose input model [otp-field.md](otp-field.md) decides).
+auto repeat and scrub; Issue #51: OTPField, whose input model [otp-field.md](otp-field.md) decides);
+then the collections (Epic #55, Issue #53: the toolkit's collections mechanism, `/selection`, and
+Listbox on it; Issue #54: Autocomplete, sharing Combobox's behaviour through each framework's
+shared code).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -110,15 +115,15 @@ The vocabulary is shared by every component:
 | `data-open` | an overlay while open; an open Collapsible, Accordion item and their panels |
 | `data-closed` | a closed Collapsible, Accordion item and their panels; an overlay part that carries `data-open` (popup, positioner, backdrop, viewport, arrow) while it is rendered and not open: its exit animation runs, or it is kept mounted (with `data-open`: exactly one is present; Base UI). Triggers keep `data-popup-open` only |
 | `data-panel-open` | a Collapsible's or an Accordion's Trigger while its panel is open (Base UI's name) |
-| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover, Select or picker trigger, a Combobox's Input, InputGroup and Trigger |
+| `data-popup-open` | a trigger while its overlay is open (Base UI's name, D4 §3 "Naming"): a Menu, Popover, Select or picker trigger, a Combobox's or an Autocomplete's Input, InputGroup and Trigger |
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
-| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox item, select item) |
-| `data-selected` | a selected tab, combobox item or calendar date |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox and autocomplete item, select item); a Listbox's focused option while the focus is in the list |
+| `data-selected` | a selected tab, combobox item, listbox option or calendar date |
 | `data-pressed` | a pressed Toggle (spec/toggle.md) |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
-| `data-multiple` | a ToggleGroup with `multiple` |
+| `data-multiple` | a ToggleGroup or a Listbox with `multiple` |
 | `data-activation` | `automatic` or `manual` on Tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one: `left`, `right`, `up`, `down` or `none` (a physical value, [tabs.md](tabs.md#state-attributes-and-aria)) |
 | `data-side` | the side an overlay ended up on (a value: `top`, `bottom`, the logical `inline-start` / `inline-end`, or the physical `left` / `right`, named as the overlay asked for it; Base UI's names, D4 §3 "Naming", [popover.md](popover.md#positioning)) |
@@ -129,7 +134,7 @@ The vocabulary is shared by every component:
 | `data-readonly` | a read-only calendar or switch |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
-| `data-empty` | a combobox list with no item |
+| `data-empty` | a combobox's or an autocomplete's list with no item |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; an indeterminate Progress |
@@ -166,18 +171,18 @@ The reasons are shared:
 | `escape-key` | Escape dismissed the overlay |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu or combobox item was chosen; a menu checkbox or radio item changed |
+| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's selection |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did) |
+| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did) |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
-| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; a NumberField's text was emptied; an OTPField slot's character was deleted by the input itself |
-| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md) |
+| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; an OTPField slot's character was deleted by the input itself |
+| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md) |
 | `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md) |
-| `clear-press` | a combobox's Clear was pressed |
+| `clear-press` | a combobox's or an autocomplete's Clear was pressed |
 | `chip-remove-press` | a combobox chip's remove button was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's, or removed an OTPField's characters (Backspace, Delete) |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's selection |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
@@ -219,13 +224,14 @@ Checkbox, Slider and Select.
 ### Forms
 
 The form controls (Select, Checkbox, Switch, RadioGroup, Slider, Combobox, DatePicker,
-DateRangePicker, NumberField, OTPField) take `name` and render a **hidden input** that
+DateRangePicker, NumberField, OTPField, Listbox) take `name` and render a **hidden input** that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
 (`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
-`hidden-input`, since its `input` is the visible Input; NumberField and OTPField: `hidden-input` too).
+`hidden-input`, since its `input` is the visible Input; NumberField and OTPField: `hidden-input` too); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
+input is).
 Outside a Field, a control is named by a [Label](label.md) (`for`, or wrapping it), or by the
 consumer's `aria-label` / `aria-labelledby`.
 
@@ -237,7 +243,7 @@ the toolkit's form bridge cancels the later controls' `invalid` events of that v
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
-DatePicker, a DateRangePicker, a NumberField or an OTPField gives the control:
+DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox or an Autocomplete gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
@@ -426,6 +432,10 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Meter's parts | `Meter.Root`, `.Label`, `.Value`, `.Track`, `.Indicator` | the same | `[meterRoot]`, `[meterLabel]`, `[meterValue]` (`formattedValue()`, `value()` through `exportAs`), `[meterTrack]`, `[meterIndicator]` |
 | OTPField's value (a string) and events | `value` + `onValueChange(value, details)` (`defaultValue`), `onValueComplete`, `onValueInvalid` on `OTPField.Root` | `v-model:value` (`default-value`, `@value-change`, `@value-complete`, `@value-invalid`) | `[(value)]` on `[otpFieldRoot]` (`defaultValue`; `valueChangeDetails`, `valueComplete` and `valueInvalid` outputs, each `{ value, details }`) |
 | OTPField's parts | `OTPField.Root`, `OTPField.Input` | the same | `[otpFieldRoot]`, `input[otpFieldInput]` |
+| Listbox's value (a string or `null`, or an array of strings) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Listbox.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[listboxRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
+| Listbox's parts | `Listbox.Root`, `.Item`, `.ItemIndicator`, `.Group`, `.GroupLabel`, `.Separator` | the same | `[listboxRoot]`, `[listboxItem]`, structural `*listboxItemIndicator`, `[listboxGroup]`, `[listboxGroupLabel]`, `[listboxSeparator]` |
+| Autocomplete's value (the text) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Autocomplete.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[autocompleteRoot]` (`valueChangeDetails`); the Root's `value()` signal instead of a Value directive |
+| Autocomplete's parts | `Autocomplete.Root`, `.InputGroup`, `.Input`, `.Trigger`, `.Clear`, `.Value`, `.Status`, `.Portal`, `.Positioner`, `.Popup`, `.Empty`, `.List`, `.Group`, `.GroupLabel`, `.Separator`, `.Item` | the same | `[autocompleteRoot]`, `[autocompleteInputGroup]`, `input[autocompleteInput]`, `[autocompleteTrigger]`, structural `*autocompleteClear`, `[autocompleteStatus]`, `*autocompletePortal`, `[autocompletePositioner]`, `[autocompletePopup]`, `[autocompleteEmpty]`, `[autocompleteList]` (`entries()`), `[autocompleteGroup]`, `[autocompleteGroupLabel]`, `[autocompleteSeparator]`, `[autocompleteItem]`; `injectAutocomplete()` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`

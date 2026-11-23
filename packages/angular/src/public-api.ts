@@ -6,6 +6,7 @@
 
 export * from "@fragiola/primitives-angular/accordion";
 export * from "@fragiola/primitives-angular/alert-dialog";
+export * from "@fragiola/primitives-angular/autocomplete";
 export * from "@fragiola/primitives-angular/avatar";
 export * from "@fragiola/primitives-angular/button";
 export * from "@fragiola/primitives-angular/calendar";
@@ -23,6 +24,7 @@ export * from "@fragiola/primitives-angular/field";
 export * from "@fragiola/primitives-angular/fieldset";
 export * from "@fragiola/primitives-angular/form";
 export * from "@fragiola/primitives-angular/label";
+export * from "@fragiola/primitives-angular/listbox";
 export * from "@fragiola/primitives-angular/menu";
 export * from "@fragiola/primitives-angular/menubar";
 export * from "@fragiola/primitives-angular/meter";

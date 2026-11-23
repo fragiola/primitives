@@ -5,6 +5,14 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.tsx";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.tsx";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.tsx";
+import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.tsx";
+import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.tsx";
+import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.tsx";
+import { AutocompleteField } from "../scenarios/autocomplete/autocomplete-field.tsx";
+import { AutocompleteGroups } from "../scenarios/autocomplete/autocomplete-groups.tsx";
+import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inline.tsx";
+import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.tsx";
+import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
@@ -61,6 +69,12 @@ import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { LabelControls } from "../scenarios/label/label-controls.tsx";
+import { ListboxField } from "../scenarios/listbox/listbox-field.tsx";
+import { ListboxGroups } from "../scenarios/listbox/listbox-groups.tsx";
+import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.tsx";
+import { ListboxMultiple } from "../scenarios/listbox/listbox-multiple.tsx";
+import { ListboxReplace } from "../scenarios/listbox/listbox-replace.tsx";
+import { ListboxSingle } from "../scenarios/listbox/listbox-single.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
@@ -196,6 +210,14 @@ export const routes: Record<
     "/combobox/form": ComboboxForm,
     "/combobox/field": ComboboxField,
     "/combobox/lifecycle": ComboboxLifecycle,
+    "/autocomplete/basic": AutocompleteBasic,
+    "/autocomplete/both": AutocompleteBoth,
+    "/autocomplete/inline": AutocompleteInline,
+    "/autocomplete/none": AutocompleteNone,
+    "/autocomplete/groups": AutocompleteGroups,
+    "/autocomplete/async": AutocompleteAsync,
+    "/autocomplete/field": AutocompleteField,
+    "/autocomplete/lifecycle": AutocompleteLifecycle,
     "/select/basic": SelectBasic,
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
@@ -240,6 +262,12 @@ export const routes: Record<
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
     "/label/controls": LabelControls,
+    "/listbox/single": ListboxSingle,
+    "/listbox/multiple": ListboxMultiple,
+    "/listbox/replace": ListboxReplace,
+    "/listbox/groups": ListboxGroups,
+    "/listbox/horizontal": ListboxHorizontal,
+    "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
     "/number-field/basic": NumberFieldBasic,
     "/number-field/field": NumberFieldField,

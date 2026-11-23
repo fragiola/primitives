@@ -47,6 +47,7 @@
         "radio-group",
         "switch",
         "progress",
+        "autocomplete",
         "avatar",
         "separator",
         "collapsible",
@@ -59,6 +60,7 @@
         "meter",
         "number-field",
         "otp-field",
+        "listbox",
         "tests",
         "*.config.ts"
     ]

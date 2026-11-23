@@ -124,6 +124,15 @@ export const LIFECYCLE_OVERLAYS: Record<string, LifecycleOverlay> = {
         trigger: (page) => page.getByRole("combobox", { name: "Fruit" }),
         outsidePress: true,
     },
+    autocomplete: {
+        path: "/autocomplete/lifecycle",
+        kept: "autocomplete-positioner",
+        popup: "autocomplete-popup",
+        role: "listbox",
+        open: async (page) => button("Show suggestions")(page).click(),
+        trigger: (page) => page.getByRole("combobox", { name: "Fruit" }),
+        outsidePress: true,
+    },
     combobox: {
         path: "/combobox/lifecycle",
         kept: "combobox-positioner",

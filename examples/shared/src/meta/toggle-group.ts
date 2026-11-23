@@ -5,7 +5,7 @@ export default {
     description:
         "A ToggleGroup of four alignments, one pressed at a time, applied to a paragraph: the group is one tab stop, the arrow keys move between the toggles, and pressing the pressed one releases it.",
     category: "forms",
-    order: 12,
+    order: 14,
     features: [
         "ToggleGroup",
         "Toggle",

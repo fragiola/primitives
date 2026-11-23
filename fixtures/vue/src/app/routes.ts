@@ -5,6 +5,14 @@ import AccordionMultiple from "../scenarios/accordion/accordion-multiple.vue";
 import AlertDialogBasic from "../scenarios/alert-dialog/alert-dialog-basic.vue";
 import AlertDialogDetached from "../scenarios/alert-dialog/alert-dialog-detached.vue";
 import AlertDialogLifecycle from "../scenarios/alert-dialog/alert-dialog-lifecycle.vue";
+import AutocompleteAsync from "../scenarios/autocomplete/autocomplete-async.vue";
+import AutocompleteBasic from "../scenarios/autocomplete/autocomplete-basic.vue";
+import AutocompleteBoth from "../scenarios/autocomplete/autocomplete-both.vue";
+import AutocompleteField from "../scenarios/autocomplete/autocomplete-field.vue";
+import AutocompleteGroups from "../scenarios/autocomplete/autocomplete-groups.vue";
+import AutocompleteInline from "../scenarios/autocomplete/autocomplete-inline.vue";
+import AutocompleteLifecycle from "../scenarios/autocomplete/autocomplete-lifecycle.vue";
+import AutocompleteNone from "../scenarios/autocomplete/autocomplete-none.vue";
 import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
 import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
@@ -61,6 +69,12 @@ import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
 import LabelControls from "../scenarios/label/label-controls.vue";
+import ListboxField from "../scenarios/listbox/listbox-field.vue";
+import ListboxGroups from "../scenarios/listbox/listbox-groups.vue";
+import ListboxHorizontal from "../scenarios/listbox/listbox-horizontal.vue";
+import ListboxMultiple from "../scenarios/listbox/listbox-multiple.vue";
+import ListboxReplace from "../scenarios/listbox/listbox-replace.vue";
+import ListboxSingle from "../scenarios/listbox/listbox-single.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
 import MenuCheckboxRadio from "../scenarios/menu/menu-checkbox-radio.vue";
 import MenuControlled from "../scenarios/menu/menu-controlled.vue";
@@ -193,6 +207,14 @@ export const routes: Record<string, Component> = {
     "/combobox/form": ComboboxForm,
     "/combobox/field": ComboboxField,
     "/combobox/lifecycle": ComboboxLifecycle,
+    "/autocomplete/basic": AutocompleteBasic,
+    "/autocomplete/both": AutocompleteBoth,
+    "/autocomplete/inline": AutocompleteInline,
+    "/autocomplete/none": AutocompleteNone,
+    "/autocomplete/groups": AutocompleteGroups,
+    "/autocomplete/async": AutocompleteAsync,
+    "/autocomplete/field": AutocompleteField,
+    "/autocomplete/lifecycle": AutocompleteLifecycle,
     "/select/basic": SelectBasic,
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
@@ -251,6 +273,12 @@ export const routes: Record<string, Component> = {
     "/separator/basic": SeparatorBasic,
     "/direction/provider": DirectionProviderScenario,
     "/label/controls": LabelControls,
+    "/listbox/single": ListboxSingle,
+    "/listbox/multiple": ListboxMultiple,
+    "/listbox/replace": ListboxReplace,
+    "/listbox/groups": ListboxGroups,
+    "/listbox/horizontal": ListboxHorizontal,
+    "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
     "/number-field/basic": NumberFieldBasic,
     "/number-field/field": NumberFieldField,

@@ -138,6 +138,12 @@
             "import": "./dist/scroll-lock.js",
             "default": "./dist/scroll-lock.js"
         },
+        "./selection": {
+            "@fragiola/source": "./src/selection/index.ts",
+            "types": "./dist/selection.d.ts",
+            "import": "./dist/selection.js",
+            "default": "./dist/selection.js"
+        },
         "./swipe": {
             "@fragiola/source": "./src/swipe/index.ts",
             "types": "./dist/swipe.d.ts",
@@ -243,6 +249,11 @@
                 "types": "./dist/scroll-lock.d.ts",
                 "import": "./dist/scroll-lock.js",
                 "default": "./dist/scroll-lock.js"
+            },
+            "./selection": {
+                "types": "./dist/selection.d.ts",
+                "import": "./dist/selection.js",
+                "default": "./dist/selection.js"
             },
             "./swipe": {
                 "types": "./dist/swipe.d.ts",

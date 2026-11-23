@@ -1,0 +1,43 @@
+import type { Recipe } from "./recipe.ts";
+import { FLOATING_BOX, LIST_ITEM } from "./shared.ts";
+
+/** The box around the input: a field row, with the focus ring and the invalid border of a Field. */
+const BOX =
+    "rounded-control border border-palette-line bg-palette-base font-primitives text-(length:--pr-size) focus-within:outline-solid focus-within:outline-(length:--pr-focus-width) focus-within:outline-offset-2 focus-within:outline-palette-ring has-[[data-invalid]]:border-2 has-[[data-invalid]]:border-palette-contrast";
+
+/** A small square button inside the box (Trigger, Clear). */
+const BOX_BUTTON =
+    "inline-flex size-7 shrink-0 items-center justify-center rounded-control text-palette-accent/85 hover:bg-palette-soft disabled:opacity-50";
+
+// spec/autocomplete.md, "Anatomy": Combobox's look, with no selection (a suggestion is never
+// selected); the inline completion is the input's own text selection
+export const autocomplete: Recipe<
+    | "input-group"
+    | "input"
+    | "trigger"
+    | "clear"
+    | "status"
+    | "positioner"
+    | "popup"
+    | "empty"
+    | "list"
+    | "group"
+    | "group-label"
+    | "separator"
+    | "item"
+> = {
+    "input-group": `${BOX} flex h-(--pr-control-height) w-64 items-center gap-1 ps-3 pe-1 data-disabled:opacity-50`,
+    input: "h-full min-w-12 flex-1 bg-transparent text-palette-contrast outline-none",
+    trigger: `${BOX_BUTTON} data-popup-open:bg-palette-soft`,
+    clear: BOX_BUTTON,
+    status: "sr-only",
+    positioner: "z-50",
+    popup: `${FLOATING_BOX} w-(--anchor-width) min-w-56 max-h-(--available-height) overflow-y-auto p-1`,
+    // a live region stays rendered: with no text it takes no room
+    empty: "px-2 py-3 text-palette-accent/85 empty:p-0",
+    list: "flex flex-col outline-none data-empty:hidden",
+    group: "flex flex-col",
+    "group-label": "px-2 pt-2 pb-1 text-xs font-medium text-palette-accent",
+    separator: "-mx-1 my-1 h-px bg-palette-line",
+    item: LIST_ITEM,
+};

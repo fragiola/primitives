@@ -384,7 +384,7 @@ const SHARED_PARTS: Record<string, string> = {
 };
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
-const NO_ANGULAR_DIRECTIVE = new Set(["combobox.Value"]);
+const NO_ANGULAR_DIRECTIVE = new Set(["combobox.Value", "autocomplete.Value"]);
 
 /** The Angular inputs and outputs of each part's directive. */
 function angularProps(

@@ -5,6 +5,7 @@
 
 export * from "./components/accordion/index.ts";
 export * from "./components/alert-dialog/index.ts";
+export * from "./components/autocomplete/index.ts";
 export * from "./components/avatar/index.ts";
 export * from "./components/button/index.ts";
 export * from "./components/calendar/index.ts";
@@ -21,6 +22,7 @@ export * from "./components/field/index.ts";
 export * from "./components/fieldset/index.ts";
 export * from "./components/form/index.ts";
 export * from "./components/label/index.ts";
+export * from "./components/listbox/index.ts";
 export * from "./components/menu/index.ts";
 export * from "./components/menubar/index.ts";
 export * from "./components/meter/index.ts";

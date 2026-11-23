@@ -7,6 +7,7 @@
 export const COMPONENTS = [
     "accordion",
     "alert-dialog",
+    "autocomplete",
     "avatar",
     "button",
     "calendar",
@@ -23,6 +24,7 @@ export const COMPONENTS = [
     "fieldset",
     "form",
     "label",
+    "listbox",
     "menu",
     "menubar",
     "meter",
@@ -93,6 +95,7 @@ export const MECHANISMS = [
     "presence",
     "range",
     "scroll-lock",
+    "selection",
     "swipe",
 ] as const;
 

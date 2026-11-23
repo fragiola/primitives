@@ -63,6 +63,12 @@
             "import": "./dist/alert-dialog.js",
             "default": "./dist/alert-dialog.js"
         },
+        "./autocomplete": {
+            "@fragiola/source": "./src/components/autocomplete/index.ts",
+            "types": "./dist/autocomplete.d.ts",
+            "import": "./dist/autocomplete.js",
+            "default": "./dist/autocomplete.js"
+        },
         "./avatar": {
             "@fragiola/source": "./src/components/avatar/index.ts",
             "types": "./dist/avatar.d.ts",
@@ -158,6 +164,12 @@
             "types": "./dist/label.d.ts",
             "import": "./dist/label.js",
             "default": "./dist/label.js"
+        },
+        "./listbox": {
+            "@fragiola/source": "./src/components/listbox/index.ts",
+            "types": "./dist/listbox.d.ts",
+            "import": "./dist/listbox.js",
+            "default": "./dist/listbox.js"
         },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
@@ -316,6 +328,11 @@
                 "import": "./dist/alert-dialog.js",
                 "default": "./dist/alert-dialog.js"
             },
+            "./autocomplete": {
+                "types": "./dist/autocomplete.d.ts",
+                "import": "./dist/autocomplete.js",
+                "default": "./dist/autocomplete.js"
+            },
             "./avatar": {
                 "types": "./dist/avatar.d.ts",
                 "import": "./dist/avatar.js",
@@ -395,6 +412,11 @@
                 "types": "./dist/label.d.ts",
                 "import": "./dist/label.js",
                 "default": "./dist/label.js"
+            },
+            "./listbox": {
+                "types": "./dist/listbox.d.ts",
+                "import": "./dist/listbox.js",
+                "default": "./dist/listbox.js"
             },
             "./menu": {
                 "types": "./dist/menu.d.ts",
