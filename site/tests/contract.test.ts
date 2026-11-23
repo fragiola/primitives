@@ -202,6 +202,10 @@ describe("the sidebar", () => {
             "api/navigation-menu",
             "api/tabs",
             "api/pagination",
+            "api/link",
+            "api/breadcrumbs",
+            "api/steps",
+            "api/carousel",
             "api/collapsible",
             "api/accordion",
             "api/field",
@@ -288,6 +292,10 @@ describe("the sidebar", () => {
             "api/navigation-menu",
             "api/tabs",
             "api/pagination",
+            "api/link",
+            "api/breadcrumbs",
+            "api/steps",
+            "api/carousel",
             "api/collapsible",
             "api/accordion",
             "api/field",
@@ -341,6 +349,10 @@ describe("the sidebar", () => {
             "api/scroll-area",
             "api/aspect-ratio",
             "api/clipboard",
+            "api/link",
+            "api/breadcrumbs",
+            "api/steps",
+            "api/carousel",
         ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);

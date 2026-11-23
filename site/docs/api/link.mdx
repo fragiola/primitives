@@ -1,0 +1,107 @@
+---
+title: Link
+description: A link with a disabled and a current state, on your anchor or your router's link, with no router dependency, in each framework.
+---
+
+A link that knows the two states your navigation gives it: **current** (`aria-current="page"`,
+the APG [breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/)'s attribute for the
+page you are on) and **disabled** (`aria-disabled="true"`: it stays in the tab order, and its
+press navigates nowhere). It is the APG [link](https://www.w3.org/WAI/ARIA/apg/patterns/link/): a
+native anchor, Enter follows it. It renders your router's link, and the package depends on no
+router.
+
+<Example id="link" />
+
+## Behaviour
+
+- **Current**: `current` sets `aria-current="page"` and `data-current`.
+- **Disabled**: `aria-disabled="true"` and `data-disabled`; the anchor keeps its `href` and its tab
+  stop. Its click stops in its capture phase: its default is prevented (no navigation) and no
+  listener after it runs, a router's included (React Router's and Vue Router's links, and Angular's
+  `RouterLink`, which does not check `defaultPrevented`). Enter on it does nothing.
+- **Routers**: React `render={<RouterLink to="/docs" />}`, Vue `:as="RouterLink" to="/docs"`,
+  Angular on the router's own anchor, `<a routerLink="/docs" link>`.
+- **No text**: its text, or your `aria-label`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Link | `a` | `link-root` | one component; your anchor or your router's |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Link } from "@fragiola/primitives-react/link";
+import { Link as RouterLink } from "react-router";
+
+<Link render={<RouterLink to="/docs" />} current={pathname === "/docs"}>
+    Docs
+</Link>;
+<Link href="/archive" disabled>
+    Archive
+</Link>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Link :as="RouterLink" to="/docs" :current="route.path === '/docs'">Docs</Link>
+    <Link href="/archive" disabled>Archive</Link>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Link, RouterLink],
+    template: `
+        <a routerLink="/docs" link [current]="isDocs()">Docs</a>
+        <a link href="/archive" disabled>Archive</a>
+    `,
+})
+export class Nav {}
+```
+
+</Framework>
+
+## Props
+
+Link also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards (`href`, `target`, `rel`). Angular binds them as inputs (`[current]`, `[disabled]`).
+
+### Link
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | unavailable: `aria-disabled`, and its press navigates nowhere |
+| `current` | `boolean` | `false` | it links to the page the app is on: `aria-current="page"` |
+
+## State and part attributes
+
+| attribute | when |
+| --- | --- |
+| `aria-disabled="true"`, `data-disabled` | disabled |
+| `aria-current="page"`, `data-current` | current |
+
+## Keyboard
+
+The browser's: Tab reaches it (a disabled link too), Enter follows it; Enter on a disabled link
+does nothing.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/link` | `Link`, `LinkProps`, `LinkState`, `RenderProp` |
+| `@fragiola/primitives-vue/link` | `Link`, `LinkProps`, `LinkState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/link` | `Link`, `LinkState` |

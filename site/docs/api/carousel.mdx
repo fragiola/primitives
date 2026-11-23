@@ -1,0 +1,215 @@
+---
+title: Carousel
+description: The APG carousel, basic or tabbed: native scroll snapping a page at a time, a mouse drag, and a rotation that focus stops, in each framework.
+---
+
+A set of slides shown a page at a time, one slide or several side by side. It is the APG
+[carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) in both its styles: the basic
+carousel (Previous, Next and a group of picker buttons) and the tabbed one (the pickers a tablist,
+the slides tabpanels). The slides scroll natively with CSS scroll snapping: a touch swipe or a
+trackpad scrolls them, a mouse drags them.
+
+<Example id="carousel" />
+
+## Behaviour
+
+- **Pages**: a page starts at slide 0, then every `slidesPerMove` slides; the last page is always
+  full (it starts at `slideCount - slidesPerPage`). The out-of-view slides are `inert` and hidden
+  from assistive technology.
+- **Changes**: Previous and Next (`previous-press`, `next-press`; disabled at the edges unless
+  `loop`), an Indicator (`item-press`), a tabbed Indicator's keys (`keyboard`), the rotation
+  (`autoplay`), a mouse drag (`drag`) and any other scroll you make (`swipe`, once it settles).
+- **Rotation**: `playing` rotates the pages every `delay`, wrapping to the first. Focus entering
+  the carousel **stops** it (`focus-in`) until the AutoplayTrigger starts it again; the pointer
+  over it (but the AutoplayTrigger) **pauses** it, and leaving resumes it with the time it had
+  left. The slides' container is `aria-live="off"` while rotating, `"polite"` otherwise.
+- **Tabbed**: `variant="tabbed"`: the APG tabs' keys (the arrows select and wrap, Home and End),
+  one slide per page.
+- **Layout**: the ItemGroup lays the slides out and scrolls them (a structural style: a grid, its
+  scrolling axis, the snapping, no visible scrollbar); give it a width (and a height when
+  vertical). `--carousel-slides-per-page` and `--carousel-spacing` are on the Root.
+- **No text**: name the Root, the slides ("2 of 4"), the triggers and the Indicators; the
+  AutoplayTrigger's label follows its state.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `carousel-root` | `region`, the role description "carousel" |
+| ItemGroup | `div` | `carousel-item-group` | the slides' scroll container and live region |
+| Item | `div` | `carousel-item` | a slide: `group` with the role description "slide" (tabbed: `tabpanel`) |
+| PrevTrigger | `button` | `carousel-prev-trigger` | the page before |
+| NextTrigger | `button` | `carousel-next-trigger` | the page after |
+| IndicatorGroup | `div` | `carousel-indicator-group` | the pickers: `group` (tabbed: `tablist`) |
+| Indicator | `button` | `carousel-indicator` | picks a page (tabbed: a `tab`) |
+| AutoplayTrigger | `button` | `carousel-autoplay-trigger` | stops and starts the rotation |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Carousel } from "@fragiola/primitives-react/carousel";
+
+<Carousel.Root aria-label="Featured" slideCount={photos.length} defaultPlaying loop>
+    <Carousel.AutoplayTrigger>
+        {({ playing }) => (playing ? "Stop slide rotation" : "Start slide rotation")}
+    </Carousel.AutoplayTrigger>
+    <Carousel.ItemGroup className="w-96">
+        {photos.map((photo, index) => (
+            <Carousel.Item key={photo.src} index={index} aria-label={`${index + 1} of ${photos.length}`}>
+                <img src={photo.src} alt={photo.alt} />
+            </Carousel.Item>
+        ))}
+    </Carousel.ItemGroup>
+    <Carousel.PrevTrigger aria-label="Previous slide">‹</Carousel.PrevTrigger>
+    <Carousel.NextTrigger aria-label="Next slide">›</Carousel.NextTrigger>
+</Carousel.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Carousel.Root v-model:page="page" aria-label="Featured" :slide-count="photos.length" default-playing loop>
+        <Carousel.AutoplayTrigger v-slot="{ state }">
+            {{ state.playing ? "Stop slide rotation" : "Start slide rotation" }}
+        </Carousel.AutoplayTrigger>
+        <Carousel.ItemGroup class="w-96">
+            <Carousel.Item v-for="(photo, index) in photos" :key="photo.src" :index="index" :aria-label="`${index + 1} of ${photos.length}`">
+                <img :src="photo.src" :alt="photo.alt" />
+            </Carousel.Item>
+        </Carousel.ItemGroup>
+        <Carousel.PrevTrigger aria-label="Previous slide">‹</Carousel.PrevTrigger>
+        <Carousel.NextTrigger aria-label="Next slide">›</Carousel.NextTrigger>
+    </Carousel.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CarouselRoot, CarouselAutoplayTrigger, CarouselItemGroup, CarouselItem, CarouselPrevTrigger, CarouselNextTrigger],
+    template: `
+        <div carouselRoot aria-label="Featured" [slideCount]="photos.length" defaultPlaying loop [(page)]="page">
+            <button carouselAutoplayTrigger #rotation="carouselAutoplayTrigger">
+                {{ rotation.state().playing ? "Stop slide rotation" : "Start slide rotation" }}
+            </button>
+            <div carouselItemGroup class="w-96">
+                @for (photo of photos; track photo.src; let index = $index) {
+                    <div carouselItem [index]="index" [attr.aria-label]="index + 1 + ' of ' + photos.length">
+                        <img [src]="photo.src" [alt]="photo.alt" />
+                    </div>
+                }
+            </div>
+            <button carouselPrevTrigger aria-label="Previous slide">‹</button>
+            <button carouselNextTrigger aria-label="Next slide">›</button>
+        </div>
+    `,
+})
+export class Featured {
+    protected readonly page = signal(0);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`v-model:page`, `v-model:playing`, `:slide-count`), and
+Angular as inputs (`[(page)]`, `[(playing)]`, `[slideCount]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `slideCount` | `number` | required | the number of slides |
+| `page` | `number` | | the current page, from 0 (controlled) |
+| `defaultPage` | `number` | `0` | the page at first |
+| `onPageChange` | `(page, details) => void` | | every page change, with its reason; Vue `@page-change` (and `update:page`), Angular `(pageChangeDetails)` (and `(pageChange)`) |
+| `slidesPerPage` | `number` | `1` | the slides a page shows side by side |
+| `slidesPerMove` | `number` | `slidesPerPage` | the slides a page moves by |
+| `loop` | `boolean` | `false` | Previous on the first page goes to the last, Next on the last to the first |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the scrolling axis |
+| `spacing` | `string` | `"0px"` | the gap between slides, a CSS length |
+| `variant` | `"basic" \| "tabbed"` | `"basic"` | `"tabbed"`: the Indicators are tabs, the slides tabpanels |
+| `playing` | `boolean` | | whether the slides rotate (controlled) |
+| `defaultPlaying` | `boolean` | `false` | whether they rotate at first |
+| `onPlayingChange` | `(playing, details) => void` | | every rotation change, with its reason; Vue `@playing-change` (and `update:playing`), Angular `(playingChangeDetails)` (and `(playingChange)`) |
+| `delay` | `number` | `5000` | the time a page shows while rotating, in ms |
+| `allowMouseDrag` | `boolean` | `true` | a mouse drag scrolls the slides |
+
+### ItemGroup
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | required | its slide, from 0 |
+
+### PrevTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the trigger's own; not while disabled |
+
+### NextTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the trigger's own; not while disabled |
+
+### IndicatorGroup
+
+No props of its own; name it with `aria-label`.
+
+### Indicator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | required | the page it picks, from 0 |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the Indicator's own; not on the current page's |
+
+### AutoplayTrigger
+
+Its label follows its state: React `children` as a node or `({ playing }) => node`, Vue the
+default slot's `{ state }`, Angular `state()` through `exportAs`.
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the trigger's own |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="region"`, `aria-roledescription="carousel"`; `data-orientation`; `data-playing` while rotating; `data-paused` while a hover pauses it |
+| ItemGroup | `aria-live="off"` while playing, `"polite"` otherwise; `aria-atomic="false"`; `tabindex="0"` while its slides hold nothing Tab reaches; `data-orientation`; `data-dragging` |
+| Item | basic: `role="group"`, `aria-roledescription="slide"`; tabbed: `role="tabpanel"`; out of view `inert` and `aria-hidden="true"`; `data-inview`; `data-index` |
+| PrevTrigger, NextTrigger | `type="button"`; `aria-controls` the ItemGroup; `disabled` and `data-disabled` at an edge |
+| IndicatorGroup | `role="group"` (tabbed: `tablist`, `aria-orientation`); `data-orientation` |
+| Indicator | `data-current`; basic: `aria-disabled="true"` on the current one; tabbed: `role="tab"`, `aria-selected`, `aria-controls`, the roving `tabindex` |
+| AutoplayTrigger | `data-playing` while playing |
+
+## Keyboard
+
+Tab and Shift+Tab move through the controls and the in-view slides. In the tabbed variant the
+IndicatorGroup is one tab stop: the arrows (swapped in RTL) select the next or previous tab and
+wrap, Home and End the first and last.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/carousel` | `Carousel`, `CarouselAutoplayTriggerProps`, `CarouselAutoplayTriggerState`, `CarouselIndicatorGroupProps`, `CarouselIndicatorProps`, `CarouselIndicatorState`, `CarouselItemGroupProps`, `CarouselItemProps`, `CarouselItemState`, `CarouselNextTriggerProps`, `CarouselOrientation`, `CarouselPrevTriggerProps`, `CarouselRootProps`, `CarouselState`, `CarouselStepTriggerProps`, `CarouselStepTriggerState`, `ChangeDetails`, `ChangeReason`, `RenderProp` |
+| `@fragiola/primitives-vue/carousel` | `Carousel`, `CarouselAutoplayTriggerState`, `CarouselIndicatorProps`, `CarouselIndicatorState`, `CarouselItemProps`, `CarouselItemState`, `CarouselOrientation`, `CarouselRootEmits`, `CarouselRootProps`, `CarouselState`, `CarouselStepTriggerState`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/carousel` | `CarouselAutoplayTrigger`, `CarouselAutoplayTriggerState`, `CarouselIndicator`, `CarouselIndicatorGroup`, `CarouselIndicatorState`, `CarouselItem`, `CarouselItemGroup`, `CarouselItemState`, `CarouselNextTrigger`, `CarouselOrientation`, `CarouselPrevTrigger`, `CarouselRoot`, `CarouselState`, `CarouselStepTriggerState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |
