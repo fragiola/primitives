@@ -93,6 +93,7 @@ export const MECHANISMS = [
     "presence",
     "range",
     "scroll-lock",
+    "selection",
     "swipe",
 ] as const;
 

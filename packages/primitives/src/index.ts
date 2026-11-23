@@ -19,4 +19,5 @@ export * from "./positioning/index.ts";
 export * from "./presence/index.ts";
 export * from "./range/index.ts";
 export * from "./scroll-lock/index.ts";
+export * from "./selection/index.ts";
 export * from "./swipe/index.ts";
