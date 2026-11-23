@@ -170,7 +170,8 @@ describe("watchToastViewport", () => {
             viewport.append(root);
             return root;
         });
-        const [a, b] = roots as [HTMLElement, HTMLElement];
+        const a = roots[0] as HTMLElement;
+        const b = roots[1] as HTMLElement;
         before.focus();
         document.dispatchEvent(
             new KeyboardEvent("keydown", {
