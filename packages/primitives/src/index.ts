@@ -13,6 +13,7 @@ export * from "./id/index.ts";
 export * from "./image/index.ts";
 export * from "./inert/index.ts";
 export * from "./layers/index.ts";
+export * from "./month-year/index.ts";
 export * from "./number/index.ts";
 export * from "./overlay/index.ts";
 export * from "./pagination/index.ts";
