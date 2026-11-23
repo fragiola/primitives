@@ -1,15 +1,21 @@
 /** Where a key moves the focus among a field's segments (spec/date-field.md, "Keyboard"). */
 export type SegmentMove = "next" | "previous" | "left" | "right" | "first";
 
-/** The focusable segments of the group `segment` sits in, in document order. */
-function focusableSegments(segment: HTMLElement): HTMLElement[] {
-    const group = segment.closest('[role="group"]');
-    if (group === null) {
-        return [];
-    }
-    return [
-        ...group.querySelectorAll<HTMLElement>('[role="spinbutton"]'),
-    ].filter((element) => element.tabIndex >= 0);
+/**
+ * The focusable segments of `groups` (default: the group `segment` sits in), in their order and
+ * each group's document order.
+ */
+function focusableSegments(
+    segment: HTMLElement,
+    groups: readonly Element[] | undefined,
+): HTMLElement[] {
+    const own = segment.closest('[role="group"]');
+    const scopes = groups ?? (own === null ? [] : [own]);
+    return scopes
+        .flatMap((group) => [
+            ...group.querySelectorAll<HTMLElement>('[role="spinbutton"]'),
+        ])
+        .filter((element) => element.tabIndex >= 0);
 }
 
 function center(element: HTMLElement): number {
@@ -22,13 +28,15 @@ function center(element: HTMLElement): number {
  * document's), `left` and `right` on screen, wherever the bidirectional text placed the segments
  * (a he-IL date reads left to right in a right-to-left page), `first` the group's first.
  * `null` when there is none that way. With no layout (every box empty), `right` is `next` and
- * `left` is `previous`.
+ * `left` is `previous`. `groups` makes several groups one sequence (a range field's start and end,
+ * spec/date-range-field.md "Typing and keys"); by default the moves stay in the segment's group.
  */
 export function segmentTarget(
     segment: HTMLElement,
     move: SegmentMove,
+    groups?: readonly Element[],
 ): HTMLElement | null {
-    const segments = focusableSegments(segment);
+    const segments = focusableSegments(segment, groups);
     const index = segments.indexOf(segment);
     if (move === "first") {
         return segments[0] ?? null;
