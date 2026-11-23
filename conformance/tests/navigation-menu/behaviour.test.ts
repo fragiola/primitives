@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
+import { openInFrame } from "../../src/frame.ts";
 import { expectOutput } from "../../src/output.ts";
 import { settleAnimations } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
@@ -91,6 +92,44 @@ test.describe("navigation-menu / basic", () => {
         await page.mouse.move(600, 600);
         await expectOutput(page, "value", "none");
         await expectOutput(page, "reason", "trigger-hover");
+    });
+
+    // Epic #49 (#46): a pointer leaving the iframe in one move sends no move outside the bridge
+    test("the pointer leaving the iframe at once closes a hover-opened Content", async ({
+        page,
+    }) => {
+        const frame = await openInFrame(page, "/navigation-menu/basic");
+        const products = frame.getByRole("button", {
+            name: "Products",
+            exact: true,
+        });
+        const box = await products.boundingBox();
+        expect(box).not.toBeNull();
+        const { x, y, width, height } = box as NonNullable<typeof box>;
+        const center = {
+            x: Math.round(x + width / 2),
+            y: Math.round(y + height / 2),
+        };
+        await page.mouse.move(center.x, center.y, { steps: 2 });
+        await expectOutput(frame, "value", "products");
+        await page.mouse.move(10, 10);
+        await expectOutput(frame, "value", "none");
+        await expectOutput(frame, "reason", "trigger-hover");
+
+        // a press-opened Content stays
+        await page.mouse.move(center.x, center.y, { steps: 2 });
+        await expectOutput(frame, "value", "products");
+        await page.waitForTimeout(600);
+        await page.mouse.down();
+        await page.mouse.up();
+        await expectOutput(frame, "value", "none");
+        await page.mouse.down();
+        await page.mouse.up();
+        await expectOutput(frame, "value", "products");
+        await expectOutput(frame, "reason", "trigger-press");
+        await page.mouse.move(10, 10);
+        await page.waitForTimeout(200);
+        await expectOutput(frame, "value", "products");
     });
 
     test("a press opens it, it stays when the pointer leaves, and a second press closes it", async ({

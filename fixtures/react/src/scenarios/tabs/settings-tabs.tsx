@@ -13,9 +13,12 @@ const TABS = [
 export function SettingsTabs({
     activation,
     orientation,
+    nonce,
 }: {
     activation: "automatic" | "manual";
     orientation: "horizontal" | "vertical";
+    /** `/tabs/nonce`: the Indicator script's nonce. */
+    nonce?: string;
 }) {
     const [value, setValue] = useState("account");
     return (
@@ -36,7 +39,7 @@ export function SettingsTabs({
                             {tab.label}
                         </Tabs.Tab>
                     ))}
-                    <Tabs.Indicator renderBeforeHydration />
+                    <Tabs.Indicator renderBeforeHydration nonce={nonce} />
                 </Tabs.List>
                 {TABS.map((tab) => (
                     <Tabs.Panel key={tab.value} value={tab.value}>

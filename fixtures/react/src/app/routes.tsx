@@ -14,6 +14,7 @@ import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.tsx
 import { CalendarUnavailable } from "../scenarios/calendar/calendar-unavailable.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
+import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
@@ -32,6 +33,7 @@ import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lif
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
+import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
@@ -49,6 +51,7 @@ import { DrawerNested } from "../scenarios/drawer/drawer-nested.tsx";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.tsx";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.tsx";
 import { FieldAsync } from "../scenarios/field/field-async.tsx";
+import { FieldAsyncBlur } from "../scenarios/field/field-async-blur.tsx";
 import { FieldBasic } from "../scenarios/field/field-basic.tsx";
 import { FieldControls } from "../scenarios/field/field-controls.tsx";
 import { FieldMatch } from "../scenarios/field/field-match.tsx";
@@ -88,12 +91,15 @@ import { SliderBasic } from "../scenarios/slider/slider-basic.tsx";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.tsx";
 import { SliderLabelValue } from "../scenarios/slider/slider-label-value.tsx";
 import { SliderRange } from "../scenarios/slider/slider-range.tsx";
+import { SliderThumbName } from "../scenarios/slider/slider-thumb-name.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.tsx";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.tsx";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.tsx";
+import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.tsx";
 import { TabsAutomatic } from "../scenarios/tabs/tabs-automatic.tsx";
 import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
+import { TabsNonce } from "../scenarios/tabs/tabs-nonce.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.tsx";
@@ -129,6 +135,8 @@ export const routes: Record<
     "/tabs/vertical": TabsVertical,
     "/tabs/none-selected": TabsNoneSelected,
     "/tabs/animated": TabsAnimated,
+    "/tabs/animated-default": TabsAnimatedDefault,
+    "/tabs/nonce": TabsNonce,
     "/collapsible/basic": CollapsibleBasic,
     "/collapsible/hidden-until-found": CollapsibleHiddenUntilFound,
     "/accordion/basic": AccordionBasic,
@@ -178,6 +186,7 @@ export const routes: Record<
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
+    "/checkbox/controlled-form": CheckboxControlledForm,
     "/radio-group/basic": RadioGroupBasic,
     "/radio-group/controlled": RadioGroupControlled,
     "/switch/basic": SwitchBasic,
@@ -189,10 +198,12 @@ export const routes: Record<
     "/slider/rtl": SliderBasic,
     "/slider/controlled": SliderControlled,
     "/slider/label-value": SliderLabelValue,
+    "/slider/thumb-name": SliderThumbName,
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
     "/field/async": FieldAsync,
+    "/field/async-blur": FieldAsyncBlur,
     "/field/match": FieldMatch,
     "/field/more-controls": FieldMoreControls,
     "/field/settings": FieldSettings,
@@ -208,6 +219,7 @@ export const routes: Record<
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
+    "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
     "/progress/basic": ProgressBasic,
     "/avatar/basic": AvatarBasic,

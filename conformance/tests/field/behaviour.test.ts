@@ -333,6 +333,35 @@ test.describe("field / async", () => {
     });
 });
 
+// Epic #49 (#46), spec/field.md "Async validation": in onBlur mode, a change hides the error an
+// earlier run showed at once, before its own run settles
+test.describe("field / async-blur", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/field/async-blur");
+    });
+
+    test("a change hides the shown error at once", async ({ page }) => {
+        const username = textbox(page, "Username");
+        await username.fill("ada");
+        await page.keyboard.press("Tab");
+        await expectOutput(page, "resolved", "ada");
+        await shown(page, "This username is taken.");
+        await expect(username).toHaveAttribute("aria-invalid", "true");
+
+        await username.fill("adax");
+        await hidden(page, "This username is taken.");
+        await expect(username).not.toHaveAttribute("aria-invalid");
+        // the change's run has not settled yet
+        await expectOutput(page, "resolved", "ada");
+
+        await expectOutput(page, "resolved", "adax");
+        await hidden(page, "This username is taken.");
+        await page.keyboard.press("Tab");
+        await hidden(page, "This username is taken.");
+        await expect(username).not.toHaveAttribute("aria-invalid");
+    });
+});
+
 test.describe("field / match", () => {
     test.beforeEach(async ({ page }) => {
         await openScenario(page, "/field/match");

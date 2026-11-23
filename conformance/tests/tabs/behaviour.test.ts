@@ -245,11 +245,80 @@ test.describe("tabs / animated", () => {
         await expect.poll(() => directions(page)).toEqual(["right"]);
     });
 
+    // Epic #49 (#46): two keys before a render that comes after the task (a microtask between
+    // them lets a framework that renders after each event's microtasks render in between)
+    test("two keys in one task give the last step's direction", async ({
+        page,
+    }) => {
+        await openScenario(page, "/tabs/animated");
+        await expect(panel(page, "Overview content")).toBeVisible();
+        await tab(page, "Overview").focus();
+        await page.evaluate(async () => {
+            for (const key of ["ArrowRight", "ArrowLeft"]) {
+                document.activeElement?.dispatchEvent(
+                    new KeyboardEvent("keydown", {
+                        key,
+                        bubbles: true,
+                        cancelable: true,
+                    }),
+                );
+                await Promise.resolve();
+            }
+        });
+        await expect(tab(page, "Overview")).toBeFocused();
+        await expect(tab(page, "Overview")).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+        await expect.poll(() => directions(page)).toEqual(["left"]);
+    });
+
     test("has no axe violation", async ({ page }) => {
         await openScenario(page, "/tabs/animated");
         await tab(page, "Projects").click();
         await expectNoAxeViolations(page);
     });
+});
+
+// Epic #49 (#46): with neither value nor defaultValue, the first tab is selected after the first
+// render, so its panel enters (spec/tabs.md, "Animation")
+test("tabs / animated-default: the first panel enters with data-starting-style", async ({
+    page,
+}) => {
+    await page.addInitScript(() => {
+        const seen = { starting: false };
+        (window as unknown as { __seen: typeof seen }).__seen = seen;
+        new MutationObserver(() => {
+            if (
+                document.querySelector(
+                    '[data-primitives-part="tabs-panel"][data-starting-style]',
+                ) !== null
+            ) {
+                seen.starting = true;
+            }
+        }).observe(document, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+        });
+    });
+    await openScenario(page, "/tabs/animated-default");
+    await expectOutput(page, "value", "overview");
+    await expectOutput(page, "reason", "none");
+    await expect(tab(page, "Overview")).toHaveAttribute(
+        "aria-selected",
+        "true",
+    );
+    await expect(
+        page.getByRole("tabpanel", { name: "Overview" }),
+    ).toContainText("Overview content");
+    expect(
+        await page.evaluate(
+            () =>
+                (window as unknown as { __seen: { starting: boolean } }).__seen
+                    .starting,
+        ),
+    ).toBe(true);
 });
 
 test("tabs / vertical: the activation direction is up or down", async ({

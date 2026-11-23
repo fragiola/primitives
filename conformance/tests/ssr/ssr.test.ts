@@ -132,6 +132,55 @@ test.describe("before hydration", () => {
         });
     }
 
+    // Epic #49 (#46), spec/tabs.md `/tabs/nonce`: under a Content Security Policy that allows
+    // inline scripts by nonce, the script with the Indicator's `nonce` runs; one without is blocked
+    test("ssr /tabs/nonce: the Indicator's script runs under a nonce policy", async ({
+        page,
+    }, info) => {
+        const base = ssrBase(info.project.name);
+        await page.route(
+            (url) => url.pathname.startsWith("/tabs/"),
+            async (route) => {
+                const response = await route.fetch();
+                await route.fulfill({
+                    response,
+                    headers: {
+                        ...response.headers(),
+                        "content-security-policy":
+                            "script-src 'nonce-fixture-nonce'",
+                    },
+                });
+            },
+        );
+        const indicator = page.locator(
+            '[data-primitives-part="tabs-indicator"]',
+        );
+        const width = () =>
+            indicator.evaluate((element) =>
+                getComputedStyle(element).getPropertyValue(
+                    "--tabs-indicator-inline-size",
+                ),
+            );
+
+        // the policy is in force: the script with no nonce is blocked and stays
+        await page.goto(`${base}/tabs/automatic`);
+        await expect(indicator.locator("script")).toHaveCount(1);
+        expect(await width()).toBe("");
+
+        await page.goto(`${base}/tabs/nonce`);
+        await expect(indicator.locator("script")).toHaveCount(0);
+        const tab = await page
+            .getByRole("tab", { selected: true })
+            .boundingBox();
+        expect(tab).not.toBeNull();
+        expect(Number.parseFloat(await width())).toBeCloseTo(
+            tab?.width ?? 0,
+            0,
+        );
+        const box = await indicator.boundingBox();
+        expect(box?.x).toBeCloseTo(tab?.x ?? Number.NaN, 0);
+    });
+
     test("ssr /slider/basic: the thumb sits at its value", async ({
         page,
     }, info) => {

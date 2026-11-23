@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
+import { openInFrame } from "../../src/frame.ts";
 import { expectOutput } from "../../src/output.ts";
 import { openScenario } from "../../src/scenario.ts";
 
@@ -62,6 +63,29 @@ test.describe("tooltip / basic", () => {
         await expect(popup).toBeHidden();
         await expectOutput(page, "open", "false");
         await expectOutput(page, "reason", "trigger-hover");
+    });
+
+    // Epic #49 (#46): a pointer leaving the iframe in one move sends no move outside the bridge
+    test("the pointer leaving the iframe at once closes it", async ({
+        page,
+    }) => {
+        const frame = await openInFrame(page, "/tooltip/basic");
+        const popup = frame.getByRole("tooltip", { name: "Save the document" });
+        const box = await frame
+            .getByRole("button", { name: "Save", exact: true })
+            .boundingBox();
+        expect(box).not.toBeNull();
+        const { x, y, width, height } = box as NonNullable<typeof box>;
+        await page.mouse.move(
+            Math.round(x + width / 2),
+            Math.round(y + height / 2),
+            { steps: 2 },
+        );
+        await expect(popup).toBeVisible({ timeout: 5000 });
+        await page.mouse.move(10, 10);
+        await expect(popup).toBeHidden();
+        await expectOutput(frame, "open", "false");
+        await expectOutput(frame, "reason", "trigger-hover");
     });
 
     test("keyboard focus opens it at once; Escape closes it and keeps focus", async ({

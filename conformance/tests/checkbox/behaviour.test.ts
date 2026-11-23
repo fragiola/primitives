@@ -196,3 +196,18 @@ test("checkbox / controlled: a cleared value the consumer refuses stays checked"
     await page.keyboard.press("Space");
     await expect(keep).toHaveAttribute("aria-checked", "true");
 });
+
+// Epic #49 (#46): after a reset, the hidden input is the rendered state, as Radio's and Switch's
+test("checkbox / controlled-form: a reset the consumer refuses keeps the input checked", async ({
+    page,
+}) => {
+    await openScenario(page, "/checkbox/controlled-form");
+    const remember = checkbox(page, "Remember me");
+    await expect(remember).toHaveAttribute("aria-checked", "true");
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(remember).toHaveAttribute("aria-checked", "true");
+    // the controls reset a task after the reset event: let it pass, and the render after it
+    await page.waitForTimeout(200);
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expectSubmitted(page, "remember=on");
+});
