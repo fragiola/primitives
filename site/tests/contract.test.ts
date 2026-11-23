@@ -204,6 +204,7 @@ describe("the sidebar", () => {
             "api/field",
             "api/fieldset",
             "api/form",
+            "api/label",
             "api/button",
             "api/toggle",
             "api/toggle-group",
@@ -214,6 +215,8 @@ describe("the sidebar", () => {
             "api/radio",
             "api/switch",
             "api/slider",
+            "api/number-field",
+            "api/otp-field",
             "api/select",
             "api/combobox",
             "api/calendar",
@@ -221,6 +224,7 @@ describe("the sidebar", () => {
             "api/date-picker",
             "api/date-range-picker",
             "api/progress",
+            "api/meter",
             "api/avatar",
             "api/separator",
             "api/direction",
@@ -255,6 +259,8 @@ describe("the sidebar", () => {
             "api/checkbox",
             "api/checkbox-group",
             "api/slider",
+            "api/number-field",
+            "api/otp-field",
             "api/select",
             "api/combobox",
             "api/calendar",
@@ -273,9 +279,16 @@ describe("the sidebar", () => {
                 "Keyboard",
                 "Exports",
             ]);
-            // every component follows an APG pattern but the Field layer, which has none (Base UI's
-            // Field, Fieldset and Form)
-            if (!["api/field", "api/fieldset", "api/form"].includes(path)) {
+            // every component follows an APG pattern but the Field layer and OTPField, which have
+            // none (Base UI's Field, Fieldset, Form and OTP Field)
+            if (
+                ![
+                    "api/field",
+                    "api/fieldset",
+                    "api/form",
+                    "api/otp-field",
+                ].includes(path)
+            ) {
                 expect(page, path).toMatch(
                     /https:\/\/www\.w3\.org\/WAI\/ARIA\/apg\/patterns\//,
                 );

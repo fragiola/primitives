@@ -4,13 +4,13 @@ description: What the first release does not do yet - the rest of the catalog, o
 ---
 
 The first release covers the overlays (a drawer swiped away included), the tabs, a navigation menu, a collapsible and an accordion, the form controls with their field layer, the
-date pickers, and a progress bar, an avatar and a separator. Here is what it leaves out, on purpose or for a later release.
+date pickers, a number field and a one-time code field, and a progress bar, a meter, an avatar and a separator. Here is what it leaves out, on purpose or for a later release.
 
 ## Not in this release
 
-- **Thirty-three components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form,
-  Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, Select, Combobox, Calendar,
-  RangeCalendar, DatePicker, DateRangePicker, Progress, Avatar and Separator ship today, with two entries that are no component: the
+- **Thirty-seven components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
+  Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Calendar,
+  RangeCalendar, DatePicker, DateRangePicker, Progress, Meter, Avatar and Separator ship today, with two entries that are no component: the
   [direction provider](/docs/api/direction) and the [render utilities](/docs/api/render).
 - **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
   with no time and no time zone. No date field to type a date in parts, no time field, no
@@ -20,8 +20,13 @@ date pickers, and a progress bar, an avatar and a separator. Here is what it lea
   `touched`, the Error's enter and exit animations, and the Form's `onFormSubmit` (read the native
   `submit` event and its `FormData`) and `actionsRef`. A form reset does not reset a field's
   states, as in Base UI.
-- **No NumberField, Listbox or Autocomplete** yet: they come with later stages. Nor a toggle
-  button, a Meter, a radio outside a group or a read-only RadioGroup.
+- **No Listbox or Autocomplete** yet: they come with later stages. Nor a radio outside a group or
+  a read-only RadioGroup.
+- **NumberField leaves out** Base UI's `onValueCommitted`, `inputRef`, `form`, the scrub's
+  `teleportDistance`, cancelable change details and the `input-paste` reason (a paste is
+  `input-change`); its hidden input has `step="any"` (no step validation).
+- **OTPField leaves out** Base UI's `autoSubmit`, `normalizeValue` (a `RegExp` `validationType`
+  covers a pattern; uppercase in your `onValueChange`), `form` and its own `Separator`.
 - **Avatar leaves out** Base UI's `keepMounted` on the Image and its enter and exit transitions:
   the image only shows once loaded.
 - **Combobox and Select**: no virtualization or async lists, no `readOnly` or `autoHighlight`, no

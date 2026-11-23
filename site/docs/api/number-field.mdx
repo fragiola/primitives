@@ -1,0 +1,196 @@
+---
+title: NumberField
+description: A text field for a number, as the APG spinbutton, with localized formatting and parsing, keys, held buttons, the wheel and a scrub area, in each framework.
+---
+
+A text field for a number (the APG [spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/)
+pattern): the user types it in the locale's own writing, or steps it with the keyboard, the
+Increment and Decrement buttons (pressed once or held), the mouse wheel (opt-in) or a scrub area
+dragged sideways. Its value is a number, or `null` while empty. It works in a native `<form>` and
+in a [Field](/docs/api/field).
+
+<Example id="number-field" />
+
+## Behaviour
+
+- **Value**: a number or `null`, controlled or not; every change reports `{ reason, event }`:
+  `input-change`, `input-clear`, `input-blur`, `keyboard`, `increment-press`, `decrement-press`,
+  `wheel`, `scrub`, `none` (a form reset).
+- **Locale**: `format` (`Intl.NumberFormatOptions`) and `locale` write the value
+  (`€1,234.50`, `1.234,50 €`, `‏١٬٢٣٤٫٥٠ €`) and read what is typed: the locale's digits
+  (Arabic-Indic, ...), group and decimal separators, any minus sign, the currency, unit and
+  percent text (a percent field reads `25%` as `0.25`). A character no number of the locale holds
+  is refused as it is typed; the blur writes the value formatted.
+- **Stepping**: `step` (Alt: `smallStep`, Shift: `largeStep`), clamped to `min` and `max`, with
+  no floating-point noise; an empty field steps from `0`. `snapOnStep` steps to the grid.
+  `clampOnBlur` (on by default) clamps a typed value on blur; off, the native validity reports it.
+- **Buttons**: out of the tab order, named by you (`aria-label`); a press steps at once, and a
+  held press repeats every 60 ms after 400 ms; a button is disabled at its bound.
+- **Wheel**: `allowWheelScrub` steps the value over the focused Input.
+- **Scrub**: a press on the ScrubArea dragged sideways (or up, `direction="vertical"`) steps once
+  per `pixelSensitivity` pixels; a mouse locks the pointer and the ScrubAreaCursor follows it.
+- **Forms**: a hidden `type="number"` input submits the plain number (`1234.5`) and validates
+  `required`, `min` and `max` (`step="any"`); a reset returns to `defaultValue`.
+- **No text**: the buttons and the Input have no name of their own.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `number-field-root` | holds the value; renders the hidden input after it |
+| Group | `div` | `number-field-group` | `group`: the Input with its buttons |
+| Input | `input` | `number-field-input` | the `spinbutton` |
+| Increment | `button` | `number-field-increment` | steps up |
+| Decrement | `button` | `number-field-decrement` | steps down |
+| ScrubArea | `span` | `number-field-scrub-area` | a press dragged along it steps the value |
+| ScrubAreaCursor | `span` | `number-field-scrub-area-cursor` | the virtual cursor of a locked scrub, in `body` |
+| (hidden input) | `input type="number"` | `number-field-hidden-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Label } from "@fragiola/primitives-react/label";
+import { NumberField } from "@fragiola/primitives-react/number-field";
+
+<Label htmlFor="quantity">Quantity</Label>
+<NumberField.Root id="quantity" name="quantity" defaultValue={1} min={1} max={10}>
+    <NumberField.Group>
+        <NumberField.Decrement aria-label="Decrease">−</NumberField.Decrement>
+        <NumberField.Input />
+        <NumberField.Increment aria-label="Increase">+</NumberField.Increment>
+    </NumberField.Group>
+</NumberField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Label for="price">Price</Label>
+    <NumberField.Root id="price" v-model:value="price" :format="{ style: 'currency', currency: 'EUR' }" locale="de-DE">
+        <NumberField.Group>
+            <NumberField.Input />
+        </NumberField.Group>
+    </NumberField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Label, NumberFieldRoot, NumberFieldGroup, NumberFieldInput, NumberFieldIncrement, NumberFieldDecrement],
+    template: `
+        <label label for="quantity">Quantity</label>
+        <div numberFieldRoot [id]="'quantity'" [(value)]="quantity" [min]="1" [max]="10">
+            <div numberFieldGroup>
+                <button numberFieldDecrement aria-label="Decrease">−</button>
+                <input numberFieldInput />
+                <button numberFieldIncrement aria-label="Increase">+</button>
+            </div>
+        </div>
+    `,
+})
+export class Quantity {
+    protected readonly quantity = signal<number | null>(1);
+}
+```
+
+`*numberFieldScrubAreaCursor` is structural: its element is rendered, in `body`, only while a
+locked scrub runs.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds the value as `v-model:value` and `@value-change`; Angular as `[(value)]`
+and `(valueChangeDetails)` (`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `number \| null` | | the value, controlled (`null`: empty) |
+| `defaultValue` | `number \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value: number \| null, details: { reason, event }) => void` | | every change |
+| `min` | `number` | | the lower bound |
+| `max` | `number` | | the upper bound |
+| `step` | `number` | `1` | the amount of a step |
+| `smallStep` | `number` | `0.1` | the amount of a step with Alt |
+| `largeStep` | `number` | `10` | the amount of a step with Shift, Page Up and Page Down |
+| `snapOnStep` | `boolean` | `false` | a step from a value off the grid goes to the grid's next point |
+| `clampOnBlur` | `boolean` | `true` | a typed value outside the bounds is clamped on blur |
+| `format` | `Intl.NumberFormatOptions` | the plain number | how the Input writes (and reads) the value |
+| `locale` | `string` | the runtime's | the locale of the format and the parsing (a BCP 47 tag) |
+| `allowWheelScrub` | `boolean` | `false` | the wheel steps the value over the focused Input |
+| `required` | `boolean` | `false` | the hidden input is required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | ignores every interaction, submits nothing |
+| `name` | `string` | | the hidden input's name (a Field's wins) |
+| `id` | `string` | generated | the Input's `id` (a Field's control id inside one) |
+
+### Group
+
+No props of its own.
+
+### Input
+
+No props of its own.
+
+### Increment
+
+No props of its own.
+
+### Decrement
+
+No props of its own.
+
+### ScrubArea
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `direction` | `"horizontal" \| "vertical"` | `"horizontal"` | the axis it scrubs along (right or up steps up) |
+| `pixelSensitivity` | `number` | `2` | the pixels one step takes |
+
+### ScrubAreaCursor
+
+No props of its own.
+
+## State and part attributes
+
+Every part carries `data-disabled`, `data-readonly`, `data-required`, `data-scrubbing` (while a
+scrub runs) and, inside a Field, the Field's state (`data-invalid`, `data-valid`, `data-dirty`,
+`data-touched`, `data-filled`, `data-focused`).
+
+| part | attributes |
+| --- | --- |
+| Group | `role="group"` |
+| Input | `role="spinbutton"`, `type="text"`, `inputmode`, `autocomplete="off"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext` (the formatted value; none while empty), `aria-required`, `aria-readonly` |
+| Increment, Decrement | `type="button"`, `tabindex="-1"`, `aria-controls` (the Input), `disabled` at the bound or while disabled or read-only |
+| ScrubArea | structural `touch-action: none`, `user-select: none` |
+| ScrubAreaCursor | structural `position: fixed`, `pointer-events: none`, `transform: translate3d(<x>px, <y>px, 0)` |
+
+## Keyboard
+
+| key | does |
+| --- | --- |
+| ArrowUp, ArrowDown | step up or down (Shift: `largeStep`, Alt: `smallStep`) |
+| PageUp, PageDown | step by `largeStep` |
+| Home, End | set `min`, `max` (when given) |
+| any other key | the input's own text editing |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/number-field` | `ChangeDetails`, `ChangeReason`, `NumberField`, `NumberFieldDecrementProps`, `NumberFieldGroupProps`, `NumberFieldIncrementProps`, `NumberFieldInputProps`, `NumberFieldRootProps`, `NumberFieldScrubAreaCursorProps`, `NumberFieldScrubAreaProps`, `NumberFieldState`, `RenderProp` |
+| `@fragiola/primitives-vue/number-field` | `ChangeDetails`, `ChangeReason`, `NumberField`, `NumberFieldRootEmits`, `NumberFieldRootProps`, `NumberFieldScrubAreaProps`, `NumberFieldState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/number-field` | `ChangeDetails`, `ChangeReason`, `NumberFieldDecrement`, `NumberFieldGroup`, `NumberFieldIncrement`, `NumberFieldInput`, `NumberFieldRoot`, `NumberFieldScrubArea`, `NumberFieldScrubAreaCursor`, `NumberFieldState`, `ScrubPoint`, `ValueChangeEvent` |

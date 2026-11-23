@@ -263,6 +263,8 @@ its focus and its changes; give it no `name` of its own. Outside a field it beha
 | [Combobox](/docs/api/combobox) | the item, `null`, or the items | its hidden input (`required`) | its Input |
 | [DatePicker](/docs/api/date-picker) | the date, or `null` | its hidden input (`required`) | its Trigger |
 | [DateRangePicker](/docs/api/date-range-picker) | the range, or `null` | its hidden input (`required`) | its Trigger |
+| [NumberField](/docs/api/number-field) | the number, or `null` | its hidden `number` input (`required`, `min`, `max`) | its Input |
+| [OTPField](/docs/api/otp-field) | the code, a string | its hidden input (`required`, and a `pattern` that refuses an incomplete code) | its first empty slot |
 
 ```tsx
 <Form aria-label="Booking">
@@ -291,6 +293,7 @@ its focus and its changes; give it no `name` of its own. Outside a field it beha
 - **A picker's name** is the label, then the Trigger's own content: "Arrival 2026-11-24". Your
   visible text stays in its name. A Select's Trigger is named by the label alone.
 - **A Slider** has a Label of its own; inside a Field, use the Field's instead.
+- **Outside a Field**, a [Label](/docs/api/label) names a control by `for` or by wrapping it.
 - **A form reset** returns every control to its default; the fields keep their states (`dirty`,
   `touched`, the validity), as in Base UI.
 

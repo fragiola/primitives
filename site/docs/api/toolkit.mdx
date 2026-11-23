@@ -33,7 +33,10 @@ and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 `/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms. Progress uses
 `/range` alone, Avatar `/image` alone; Button and Separator use none. Toolbar and ToggleGroup use
 the roving focus of `/collection` and `/direction` (a Toggle alone imports neither: its
-composite's root handles the keys). The root entry,
+composite's root handles the keys). NumberField adds `/number` to `/form` (its parsing and
+formatting of localized text, its stepping, the auto repeat of its buttons and its scrub; no
+other component imports it), OTPField uses `/form` (its value rules), `/collection` and
+`/direction`; Meter uses `/range` alone, Label `/form` alone (its press). The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
@@ -44,12 +47,13 @@ composite's root handles the keys). The root entry,
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |
-| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey` |
+| `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/image` | `watchImageStatus`, `ImageLoadingStatus`, `ImageSourceOptions` |
 | `@fragiola/primitives/inert` | `inertOutside`, `blockOutsidePointer` |
 | `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
+| `@fragiola/primitives/number` | `formatNumber`, `numberFormatOptions`, `NumberFormatOptions`, `parseNumber`, `isNumberText`, `stepNumber`, `clampNumber`, `NumberStepOptions`, `watchAutoRepeat`, `AutoRepeatOptions`, `watchScrub`, `ScrubOptions`, `ScrubPoint` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason`, `DismissEvent` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `watchPointerExit`, `LongPressOptions`, `watchLongPress` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement`, `AnchorRect`, `VirtualAnchor`, `virtualAnchor` |
@@ -132,6 +136,20 @@ composite's root handles the keys). The root entry,
   `withoutFormErrors`).
 - **Direction**: `getDirection(element, provided)`, the direction a provider gives, else the
   element's computed `direction`.
+- **Number**: a number field's text and steps (Epic #52). `formatNumber(value, { locale, format })`
+  writes a value (`""` for `null`; every decimal kept without a format); `parseNumber(text, options)`
+  reads the locale's writing back: its digits (Arabic-Indic, Extended Arabic-Indic and ASCII in
+  every locale), its group and decimal separators (`.` or `,` also read as the decimal point where
+  the locale groups with neither), any minus or plus sign and the bidirectional marks around it,
+  the currency, unit and percent text (a percent format reads `25%` as `0.25`), an accounting
+  negative in parentheses; `null` for a text with no digit, `NaN` for one that is no number.
+  `isNumberText` says whether a text holds only those characters (a field refuses the others as
+  they are typed). `stepNumber(value, amount, { min, max, snapOnStep })` steps and clamps with no
+  floating-point noise (an empty field starts at `0`). `watchAutoRepeat(button, { onStep, delay,
+  interval })` steps at a press, then every 60 ms after 400 ms (a click no press started steps
+  once; a mouse press keeps the focus). `watchScrub(element, { direction, pixelSensitivity,
+  onStart, onScrub, onEnd, onCursor })` reports steps per pixels moved, under the pointer lock for
+  a mouse, with the virtual cursor's point wrapped around the viewport.
 - **Range**: slider math and keys, and a progress bar's value. `progressValue(value, options)`
   clamps the value to `[min, max]` and returns it with its percent (0 to 100), its status
   (`ProgressStatus`: `indeterminate` for `null`, `complete` at `max`, else `progressing`) and its
