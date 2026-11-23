@@ -31,6 +31,8 @@ import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
 import CheckboxGroupScenario from "../scenarios/checkbox/checkbox-group.vue";
+import ClipboardBasic from "../scenarios/clipboard/clipboard-basic.vue";
+import ClipboardFailure from "../scenarios/clipboard/clipboard-failure.vue";
 import CollapsibleBasic from "../scenarios/collapsible/collapsible-basic.vue";
 import CollapsibleHiddenUntilFound from "../scenarios/collapsible/collapsible-hidden-until-found.vue";
 import ComboboxBasic from "../scenarios/combobox/combobox-basic.vue";
@@ -74,6 +76,10 @@ import DrawerLifecycle from "../scenarios/drawer/drawer-lifecycle.vue";
 import DrawerNested from "../scenarios/drawer/drawer-nested.vue";
 import DrawerSide from "../scenarios/drawer/drawer-side.vue";
 import DrawerSnapPoints from "../scenarios/drawer/drawer-snap-points.vue";
+import EditableBasic from "../scenarios/editable/editable-basic.vue";
+import EditableField from "../scenarios/editable/editable-field.vue";
+import EditableModes from "../scenarios/editable/editable-modes.vue";
+import EditableStates from "../scenarios/editable/editable-states.vue";
 import FieldAsync from "../scenarios/field/field-async.vue";
 import FieldAsyncBlur from "../scenarios/field/field-async-blur.vue";
 import FieldBasic from "../scenarios/field/field-basic.vue";
@@ -122,6 +128,9 @@ import OtpFieldBasic from "../scenarios/otp-field/otp-field-basic.vue";
 import OtpFieldField from "../scenarios/otp-field/otp-field-field.vue";
 import PaginationBasic from "../scenarios/pagination/pagination-basic.vue";
 import PaginationLinks from "../scenarios/pagination/pagination-links.vue";
+import PasswordInputBasic from "../scenarios/password-input/password-input-basic.vue";
+import PasswordInputField from "../scenarios/password-input/password-input-field.vue";
+import PasswordInputStates from "../scenarios/password-input/password-input-states.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
 import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
@@ -139,6 +148,9 @@ import RatingHalf from "../scenarios/rating/rating-half.vue";
 import RatingReadOnly from "../scenarios/rating/rating-read-only.vue";
 import ScrollAreaBasic from "../scenarios/scroll-area/scroll-area-basic.vue";
 import ScrollAreaLinks from "../scenarios/scroll-area/scroll-area-links.vue";
+import SearchFieldBasic from "../scenarios/search-field/search-field-basic.vue";
+import SearchFieldField from "../scenarios/search-field/search-field-field.vue";
+import SearchFieldStates from "../scenarios/search-field/search-field-states.vue";
 import SegmentedControlBasic from "../scenarios/segmented-control/segmented-control-basic.vue";
 import SegmentedControlDisabled from "../scenarios/segmented-control/segmented-control-disabled.vue";
 import SegmentedControlField from "../scenarios/segmented-control/segmented-control-field.vue";
@@ -422,6 +434,18 @@ export const routes: Record<string, Component> = {
     "/rating/half": RatingHalf,
     "/rating/read-only": RatingReadOnly,
     "/rating/field": RatingField,
+    "/password-input/basic": PasswordInputBasic,
+    "/password-input/states": PasswordInputStates,
+    "/password-input/field": PasswordInputField,
+    "/search-field/basic": SearchFieldBasic,
+    "/search-field/states": SearchFieldStates,
+    "/search-field/field": SearchFieldField,
+    "/clipboard/basic": ClipboardBasic,
+    "/clipboard/failure": ClipboardFailure,
+    "/editable/basic": EditableBasic,
+    "/editable/modes": EditableModes,
+    "/editable/states": EditableStates,
+    "/editable/field": EditableField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
