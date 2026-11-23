@@ -105,6 +105,7 @@ export function entrySource(name: ComponentName | UtilityName): string {
  */
 export const MECHANISMS = [
     "async-list",
+    "calendar-systems",
     "collection",
     "date",
     "direction",
@@ -129,6 +130,7 @@ export const MECHANISMS = [
     "selection",
     "swipe",
     "time",
+    "time-zone",
     "toast",
     "virtual",
 ] as const;

@@ -65,9 +65,12 @@ export function typeSegment(
     edit: SegmentEdit | null,
     seed: SegmentValues = {},
 ): SegmentTypeResult | null {
-    if (type === "dayPeriod") {
+    if (type === "dayPeriod" || type === "era") {
+        // a letter: the first letters of a day period's text, or of an era's name
         const key = character.toLocaleLowerCase(format.locale);
-        const index = format.dayPeriods.findIndex(
+        const index = (
+            type === "era" ? (format.eras ?? []) : format.dayPeriods
+        ).findIndex(
             (text) =>
                 text !== "" &&
                 text.toLocaleLowerCase(format.locale).startsWith(key),
@@ -114,8 +117,8 @@ export function eraseSegment(
     type: EditableSegmentType,
     edit: SegmentEdit | null,
 ): SegmentEraseResult {
-    if (type === "dayPeriod") {
-        return values.dayPeriod === undefined
+    if (type === "dayPeriod" || type === "era") {
+        return values[type] === undefined
             ? { values, edit: null, retreat: true }
             : {
                   values: setSegment(format, values, type, undefined),
