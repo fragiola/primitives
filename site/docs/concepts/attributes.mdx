@@ -47,7 +47,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-placeholder` | a Select showing its placeholder |
 | `data-empty` | a combobox's or an autocomplete's list with no item |
 | `data-dragging` | a slider while a pointer drags a thumb |
-| `data-index` | a slider thumb's value index; an OTP field slot's index (a value) |
+| `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index (a value) |
+| `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
 | `data-required` | a required checkbox, switch or radio group, and its radios; every part of a required number field or OTP field |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTP field slot that holds a character |
@@ -70,8 +71,8 @@ One CSS variable carries the depth of nested dialogs: a dialog's popup has the i
 scale or offset the parent (`scale: calc(1 - 0.05 * var(--nested-dialogs))`).
 
 ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`, `aria-invalid`,
-`aria-activedescendant`, `aria-modal`, `aria-controls`, `aria-current`, `aria-readonly`, `aria-valuenow`
-and `aria-valuetext`.
+`aria-activedescendant`, `aria-modal`, `aria-controls`, `aria-current`, `aria-readonly`, `aria-valuenow`,
+`aria-valuetext`, `aria-busy`, and a virtual list's `aria-setsize` and `aria-posinset`.
 
 ## An enter and exit transition
 

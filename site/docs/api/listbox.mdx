@@ -37,6 +37,12 @@ parts and names are the API pattern.
   `aria-invalid` on the Root.
 - **The collections mechanism**: the list model, the selection rules and the key map are the
   toolkit's [`/selection`](/docs/api/toolkit) entry, which Menu, Tabs or Dialog never import.
+- **Long and loaded lists**: for thousands of items, or items loaded page by page, use
+  [ListboxVirtual](/docs/api/listbox-virtual): **ListboxVirtual.Root** (`/listbox-virtual`) takes
+  every option as `items` and renders only the ones in view, with the same keys, typeahead, ranges
+  and select all over every item. Its pages can come from a loader through the [async
+  list](/docs/api/async-list) (`loading`, `onLoadMore`). It is opt-in: this entry ships no
+  virtualizer.
 
 ## Anatomy
 

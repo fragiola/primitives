@@ -18,6 +18,11 @@ import { Tabs } from "@fragiola/primitives-react/tabs";
 Importing from the root (`@fragiola/primitives-react`) tree-shakes to the same output. In Angular
 each component is an ng-packagr secondary entry point (`@fragiola/primitives-angular/dialog`).
 
+An opt-in feature is an entry of its own, never a prop: the virtual lists
+(`/listbox-virtual`, `/select-virtual`, `/combobox-virtual`, `/autocomplete-virtual`) and the
+[async list](/docs/api/async-list) (`/async-list`). A Listbox, Select, Combobox or Autocomplete
+that does not import them ships the same code, with no virtualizer.
+
 ## No registry
 
 There is no Vue `app.use()` plugin and no Angular NgModule of every directive: nothing references

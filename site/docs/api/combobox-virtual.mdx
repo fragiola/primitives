@@ -1,0 +1,218 @@
+---
+title: ComboboxVirtual
+description: A Combobox List over thousands of items that renders only the matches in view, the keys reaching every match, with async pages filtered by the text.
+---
+
+A [Combobox](/docs/api/combobox) for a long or loaded list: **ComboboxVirtual.List** replaces the
+Combobox's List and renders only the matching items in view (with 10 000 items, a few dozen
+options in the DOM), while the input's keys and `aria-activedescendant` reach every match. The
+items can come from a loader, filtered by the input's text, through
+[`useAsyncList`](/docs/api/async-list). It is opt-in, in an entry of its own, `/combobox-virtual`:
+a Combobox that does not use it ships no virtualizer.
+
+The APG has no virtual list pattern; it only says that a set whose options are not all in the DOM
+gives each option `aria-setsize` and `aria-posinset`. Everything else is the
+[Combobox](/docs/api/combobox)'s (the APG [combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)): a virtual list
+behaves as the same list rendered whole.
+
+<Example id="combobox-virtual" />
+
+## Behaviour
+
+- **The Combobox's part**: the List is a Combobox List (`data-primitives-part="combobox-list"`,
+  the same role and state attributes, `data-empty` included), so a Combobox recipe and its
+  selectors apply. Its options are `Combobox.Item`s that you render for each row in view.
+- **It needs the Root's `items`**, flat (no groups); the List renders the matching ones (the
+  filtered items, as the List's own render function).
+- **Only the rows in view are rendered**, plus `overscan` rows beyond each end and the **pinned**
+  rows: the first and last matches, the highlighted one with its neighbours and the selected one.
+  So the arrows, the wrap through the input and opening on the first, last or selected item
+  behave as with every item rendered.
+- **The place in the set**: each rendered option has `aria-setsize` (the number of matching
+  items), `aria-posinset` (its index + 1) and `data-index`.
+- **Sizes**: each row starts at `itemSize` (36 px) and is measured once rendered (`measure`);
+  `measure={false}` keeps every row at `itemSize` (fixed sizes).
+- **Loading**: `loading` sets `data-loading` and `aria-busy="true"` on the List; `onLoadMore` runs
+  when the last row comes into view while not `loading` (load more on scroll end). A Status can
+  say "Loading…" meanwhile.
+- **Async filtering**: with `filter={null}`, send the input's text to the async list
+  (`setFilterText`): a new text aborts the page in flight, and a stale page never shows.
+
+### The row style
+
+The rows keep the list's flow layout: no wrapper and no spacer element. Each rendered option gets,
+inline, the room of the unrendered rows before it as `margin-block-start` (the last one, the room
+after it as `margin-block-end`), `flex-shrink: 0` and `overflow-anchor: none`; the list's
+`row-gap` is read and counted. So lay the options out in a **flex or grid column** with **no
+margin of their own**, make the **List the popup's scroll container** (a height and
+`overflow-y: auto` on it), and set `itemSize` to the typical row height.
+
+## Anatomy
+
+The [Combobox](/docs/api/combobox)'s parts, the List replaced:
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| List | `div` | `combobox-list` | the `listbox`, a Combobox List that renders the matching items in view |
+| (options) | `div` | `combobox-item` | your `Combobox.Item` for each row in view |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Combobox, ComboboxVirtual } from "@fragiola/primitives-react/combobox-virtual";
+
+<Combobox.Root items={ITEMS} name="item">
+    <label htmlFor="item">Item</label>
+    <Combobox.InputGroup>
+        <Combobox.Input id="item" />
+    </Combobox.InputGroup>
+    <Combobox.Portal>
+        <Combobox.Positioner sideOffset={4}>
+            <Combobox.Popup>
+                <Combobox.Empty>No item found.</Combobox.Empty>
+                <ComboboxVirtual.List className="flex max-h-80 flex-col overflow-y-auto">
+                    {(item: Item) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+                </ComboboxVirtual.List>
+            </Combobox.Popup>
+        </Combobox.Positioner>
+    </Combobox.Portal>
+</Combobox.Root>;
+```
+
+Loaded and filtered by a server, with [`useAsyncList`](/docs/api/async-list):
+
+```tsx
+const list = useAsyncList({ load: loadItems });
+
+<Combobox.Root
+    items={list.items}
+    filter={null}
+    onInputValueChange={(text) => list.setFilterText(text)}
+>
+    {/* the Input, then in the Popup: */}
+    <Combobox.Status>{list.loading ? "Loading…" : ""}</Combobox.Status>
+    <ComboboxVirtual.List loading={list.loading} onLoadMore={list.loadMore}>
+        {(item: Item) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+    </ComboboxVirtual.List>
+</Combobox.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Combobox.Root
+        v-model:value="value"
+        :items="list.items"
+        :filter="null"
+        @input-value-change="(text: string) => list.setFilterText(text)"
+    >
+        <Combobox.InputGroup><Combobox.Input id="item" /></Combobox.InputGroup>
+        <Combobox.Status>{{ list.loading ? "Loading…" : "" }}</Combobox.Status>
+        <Combobox.Portal>
+            <Combobox.Positioner :side-offset="4">
+                <Combobox.Popup>
+                    <ComboboxVirtual.List
+                        class="flex max-h-80 flex-col overflow-y-auto"
+                        :loading="list.loading"
+                        @load-more="list.loadMore"
+                    >
+                        <template #default="{ entry }: { entry: Item }">
+                            <Combobox.Item :value="entry">{{ entry.label }}</Combobox.Item>
+                        </template>
+                    </ComboboxVirtual.List>
+                </Combobox.Popup>
+            </Combobox.Positioner>
+        </Combobox.Portal>
+    </Combobox.Root>
+</template>
+```
+
+`Combobox` and `ComboboxVirtual` both come from `@fragiola/primitives-vue/combobox-virtual`; the
+default scoped slot gets `{ entry, index }` for each matching item in view.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ComboboxRoot, ComboboxInputGroup, ComboboxInput, ComboboxPortal, ComboboxPositioner, ComboboxPopup, ComboboxEmpty, ComboboxVirtualList, ComboboxVirtualRow, ComboboxItem],
+    template: `
+        <ng-container comboboxRoot [items]="items" name="item" [(value)]="value">
+            <div comboboxInputGroup><input comboboxInput id="item" /></div>
+            <ng-container *comboboxPortal>
+                <div comboboxPositioner [sideOffset]="4">
+                    <div comboboxPopup>
+                        <div comboboxEmpty>No item found.</div>
+                        <div comboboxVirtualList #list="comboboxVirtualList" class="flex max-h-80 flex-col overflow-y-auto">
+                            @for (row of list.rows(); track row.index) {
+                                <div comboboxItem [comboboxVirtualRow]="row" [value]="row.item">{{ row.item.label }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class ItemSearch {
+    protected readonly items = ITEMS;
+    protected readonly value = signal<Item | null>(null);
+}
+```
+
+`[comboboxVirtualList]` is a `[comboboxList]` (a host directive); its `rows()` (through
+`exportAs`) are the matching items to render, each `[comboboxItem]` with the
+`[comboboxVirtualRow]` of its row. With `injectAsyncList`: `[items]="list.items()"`,
+`[filter]="null"` and `(inputValueChange)="list.setFilterText($event)"` on the Root,
+`[loading]="list.loading()"` and `(loadMore)="list.loadMore()"` on the List. Every directive comes
+from `@fragiola/primitives-angular/combobox-virtual`, which re-exports the Combobox entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`@load-more`), and Angular
+as inputs and outputs (`(loadMore)`). The other parts are the [Combobox](/docs/api/combobox)'s.
+
+### List
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `itemSize` | `number \| (index: number) => number` | `36` | a row's size in px before it is measured (every row's with `measure` off): the typical row height |
+| `measure` | `boolean` | `true` | measure the rendered rows; `false`: fixed sizes |
+| `overscan` | `number` | `4` | the rows rendered beyond each end of the view |
+| `loading` | `boolean` | `false` | the list is loading: `data-loading`, `aria-busy="true"` |
+| `onLoadMore` | `() => void` | | the last row came into view while not `loading`: load the next page (Vue `@load-more`, Angular `(loadMore)`) |
+
+React's `children` and Vue's default slot render each matching item in view, with its index (an
+Angular template renders `rows()`).
+
+## State and part attributes
+
+Everything of the [Combobox](/docs/api/combobox)'s List and Items, plus:
+
+| part | attributes |
+| --- | --- |
+| List | `data-loading` and `aria-busy="true"` while `loading` |
+| each rendered option | `aria-setsize` (the number of matching items), `aria-posinset` (its index + 1), `data-index` (its index); inline `margin-block-start` / `margin-block-end` when unrendered rows come before / after it, `flex-shrink: 0`, `overflow-anchor: none` |
+
+## Keyboard
+
+The [Combobox](/docs/api/combobox)'s keys, over every matching item: the highlighted item is
+rendered and scrolled into view.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/combobox-virtual` | `Combobox`, `ComboboxVirtual`, `ComboboxVirtualListProps`, `VirtualListProps` |
+| `@fragiola/primitives-vue/combobox-virtual` | `Combobox`, `ComboboxVirtual`, `ComboboxVirtualListProps`, `ComboboxVirtualListSlots`, `VirtualListEmits`, `VirtualListProps` |
+| `@fragiola/primitives-angular/combobox-virtual` | `*` (every export of the Combobox entry), `ComboboxVirtualList`, `ComboboxVirtualRow`, `VirtualItemSize`, `VirtualRowData` |

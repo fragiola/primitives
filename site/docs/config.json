@@ -190,16 +190,32 @@
                     "path": "api/select"
                 },
                 {
+                    "label": "SelectVirtual",
+                    "path": "api/select-virtual"
+                },
+                {
                     "label": "Combobox",
                     "path": "api/combobox"
+                },
+                {
+                    "label": "ComboboxVirtual",
+                    "path": "api/combobox-virtual"
                 },
                 {
                     "label": "Autocomplete",
                     "path": "api/autocomplete"
                 },
                 {
+                    "label": "AutocompleteVirtual",
+                    "path": "api/autocomplete-virtual"
+                },
+                {
                     "label": "Listbox",
                     "path": "api/listbox"
+                },
+                {
+                    "label": "ListboxVirtual",
+                    "path": "api/listbox-virtual"
                 },
                 {
                     "label": "Calendar",
@@ -246,6 +262,10 @@
                 {
                     "label": "Render utilities",
                     "path": "api/render"
+                },
+                {
+                    "label": "Async list",
+                    "path": "api/async-list"
                 }
             ]
         },
