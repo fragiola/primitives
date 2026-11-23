@@ -58,8 +58,7 @@ function scrollingList(height: number) {
 
 function row(height: number): HTMLElement {
     const element = document.createElement("div");
-    element.getBoundingClientRect = () =>
-        ({ height, top: 0, bottom: height }) as DOMRect;
+    Object.defineProperty(element, "offsetHeight", { value: height });
     return element;
 }
 
@@ -228,5 +227,28 @@ describe("createVirtualizer", () => {
         const alone = document.createElement("div");
         document.body.append(alone);
         expect(scrollContainer(alone)).toBe(alone);
+    });
+});
+
+describe("createVirtualizer's scroll anchoring", () => {
+    it("keeps the view still when a row above it changes size", () => {
+        vi.stubGlobal("ResizeObserver", FakeObserver);
+        const virtualizer = createVirtualizer({
+            count: 100,
+            estimateSize: 20,
+            overscan: 2,
+        });
+        const { list, scroll } = scrollingList(100);
+        virtualizer.attach(list);
+        scroll(400);
+        const above = row(20);
+        virtualizer.measure(18, above);
+        FakeObserver.instances[0]?.resize(above, 50);
+        expect(list.scrollTop).toBe(430);
+        // a row in view grows: no scroll
+        const inView = row(20);
+        virtualizer.measure(21, inView);
+        FakeObserver.instances[0]?.resize(inView, 40);
+        expect(list.scrollTop).toBe(430);
     });
 });

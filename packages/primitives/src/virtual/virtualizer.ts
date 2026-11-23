@@ -36,8 +36,9 @@ export interface VirtualizerOptions {
  * scroll position, their measured sizes and the scrolling to a row. It holds no component state
  * (rule 2): the framework keeps the items, the focus and the highlight, renders the rows of
  * `range()` and gives each its `spaceBefore` as `margin-block-start` (the last one
- * `spaceAfter` as `margin-block-end`), so the list keeps its flow layout (sticky labels, flex
- * gaps) with no extra element.
+ * `spaceAfter` as `margin-block-end`), `flex-shrink: 0` and `overflow-anchor: none` (the
+ * virtualizer keeps the view still itself), so the list keeps its flow layout (sticky labels,
+ * flex gaps) with no extra element.
  */
 export interface Virtualizer {
     /** New options (the count, the pinned rows, ...); the next `range()` follows them. */
@@ -199,12 +200,25 @@ export function createVirtualizer(initial: VirtualizerOptions): Virtualizer {
             starts = null;
         }
     };
+    /**
+     * A row's measured size. A row above the view that changes size moves the scroll position by
+     * the change, so the rows in view stay still (the scroll anchoring the rows opt out of: the
+     * browser's would also follow the rows the virtualizer adds and removes).
+     */
     const setSize = (index: number, next: number): boolean => {
+        const previous = size(index);
         if (next <= 0 || sizes.get(index) === next) {
             return false;
         }
+        const above =
+            scroller !== null &&
+            (startsOf()[index] as number) + previous <= offset;
         sizes.set(index, next);
         starts = null;
+        if (above && scroller !== null && next !== previous) {
+            scroller.scrollTop += next - previous;
+            offset += next - previous;
+        }
         return true;
     };
 
@@ -246,8 +260,8 @@ export function createVirtualizer(initial: VirtualizerOptions): Virtualizer {
                                   setSize(
                                       index,
                                       box === undefined
-                                          ? entry.target.getBoundingClientRect()
-                                                .height
+                                          ? (entry.target as HTMLElement)
+                                                .offsetHeight
                                           : box.blockSize,
                                   ) || changed;
                           }
@@ -279,8 +293,9 @@ export function createVirtualizer(initial: VirtualizerOptions): Virtualizer {
             observed.set(element, index);
             observer?.observe(element);
             if (list !== null) {
-                // a row measured as it renders: the list renders again with its real size
-                if (setSize(index, element.getBoundingClientRect().height)) {
+                // a row measured as it renders: the list renders again with its real size, its
+                // layout size (a popup's opening scale transforms its box, never its size)
+                if (setSize(index, element.offsetHeight)) {
                     notify();
                 }
             }
