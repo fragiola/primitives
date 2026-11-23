@@ -159,6 +159,12 @@
             "import": "./dist/menu.js",
             "default": "./dist/menu.js"
         },
+        "./menubar": {
+            "@fragiola/source": "./src/components/menubar/index.ts",
+            "types": "./dist/menubar.d.ts",
+            "import": "./dist/menubar.js",
+            "default": "./dist/menubar.js"
+        },
         "./navigation-menu": {
             "@fragiola/source": "./src/components/navigation-menu/index.ts",
             "types": "./dist/navigation-menu.d.ts",
@@ -365,6 +371,11 @@
                 "types": "./dist/menu.d.ts",
                 "import": "./dist/menu.js",
                 "default": "./dist/menu.js"
+            },
+            "./menubar": {
+                "types": "./dist/menubar.d.ts",
+                "import": "./dist/menubar.js",
+                "default": "./dist/menubar.js"
             },
             "./navigation-menu": {
                 "types": "./dist/navigation-menu.d.ts",

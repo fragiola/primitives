@@ -62,8 +62,9 @@ export const GUARD = {
  * and Drawer on Dialog's (Epic #38), never the other way. A ToggleGroup is built on its Toggles'
  * entry, which holds the group's context (Epic #49), never the other way; a Toolbar on neither:
  * the nested composites meet through each framework's own roving-focus code (spec/toolbar.md,
- * "Nested composites"). Any other component's code in an entry is a leak; a utility entry
- * (UTILITIES) has none.
+ * "Nested composites"). A Menubar is built on Menu's entry, which holds the contract of a parent
+ * bar its Roots and Triggers read (spec/menu.md, "In a Menubar"), never the other way. Any other
+ * component's code in an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
@@ -78,6 +79,7 @@ export const ENTRY_DEPENDENCIES: Readonly<
     drawer: ["dialog"],
     fieldset: ["field"],
     form: ["field"],
+    menubar: ["menu"],
     radio: ["radio-group", "field"],
     "radio-group": ["field"],
     "range-calendar": ["calendar"],

@@ -225,6 +225,9 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["toggle-group"]).toEqual(["toggle"]);
         expect(ENTRY_DEPENDENCIES.toggle).toBeUndefined();
         expect(ENTRY_DEPENDENCIES.toolbar).toBeUndefined();
+        // Epic #49 (#48): a Menubar on Menu's entry (the parent-bar contract is Menu's); never
+        // the other way (spec/menu.md, "In a Menubar")
+        expect(ENTRY_DEPENDENCIES.menubar).toEqual(["menu"]);
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [
@@ -289,6 +292,46 @@ describe("the bundle guard, entry by entry", () => {
             ),
         ).toEqual([
             '/toggle: the component "toggle-group": packages/vue/src/components/toggle-group/toggle-group.ts',
+        ]);
+    });
+
+    it("lets a Menubar hold Menu's code, and fails a Menu holding Menubar's", () => {
+        const menubar = "packages/react/src/components/menubar/menubar.tsx";
+        const contract =
+            "packages/react/src/components/menu/menu-bar-context.ts";
+        expect(entryLeaks("react", "menubar", [menubar, contract], [])).toEqual(
+            [],
+        );
+        expect(
+            entryLeaks(
+                "react",
+                "menu",
+                ["packages/react/src/components/menu/menu-root.tsx", contract],
+                [],
+            ),
+        ).toEqual([]);
+        expect(
+            entryLeaks(
+                "react",
+                "menu",
+                ["packages/react/src/components/menu/menu-root.tsx", menubar],
+                [],
+            ),
+        ).toEqual([
+            '/menu: the component "menubar": packages/react/src/components/menubar/menubar.tsx',
+        ]);
+        expect(
+            entryLeaks(
+                "angular",
+                "menu",
+                [
+                    "packages/angular/menu/utils/menu-bar.ts",
+                    "packages/angular/menubar/directives/menubar.directive.ts",
+                ],
+                ["internal"],
+            ),
+        ).toEqual([
+            '/menu: the component "menubar": packages/angular/menubar/directives/menubar.directive.ts',
         ]);
     });
 
