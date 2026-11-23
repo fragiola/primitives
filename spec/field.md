@@ -221,6 +221,8 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | OTPField | its first slot (`input`) | the Root (`group`) gets `aria-labelledby` and `aria-describedby`; every slot `aria-invalid`, and `aria-labelledby` when it has no name of its own | the value, a string | its slots (focus within the group; `touched` once focus leaves it) | its visually hidden input ([otp-field.md](otp-field.md#forms)) |
 | TagGroup | none (a `grid`) | TagGroup.List | the selected values (an array) | its Tags (focus within the List; `touched` once focus leaves it) | none: it has no hidden input ([tag-group.md](tag-group.md#forms)) |
 | TagsInput | TagsInput.Input (`input`) | TagsInput.Input | the tags (an array of strings) | its Root (the Input, the tags and its buttons; `touched` once focus leaves it) | its visually hidden input ([tags-input.md](tags-input.md#forms)) |
+| SegmentedControl | none (a `radiogroup`) | SegmentedControl.Root | the value, or `null` | its Items (focus within the Root; `touched` once focus leaves it) | its visually hidden input ([segmented-control.md](segmented-control.md#forms)) |
+| Rating | none (a `radiogroup`) | Rating.Root | the value, a number (`0` for none) | its stars (focus within the Root; `touched` once focus leaves it) | its HiddenInput, when rendered ([rating.md](rating.md#forms)) |
 
 **A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
 date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival
