@@ -20,6 +20,8 @@ import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inlin
 import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.ts";
 import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.ts";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.ts";
+import { BreadcrumbsBasic } from "../scenarios/breadcrumbs/breadcrumbs-basic.ts";
+import { BreadcrumbsCollapsed } from "../scenarios/breadcrumbs/breadcrumbs-collapsed.ts";
 import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
 import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts";
@@ -30,6 +32,11 @@ import { CalendarSystemsBasic } from "../scenarios/calendar-systems/calendar-sys
 import { CalendarSystemsPickers } from "../scenarios/calendar-systems/calendar-systems-pickers.ts";
 import { CalendarViewPicker } from "../scenarios/calendar-view/calendar-view-picker.ts";
 import { CalendarViewTyped } from "../scenarios/calendar-view/calendar-view-typed.ts";
+import { CarouselAutoplay } from "../scenarios/carousel/carousel-autoplay.ts";
+import { CarouselBasic } from "../scenarios/carousel/carousel-basic.ts";
+import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.ts";
+import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.ts";
+import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
@@ -98,6 +105,8 @@ import { HoverCardDetached } from "../scenarios/hover-card/hover-card-detached.t
 import { HoverCardInDialog } from "../scenarios/hover-card/hover-card-in-dialog.ts";
 import { HoverCardLifecycle } from "../scenarios/hover-card/hover-card-lifecycle.ts";
 import { LabelControls } from "../scenarios/label/label-controls.ts";
+import { LinkBasic } from "../scenarios/link/link-basic.ts";
+import { LinkRouter } from "../scenarios/link/link-router.ts";
 import { ListboxField } from "../scenarios/listbox/listbox-field.ts";
 import { ListboxGroups } from "../scenarios/listbox/listbox-groups.ts";
 import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.ts";
@@ -170,6 +179,8 @@ import { SliderLabelValue } from "../scenarios/slider/slider-label-value.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
 import { SliderThumbName } from "../scenarios/slider/slider-thumb-name.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
+import { StepsBasic } from "../scenarios/steps/steps-basic.ts";
+import { StepsLinear } from "../scenarios/steps/steps-linear.ts";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.ts";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
@@ -431,6 +442,17 @@ import { ROUTES } from "./routes.ts";
         SegmentedControlVertical,
         SegmentedControlDisabled,
         SegmentedControlField,
+        LinkBasic,
+        LinkRouter,
+        BreadcrumbsBasic,
+        BreadcrumbsCollapsed,
+        StepsBasic,
+        StepsLinear,
+        CarouselBasic,
+        CarouselAutoplay,
+        CarouselTabbed,
+        CarouselMultiple,
+        CarouselVertical,
         RatingBasic,
         RatingHalf,
         RatingReadOnly,
@@ -676,6 +698,17 @@ import { ROUTES } from "./routes.ts";
             @case ("/editable/modes") { <main class="p-6" scenario-editable-modes></main> }
             @case ("/editable/states") { <main class="p-6" scenario-editable-states></main> }
             @case ("/editable/field") { <main class="p-6" scenario-editable-field></main> }
+            @case ("/link/basic") { <main class="p-6" scenario-link-basic></main> }
+            @case ("/link/router") { <main class="p-6" scenario-link-router></main> }
+            @case ("/breadcrumbs/basic") { <main class="p-6" scenario-breadcrumbs-basic></main> }
+            @case ("/breadcrumbs/collapsed") { <main class="p-6" scenario-breadcrumbs-collapsed></main> }
+            @case ("/steps/basic") { <main class="p-6" scenario-steps-basic></main> }
+            @case ("/steps/linear") { <main class="p-6" scenario-steps-linear></main> }
+            @case ("/carousel/basic") { <main class="p-6" scenario-carousel-basic></main> }
+            @case ("/carousel/autoplay") { <main class="p-6" scenario-carousel-autoplay></main> }
+            @case ("/carousel/tabbed") { <main class="p-6" scenario-carousel-tabbed></main> }
+            @case ("/carousel/multiple") { <main class="p-6" scenario-carousel-multiple></main> }
+            @case ("/carousel/vertical") { <main class="p-6" scenario-carousel-vertical></main> }
             @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
             @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
             @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }

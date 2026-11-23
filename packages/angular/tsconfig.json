@@ -96,6 +96,10 @@
         "search-field",
         "clipboard",
         "editable",
+        "link",
+        "breadcrumbs",
+        "steps",
+        "carousel",
         "tests",
         "*.config.ts"
     ]
