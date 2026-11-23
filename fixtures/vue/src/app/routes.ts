@@ -23,6 +23,8 @@ import CalendarTwoMonths from "../scenarios/calendar/calendar-two-months.vue";
 import CalendarUnavailable from "../scenarios/calendar/calendar-unavailable.vue";
 import CalendarPresetBasic from "../scenarios/calendar-preset/calendar-preset-basic.vue";
 import CalendarPresetPicker from "../scenarios/calendar-preset/calendar-preset-picker.vue";
+import CalendarViewPicker from "../scenarios/calendar-view/calendar-view-picker.vue";
+import CalendarViewTyped from "../scenarios/calendar-view/calendar-view-typed.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
@@ -103,6 +105,9 @@ import MenubarBasic from "../scenarios/menubar/menubar-basic.vue";
 import MenubarModal from "../scenarios/menubar/menubar-modal.vue";
 import MenubarVertical from "../scenarios/menubar/menubar-vertical.vue";
 import MeterBasic from "../scenarios/meter/meter-basic.vue";
+import MonthCalendarBasic from "../scenarios/month-calendar/month-calendar-basic.vue";
+import MonthCalendarRange from "../scenarios/month-calendar/month-calendar-range.vue";
+import MonthPickerForm from "../scenarios/month-picker/month-picker-form.vue";
 import MultipleCalendarBasic from "../scenarios/multiple-calendar/multiple-calendar-basic.vue";
 import MultipleCalendarForm from "../scenarios/multiple-calendar/multiple-calendar-form.vue";
 import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
@@ -177,6 +182,9 @@ import ListboxVirtualAsync from "../scenarios/virtual-lists/listbox-virtual-asyn
 import ListboxVirtualBasic from "../scenarios/virtual-lists/listbox-virtual-basic.vue";
 import SelectVirtualAsync from "../scenarios/virtual-lists/select-virtual-async.vue";
 import SelectVirtualBasic from "../scenarios/virtual-lists/select-virtual-basic.vue";
+import YearCalendarBasic from "../scenarios/year-calendar/year-calendar-basic.vue";
+import YearCalendarRange from "../scenarios/year-calendar/year-calendar-range.vue";
+import YearPickerForm from "../scenarios/year-picker/year-picker-form.vue";
 
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
 export const routes: Record<string, Component> = {
@@ -320,6 +328,14 @@ export const routes: Record<string, Component> = {
     "/listbox/horizontal": ListboxHorizontal,
     "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
+    "/calendar-view/picker": CalendarViewPicker,
+    "/calendar-view/typed": CalendarViewTyped,
+    "/month-calendar/basic": MonthCalendarBasic,
+    "/month-calendar/range": MonthCalendarRange,
+    "/year-calendar/basic": YearCalendarBasic,
+    "/year-calendar/range": YearCalendarRange,
+    "/month-picker/form": MonthPickerForm,
+    "/year-picker/form": YearPickerForm,
     "/multiple-calendar/basic": MultipleCalendarBasic,
     "/multiple-calendar/form": MultipleCalendarForm,
     "/number-field/basic": NumberFieldBasic,

@@ -105,6 +105,12 @@
             "import": "./dist/calendar-preset.js",
             "default": "./dist/calendar-preset.js"
         },
+        "./calendar-view": {
+            "@fragiola/source": "./src/components/calendar-view/index.ts",
+            "types": "./dist/calendar-view.d.ts",
+            "import": "./dist/calendar-view.js",
+            "default": "./dist/calendar-view.js"
+        },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
             "types": "./dist/checkbox.d.ts",
@@ -248,6 +254,30 @@
             "types": "./dist/meter.d.ts",
             "import": "./dist/meter.js",
             "default": "./dist/meter.js"
+        },
+        "./month-calendar": {
+            "@fragiola/source": "./src/components/month-calendar/index.ts",
+            "types": "./dist/month-calendar.d.ts",
+            "import": "./dist/month-calendar.js",
+            "default": "./dist/month-calendar.js"
+        },
+        "./month-picker": {
+            "@fragiola/source": "./src/components/month-picker/index.ts",
+            "types": "./dist/month-picker.d.ts",
+            "import": "./dist/month-picker.js",
+            "default": "./dist/month-picker.js"
+        },
+        "./month-range-calendar": {
+            "@fragiola/source": "./src/components/month-range-calendar/index.ts",
+            "types": "./dist/month-range-calendar.d.ts",
+            "import": "./dist/month-range-calendar.js",
+            "default": "./dist/month-range-calendar.js"
+        },
+        "./month-range-picker": {
+            "@fragiola/source": "./src/components/month-range-picker/index.ts",
+            "types": "./dist/month-range-picker.d.ts",
+            "import": "./dist/month-range-picker.js",
+            "default": "./dist/month-range-picker.js"
         },
         "./multiple-calendar": {
             "@fragiola/source": "./src/components/multiple-calendar/index.ts",
@@ -393,6 +423,30 @@
             "import": "./dist/tooltip.js",
             "default": "./dist/tooltip.js"
         },
+        "./year-calendar": {
+            "@fragiola/source": "./src/components/year-calendar/index.ts",
+            "types": "./dist/year-calendar.d.ts",
+            "import": "./dist/year-calendar.js",
+            "default": "./dist/year-calendar.js"
+        },
+        "./year-picker": {
+            "@fragiola/source": "./src/components/year-picker/index.ts",
+            "types": "./dist/year-picker.d.ts",
+            "import": "./dist/year-picker.js",
+            "default": "./dist/year-picker.js"
+        },
+        "./year-range-calendar": {
+            "@fragiola/source": "./src/components/year-range-calendar/index.ts",
+            "types": "./dist/year-range-calendar.d.ts",
+            "import": "./dist/year-range-calendar.js",
+            "default": "./dist/year-range-calendar.js"
+        },
+        "./year-range-picker": {
+            "@fragiola/source": "./src/components/year-range-picker/index.ts",
+            "types": "./dist/year-range-picker.d.ts",
+            "import": "./dist/year-range-picker.js",
+            "default": "./dist/year-range-picker.js"
+        },
         "./async-list": {
             "@fragiola/source": "./src/async-list/index.ts",
             "types": "./dist/async-list.d.ts",
@@ -470,6 +524,11 @@
                 "types": "./dist/calendar-preset.d.ts",
                 "import": "./dist/calendar-preset.js",
                 "default": "./dist/calendar-preset.js"
+            },
+            "./calendar-view": {
+                "types": "./dist/calendar-view.d.ts",
+                "import": "./dist/calendar-view.js",
+                "default": "./dist/calendar-view.js"
             },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",
@@ -591,6 +650,26 @@
                 "import": "./dist/meter.js",
                 "default": "./dist/meter.js"
             },
+            "./month-calendar": {
+                "types": "./dist/month-calendar.d.ts",
+                "import": "./dist/month-calendar.js",
+                "default": "./dist/month-calendar.js"
+            },
+            "./month-picker": {
+                "types": "./dist/month-picker.d.ts",
+                "import": "./dist/month-picker.js",
+                "default": "./dist/month-picker.js"
+            },
+            "./month-range-calendar": {
+                "types": "./dist/month-range-calendar.d.ts",
+                "import": "./dist/month-range-calendar.js",
+                "default": "./dist/month-range-calendar.js"
+            },
+            "./month-range-picker": {
+                "types": "./dist/month-range-picker.d.ts",
+                "import": "./dist/month-range-picker.js",
+                "default": "./dist/month-range-picker.js"
+            },
             "./multiple-calendar": {
                 "types": "./dist/multiple-calendar.d.ts",
                 "import": "./dist/multiple-calendar.js",
@@ -710,6 +789,26 @@
                 "types": "./dist/tooltip.d.ts",
                 "import": "./dist/tooltip.js",
                 "default": "./dist/tooltip.js"
+            },
+            "./year-calendar": {
+                "types": "./dist/year-calendar.d.ts",
+                "import": "./dist/year-calendar.js",
+                "default": "./dist/year-calendar.js"
+            },
+            "./year-picker": {
+                "types": "./dist/year-picker.d.ts",
+                "import": "./dist/year-picker.js",
+                "default": "./dist/year-picker.js"
+            },
+            "./year-range-calendar": {
+                "types": "./dist/year-range-calendar.d.ts",
+                "import": "./dist/year-range-calendar.js",
+                "default": "./dist/year-range-calendar.js"
+            },
+            "./year-range-picker": {
+                "types": "./dist/year-range-picker.d.ts",
+                "import": "./dist/year-range-picker.js",
+                "default": "./dist/year-range-picker.js"
             },
             "./async-list": {
                 "types": "./dist/async-list.d.ts",
