@@ -245,16 +245,13 @@ export class FieldRoot {
                 untracked(this.mode),
                 this.submitted,
             );
-            const next = this.run(element, value, onChange, (settled) =>
-                this.shown.update((before) =>
-                    shownAfterChange(before, settled, onChange),
-                ),
-            );
-            if (next !== null) {
+            const apply = (next: FieldValidation | null) =>
                 this.shown.update((before) =>
                     shownAfterChange(before, next, onChange),
                 );
-            }
+            // a pending run (`null`) still hides a shown error at once when the field does not
+            // validate on change (spec/field.md, "Async validation")
+            apply(this.run(element, value, onChange, apply));
         },
         focused: () => this.focused.set(true),
         blurred: (element, value) => {

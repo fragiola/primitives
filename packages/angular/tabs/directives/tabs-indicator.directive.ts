@@ -1,5 +1,6 @@
 import {
     afterRenderEffect,
+    CSP_NONCE,
     computed,
     Directive,
     effect,
@@ -47,7 +48,8 @@ const BEFORE_HYDRATION = `(${placeTabsIndicator.toString()})(document.currentScr
  * Follows the selected tab through CSS variables measured from the list (spec/tabs.md):
  * `<span *tabsIndicator>` inside the list. Structural: rendered once the selected tab is measured
  * (at once with `renderBeforeHydration`), never while no tab is selected, as in React and Vue. The directive writes its attributes on the element it renders.
- * `*tabsIndicator="true"` places it before hydration in a server render.
+ * `*tabsIndicator="true"` places it before hydration in a server render, and
+ * `*tabsIndicator="true; nonce: cspNonce"` gives its script a nonce.
  */
 @Directive({ selector: "[tabsIndicator]", exportAs: "tabsIndicator" })
 export class TabsIndicator {
@@ -62,6 +64,15 @@ export class TabsIndicator {
         // `*tabsIndicator` alone gives "": not placed before hydration
         transform: (value: unknown) => value === true || value === "true",
     });
+    /**
+     * The `nonce` of the `renderBeforeHydration` script, so it runs under a Content Security Policy
+     * that allows inline scripts by nonce: `*tabsIndicator="true; nonce: cspNonce"`. Unset, Angular's
+     * own `CSP_NONCE` provider (what Angular gives its inline styles).
+     */
+    readonly nonce = input<string | undefined>(undefined, {
+        alias: "tabsIndicatorNonce",
+    });
+    private readonly cspNonce = inject(CSP_NONCE, { optional: true });
     readonly state = computed<TabsIndicatorState>(() => ({
         orientation: this.root.orientation(),
         activationDirection: this.root.activationDirection(),
@@ -94,9 +105,13 @@ export class TabsIndicator {
             effect(() => {
                 const host = element();
                 if (host !== null && this.renderBeforeHydration()) {
+                    const nonce = this.nonce() ?? this.cspNonce;
                     untracked(() => {
                         const script =
                             host.ownerDocument.createElement("script");
+                        if (nonce) {
+                            script.setAttribute("nonce", nonce);
+                        }
                         script.textContent = BEFORE_HYDRATION;
                         host.appendChild(script);
                     });
