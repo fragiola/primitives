@@ -31,6 +31,7 @@ export * from "@fragiola/primitives-angular/date-range-picker-input";
 export * from "@fragiola/primitives-angular/dialog";
 export * from "@fragiola/primitives-angular/direction";
 export * from "@fragiola/primitives-angular/drawer";
+export * from "@fragiola/primitives-angular/editable";
 export * from "@fragiola/primitives-angular/field";
 export * from "@fragiola/primitives-angular/fieldset";
 export * from "@fragiola/primitives-angular/form";

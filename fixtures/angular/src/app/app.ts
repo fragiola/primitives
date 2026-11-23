@@ -79,6 +79,10 @@ import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.ts";
 import { DrawerNested } from "../scenarios/drawer/drawer-nested.ts";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.ts";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.ts";
+import { EditableBasic } from "../scenarios/editable/editable-basic.ts";
+import { EditableField } from "../scenarios/editable/editable-field.ts";
+import { EditableModes } from "../scenarios/editable/editable-modes.ts";
+import { EditableStates } from "../scenarios/editable/editable-states.ts";
 import { FieldAsync } from "../scenarios/field/field-async.ts";
 import { FieldAsyncBlur } from "../scenarios/field/field-async-blur.ts";
 import { FieldBasic } from "../scenarios/field/field-basic.ts";
@@ -439,6 +443,10 @@ import { ROUTES } from "./routes.ts";
         SearchFieldField,
         ClipboardBasic,
         ClipboardFailure,
+        EditableBasic,
+        EditableModes,
+        EditableStates,
+        EditableField,
         CalendarSystemsBasic,
         CalendarSystemsPickers,
         TimeZonesField,
@@ -664,6 +672,10 @@ import { ROUTES } from "./routes.ts";
             @case ("/search-field/field") { <main class="p-6" scenario-search-field-field></main> }
             @case ("/clipboard/basic") { <main class="p-6" scenario-clipboard-basic></main> }
             @case ("/clipboard/failure") { <main class="p-6" scenario-clipboard-failure></main> }
+            @case ("/editable/basic") { <main class="p-6" scenario-editable-basic></main> }
+            @case ("/editable/modes") { <main class="p-6" scenario-editable-modes></main> }
+            @case ("/editable/states") { <main class="p-6" scenario-editable-states></main> }
+            @case ("/editable/field") { <main class="p-6" scenario-editable-field></main> }
             @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
             @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
             @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }
