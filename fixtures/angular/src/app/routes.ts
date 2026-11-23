@@ -190,4 +190,8 @@ export const ROUTES: readonly string[] = [
     "/pagination/basic",
     "/pagination/links",
     "/aspect-ratio/basic",
+    "/calendar-systems/basic",
+    "/calendar-systems/pickers",
+    "/time-zones/field",
+    "/time-zones/picker",
 ];
