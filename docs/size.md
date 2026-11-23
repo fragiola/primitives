@@ -23,10 +23,10 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 123,730 B | 42,275 B |
+| `@fragiola/primitives` | 123,854 B | 42,315 B |
 | `@fragiola/primitives/async-list` | 839 B | 447 B |
 | `@fragiola/primitives/calendar-systems` | 9,711 B | 3,608 B |
-| `@fragiola/primitives/carousel` | 6,601 B | 2,502 B |
+| `@fragiola/primitives/carousel` | 6,722 B | 2,539 B |
 | `@fragiola/primitives/clipboard` | 412 B | 284 B |
 | `@fragiola/primitives/collection` | 10,242 B | 3,657 B |
 | `@fragiola/primitives/date` | 3,703 B | 1,624 B |
@@ -62,7 +62,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 354,856 B | 109,939 B | 258,934 B | 76,579 B |
+| `@fragiola/primitives-react` | 354,981 B | 109,985 B | 258,938 B | 76,575 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -74,7 +74,7 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/calendar` | 12,982 B | 5,123 B | 10,049 B | 3,982 B |
 | `@fragiola/primitives-react/calendar-preset` | 13,940 B | 5,399 B | 11,007 B | 4,254 B |
 | `@fragiola/primitives-react/calendar-view` | 23,566 B | 8,034 B | 19,653 B | 6,662 B |
-| `@fragiola/primitives-react/carousel` | 14,633 B | 5,422 B | 8,061 B | 3,162 B |
+| `@fragiola/primitives-react/carousel` | 14,762 B | 5,464 B | 8,065 B | 3,160 B |
 | `@fragiola/primitives-react/checkbox` | 7,098 B | 3,011 B | 5,820 B | 2,555 B |
 | `@fragiola/primitives-react/checkbox-group` | 5,033 B | 2,250 B | 4,579 B | 2,082 B |
 | `@fragiola/primitives-react/clipboard` | 4,159 B | 1,758 B | 3,875 B | 1,632 B |
@@ -151,7 +151,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 402,693 B | 110,839 B | 306,663 B | 76,914 B |
+| `@fragiola/primitives-vue` | 402,814 B | 110,877 B | 306,663 B | 76,914 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -163,7 +163,7 @@ External: `vue`.
 | `@fragiola/primitives-vue/calendar` | 13,980 B | 5,173 B | 11,094 B | 4,033 B |
 | `@fragiola/primitives-vue/calendar-preset` | 14,991 B | 5,432 B | 12,105 B | 4,294 B |
 | `@fragiola/primitives-vue/calendar-view` | 26,201 B | 8,058 B | 22,358 B | 6,716 B |
-| `@fragiola/primitives-vue/carousel` | 15,288 B | 5,413 B | 8,764 B | 3,187 B |
+| `@fragiola/primitives-vue/carousel` | 15,409 B | 5,451 B | 8,764 B | 3,187 B |
 | `@fragiola/primitives-vue/checkbox` | 7,135 B | 2,902 B | 5,895 B | 2,454 B |
 | `@fragiola/primitives-vue/checkbox-group` | 4,483 B | 2,011 B | 4,067 B | 1,841 B |
 | `@fragiola/primitives-vue/clipboard` | 3,761 B | 1,637 B | 3,515 B | 1,506 B |
@@ -240,7 +240,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 1,040,406 B | 170,525 B | 944,360 B | 135,696 B |
+| `@fragiola/primitives-angular` | 1,040,533 B | 170,573 B | 944,360 B | 135,696 B |
 | `@fragiola/primitives-angular/internal` | 39,783 B | 14,413 B | 17,912 B | 6,315 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -253,7 +253,7 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/calendar` | 31,756 B | 7,177 B | 28,985 B | 6,089 B |
 | `@fragiola/primitives-angular/calendar-preset` | 33,482 B | 7,339 B | 30,711 B | 6,243 B |
 | `@fragiola/primitives-angular/calendar-view` | 60,511 B | 10,233 B | 56,773 B | 8,904 B |
-| `@fragiola/primitives-angular/carousel` | 30,397 B | 7,007 B | 23,946 B | 4,738 B |
+| `@fragiola/primitives-angular/carousel` | 30,518 B | 7,050 B | 23,946 B | 4,738 B |
 | `@fragiola/primitives-angular/checkbox` | 39,089 B | 8,157 B | 36,187 B | 7,107 B |
 | `@fragiola/primitives-angular/checkbox-group` | 28,306 B | 6,245 B | 26,236 B | 5,470 B |
 | `@fragiola/primitives-angular/clipboard` | 8,647 B | 2,327 B | 8,555 B | 2,233 B |
