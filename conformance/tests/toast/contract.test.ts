@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoFalseStates, part, parts } from "../../src/contract.ts";
+import { settleAnimations } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 import { cssVariable, mouseDrag } from "../../src/swipe.ts";
 
@@ -222,6 +223,8 @@ test("toast / swipe: data-swiping, the direction and the movement while it moves
     await expect(root).toBeVisible();
     await expect(root).not.toHaveAttribute("data-swiping");
     await expect(root).not.toHaveAttribute("data-swipe-direction");
+    // the drag starts on the toast once its enter transition has placed it
+    await settleAnimations(page);
     const release = await mouseDrag(
         page,
         root.getByText("Drag to dismiss"),

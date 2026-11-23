@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
 import { expectOutput } from "../../src/output.ts";
+import { settleAnimations } from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 import { mouseDrag, touchDrag } from "../../src/swipe.ts";
 
@@ -122,8 +123,12 @@ test.describe("toast / basic", () => {
     }) => {
         await button(page, "Show toast").click();
         await button(page, "Show alert").click();
+        // both rendered before the keyboard reaches them
+        await expect(region(page).getByRole("dialog")).toHaveCount(1);
+        await expect(region(page).getByRole("alertdialog")).toHaveCount(1);
         await button(page, "Before").focus();
         await page.keyboard.press("F6");
+        await expect(region(page)).toBeFocused();
         await page.keyboard.press("Tab");
         const alert = region(page).getByRole("alertdialog", {
             name: "Connection lost",
@@ -228,6 +233,8 @@ test.describe("toast / swipe", () => {
         await open(page, "/toast/swipe");
         await button(page, "Notify").click();
         await expect(toast(page, "Swipe me")).toBeVisible();
+        // the drag starts on the toast once its enter transition has placed it
+        await settleAnimations(page);
     });
 
     test("a short drag settles back; a long one dismisses", async ({
@@ -257,6 +264,7 @@ test.describe("toast / swipe (touch)", () => {
         await button(page, "Notify").click();
         const text = toast(page, "Swipe me").getByText("Drag to dismiss");
         await expect(text).toBeVisible();
+        await settleAnimations(page);
         await touchDrag(page, text, 260, 0);
         await expectOutput(page, "toasts", "0");
     });
