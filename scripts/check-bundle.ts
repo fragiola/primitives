@@ -84,7 +84,18 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "context-menu": ["menu"],
     "date-field": ["field"],
     "date-picker": ["calendar", "field"],
+    "date-picker-input": ["calendar", "date-field", "date-picker", "field"],
+    "date-range-field": ["date-field", "field"],
     "date-range-picker": ["calendar", "date-picker", "field"],
+    "date-range-picker-input": [
+        "calendar",
+        "date-field",
+        "date-picker",
+        "date-picker-input",
+        "date-range-field",
+        "date-range-picker",
+        "field",
+    ],
     drawer: ["dialog"],
     fieldset: ["field"],
     form: ["field"],
@@ -101,18 +112,29 @@ export const ENTRY_DEPENDENCIES: Readonly<
     slider: ["field"],
     switch: ["field"],
     "time-field": ["date-field", "field"],
+    "time-range-field": ["date-field", "date-range-field", "field"],
     "toggle-group": ["toggle"],
 };
+
+/** The entries that type dates and times in segments (Epics #73, #76). */
+const SEGMENTED = [
+    "date-field",
+    "time-field",
+    "date-range-field",
+    "time-range-field",
+    "date-picker-input",
+    "date-range-picker-input",
+];
 
 /**
  * The toolkit mechanisms only some component entries may import (D8: heavy optional parts stay
  * out of the components that do not need them). The segment editing and the time values are the
- * date and time fields' (Epic #73): the calendars and the pickers never import them, so their
- * entries stay as they were.
+ * segmented fields' (Epic #73) and the pickers' opt-in typed input's (Epic #76): the calendars and
+ * the pickers never import them, so their entries stay as they were.
  */
 export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
-    segments: ["date-field", "time-field"],
-    time: ["date-field", "time-field"],
+    segments: SEGMENTED,
+    time: SEGMENTED,
 };
 
 /**
