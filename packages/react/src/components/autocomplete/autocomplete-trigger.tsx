@@ -1,0 +1,37 @@
+import type { MouseEvent as ReactMouseEvent } from "react";
+import { useRequiredContext } from "../../hooks/use-required-context.ts";
+import { type PartProps, renderElement } from "../../utils/render-element.tsx";
+import { stateAttributes } from "../../utils/state-attributes.ts";
+import { AutocompleteContext } from "./autocomplete-context.ts";
+
+/** Toggles the list; not in the tab order, keeps focus in the input. */
+export function AutocompleteTrigger(
+    props: PartProps<{ open: boolean; disabled: boolean }>,
+) {
+    const context = useRequiredContext(
+        AutocompleteContext,
+        "Autocomplete.Trigger",
+    );
+    const { open, disabled } = context;
+    return renderElement(
+        "button",
+        props,
+        { open, disabled },
+        {
+            type: "button",
+            tabIndex: -1,
+            disabled,
+            "aria-expanded": open,
+            "aria-controls": context.listId,
+            "data-primitives-part": "autocomplete-trigger",
+            ...stateAttributes({ "popup-open": open, disabled }),
+            onPointerDown: (event: PointerEvent) => event.preventDefault(),
+            onClick: (event: ReactMouseEvent) => {
+                context.pending.current = null;
+                context.setOpen(!open, "trigger-press", event.nativeEvent);
+                context.trigger?.focus();
+            },
+        },
+        context.setButton,
+    );
+}

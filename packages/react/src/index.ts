@@ -4,6 +4,7 @@
 
 export * from "./components/accordion/index.ts";
 export * from "./components/alert-dialog/index.ts";
+export * from "./components/autocomplete/index.ts";
 export * from "./components/avatar/index.ts";
 export * from "./components/button/index.ts";
 export * from "./components/calendar/index.ts";

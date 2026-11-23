@@ -7,6 +7,7 @@
 export const COMPONENTS = [
     "accordion",
     "alert-dialog",
+    "autocomplete",
     "avatar",
     "button",
     "calendar",
