@@ -103,10 +103,11 @@ The APG's "list with inline autocomplete":
 - The arrow keys move the highlight; the Input shows the highlighted suggestion's whole text,
   the caret at its end. Back to the input (no highlight), it shows the value.
 - Enter chooses the highlighted suggestion (`item-press`). Leaving the Input (Tab, an outside
-  press) with a highlighted suggestion accepts it (`input-blur`, the APG: "the automatically
+  press) with an enabled suggestion shown accepts it (a disabled one is only dropped) (`input-blur`, the APG: "the automatically
   selected suggestion becomes the value of the combobox when the combobox loses focus").
 - Escape (open) closes the list and drops the completion: the Input shows the value.
-- A pointer hovering a suggestion highlights it and completes nothing.
+- A pointer hovering a suggestion highlights it and completes nothing: a completion shown is
+  dropped, and the Input shows the value.
 
 In `list` and `none`, the Input always shows the value.
 
