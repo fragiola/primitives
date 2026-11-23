@@ -43,6 +43,8 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     toolbar: ["_recipes/toggle-group.ts", "_recipes/toggle.ts"],
     menubar: ["_recipes/menu.ts"],
     // the Label that names the field (Label has no example of its own: these show it)
+    // the transfer list's move buttons
+    listbox: ["_recipes/button.ts"],
     "number-field": ["_recipes/label.ts"],
     "otp-field": ["_recipes/label.ts"],
     "radio-group": [
@@ -87,6 +89,8 @@ describe("the manifest", () => {
                 "slider",
                 "select",
                 "combobox",
+                "autocomplete",
+                "listbox",
                 "fieldset",
                 "form",
                 "radio-group",

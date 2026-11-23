@@ -5,7 +5,7 @@ export default {
     description:
         "A quantity between 1 and 10 named by a Label, stepped by its buttons (held, they repeat), the arrows and Page Up and Down, or typed; and a discount written as a percentage whose label is a scrub area.",
     category: "forms",
-    order: 14,
+    order: 16,
     features: [
         "NumberField.Root",
         "NumberField.Group",
