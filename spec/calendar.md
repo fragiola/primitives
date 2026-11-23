@@ -11,9 +11,11 @@
 Stage 3 (`docs/handoff.md` §5): the segmented date and time fields are
 [date-field.md](date-field.md) (Epic #73), the range fields
 [date-range-field.md](date-range-field.md) (Epic #76), and the pickers' typed input is
-[Typed input](#typed-input-datepickerinput-daterangepickerinput) below (Epic #76); a multiple-date
-calendar, month and year pickers, presets, time zones, non-Gregorian calendars, event calendars
-are out of scope.
+[Typed input](#typed-input-datepickerinput-daterangepickerinput) below (Epic #76); the
+multiple-date calendar and the presets are [Multiple dates](#multiple-dates-multiplecalendar) and
+[Presets](#presets-calendarpreset) below (Epic #79, Issue #77); the month and year calendars and
+pickers, and a calendar's day, month and year views, are [month-calendar.md](month-calendar.md)
+(Epic #79, Issue #78). Time zones, non-Gregorian calendars and event calendars are out of scope.
 
 ## Dates
 
@@ -240,6 +242,92 @@ renders them (the recipes: the segments, then the Trigger). Choosing a date clos
 focuses the Trigger, as the picker's. Leaving the segments (for the Trigger too) is the field's
 blur, as leaving the Trigger is today's. The keys of the segments are DateField's; a range's two
 ends are one sequence (date-range-field.md, "Typing and keys").
+
+## Multiple dates (MultipleCalendar)
+
+A calendar that chooses **several dates** (Epic #79, Issue #77): an availability, a set of days
+off. It is **its own component, in an entry of its own** (`/multiple-calendar`), not a `multiple`
+prop on `Calendar.Root`: the calendars' state is one module shared by `/calendar`,
+`/range-calendar` and the four pickers' entries, so a mode added there would grow all six
+`docs/size.md` rows (the Epic's risk; D8, the typed input's way). `MultipleCalendar.Root` writes
+its state over the Calendar's and uses **the Calendar's parts unchanged**, named
+`multiple-calendar-<part>` (the entry exports them under `MultipleCalendar`).
+
+**Anatomy.** The Calendar's ([Anatomy](#anatomy)), with the root's prefix, plus the form's hidden
+inputs:
+
+| part | element | `data-primitives-part` | notes |
+| --- | --- | --- | --- |
+| Root | `div` | `multiple-calendar-root` | holds the dates |
+| Heading, PrevButton, NextButton, Grid, GridHeader, HeaderCell, GridBody, Row, Cell | as the Calendar's | `multiple-calendar-<part>` | |
+| (hidden inputs) | `input type="hidden"` | `multiple-calendar-input` | one per chosen date, after the Root's children, while it has a `name` |
+
+**API.** `MultipleCalendar.Root`: `value`, `defaultValue` (`[]`), `onValueChange(dates, details)`
+(`PlainDate[]`, **sorted** from the earliest, no date twice; reason `item-press`, or `none` for a
+form reset); `maxSelected` (no limit by default); the Calendar's options (`min`, `max`,
+`isDateUnavailable`, `locale`, `firstDayOfWeek`, `visibleMonths`), `disabled`, `readOnly`; and
+`name`.
+
+**Behaviour.**
+
+- A press on a date, or Enter / Space on the focused one, **toggles** it: an unchosen date is
+  added, a chosen one removed (the Bits UI and Zag `multiple` behaviour; React Aria has none). A
+  disabled, unavailable or outside-month date, or a read-only calendar, changes nothing.
+- **`maxSelected`**: a date that would make the value longer is not added (the press changes
+  nothing; the chosen dates can still be removed). No date is marked: the cells keep their state.
+- The **focused date** starts at the earliest chosen date, else today (clamped), as the Calendar's.
+  After a toggle the focus stays on the cell. Every other key, the paging and the focus rules are
+  the Calendar's.
+- The Grid has `aria-multiselectable="true"` (the APG grid's multiple selection); each chosen date
+  `aria-selected="true"` and `data-selected`.
+- It does not bind to a picker: a multiple-date picker is out of scope (a picker's trigger, form
+  and typed input hold one date or one range).
+
+**Forms.** With `name`, the Root renders **one `<input type="hidden">` per chosen date** (ISO, in
+the value's order), so the form submits `days=2026-11-20&days=2026-11-24` (`FormData.getAll`, as a
+`<select multiple>`), and nothing with no date. `disabled` disables them (nothing is submitted). A
+form reset returns an uncontrolled calendar to its `defaultValue` (a controlled one reports it,
+reason `none`). The hidden inputs are no controls to validate: there is no `required` and no Field
+integration (known limit, recorded).
+
+## Presets (CalendarPreset)
+
+A **preset** is a button that sets a calendar's value to a known date or range: "Today", "Last 7
+days" (Epic #79, Issue #77). It is one part, `CalendarPreset`, **in an entry of its own**
+(`/calendar-preset`), placed anywhere inside a `Calendar.Root` or a `RangeCalendar.Root`, inline
+or bound in a picker's popup (DatePicker, DateRangePicker and their typed inputs): the existing
+entries are unchanged, and a calendar without presets imports none of its code (D8).
+
+| part | element | `data-primitives-part` | notes |
+| --- | --- | --- | --- |
+| Preset | `button` | `calendar-preset` / `range-calendar-preset` (by the root it sits in) | its content (the label) is the consumer's |
+
+**API.** `value` (React and Vue; Angular: the directive's own input, `[calendarPreset]`): a
+`PlainDate`, a `DateRange`, or a function of today returning one (`(today) => ({ start:
+addDays(today, -6), end: today })`), read when it renders and when it is pressed. In a
+RangeCalendar a date is the one-day range; in a Calendar a range is no value (the preset is
+disabled).
+
+**Behaviour.**
+
+- **A press sets the value** (reason `item-press`, the press of an item, as a cell's), and moves
+  the focused date to it (a range: its end), and the visible months with it as the keyboard does
+  ([Keyboard](#keyboard)): a range that fits the visible months shows whole. A range started in
+  the calendar is dropped first.
+- **In a picker** the press is a choice: the picker's value is set and its popup closes (reason
+  `item-press`), focus returns to the Trigger. In a typed picker the segments are replaced by
+  [the binding rule](#typed-input-datepickerinput-daterangepickerinput) (a preset is a chosen
+  value; one press, one `onValueChange`).
+- **Disabled** (`disabled`, `data-disabled`) while the calendar is disabled or read-only, or a date
+  of its value (a range's start or end) is before `min`, after `max` or unavailable: it could not
+  be chosen in the grid either.
+- **`data-selected`** while the calendar's value equals the preset's (the same date, or the same
+  start and end). There is no `aria-pressed`: a preset sets a value, pressing it again does not
+  unset it (it is no toggle button).
+- Inline, the focus stays on the preset (as on the page buttons).
+
+The preset follows Zag's `PresetTrigger` and Bits UI's presets as behaviour references (the APG
+and Base UI have none); the labels are the app's.
 
 ## Keyboard
 
@@ -586,6 +674,83 @@ Checks:
 4. Opening the popup, ArrowRight, Enter (November 21): `value: 2026-11-21T14:30`,
    `reason: item-press` (the time kept).
 
+### `/multiple-calendar/basic`
+
+A MultipleCalendar, en-US, `maxSelected` 3, with PrevButton **"Previous month"**, a Heading,
+NextButton **"Next month"** and one Grid. Output: `value: <ISO dates joined by "," or none>`,
+`reason: ...`.
+
+Checks:
+
+1. A `grid` named "November 2026" with `aria-multiselectable="true"`; November 20 (today) has
+   `tabindex="0"` (no date chosen yet).
+2. Click November 10, then November 24: `value: 2026-11-10,2026-11-24`, `reason: item-press`; both
+   cells have `aria-selected="true"`.
+3. Click November 3: `value: 2026-11-03,2026-11-10,2026-11-24` (sorted).
+4. Click November 12 (the fourth date, over `maxSelected`): the value is unchanged, the cell has no
+   `aria-selected`.
+5. The focus is on November 12 (the last pressed). ArrowLeft ×2 (November 10), Enter removes it:
+   `value: 2026-11-03,2026-11-24`; the focus stays on November 10, which has no `aria-selected`.
+6. ArrowRight (November 11), Space: `value: 2026-11-03,2026-11-11,2026-11-24`.
+7. Axe finds no violation.
+8. Contract layer: every part carries `multiple-calendar-<part>`, none `calendar-<part>`; the
+   chosen cells carry `data-selected`; no `"false"` state attribute.
+
+### `/multiple-calendar/form`
+
+A native `<form>` holding a MultipleCalendar (en-US, `name="days"`, `defaultValue` [2026-11-20]),
+with **"Submit"** and **"Reset"** buttons. Output: `form: ...`.
+
+Checks:
+
+1. "Submit": `form: days=2026-11-20`.
+2. Click November 24, "Submit": `form: days=2026-11-20&days=2026-11-24`.
+3. Click November 20 (removes it), "Submit": `form: days=2026-11-24`.
+4. "Reset", "Submit": `form: days=2026-11-20`; November 24 has no `aria-selected`.
+5. Contract layer: one `multiple-calendar-input` per chosen date, `type="hidden"`,
+   `name="days"`, its value the ISO date.
+
+### `/calendar-preset/basic`
+
+Two `section`s. **"Date"** (`aria-label`): a Calendar (en-US, `max` 2026-12-31) with PrevButton
+**"Previous month"**, a Heading, NextButton **"Next month"**, one Grid, and three presets:
+**"Today"** (a function of today), **"Christmas"** (2026-12-25), **"New Year"** (2027-01-01, after
+`max`). **"Range"**: a RangeCalendar (en-US) with the same header and presets **"Last 7 days"**
+(today − 6 to today, a function) and **"Next week"** (2026-11-23 to 2026-11-29). Output:
+`date: ...`, `reason: ...`, `range: <start>..<end> or none`.
+
+Checks:
+
+1. In "Date", press "Christmas": `date: 2026-12-25`, `reason: item-press`; the grid is named
+   "December 2026" and December 25 has `aria-selected="true"`; the focus stays on "Christmas".
+2. Press "Today": `date: 2026-11-20`; the grid is named "November 2026".
+3. "New Year" is disabled.
+4. In "Range", click November 10 (a range started), then press "Next week": `range:
+   2026-11-23..2026-11-29` (the started range dropped); November 23–29 have
+   `aria-selected="true"`.
+5. Press "Last 7 days": `range: 2026-11-14..2026-11-20`.
+6. Axe finds no violation.
+7. Contract layer: the presets carry `calendar-preset` / `range-calendar-preset` and
+   `type="button"`; "Last 7 days" has `data-selected`, "Next week" none; "New Year" has
+   `data-disabled`.
+
+### `/calendar-preset/picker`
+
+A `Field.Root` **"Stay"** around a DateRangePickerInput (en-US): Segments `range="start"`
+(**"Check-in"**), a literal **"–"**, Segments `range="end"` (**"Check-out"**), a Trigger
+`aria-label` **"Choose dates"**, the Popup (**"Choose dates"**) holding a bound RangeCalendar (its
+header, one Grid) and the presets **"This weekend"** (2026-11-21 to 2026-11-22) and **"Next
+week"** (2026-11-23 to 2026-11-29). Output: `value`, `reason`, `changes`.
+
+Checks:
+
+1. Open the popup, press "Next week": `value: 2026-11-23..2026-11-29`, `reason: item-press`,
+   `changes: 1`; the popup closes and the Trigger has the focus; the start's day segment shows 23
+   (`aria-valuenow="23"`) and the end's 29.
+2. Reopen: November 23–29 have `aria-selected="true"`; "Next week" has `data-selected` (contract
+   layer).
+3. Axe finds no violation while open.
+
 ## Differences from Base UI
 
 Base UI has no calendar and no date picker (`docs/catalog.md`), so the behaviour comes from the
@@ -605,3 +770,5 @@ against React Aria Components 1.22. The decided points:
 | The typed input (Epic #76) | an opt-in Root of its own (`DatePickerInput.Root`) in a separate entry, DateField segments and the picker's Trigger as the calendar button; React Aria's DatePicker always has its segments | D8: the pickers without it stay byte for byte as they were |
 | A typed entry out of range | no value (`null`) and the segments invalid; React Aria sets the value and marks it invalid | the binding rule (the Epic's): the picker's value is one the calendar could have chosen |
 | A date chosen with a time granularity | the typed time is kept, a placeholder time takes `placeholderValue`'s; React Aria the same when the popup closes on a choice | the calendar chooses the date part only |
+| A multiple-date calendar (Epic #79) | its own Root and entry, `MultipleCalendar` (`/multiple-calendar`), over the Calendar's parts; one hidden input per date; no picker | D8: a `multiple` prop on `Calendar.Root` grows the shared state of six entries |
+| Presets (Epic #79) | one part, `CalendarPreset`, in its own entry, usable in every calendar and picker; reason `item-press`; `data-selected`, no `aria-pressed` | D8: the calendar and picker rows stay as they were; a preset is no toggle |
