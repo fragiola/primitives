@@ -48,6 +48,11 @@ import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
 import DatePickerLifecycle from "../scenarios/date-picker/date-picker-lifecycle.vue";
 import DatePickerMixedForm from "../scenarios/date-picker/date-picker-mixed-form.vue";
 import DatePickerRange from "../scenarios/date-picker/date-picker-range.vue";
+import DatePickerInputBasic from "../scenarios/date-picker-input/date-picker-input-basic.vue";
+import DatePickerInputDateTime from "../scenarios/date-picker-input/date-picker-input-date-time.vue";
+import DatePickerInputRange from "../scenarios/date-picker-input/date-picker-input-range.vue";
+import DateRangeFieldBasic from "../scenarios/date-range-field/date-range-field-basic.vue";
+import DateRangeFieldForm from "../scenarios/date-range-field/date-range-field-form.vue";
 import DialogBasic from "../scenarios/dialog/dialog-basic.vue";
 import DialogControlled from "../scenarios/dialog/dialog-controlled.vue";
 import DialogDetached from "../scenarios/dialog/dialog-detached.vue";
@@ -143,6 +148,7 @@ import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
 import TimeFieldBasic from "../scenarios/time-field/time-field-basic.vue";
 import TimeFieldForm from "../scenarios/time-field/time-field-form.vue";
 import TimeFieldMinMax from "../scenarios/time-field/time-field-min-max.vue";
+import TimeRangeFieldBasic from "../scenarios/time-range-field/time-range-field-basic.vue";
 import ToastBasic from "../scenarios/toast/toast-basic.vue";
 import ToastLimit from "../scenarios/toast/toast-limit.vue";
 import ToastPromise from "../scenarios/toast/toast-promise.vue";
@@ -319,6 +325,12 @@ export const routes: Record<string, Component> = {
     "/time-field/basic": TimeFieldBasic,
     "/time-field/min-max": TimeFieldMinMax,
     "/time-field/form": TimeFieldForm,
+    "/date-range-field/basic": DateRangeFieldBasic,
+    "/date-range-field/form": DateRangeFieldForm,
+    "/time-range-field/basic": TimeRangeFieldBasic,
+    "/date-picker-input/basic": DatePickerInputBasic,
+    "/date-picker-input/range": DatePickerInputRange,
+    "/date-picker-input/date-time": DatePickerInputDateTime,
     "/otp-field/basic": OtpFieldBasic,
     "/otp-field/field": OtpFieldField,
     "/listbox-virtual/basic": ListboxVirtualBasic,
