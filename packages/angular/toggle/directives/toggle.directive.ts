@@ -50,6 +50,7 @@ export interface ToggleState {
 export class Toggle {
     /** Whether it is pressed (controlled); ignored inside a ToggleGroup. */
     readonly pressed = input<boolean | undefined>(undefined);
+    /** Its new state (`[(pressed)]`); not inside a ToggleGroup. */
     readonly pressedChange = output<boolean>();
     /** Pressed at first (default `false`); ignored inside a ToggleGroup. */
     readonly defaultPressed = input(false, { transform: booleanAttribute });
@@ -125,7 +126,7 @@ export class Toggle {
             this.own.set(next, details);
             return;
         }
-        this.pressedChange.emit(next);
+        // its `pressed` is ignored in a group: no two-way change, only the report (as Vue's)
         this.pressedChangeDetails.emit({ value: next, details });
         const value = this.value();
         if (value !== undefined) {

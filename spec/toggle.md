@@ -31,7 +31,9 @@ ToggleGroup code (`ENTRY_DEPENDENCIES`: `toggle-group` is built on `toggle`).
   pressed. A press reports the new state with reason `none` (spec/README.md, "Change details";
   Base UI's reason). Inside a ToggleGroup, `pressed` and `defaultPressed` are ignored: the Toggle
   is pressed while the group's value holds its `value`, and a press changes the group's value;
-  `onPressedChange` still reports it, before the group's `onValueChange`.
+  `onPressedChange` still reports it, before the group's `onValueChange`. The two-way binding's
+  event is not emitted there (Vue's `update:pressed`, Angular's `pressedChange`): Vue reports
+  with `pressedChange`, Angular with `pressedChangeDetails`, as React's `onPressedChange`.
 - `value` (a string): its value in a ToggleGroup; required there, unused outside one.
 - `disabled` (`false`): it ignores presses and keys. Inside a disabled ToggleGroup, a disabled
   Toolbar or a disabled Toolbar.Group, it is disabled too.

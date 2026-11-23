@@ -46,6 +46,7 @@ for (const [target, names] of inputs) {
     }
 }
 Output("pressedChange")(Toggle.prototype, "pressedChange");
+Output("pressedChangeDetails")(Toggle.prototype, "pressedChangeDetails");
 Output("valueChange")(ToggleGroup.prototype, "valueChange");
 
 TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
@@ -187,7 +188,7 @@ describe("a focusable disabled Toolbar.Input and Toolbar.Button", () => {
     imports: [ToggleGroup, Toggle],
     template: `
         <div toggleGroup aria-label="Alignment" (valueChange)="calls.push('group:' + $event.join())">
-            <button toggle [value]="'left'" [pressed]="false" (pressedChange)="calls.push('left:' + $event)">Left</button>
+            <button toggle [value]="'left'" [pressed]="false" (pressedChange)="calls.push('two-way:' + $event)" (pressedChangeDetails)="calls.push('left:' + $event.value + ':' + $event.details.reason)">Left</button>
         </div>
     `,
 })
@@ -195,7 +196,9 @@ class ToggleInGroup {
     readonly calls: string[] = [];
 }
 
-// spec/toggle.md, "API": inside a group, the Toggle reports before the group's change
+// spec/toggle.md, "API": inside a group, the Toggle reports before the group's change, through
+// `(pressedChangeDetails)` only: its `pressed` is ignored there, so the two-way `pressedChange` is
+// not emitted (Epic #49 review, as Vue's `update:pressed`)
 describe("a Toggle in a ToggleGroup", () => {
     it("reports its pressed state, then the group its value", async () => {
         TestBed.configureTestingModule({
@@ -207,7 +210,7 @@ describe("a Toggle in a ToggleGroup", () => {
         button(root, "Left").click();
         await fixture.whenStable();
         expect(fixture.componentInstance.calls).toEqual([
-            "left:true",
+            "left:true:none",
             "group:left",
         ]);
         // the group's value wins over the Toggle's own `pressed`

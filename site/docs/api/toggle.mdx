@@ -75,7 +75,8 @@ export class Bold {
 It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
 (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
 forwards. Vue binds them as `v-model:pressed` and `@pressed-change`; Angular as `[(pressed)]` and
-`(pressedChangeDetails)` (`{ value, details }`). Vue and Angular take the click, pointer, key and
+`(pressedChangeDetails)` (`{ value, details }`); in a ToggleGroup only `@pressed-change` and
+`(pressedChangeDetails)` report (no `update:pressed`, no `pressedChange`). Vue and Angular take the click, pointer, key and
 focus listeners as native events (`@click`, `(click)`).
 
 ### Toggle
