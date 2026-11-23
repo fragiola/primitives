@@ -30,7 +30,9 @@ layer), so Field's form code reaches only the components that import it: Field (
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 `/direction`; Select and Combobox add `/collection`, `/overlay` and `/positioning` (Select's `modal` option `/inert` and
-`/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms. Progress uses
+`/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms; DateField and
+TimeField add `/segments` (the segment editing) and `/time` (the plain times and date-times) to
+`/date` and `/form`, and no other component imports those two. Progress uses
 `/range` alone, Avatar `/image` alone; Button and Separator use none. Toolbar and ToggleGroup use
 the roving focus of `/collection` and `/direction` (a Toggle alone imports neither: its
 composite's root handles the keys). NumberField adds `/number` to `/form` (its parsing and
@@ -69,8 +71,10 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
 | `@fragiola/primitives/scroll-area` | `createScrollArea`, `ScrollAreaController`, `ScrollAreaOptions`, `ScrollAreaOrientation`, `ScrollAreaPart`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `initialScrollAreaState`, `normalizeScrollAreaThreshold`, `thumbGeometry`, `ThumbGeometry`, `ThumbGeometryInput`, `scrollFromStart`, `scrollForThumbOffset`, `MIN_THUMB_SIZE` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
+| `@fragiola/primitives/segments` | `segmentFormat`, `SegmentFormat`, `SegmentFormatOptions`, `SegmentGranularity`, `SegmentKind`, `SegmentPart`, `SegmentType`, `EditableSegmentType`, `HourCycle`, `dateSegments`, `DateSegment`, `SEGMENT_PLACEHOLDER`, `SegmentValues`, `SegmentRange`, `segmentRange`, `SEGMENT_PAGE_STEPS`, `setSegment`, `stepSegment`, `segmentToEdge`, `shownValue`, `displayHour`, `isSegmentsComplete`, `segmentValuesOf`, `segmentsToDate`, `segmentsToTime`, `segmentsToDateTime`, `typeSegment`, `eraseSegment`, `segmentDigit`, `SegmentEdit`, `SegmentTypeResult`, `SegmentEraseResult`, `segmentKeyDown`, `SegmentKeyResult`, `segmentTarget`, `SegmentMove`, `focusOnLabelPress` |
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
+| `@fragiola/primitives/time` | `PlainTime`, `plainTime`, `currentTime`, `compareTimes`, `isSameTime`, `addTime`, `cycleTime`, `TimeDuration`, `TimeField`, `toIsoTime`, `fromIsoTime`, `IsoTimePrecision`, `PlainDateTime`, `plainDateTime`, `currentDateTime`, `toPlainDate`, `toPlainTime`, `compareDateTimes`, `isSameDateTime`, `addDateTime`, `DateTimeDuration`, `toIsoDateTime`, `fromIsoDateTime` |
 | `@fragiola/primitives/toast` | `createToastManager`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `watchToastViewport`, `ToastViewportWatch`, `ToastViewportWatchOptions`, `measureToastHeight` |
 | `@fragiola/primitives/virtual` | `createVirtualizer`, `Virtualizer`, `VirtualizerOptions`, `VirtualAlign`, `scrollContainer`, `virtualLayout`, `VirtualLayoutOptions`, `VirtualRange`, `VirtualRow`, `rowStarts`, `rowAt`, `activeSticky`, `pageIndex` |
 
@@ -233,3 +237,22 @@ alone: a list that does not opt in imports neither. The root entry,
   its own state ([async list](/docs/api/async-list)).
 - **Id, date**: document-unique ids, and plain dates with their math and locale data from `Intl`
   (imported only by the calendar and picker entries).
+- **Time** (Epic #73): `PlainTime` (`{ hour, minute, second, millisecond }`) and `PlainDateTime`
+  (a `PlainDate` and a `PlainTime` in one flat object, so the date math takes it), with no time
+  zone: `compareTimes`, `compareDateTimes` (a `PlainDate` counts as its midnight), `addTime`
+  (carrying, wrapping around midnight), `cycleTime` (one field, wrapping, carrying nothing),
+  `addDateTime`, the ISO text (`toIsoTime`: `14:30`, the shortest exact form unless a precision is
+  given; `toIsoDateTime`; their `fromIso*` parsers) and the clock's now (`currentTime`,
+  `currentDateTime`). Written in-house on `Intl` and `Date`, no date library.
+- **Segments** (Epic #73): the segment editing of the date and time fields, pure functions.
+  `segmentFormat({ locale, kind, granularity, hourCycle })` reads a field's format from
+  `Intl.DateTimeFormat#formatToParts` in UTC (the order, the literals, the hour cycle `h11`,
+  `h12`, `h23` or `h24`, the locale's digits, the day period texts, and each segment's name from
+  `Intl.DisplayNames`); `dateSegments(format, values, edit)` gives the segments to render (a
+  placeholder shows one `–` per digit). `typeSegment` types one character (a digit continues the
+  segment's digits and reports `advance` once no further digit fits; a day period takes its first
+  letter), `eraseSegment` erases one, `stepSegment` and `segmentToEdge` step with a wrap inside
+  the segment (a 12-hour hour stays in its half of the day), and `segmentKeyDown` maps the keys
+  to those. `segmentTarget(segment, move)` finds the segment a move reaches, ArrowLeft and
+  ArrowRight measured on screen; `focusOnLabelPress` focuses the first segment from a Field's
+  label.

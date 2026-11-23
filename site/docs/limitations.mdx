@@ -8,16 +8,21 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
 
 ## Not in this release
 
-- **Thirty-nine components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
+- **Forty-one components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
   Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Autocomplete, Listbox, Calendar,
-  RangeCalendar, DatePicker, DateRangePicker, Progress, Meter, Avatar and Separator ship today, with the opt-in virtual lists of Listbox,
+  RangeCalendar, DatePicker, DateRangePicker, DateField, TimeField, Progress, Meter, Avatar and Separator ship today, with the opt-in virtual lists of Listbox,
   Select, Combobox and Autocomplete ([ListboxVirtual](/docs/api/listbox-virtual), [SelectVirtual](/docs/api/select-virtual),
   [ComboboxVirtual](/docs/api/combobox-virtual), [AutocompleteVirtual](/docs/api/autocomplete-virtual)) and three entries that are no
   component: the [direction provider](/docs/api/direction), the [render utilities](/docs/api/render) and the
   [async list](/docs/api/async-list).
-- **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
-  with no time and no time zone. No date field to type a date in parts, no time field, no
-  multiple-date calendar, no month or year pickers and no presets yet. They come with stage 3.
+- **Dates are stage 3's first step.** A plain `{ year, month, day }` and a plain time in the
+  Gregorian calendar, with no time zone, typed in a DateField or a TimeField. No range fields, no
+  date field inside a picker, no multiple-date calendar, no month or year pickers, no presets,
+  calendar systems or time zones yet: they come with the rest of stage 3.
+- **DateField and TimeField leave out** a paste and an IME composition into a segment, the
+  expansion of a two-digit year (`26` is the year 26), a native message for an unavailable date
+  (a Field's `validate` gives yours), and a range across midnight (a TimeField's `min` later than
+  its `max`); a controlled value the consumer refuses leaves the typed segments shown.
 - **The field layer leaves out** Base UI's `Field.Item`, `Field.Validity`, a validation debounce
   (`validationDebounceTime`: debounce your async `validate` yourself), the controlled `dirty` and
   `touched`, the Error's enter and exit animations, and the Form's `onFormSubmit` (read the native

@@ -1,0 +1,181 @@
+---
+title: DateField
+description: A date, or a date and a time, typed in segments, each an APG spinbutton, in the locale's order, with forms and Field support, in each framework.
+---
+
+A date typed in parts: a month, a day and a year, each a `spinbutton` the user types digits into
+or steps with the arrows, in the order and with the digits of the locale. With a time
+granularity it is a date and a time. It works in a native `<form>` and in a
+[Field](/docs/api/field). The APG has no date field and Base UI has no date component, so each
+segment is the [APG spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/), the closest pattern, with React Aria's DateField as the behaviour
+reference where the APG says nothing (the [behaviour rule](/docs/concepts/behaviour-rule)).
+[TimeField](/docs/api/time-field) is the same anatomy over a time.
+
+<Example id="date-field" />
+
+## Behaviour
+
+- **Segments from `Intl`**: the order, the literals between the segments, the hour cycle, the
+  digits (Arabic-Indic in `ar-EG`) and each segment's name ("month", "Monat") come from
+  `Intl.DateTimeFormat#formatToParts` and `Intl.DisplayNames`: the one exception to "no text",
+  as the calendars', and you can replace each. A segment with no value shows one `–` per digit.
+- **Value**: a `PlainDate` (`{ year, month, day }`), or a `PlainDateTime` with a time
+  granularity, set only once every segment is; `null` until then. `onValueChange` reports
+  `input-change`, `input-clear`, `keyboard` or `none` (a reset).
+- **Typing**: a digit continues the segment's digits and moves on once no further digit fits
+  (`4` in a month, `12`, a year's fourth digit); a number out of range starts again; the day
+  period takes the first letter of AM or PM. Backspace and Delete erase a digit, then move back.
+- **Keys**: ArrowUp and ArrowDown step and wrap within the segment, Page Up and Page Down by a
+  larger step, Home and End to its edges, ArrowLeft and ArrowRight to the segment on that side
+  of the screen; each segment is a tab stop.
+- **Validation**: a value before `min`, after `max` or unavailable (`isDateUnavailable`) is
+  invalid (`data-invalid`, `aria-invalid`).
+- **Forms**: a hidden native `date` (or `datetime-local`) input submits the ISO value, with
+  `min` and `max`; `required` refuses an empty field; a reset returns to `defaultValue`.
+- **Right to left**: the segments keep the order the locale's text has (a numeric segment is one
+  left-to-right run); lay them out inline, not as flex items.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `date-field-root` | holds the value; renders the hidden input after it |
+| Input | `div` | `date-field-input` | `group` of the segments |
+| Segment | `span` | `date-field-segment` | `spinbutton`, or a literal hidden from assistive technology |
+| (hidden input) | `input type="date"` | `date-field-hidden-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { DateField } from "@fragiola/primitives-react/date-field";
+import { Field } from "@fragiola/primitives-react/field";
+
+<Field.Root name="birth-date">
+    <Field.Label>Birth date</Field.Label>
+    <DateField.Root value={date} onValueChange={setDate} max={today} required>
+        <DateField.Input>
+            {(segment) => <DateField.Segment key={segment.index} segment={segment} />}
+        </DateField.Input>
+    </DateField.Root>
+</Field.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Field.Root name="birth-date">
+        <Field.Label>Birth date</Field.Label>
+        <DateField.Root v-model:value="date" :max="today" required>
+            <DateField.Input v-slot="{ segment }">
+                <DateField.Segment :segment="segment" />
+            </DateField.Input>
+        </DateField.Root>
+    </Field.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [FieldRoot, FieldLabel, DateFieldRoot, DateFieldInput, DateFieldSegment],
+    template: `
+        <div fieldRoot name="birth-date">
+            <label fieldLabel>Birth date</label>
+            <div dateFieldRoot [(value)]="date" [max]="today" [required]="true">
+                <div dateFieldInput #input="dateFieldInput">
+                    @for (segment of input.segments(); track segment.index) {
+                        <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                    }
+                </div>
+            </div>
+        </div>
+    `,
+})
+export class BirthDate {
+    protected readonly date = signal<DateFieldValue | null>(null);
+    protected readonly today = { year: 2026, month: 11, day: 23 };
+}
+```
+
+A directive has no template, so the Input cannot render the segments by itself: the `@for` over
+its `segments()` writes them.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds the value as `v-model:value` with `@value-change`; Angular as `[(value)]`
+with `(valueChangeDetails)` (`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainDate \| PlainDateTime \| null` | | the value, controlled |
+| `defaultValue` | `PlainDate \| PlainDateTime \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason, event }) => void` | | every change of the value |
+| `granularity` | `"day" \| "hour" \| "minute" \| "second"` | `"day"` | the smallest segment; a time granularity makes the value a `PlainDateTime` |
+| `placeholderValue` | `PlainDate \| PlainDateTime` | today at midnight | what an arrow on an empty segment starts from |
+| `hourCycle` | `12 \| 24` | the locale's | a time granularity's clock |
+| `min` | `PlainDate \| PlainDateTime` | | values before it are invalid |
+| `max` | `PlainDate \| PlainDateTime` | | values after it are invalid |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | an unavailable date is invalid |
+| `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `required` | `boolean` | `false` | the hidden input is required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |
+| `name` | `string` | | the hidden input's name (a Field's wins) |
+
+### Input
+
+Its children: a function of each segment (Vue: the default slot's `{ segment }`; Angular: `@for`
+over `segments()`); with none, every segment with its own text.
+
+### Segment
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `segment` | `DateSegment` | required | one of the Input's segments: `{ type, index, text, editable, placeholder, value, min, max, valueText, label }` |
+
+Its content replaces the segment's text; your `aria-label` replaces its name.
+
+## State and part attributes
+
+Every part carries `data-disabled`, `data-readonly`, `data-required`, `data-invalid` and, inside
+a Field, the Field's state.
+
+| part | attributes |
+| --- | --- |
+| Input | `role="group"`; inside a Field, `aria-labelledby` and `aria-describedby` |
+| Segment (editable) | `role="spinbutton"`, `tabindex="0"`, `aria-label`, `aria-valuenow`, `aria-valuetext`, `aria-valuemin`, `aria-valuemax`, `contenteditable`, `inputmode`, `data-type`, `data-placeholder` |
+| Segment (literal) | `aria-hidden="true"`, `data-type="literal"` |
+
+## Keyboard
+
+| key | does |
+| --- | --- |
+| digits | fill the segment, then move on |
+| ArrowUp, ArrowDown | step by one, wrapping within the segment |
+| Page Up, Page Down | step by a larger amount (year 5, month 2, day 7, hour 2, minutes 15) |
+| Home, End | the segment's minimum, maximum |
+| ArrowLeft, ArrowRight | the segment on that side |
+| Backspace, Delete | erase a digit; on an empty segment, move back |
+| Tab | the next segment, then out of the field |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/date-field` | `ChangeDetails`, `ChangeReason`, `DateField`, `DateFieldInputProps`, `DateFieldRootProps`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RenderProp`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-vue/date-field` | `ChangeDetails`, `ChangeReason`, `DateField`, `DateFieldInputSlots`, `DateFieldRootEmits`, `DateFieldRootProps`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RenderSlotProps`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-angular/date-field` | `ChangeDetails`, `ChangeReason`, `DATE_FIELD`, `DateFieldComponent`, `DateFieldInput`, `DateFieldInputs`, `DateFieldRoot`, `DateFieldRootBase`, `DateFieldRootState`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `FieldValue`, `PlainDate`, `PlainDateTime`, `PlainTime`, `SegmentGranularity`, `SegmentType`, `ValueChangeEvent` |

@@ -8,8 +8,8 @@
 - **DatePicker** / **DateRangePicker**: a trigger and a non-modal popup holding a Calendar /
   RangeCalendar.
 
-Out of scope (stage 3, `docs/handoff.md` §5): a segmented date field (typing a date in parts),
-time, the range fields, a multiple-date calendar, month and year pickers, presets, time zones,
+Out of scope (stage 3, `docs/handoff.md` §5): the segmented date and time fields are
+[date-field.md](date-field.md) (Epic #73); the range fields, a multiple-date calendar, month and year pickers, presets, time zones,
 non-Gregorian calendars, event calendars.
 
 ## Dates

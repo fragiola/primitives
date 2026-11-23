@@ -145,7 +145,8 @@ calendars: the segments' texts, their `aria-valuetext` and their names come from
 consumer can replace each one.
 
 Change reasons (spec/README.md): `input-change` (a typed digit or letter changed the value, or
-completed it), `input-clear` (Backspace or Delete made it `null`), `keyboard` (an arrow, Page Up,
+completed it; an erased digit that leaves a value, a year 2026 erased to 202), `input-clear`
+(Backspace or Delete made it `null`), `keyboard` (an arrow, Page Up,
 Page Down, Home or End changed it), `none` (a form reset).
 
 ### Typing
