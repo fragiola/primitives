@@ -36,6 +36,12 @@
             "import": "./dist/index.js",
             "default": "./dist/index.js"
         },
+        "./async-list": {
+            "@fragiola/source": "./src/async-list/index.ts",
+            "types": "./dist/async-list.d.ts",
+            "import": "./dist/async-list.js",
+            "default": "./dist/async-list.js"
+        },
         "./collection": {
             "@fragiola/source": "./src/collection/index.ts",
             "types": "./dist/collection.d.ts",
@@ -150,6 +156,12 @@
             "import": "./dist/swipe.js",
             "default": "./dist/swipe.js"
         },
+        "./virtual": {
+            "@fragiola/source": "./src/virtual/index.ts",
+            "types": "./dist/virtual.d.ts",
+            "import": "./dist/virtual.js",
+            "default": "./dist/virtual.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -164,6 +176,11 @@
                 "types": "./dist/index.d.ts",
                 "import": "./dist/index.js",
                 "default": "./dist/index.js"
+            },
+            "./async-list": {
+                "types": "./dist/async-list.d.ts",
+                "import": "./dist/async-list.js",
+                "default": "./dist/async-list.js"
             },
             "./collection": {
                 "types": "./dist/collection.d.ts",
@@ -259,6 +276,11 @@
                 "types": "./dist/swipe.d.ts",
                 "import": "./dist/swipe.js",
                 "default": "./dist/swipe.js"
+            },
+            "./virtual": {
+                "types": "./dist/virtual.d.ts",
+                "import": "./dist/virtual.js",
+                "default": "./dist/virtual.js"
             },
             "./package.json": "./package.json"
         }

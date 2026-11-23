@@ -78,6 +78,7 @@ export function entrySource(name: ComponentName | UtilityName): string {
  * (`packages/primitives/tests/guard.test.ts` checks the folders against them).
  */
 export const MECHANISMS = [
+    "async-list",
     "collection",
     "date",
     "direction",
@@ -97,6 +98,7 @@ export const MECHANISMS = [
     "scroll-lock",
     "selection",
     "swipe",
+    "virtual",
 ] as const;
 
 export type MechanismName = (typeof MECHANISMS)[number];
