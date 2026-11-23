@@ -235,7 +235,13 @@ export function Menubar({
     const hover = useCallback(
         (trigger: HTMLElement, event: PointerEvent<HTMLElement>) => {
             const entry = entries.get(trigger)?.current;
-            if (entry === undefined || entry.disabled || entry.menu.open) {
+            // a tap's pointer entering an item is no hover (spec/menubar.md, "Pointer")
+            if (
+                event.pointerType === "touch" ||
+                entry === undefined ||
+                entry.disabled ||
+                entry.menu.open
+            ) {
                 return;
             }
             const open = openOne();

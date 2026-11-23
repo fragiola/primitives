@@ -236,7 +236,9 @@ export const Menubar: PartComponent<MenubarProps, MenubarState> =
 
                 const hover = (trigger: HTMLElement, event: PointerEvent) => {
                     const entry = entries.get(trigger);
+                    // a tap's pointer entering an item is no hover (spec/menubar.md, "Pointer")
                     if (
+                        event.pointerType === "touch" ||
                         entry === undefined ||
                         entry.disabled() ||
                         entry.menu.open.value

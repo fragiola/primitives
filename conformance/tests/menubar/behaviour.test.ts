@@ -20,6 +20,14 @@ async function step(page: Page, key: string, target: Locator): Promise<void> {
 /** The open menus of the page. */
 const openMenus = (page: Page) => page.getByRole("menu");
 
+/** Taps the center of `target` (a touch context). */
+async function tap(page: Page, target: Locator): Promise<void> {
+    const box = await target.boundingBox();
+    expect(box).not.toBeNull();
+    const { x, y, width, height } = box as NonNullable<typeof box>;
+    await page.touchscreen.tap(x + width / 2, y + height / 2);
+}
+
 test.describe("menubar / basic", () => {
     test.beforeEach(async ({ page }) => {
         await openScenario(page, "/menubar/basic");
@@ -497,5 +505,24 @@ test.describe("menubar / modal", () => {
         await outside(page).click();
         await expectOutput(page, "outside", "pressed");
         expect(await wheelScrolls(page)).toBe(true);
+    });
+});
+
+// Epic #49 review, spec/menubar.md "Pointer": a tap's pointer entering an item is no hover
+test.describe("menubar / basic, touch", () => {
+    test.use({ hasTouch: true });
+
+    test("a tap on another item while a menu is open is a press, not a hover switch", async ({
+        page,
+    }) => {
+        await openScenario(page, "/menubar/basic");
+        await tap(page, item(page, "File"));
+        await expect(menu(page, "File")).toBeVisible();
+        await expectOutput(page, "reason", "trigger-press");
+        await tap(page, item(page, "Edit"));
+        await expect(menu(page, "Edit")).toBeVisible();
+        await expect(menu(page, "File")).toBeHidden();
+        await expectOutput(page, "menu", "Edit");
+        await expectOutput(page, "reason", "trigger-press");
     });
 });

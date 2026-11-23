@@ -244,7 +244,9 @@ export class Menubar {
 
     private hover(trigger: HTMLElement, event: PointerEvent): void {
         const entry = this.entries.get(trigger);
+        // a tap's pointer entering an item is no hover (spec/menubar.md, "Pointer")
         if (
+            event.pointerType === "touch" ||
             entry === undefined ||
             untracked(entry.disabled) ||
             untracked(entry.menu.overlay.open)

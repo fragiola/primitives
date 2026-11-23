@@ -149,7 +149,9 @@ between menus above, which keep the focus on the bar's item.
 - **Hover switching** (Base UI): while a menu of the bar is open, the pointer entering another
   item that is not disabled closes that menu and opens the hovered item's at once (no delay), as a
   pointer opening (the popup focused, no item highlighted); both report reason `trigger-hover`.
-  The hovered item becomes the tab stop. With no menu open, hovering opens nothing.
+  The hovered item becomes the tab stop. With no menu open, hovering opens nothing. A touch is no
+  hover: a tap's pointer entering an item (`pointerType` `touch`) switches nothing, the tap is a
+  press.
 - **The press that follows a hover opening keeps it** (Base UI's patient click, as NavigationMenu's
   [navigation-menu.md](navigation-menu.md#pointer)): a press on an item within 500 ms after the
   hover opened its menu leaves the menu open; a later press closes it.
@@ -254,6 +256,8 @@ Checks:
     trigger-hover`); hover "View": View's opens; hover "Help" (disabled): View's stays open; click
     "View" at once: it stays open (`menu: View`); after 600 ms, click "View" again: it closes
     (`menu: none`, `reason: trigger-press`). With no menu open, hovering "File" opens nothing.
+    With touch: tap "File" (`reason: trigger-press`), then tap "Edit": File's menu closes and
+    Edit's opens by the press, not by a hover switch (`menu: Edit`, `reason: trigger-press`).
 11. Non-modal: click "File", then click "After": the menu closes (`reason: outside-press`) and
     "After" is focused.
 12. "Help" opens nothing: ArrowDown, Enter and Space on it, and a click, leave `menu: none`.
