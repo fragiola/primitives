@@ -156,6 +156,17 @@ import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNonce } from "../scenarios/tabs/tabs-nonce.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
+import { TagGroupBasic } from "../scenarios/tag-group/tag-group-basic.tsx";
+import { TagGroupDisabled } from "../scenarios/tag-group/tag-group-disabled.tsx";
+import { TagGroupEmpty } from "../scenarios/tag-group/tag-group-empty.tsx";
+import { TagGroupField } from "../scenarios/tag-group/tag-group-field.tsx";
+import { TagGroupSelection } from "../scenarios/tag-group/tag-group-selection.tsx";
+import { TagGroupSingle } from "../scenarios/tag-group/tag-group-single.tsx";
+import { TagsInputBasic } from "../scenarios/tags-input/tags-input-basic.tsx";
+import { TagsInputBlur } from "../scenarios/tags-input/tags-input-blur.tsx";
+import { TagsInputEdit } from "../scenarios/tags-input/tags-input-edit.tsx";
+import { TagsInputField } from "../scenarios/tags-input/tags-input-field.tsx";
+import { TagsInputOptions } from "../scenarios/tags-input/tags-input-options.tsx";
 import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.tsx";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.tsx";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.tsx";
@@ -384,6 +395,17 @@ export const routes: Record<
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/tag-group/basic": TagGroupBasic,
+    "/tag-group/selection": TagGroupSelection,
+    "/tag-group/single": TagGroupSingle,
+    "/tag-group/disabled": TagGroupDisabled,
+    "/tag-group/empty": TagGroupEmpty,
+    "/tag-group/field": TagGroupField,
+    "/tags-input/basic": TagsInputBasic,
+    "/tags-input/options": TagsInputOptions,
+    "/tags-input/edit": TagsInputEdit,
+    "/tags-input/blur": TagsInputBlur,
+    "/tags-input/field": TagsInputField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
