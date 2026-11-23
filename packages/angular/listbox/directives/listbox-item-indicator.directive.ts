@@ -1,4 +1,4 @@
-import { computed, Directive, effect, inject, input } from "@angular/core";
+import { computed, Directive, inject, input } from "@angular/core";
 import { conditionalView } from "@fragiola/primitives-angular/internal";
 import { ListboxItem } from "./listbox-item.directive.ts";
 
@@ -23,7 +23,7 @@ export class ListboxItemIndicator {
     readonly state = computed(() => ({
         selected: this.item.state().selected,
     }));
-    private readonly element = conditionalView(
+    protected readonly element = conditionalView(
         computed(() => this.state().selected || this.keepMounted()),
         (element) => {
             element.setAttribute("aria-hidden", "true");
@@ -33,18 +33,4 @@ export class ListboxItemIndicator {
             );
         },
     );
-
-    constructor() {
-        effect(() => {
-            const element = this.element();
-            if (element === null) {
-                return;
-            }
-            if (this.state().selected) {
-                element.setAttribute("data-selected", "");
-            } else {
-                element.removeAttribute("data-selected");
-            }
-        });
-    }
 }

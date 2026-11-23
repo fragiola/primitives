@@ -155,6 +155,7 @@ export function AutocompleteRoot<Item>(props: AutocompleteRootProps<Item>) {
             if (
                 current.inline &&
                 current.shown !== null &&
+                !current.shown.disabled &&
                 (reason === "focus-out" || reason === "outside-press")
             ) {
                 setValue(current.label(current.shown.item), {
@@ -178,7 +179,10 @@ export function AutocompleteRoot<Item>(props: AutocompleteRootProps<Item>) {
             pending.current = null;
             const filled = text.trim() !== "";
             if (filled && !root.open) {
-                setOpen(true, "input-change", event);
+                // an opening the consumer refused asks for no highlight later
+                if (!setOpen(true, "input-change", event)) {
+                    return;
+                }
             } else if (!filled && root.open && !openOnInputClick) {
                 setOpen(false, "input-clear", event);
                 return;
@@ -208,7 +212,12 @@ export function AutocompleteRoot<Item>(props: AutocompleteRootProps<Item>) {
     const highlight = useCallback(
         (id: string | null, from: "keyboard" | "pointer") => {
             setHighlighted(id);
-            if (from === "pointer" || !latest.current.inline) {
+            if (!latest.current.inline) {
+                return;
+            }
+            // a hover completes nothing: the input shows the value again
+            if (from === "pointer") {
+                setShown(null);
                 return;
             }
             const item = [...registered.values()].find(
@@ -221,6 +230,7 @@ export function AutocompleteRoot<Item>(props: AutocompleteRootProps<Item>) {
                           item: item.value,
                           text: latest.current.label(item.value),
                           selectFrom: null,
+                          disabled: item.disabled,
                       },
             );
         },
@@ -235,6 +245,7 @@ export function AutocompleteRoot<Item>(props: AutocompleteRootProps<Item>) {
             item: item.value,
             text: latest.current.label(item.value),
             selectFrom: typed.length,
+            disabled: item.disabled,
         });
     }, []);
 

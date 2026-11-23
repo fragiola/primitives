@@ -67,7 +67,10 @@ export const AutocompleteInput: PartComponent<
 
             const openWith = (pending: AutocompletePending, event?: Event) => {
                 context.requestHighlight(pending);
-                context.setOpen(true, "list-navigation", event);
+                // an opening the consumer refused asks for no highlight later
+                if (!context.setOpen(true, "list-navigation", event)) {
+                    context.requestHighlight(null);
+                }
             };
             const move = (delta: 1 | -1) => {
                 // past an end, the visual focus goes back to the input; from the input, to the near end

@@ -138,7 +138,7 @@ export function ListboxRoot(props: ListboxRootProps) {
     const [element, ref] = useElement<HTMLElement>();
     const direction = useContext(DirectionContext);
     const [entries, setEntries] = useState<readonly ListboxItemEntry[]>([]);
-    const ordered = useMemo(() => inOrder(entries), [entries]);
+    const ordered = inOrder(entries);
     const [active, setActive] = useState<HTMLElement | null>(null);
     const [within, setWithin] = useState(false);
     const anchor = useRef<string | null>(null);
@@ -164,11 +164,13 @@ export function ListboxRoot(props: ListboxRootProps) {
         },
         [within, active],
     );
-    const latest = useRef({ ordered, selected, tabStopOf });
-    latest.current = { ordered, selected, tabStopOf };
+    // the items' order is read when it is used: a keyed reorder moves the elements, not the
+    // entries
+    const latest = useRef({ entries, selected, tabStopOf });
+    latest.current = { entries, selected, tabStopOf };
     const tabStopElement = useCallback(() => {
         const current = latest.current;
-        return current.tabStopOf(current.ordered, current.selected);
+        return current.tabStopOf(inOrder(current.entries), current.selected);
     }, []);
 
     // inside a Field, the list is the field's control (spec/listbox.md, "Forms"), as RadioGroup
@@ -194,7 +196,7 @@ export function ListboxRoot(props: ListboxRootProps) {
                 return;
             }
             const current = latest.current;
-            const model = modelOf(current.ordered, false);
+            const model = modelOf(inOrder(current.entries), false);
             const next = applySelection(
                 model,
                 { selected: current.selected, anchor: anchor.current },
@@ -220,7 +222,7 @@ export function ListboxRoot(props: ListboxRootProps) {
         if (disabled || event.defaultPrevented) {
             return;
         }
-        const items = latest.current.ordered;
+        const items = inOrder(latest.current.entries);
         const index = items.findIndex(
             (entry) => entry.element === event.target,
         );
@@ -260,7 +262,7 @@ export function ListboxRoot(props: ListboxRootProps) {
     }, []);
     const press = useCallback(
         (item: HTMLElement, event: MouseEvent) => {
-            const entry = latest.current.ordered.find(
+            const entry = latest.current.entries.find(
                 (candidate) => candidate.element === item,
             );
             if (entry === undefined || disabled) {

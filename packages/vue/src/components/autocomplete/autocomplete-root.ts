@@ -203,6 +203,7 @@ export const AutocompleteRoot: PublicComponent<
                 if (
                     inline() &&
                     completion !== null &&
+                    !completion.disabled &&
                     (reason === "focus-out" || reason === "outside-press")
                 ) {
                     setValue(label(completion.item), {
@@ -248,7 +249,10 @@ export const AutocompleteRoot: PublicComponent<
                     pending.current = null;
                     const filled = text.trim() !== "";
                     if (filled && !root.open.value) {
-                        setOpen(true, "input-change", event);
+                        // an opening the consumer refused asks for no highlight later
+                        if (!setOpen(true, "input-change", event)) {
+                            return;
+                        }
                     } else if (
                         !filled &&
                         root.open.value &&
@@ -275,7 +279,12 @@ export const AutocompleteRoot: PublicComponent<
                 highlighted,
                 highlight(id, from) {
                     highlighted.value = id;
-                    if (from === "pointer" || !inline()) {
+                    if (!inline()) {
+                        return;
+                    }
+                    // a hover completes nothing: the input shows the value again
+                    if (from === "pointer") {
+                        shown.value = null;
                         return;
                     }
                     const item = [...items.values()].find(
@@ -288,6 +297,7 @@ export const AutocompleteRoot: PublicComponent<
                                   item: item.value,
                                   text: label(item.value),
                                   selectFrom: null,
+                                  disabled: item.disabled,
                               };
                 },
                 complete(item) {
@@ -297,6 +307,7 @@ export const AutocompleteRoot: PublicComponent<
                         item: item.value,
                         text: label(item.value),
                         selectFrom: value.value.length,
+                        disabled: item.disabled,
                     };
                 },
                 choose(item, event) {

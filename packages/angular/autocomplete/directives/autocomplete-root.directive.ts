@@ -60,6 +60,8 @@ export interface AutocompleteShown {
     text: string;
     /** Where the completion string starts: it is selected (`null`: the caret at the end). */
     selectFrom: number | null;
+    /** A disabled suggestion is shown, never accepted. */
+    disabled: boolean;
 }
 
 export interface AutocompleteState {
@@ -227,6 +229,7 @@ export class AutocompleteRoot implements OverlayActions {
         if (
             untracked(this.inline) &&
             shown !== null &&
+            !shown.disabled &&
             (reason === "focus-out" || reason === "outside-press")
         ) {
             this.text.set(this.label(shown.item), {
@@ -250,7 +253,10 @@ export class AutocompleteRoot implements OverlayActions {
         const filled = text.trim() !== "";
         const open = untracked(this.overlay.open);
         if (filled && !open) {
-            this.setOpen(true, "input-change", event);
+            // an opening the consumer refused asks for no highlight later
+            if (!this.setOpen(true, "input-change", event)) {
+                return;
+            }
         } else if (!filled && open && !this.openOnInputClick()) {
             this.setOpen(false, "input-clear", event);
             return;
@@ -270,6 +276,10 @@ export class AutocompleteRoot implements OverlayActions {
     /** Highlights an item (or none); the keyboard's highlight shows its text inline. */
     highlight(id: string | null, from: "keyboard" | "pointer"): void {
         this.highlighted.set(id);
+        // a hover completes nothing: the input shows the value again
+        if (from === "pointer" && untracked(this.inline)) {
+            this.shown.set(null);
+        }
         if (from === "keyboard" && untracked(this.inline)) {
             const item = [...this.registered.values()].find(
                 (entry) => entry.id === id,
@@ -281,6 +291,7 @@ export class AutocompleteRoot implements OverlayActions {
                           item: item.value,
                           text: this.label(item.value),
                           selectFrom: null,
+                          disabled: item.disabled,
                       },
             );
         }
@@ -295,6 +306,7 @@ export class AutocompleteRoot implements OverlayActions {
             item: item.value,
             text: this.label(item.value),
             selectFrom: typed.length,
+            disabled: item.disabled,
         });
     }
 

@@ -150,7 +150,10 @@ export class AutocompleteInput {
         const open = root.overlay.open();
         const openWith = (pending: AutocompletePending) => {
             root.pending.set(pending);
-            root.setOpen(true, "list-navigation", event);
+            // an opening the consumer refused asks for no highlight later
+            if (!root.setOpen(true, "list-navigation", event)) {
+                root.pending.set(null);
+            }
         };
         switch (event.key) {
             case "ArrowDown":

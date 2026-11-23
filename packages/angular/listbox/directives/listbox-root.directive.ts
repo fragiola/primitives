@@ -155,7 +155,9 @@ export class ListboxRoot {
         return value === null || value === undefined ? NONE : [value as string];
     });
     private readonly entries = signal<readonly ListboxItemEntry[]>([]);
-    private readonly ordered = computed(() => inOrder(this.entries()));
+    // the items' document order, read when it is used: a keyed reorder moves the elements, not
+    // the entries
+    private readonly ordered = () => inOrder(this.entries());
     private readonly active = signal<HTMLElement | null>(null);
     private readonly within = signal(false);
     private anchor: string | null = null;

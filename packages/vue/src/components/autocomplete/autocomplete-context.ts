@@ -26,6 +26,8 @@ export interface AutocompleteShown {
     text: string;
     /** Where the completion string starts: it is selected (`null`: the caret at the end). */
     selectFrom: number | null;
+    /** A disabled suggestion is shown, never accepted. */
+    disabled: boolean;
 }
 
 export interface AutocompleteContext extends OverlayRoot {
