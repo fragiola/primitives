@@ -1,0 +1,249 @@
+---
+title: TagsInput
+description: A text input that turns what is typed into tags, reached with the arrows, removed and edited in place, as a form control, in each framework.
+---
+
+A text input that turns what the user types into a list of tags: email recipients, keywords,
+labels. Enter (or a delimiter, or a paste) adds the typed text as a tag; the tags are shown before
+the input, can be reached with the arrow keys and Backspace, removed, and edited in place. It is a
+form control: it submits one value per tag, resets and validates, alone or in a
+[Field](/docs/api/field). The APG has no tags input pattern and Base UI no TagsInput: the Input is
+the APG's textbox (a native text input, see the APG's
+[patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)), the tags take the focus as a Combobox's
+chips do, and the rest follows Zag/Ark's and Reka UI's TagsInput. A group of tags to choose from
+is a [TagGroup](/docs/api/tag-group); suggestions are a [Combobox](/docs/api/combobox) or an
+[Autocomplete](/docs/api/autocomplete) the app combines with it.
+
+<Example id="tags-input" />
+
+## Behaviour
+
+- **Adding**: a text offered as tags is split by the `delimiter` (`","`, `null` for none) and each
+  part trimmed; empty parts are dropped. Enter offers the Input's whole text (and keeps the form
+  from submitting; with an empty text, Enter submits the form as from any text input); typing the
+  delimiter offers the text before it; a paste that holds the delimiter is offered whole; leaving
+  the TagsInput offers it with `blurBehavior="add"` (`"clear"` empties it; by default it stays).
+- **Refusals**: a duplicate (unless `allowDuplicates`), a part past `max`, or one `validate`
+  returns `false` for is refused and reported by `onValueInvalid(text, details)`, with
+  `details.cause` (`"duplicate"`, `"max"`, `"invalid"`). The refused text stays in the Input, so
+  the user corrects it instead of retyping it.
+- **The tags** take DOM focus (`tabindex="-1"`, out of the tab order), so a screen reader reads the
+  tag it is on; they have no role (the app's text with a remove button). The Input is the only tab
+  stop (with the ClearTrigger, a native button). At the start of the Input, Backspace and the
+  previous arrow focus the last tag; on a tag, Backspace and Delete remove it.
+- **Editing** (`editable`): Enter or a double press on a tag shows its TagInput (always rendered,
+  `hidden` until then) with the tag's text selected; Enter commits (an empty text removes the
+  tag), Escape cancels, leaving commits.
+- **The tags in an uncontrolled root**: the app renders one Tag per value, `index` its position.
+  An uncontrolled Root gives its value to its children (React: the children function
+  `({ value }) => ...`; Vue: the default scoped slot; Angular: `tags()` through `exportAs`).
+- **Forms**: the Root renders, as its last children, one `type="hidden"` input per tag with the
+  `name`, and a visually hidden input that carries `required` while there is no tag. The Input
+  has no `name`. A form reset returns the tags and the text to their defaults (reason `none`).
+- **Name**: a `<label for>` the Input's `id`, a Field's Label, or the consumer's `aria-label`; the
+  TagRemove, TagInput and ClearTrigger are named by the consumer: primitives name nothing.
+- **In a [Field](/docs/api/field)**: the Input is the labelable element (`aria-labelledby`,
+  `aria-describedby`, `aria-invalid`), the Root carries the field's states, `validate` gets the
+  tags, and the validated element is the visually hidden input.
+- **Reasons**: `keyboard`, `input-change`, `input-paste`, `input-blur`, `chip-remove-press`,
+  `clear-press`, `none`. The keys are the toolkit's [`/collection`](/docs/api/toolkit)
+  (`tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`), the adding and editing rules `/form`
+  (`takeTags`, `editTag`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `tags-input-root` | none; holds the state and renders the hidden inputs |
+| Control | `div` | `tags-input-control` | holds the tags and the Input; a press on it focuses the Input |
+| Input | `input` | `tags-input-input` | the textbox the next tag is typed in |
+| Tag | `div` | `tags-input-tag` | one per value, focusable |
+| TagText | `span` | `tags-input-tag-text` | the tag's text |
+| TagRemove | `button` | `tags-input-tag-remove` | removes its tag |
+| TagInput | `input` | `tags-input-tag-input` | edits its tag in place (`editable`); `hidden` until then |
+| ClearTrigger | `button` | `tags-input-clear-trigger` | removes every tag and the text |
+| (hidden inputs) | `input` | `tags-input-hidden-input` | the Root's last children: what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { TagsInput } from "@fragiola/primitives-react/tags-input";
+
+<label htmlFor="tags">Tags</label>
+<TagsInput.Root name="tags" defaultValue={["react", "vue"]}>
+    {({ value }) => (
+        <>
+            <TagsInput.Control>
+                {value.map((tag, index) => (
+                    <TagsInput.Tag key={index} index={index}>
+                        <TagsInput.TagText>{tag}</TagsInput.TagText>
+                        <TagsInput.TagRemove aria-label={`Remove ${tag}`}>×</TagsInput.TagRemove>
+                    </TagsInput.Tag>
+                ))}
+                <TagsInput.Input id="tags" />
+            </TagsInput.Control>
+            <TagsInput.ClearTrigger aria-label="Clear tags">×</TagsInput.ClearTrigger>
+        </>
+    )}
+</TagsInput.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label for="tags">Tags</label>
+    <TagsInput.Root v-slot="{ value }" name="tags" :default-value="['react', 'vue']">
+        <TagsInput.Control>
+            <TagsInput.Tag v-for="(tag, index) in value" :key="index" :index="index">
+                <TagsInput.TagText>{{ tag }}</TagsInput.TagText>
+                <TagsInput.TagRemove :aria-label="`Remove ${tag}`">×</TagsInput.TagRemove>
+            </TagsInput.Tag>
+            <TagsInput.Input id="tags" />
+        </TagsInput.Control>
+        <TagsInput.ClearTrigger aria-label="Clear tags">×</TagsInput.ClearTrigger>
+    </TagsInput.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [TagsInputRoot, TagsInputControl, TagsInputInput, TagsInputTag, TagsInputTagText, TagsInputTagRemove, TagsInputClearTrigger],
+    template: `
+        <label for="tags">Tags</label>
+        <div tagsInputRoot #tags="tagsInputRoot" name="tags" [defaultValue]="['react', 'vue']">
+            <div tagsInputControl>
+                @for (tag of tags.tags(); track $index) {
+                    <div tagsInputTag [index]="$index">
+                        <span tagsInputTagText>{{ tag }}</span>
+                        <button tagsInputTagRemove [attr.aria-label]="'Remove ' + tag">×</button>
+                    </div>
+                }
+                <input tagsInputInput id="tags" />
+            </div>
+            <button tagsInputClearTrigger aria-label="Clear tags">×</button>
+        </div>
+    `,
+})
+export class Tags {}
+```
+
+`tags()` is the current value, controlled (`[(value)]`) or not. `(valueInvalid)` emits
+`{ value, details }`, the refused text and its `cause`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`v-model:input-value`, `@value-change`, `@input-value-change`, `@value-invalid`), and Angular as
+inputs and outputs (`[(value)]`, `[(inputValue)]`, `(valueChangeDetails)`,
+`(inputValueChangeDetails)` and `(valueInvalid)`, each with `{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | | the tags, in order, controlled |
+| `defaultValue` | `string[]` | `[]` | the initial tags, uncontrolled |
+| `onValueChange` | `(value: string[], details: { reason }) => void` | | every change of the tags |
+| `inputValue` | `string` | | the Input's text, controlled |
+| `defaultInputValue` | `string` | `""` | the initial text, uncontrolled |
+| `onInputValueChange` | `(text: string, details: { reason }) => void` | | every change of the text |
+| `onValueInvalid` | `(text: string, details: { reason, cause }) => void` | | a text was refused as a tag (`cause`: `"duplicate"`, `"max"`, `"invalid"`) |
+| `delimiter` | `string \| null` | `","` | ends a tag while typing and splits a paste; `null` for none (only Enter adds) |
+| `max` | `number` | `Infinity` | the most tags |
+| `allowDuplicates` | `boolean` | `false` | a text equal to a tag is accepted |
+| `validate` | `(tag: string, value: string[]) => boolean` | | `false` refuses a trimmed text; `value` is the tags it would join |
+| `blurBehavior` | `"add" \| "clear"` | | leaving the TagsInput adds the text as tags, or clears it; by default it stays |
+| `editable` | `boolean` | `false` | Enter and a double press on a Tag edit it in its TagInput |
+| `disabled` | `boolean` | `false` | disables every part |
+| `name` | `string` | | the hidden inputs' name (a Field's wins) |
+| `required` | `boolean` | `false` | the form's validation fails while there is no tag |
+
+### Control
+
+No props of its own.
+
+### Input
+
+No props of its own.
+
+### Tag
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | | required: its position in the value |
+
+### TagText
+
+No props of its own.
+
+### TagRemove
+
+No props of its own.
+
+### TagInput
+
+No props of its own.
+
+### ClearTrigger
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-empty` (no tag); in a Field, the field's states |
+| Control | `data-disabled`, `data-empty` |
+| Input | an `id` (the consumer's, else its own), `disabled`, `aria-required="true"` when required; in a Field, `aria-labelledby`, `aria-describedby`, `aria-invalid` |
+| Tag | `tabindex="-1"` (none when disabled), `data-disabled`, `data-editing` while its TagInput edits it |
+| TagText | `hidden` while its Tag is edited |
+| TagRemove | `type="button"`, `tabindex="-1"`, `disabled` and `data-disabled` when disabled, `hidden` while its Tag is edited |
+| TagInput | `tabindex="-1"`, `hidden` unless its Tag is edited, `disabled` when disabled |
+| ClearTrigger | `type="button"`, `hidden` while there is no tag and no text, `disabled` and `data-disabled` when disabled |
+| hidden inputs | `type="hidden"` with the `name`, one per tag; the validation input: no `name`, `aria-hidden="true"`, `tabindex="-1"`, `required` while there is no tag |
+
+## Keyboard
+
+In the Input ("at the start": the caret at 0 with no text selected):
+
+| key | action |
+| --- | --- |
+| Enter | offers the text as tags; nothing with an empty text (the form submits) |
+| the delimiter | ends the tag |
+| Backspace, at the start | focuses the last tag (it does not remove it) |
+| ArrowLeft, at the start | focuses the last tag (ArrowRight in RTL) |
+
+On a focused tag:
+
+| key | action |
+| --- | --- |
+| ArrowLeft | the previous tag; on the first, nothing (ArrowRight in RTL) |
+| ArrowRight | the next tag; on the last, the Input (ArrowLeft in RTL) |
+| Backspace | removes it; focuses the previous tag, else the tag now at its place, else the Input |
+| Delete | removes it; focuses the tag now at its place, else the previous one, else the Input |
+| Enter | `editable`: edits it (Enter commits, Escape cancels) |
+| Escape | focuses the Input |
+| a printable character | focuses the Input, which receives it |
+
+A key with Ctrl, Meta or Alt, or during a text composition, does nothing of the TagsInput's.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/tags-input` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `TagRefusal`, `TagsInput`, `TagsInputClearTriggerState`, `TagsInputControlState`, `TagsInputInputState`, `TagsInputInvalidDetails`, `TagsInputRootProps`, `TagsInputRootState`, `TagsInputTagInputState`, `TagsInputTagProps`, `TagsInputTagRemoveState`, `TagsInputTagState` |
+| `@fragiola/primitives-vue/tags-input` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `TagRefusal`, `TagsInput`, `TagsInputClearTriggerState`, `TagsInputControlState`, `TagsInputInputState`, `TagsInputInvalidDetails`, `TagsInputRootEmits`, `TagsInputRootProps`, `TagsInputRootSlots`, `TagsInputRootState`, `TagsInputSlotProps`, `TagsInputTagInputState`, `TagsInputTagProps`, `TagsInputTagRemoveState`, `TagsInputTagState`, `TagsInputTagTextState` |
+| `@fragiola/primitives-angular/tags-input` | `ChangeDetails`, `ChangeReason`, `TagRefusal`, `TagsInputClearTrigger`, `TagsInputClearTriggerState`, `TagsInputControl`, `TagsInputControlState`, `TagsInputEdit`, `TagsInputInput`, `TagsInputInputState`, `TagsInputInvalidDetails`, `TagsInputInvalidEvent`, `TagsInputRoot`, `TagsInputRootState`, `TagsInputTag`, `TagsInputTagInput`, `TagsInputTagInputState`, `TagsInputTagRemove`, `TagsInputTagRemoveState`, `TagsInputTagState`, `TagsInputTagText`, `ValueChangeEvent` |

@@ -37,23 +37,25 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's or a date picker's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts (or is hidden) once its animations end: an overlay, a tabs panel, a collapsible or accordion panel |
-| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a chosen calendar date |
-| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's |
+| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a selected tag of a tag group, a chosen calendar date |
+| `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's; a segmented control's item and its text; a rating's star (the one that holds the value is checked) |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
-| `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch) |
+| `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch); a read-only rating and its stars |
 | `data-pressed` | a pressed toggle |
 | `data-multiple` | a toggle group or a listbox with `multiple` |
 | `data-placeholder` | a Select showing its placeholder; a date or time field's segment with no value |
 | `data-type` | a date or time field's segment: its type (`era`, `year`, `month`, `day`, `hour`, `minute`, `second`, `dayPeriod`, `timeZoneName`, `literal`; a value) |
-| `data-empty` | a combobox's or an autocomplete's list with no item |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a tag group's root and list with no tag (once mounted); a tags input's root and control with no tag |
+| `data-editing` | a tags input's tag while its tag input edits it |
 | `data-dragging` | a slider while a pointer drags a thumb |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
-| `data-required` | a required checkbox, switch or radio group, and its radios; every part of a required number field, OTP field, date or time field, or range field |
+| `data-required` | a required checkbox, switch, radio group, segmented control or rating, and its radios; every part of a required number field, OTP field, date or time field, or range field |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid; `data-invalid` also on every part of a date, time or range field whose value is out of range or unavailable (a range: or whose end is before its start), and on a typed picker's segments whose complete entry is |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTP field slot that holds a character |
-| `data-highlighted` | the menu item, select, combobox or autocomplete option the keyboard or the pointer points at; a listbox's focused option |
+| `data-highlighted` | the menu item, select, combobox or autocomplete option the keyboard or the pointer points at; a listbox's focused option; a rating's star drawn filled, whole or half (by the value, or the pointer's preview) |
+| `data-half` | a rating's star drawn half filled |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group); a hover card moved to another of its triggers |
 | `data-expanded` | a toast viewport and its toasts while the pointer is over it or the keyboard is in it |
 | `data-limited` | a toast queued past the limit (with `inert`) |
@@ -70,7 +72,7 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
-| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb |
+| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb, a segmented control and its parts |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one, on every tabs part (a physical value: `left`, `right`, `up`, `down`, `none`) |
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |
@@ -85,6 +87,11 @@ A scroll area writes what it measures: its viewport's `--scroll-area-overflow-x-
 `-y-start` and `-y-end` (the distance to each edge, for a fade), its scrollbars'
 `--scroll-area-thumb-height` / `--scroll-area-thumb-width`, and its root's
 `--scroll-area-corner-width` / `--scroll-area-corner-height`.
+
+A segmented control's indicator carries its checked item's box, from the root's padding box:
+the logical `--segment-indicator-inset-inline-start`, `-inset-block-start`, `-inline-size` and
+`-block-size`, and the physical `--segment-indicator-left`, `-right`, `-top`, `-bottom`, `-width`
+and `-height`.
 
 A toast carries its place in the stack: `--toast-index`, `--toast-offset-y`, `--toast-height` and
 the swipe's `--toast-swipe-movement-x` / `-y`, with the viewport's `--toast-frontmost-height`.

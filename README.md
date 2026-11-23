@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 62 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete:
+Today, 66 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
 
 | group | components |
 | --- | --- |
@@ -23,6 +23,7 @@ Today, 62 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2
 | virtual and async lists | **ListboxVirtual**, **SelectVirtual**, **ComboboxVirtual**, **AutocompleteVirtual** (opt-in entries on the toolkit's virtualizer), and each framework's async list |
 | inputs | **Label**, **NumberField** (localized text, held buttons, scrub), **OTPField** |
 | dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker**, **DateField**, **TimeField**, **DateRangeField** and **TimeRangeField** (typed in segments, on the toolkit's segment editing and time values), and the pickers' opt-in typed input (**DatePickerInput**, **DateRangePickerInput**); the multiple-date **MultipleCalendar**, **CalendarPreset**, **MonthCalendar**, **YearCalendar** (and their ranges), **MonthPicker**, **YearPicker** (and their ranges) and a calendar's day, month and year views (**CalendarView**); every one of them in 13 calendar systems and the date-time fields and pickers in time zones (the toolkit's `/calendar-systems` and `/time-zone`, injected, computed on `Intl`) |
+| tags and choices | **TagGroup** (a grid of removable, selectable tags), **TagsInput** (tags typed, pasted, edited in place; a form control), **SegmentedControl** (a radio group with a moving Indicator), **Rating** (stars in whole or half steps) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 
