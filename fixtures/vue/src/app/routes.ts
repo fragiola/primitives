@@ -39,6 +39,10 @@ import ComboboxObjects from "../scenarios/combobox/combobox-objects.vue";
 import ComboboxRejectedInput from "../scenarios/combobox/combobox-rejected-input.vue";
 import ContextMenuBasic from "../scenarios/context-menu/context-menu-basic.vue";
 import ContextMenuLifecycle from "../scenarios/context-menu/context-menu-lifecycle.vue";
+import DateFieldBasic from "../scenarios/date-field/date-field-basic.vue";
+import DateFieldDateTime from "../scenarios/date-field/date-field-date-time.vue";
+import DateFieldForm from "../scenarios/date-field/date-field-form.vue";
+import DateFieldMinMax from "../scenarios/date-field/date-field-min-max.vue";
 import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
 import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
 import DatePickerLifecycle from "../scenarios/date-picker/date-picker-lifecycle.vue";
@@ -136,6 +140,9 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
+import TimeFieldBasic from "../scenarios/time-field/time-field-basic.vue";
+import TimeFieldForm from "../scenarios/time-field/time-field-form.vue";
+import TimeFieldMinMax from "../scenarios/time-field/time-field-min-max.vue";
 import ToastBasic from "../scenarios/toast/toast-basic.vue";
 import ToastLimit from "../scenarios/toast/toast-limit.vue";
 import ToastPromise from "../scenarios/toast/toast-promise.vue";
@@ -305,6 +312,13 @@ export const routes: Record<string, Component> = {
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,
     "/number-field/scrub": NumberFieldScrub,
+    "/date-field/basic": DateFieldBasic,
+    "/date-field/min-max": DateFieldMinMax,
+    "/date-field/form": DateFieldForm,
+    "/date-field/date-time": DateFieldDateTime,
+    "/time-field/basic": TimeFieldBasic,
+    "/time-field/min-max": TimeFieldMinMax,
+    "/time-field/form": TimeFieldForm,
     "/otp-field/basic": OtpFieldBasic,
     "/otp-field/field": OtpFieldField,
     "/listbox-virtual/basic": ListboxVirtualBasic,
