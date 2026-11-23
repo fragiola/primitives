@@ -23,6 +23,8 @@ import CalendarTwoMonths from "../scenarios/calendar/calendar-two-months.vue";
 import CalendarUnavailable from "../scenarios/calendar/calendar-unavailable.vue";
 import CalendarPresetBasic from "../scenarios/calendar-preset/calendar-preset-basic.vue";
 import CalendarPresetPicker from "../scenarios/calendar-preset/calendar-preset-picker.vue";
+import CalendarSystemsBasic from "../scenarios/calendar-systems/calendar-systems-basic.vue";
+import CalendarSystemsPickers from "../scenarios/calendar-systems/calendar-systems-pickers.vue";
 import CalendarViewPicker from "../scenarios/calendar-view/calendar-view-picker.vue";
 import CalendarViewTyped from "../scenarios/calendar-view/calendar-view-typed.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
@@ -158,6 +160,8 @@ import TimeFieldBasic from "../scenarios/time-field/time-field-basic.vue";
 import TimeFieldForm from "../scenarios/time-field/time-field-form.vue";
 import TimeFieldMinMax from "../scenarios/time-field/time-field-min-max.vue";
 import TimeRangeFieldBasic from "../scenarios/time-range-field/time-range-field-basic.vue";
+import TimeZonesField from "../scenarios/time-zones/time-zones-field.vue";
+import TimeZonesPicker from "../scenarios/time-zones/time-zones-picker.vue";
 import ToastBasic from "../scenarios/toast/toast-basic.vue";
 import ToastLimit from "../scenarios/toast/toast-limit.vue";
 import ToastPromise from "../scenarios/toast/toast-promise.vue";
@@ -378,4 +382,8 @@ export const routes: Record<string, Component> = {
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/calendar-systems/basic": CalendarSystemsBasic,
+    "/calendar-systems/pickers": CalendarSystemsPickers,
+    "/time-zones/field": TimeZonesField,
+    "/time-zones/picker": TimeZonesPicker,
 };
