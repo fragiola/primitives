@@ -173,8 +173,7 @@ uncontrolled list to its `defaultValue` (reason `none`). When the browser's vali
 list invalid, focus goes to its tab stop.
 
 **In a Field** ([field.md](field.md#integration-contract)): the Root is the field's control (as
-RadioGroup): named by the `Field.Label` (`aria-labelledby`; a press on the label focuses the tab
-stop), described by the field, `aria-invalid` on the Root; focus and blur are the focus entering
+RadioGroup): named by the `Field.Label` (`aria-labelledby`), described by the field, `aria-invalid` on the Root; focus and blur are the focus entering
 and leaving the list; `validate` gets the value; the validated element is the visually hidden
 input; the field's `name` and `disabled` win.
 
@@ -212,7 +211,7 @@ Checks:
    a pause, `b` focuses "Banana" (the next match, wrapping) and `b` again at once "Blueberry".
 6. Tab moves to "After"; Shift+Tab comes back to the selected "Blueberry" (not the last focused).
 7. A click on "Cherry" selects and focuses it (`value: cherry`, `reason: item-press`); a click on
-   "Orange" (disabled) focuses it and selects nothing.
+   "Orange" (forced: it is disabled) focuses it and selects nothing.
 8. Home, then PageDown (the list does not scroll) focuses "Orange"; PageUp focuses "Apple".
 9. Axe finds no violation.
 
@@ -323,16 +322,15 @@ Checks:
 
 1. A `listbox` named "Fruit", described by "Pick one.", not `aria-invalid`; no hidden input is in
    the accessibility tree.
-2. A click on the label "Fruit" focuses "Apple" (the tab stop).
-3. "Submit" submits nothing (`form: none`), focuses "Apple", makes the list
+2. "Submit" submits nothing (`form: none`), focuses "Apple", makes the list
    `aria-invalid="true"` with `data-invalid`, and shows "Choose a fruit."; the description is
    "Pick one. Choose a fruit.".
-4. A click on "Banana" selects it and hides the error; "Submit" gives
+3. A click on "Banana" selects it and hides the error; "Submit" gives
    `form: fruit=banana&toppings=cheese`.
-5. Adding "Onions" (a click) and "Submit" give `form: fruit=banana&toppings=cheese&toppings=onions`.
-6. "Reset" returns both lists to their defaults (no fruit, "Cheese" alone); "Submit" submits
+4. Adding "Onions" (a click) and "Submit" give `form: fruit=banana&toppings=cheese&toppings=onions`.
+5. "Reset" returns both lists to their defaults (no fruit, "Cheese" alone); "Submit" submits
    nothing again.
-7. Axe finds no violation, before and after the failed submission.
+6. Axe finds no violation, before and after the failed submission.
 
 ## Differences from Base UI and the references
 

@@ -61,6 +61,12 @@ import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { LabelControls } from "../scenarios/label/label-controls.tsx";
+import { ListboxField } from "../scenarios/listbox/listbox-field.tsx";
+import { ListboxGroups } from "../scenarios/listbox/listbox-groups.tsx";
+import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.tsx";
+import { ListboxMultiple } from "../scenarios/listbox/listbox-multiple.tsx";
+import { ListboxReplace } from "../scenarios/listbox/listbox-replace.tsx";
+import { ListboxSingle } from "../scenarios/listbox/listbox-single.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
@@ -240,6 +246,12 @@ export const routes: Record<
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
     "/label/controls": LabelControls,
+    "/listbox/single": ListboxSingle,
+    "/listbox/multiple": ListboxMultiple,
+    "/listbox/replace": ListboxReplace,
+    "/listbox/groups": ListboxGroups,
+    "/listbox/horizontal": ListboxHorizontal,
+    "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
     "/number-field/basic": NumberFieldBasic,
     "/number-field/field": NumberFieldField,
