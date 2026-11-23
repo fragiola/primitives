@@ -225,7 +225,9 @@ export function createVirtualizer(initial: VirtualizerOptions): Virtualizer {
     return {
         update(next) {
             const countChanged =
-                next.count !== undefined && next.count !== options.count;
+                (next.count !== undefined && next.count !== options.count) ||
+                ("estimateSize" in next &&
+                    next.estimateSize !== options.estimateSize);
             options = { ...options, ...next };
             if (countChanged) {
                 starts = null;
@@ -292,7 +294,7 @@ export function createVirtualizer(initial: VirtualizerOptions): Virtualizer {
         measure(index, element) {
             observed.set(element, index);
             observer?.observe(element);
-            if (list !== null) {
+            if (list !== null && !sizes.has(index)) {
                 // a row measured as it renders: the list renders again with its real size, its
                 // layout size (a popup's opening scale transforms its box, never its size)
                 if (setSize(index, element.offsetHeight)) {

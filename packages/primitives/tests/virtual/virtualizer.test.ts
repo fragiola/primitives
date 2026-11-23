@@ -252,3 +252,12 @@ describe("createVirtualizer's scroll anchoring", () => {
         expect(list.scrollTop).toBe(430);
     });
 });
+
+describe("createVirtualizer's estimate", () => {
+    it("lays the rows out again when the estimated size changes", () => {
+        const virtualizer = createVirtualizer({ count: 10, estimateSize: 20 });
+        expect(virtualizer.range().totalSize).toBe(200);
+        virtualizer.update({ estimateSize: 30 });
+        expect(virtualizer.range().totalSize).toBe(300);
+    });
+});

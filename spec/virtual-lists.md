@@ -62,7 +62,8 @@ the rows it adds and removes).
 
 **`@fragiola/primitives/async-list`**: `createAsyncList({ load, filterText, onChange })`, an async
 list framework-free: `reload()` loads the first page, `loadMore()` the next one (with the cursor
-the previous page returned; nothing while one loads or when there is none), `setFilterText(text)`
+the previous page returned; nothing while one loads, after a failed load, or when there is none:
+a failed load is retried with `reload()`, never in a loop at the list's end), `setFilterText(text)`
 loads the first page for the text, `abort()`. The loader gets `{ signal, filterText, cursor }`
 and returns `{ items, cursor? }`. A new load **aborts the one in flight** (its signal), and a
 stale page is **never used**, whichever arrives first; the items stay until the new page arrives.

@@ -51,7 +51,7 @@ export interface AsyncList<Item> {
     state(): AsyncListState<Item>;
     /** Loads the first page again (aborting a load in flight). */
     reload(): void;
-    /** Loads the next page, unless one is loading or there is none. */
+    /** Loads the next page, unless one is loading, the last load failed, or there is none. */
     loadMore(): void;
     /** Loads the first page for a new text (aborting a load in flight); the items stay until it arrives. */
     setFilterText(text: string): void;
@@ -80,7 +80,15 @@ export function createAsyncList<Item, Cursor = unknown>(
         controller?.abort();
         const own = new AbortController();
         controller = own;
-        set({ status: more ? "loading-more" : "loading", error: undefined });
+        if (!more) {
+            // a first page: the previous text's cursor is not this one's
+            cursor = undefined;
+        }
+        set({
+            status: more ? "loading-more" : "loading",
+            error: undefined,
+            ...(more ? {} : { hasMore: false }),
+        });
         let page: Promise<AsyncListPage<Item, Cursor>>;
         try {
             page = options.load({
@@ -122,11 +130,8 @@ export function createAsyncList<Item, Cursor = unknown>(
         state: () => state,
         reload: () => run(false),
         loadMore() {
-            if (
-                !state.hasMore ||
-                state.status === "loading" ||
-                state.status === "loading-more"
-            ) {
+            // after a failed load, only `reload` loads again (no retry loop at the list's end)
+            if (state.status !== "idle" || !state.hasMore) {
                 return;
             }
             run(true);

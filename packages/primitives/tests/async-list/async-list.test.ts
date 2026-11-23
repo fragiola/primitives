@@ -149,3 +149,33 @@ describe("createAsyncList", () => {
         expect(changes).not.toHaveBeenCalled();
     });
 });
+
+describe("createAsyncList after a failure", () => {
+    it("loads no next page after a failed one, until reload", async () => {
+        const { calls, load } = controlledLoader();
+        const list = createAsyncList({ load });
+        list.reload();
+        calls[0]?.resolve({ items: ["a"], cursor: 1 });
+        await flush();
+        list.loadMore();
+        calls[1]?.reject(new Error("offline"));
+        await flush();
+        expect(list.state().status).toBe("error");
+        list.loadMore();
+        expect(load).toHaveBeenCalledTimes(2);
+    });
+
+    it("drops the previous text's cursor when a first page starts", async () => {
+        const { calls, load } = controlledLoader();
+        const list = createAsyncList({ load });
+        list.reload();
+        calls[0]?.resolve({ items: ["a"], cursor: 1 });
+        await flush();
+        list.setFilterText("b");
+        expect(list.state().hasMore).toBe(false);
+        calls[1]?.reject(new Error("offline"));
+        await flush();
+        list.reload();
+        expect(calls[2]?.request.cursor).toBeUndefined();
+    });
+});
