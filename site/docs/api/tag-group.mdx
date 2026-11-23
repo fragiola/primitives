@@ -1,0 +1,230 @@
+---
+title: TagGroup
+description: A focusable group of tags to move through with the arrows, select and remove, a grid of rows after React Aria, in each framework.
+---
+
+A group of tags that stays on the page: labels, categories, keywords or filters, which the user
+moves through with the arrow keys, may select (none, one or several) and may remove. The app owns
+the tags: it renders one Tag per entry and removes the entry when `onRemove` asks for it. The APG
+has no tag pattern and Base UI no TagGroup: it follows React Aria's TagGroup, built on the WAI-ARIA
+APG [grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) (one row per tag) with the
+APG's roving `tabindex` and its recommended multi-select model. A text input that creates tags is
+a [TagsInput](/docs/api/tags-input); a list of options submitted with a form, a
+[Listbox](/docs/api/listbox).
+
+<Example id="tag-group" />
+
+## Behaviour
+
+- **Roles**: the List is a `grid` whose Tags are `row`s, each holding one `gridcell` (the
+  TagCell, which the consumer renders around the tag's content and its RemoveButton): a row can
+  hold a remove button and carry `aria-selected`, which an `option` or a `listitem` cannot. While
+  it holds no tag, the List is a `group`.
+- **Focus**: one tab stop (a roving `tabindex`): the tag that last had focus, else the first
+  enabled one. The arrows move between the tags as one wrapping line (ArrowRight and ArrowDown the
+  next, ArrowLeft and ArrowUp the previous, Left and Right mirrored in RTL), Home and End go to
+  the ends; `loopFocus` (the default) wraps. Disabled tags are skipped and never focused.
+- **Selection** (`selectionMode`): `"none"` (the default), `"single"` or `"multiple"`. Space,
+  Enter and a press select a tag (`"single"`; the selected one stays selected) or toggle it
+  (`"multiple"`); a move never selects (the APG's recommended model). The value is an array of
+  strings in every mode, in the tags' order. Reasons: `item-press`, `keyboard`.
+- **Removal**: with `onRemove` (Angular: `removable` and `(remove)`), Delete and Backspace on a
+  tag, or its RemoveButton, ask for its removal (reasons `keyboard`, `chip-remove-press`); the app
+  removes the tag in the handler, or keeps it. The focus then moves to the next enabled tag, else
+  the previous one, else the List. A removal does not change the selection: an app that removes a
+  selected tag updates `value` too. Without `onRemove` no tag is removable.
+- **Empty**: once mounted, `data-empty` is on the Root and the List while no tag is rendered; the
+  List is then a `group` with `tabindex="-1"`, out of the tab order. The app renders its empty
+  message itself, outside the List (in the Root, for example).
+- **Name**: the Label names the List (`aria-labelledby`), or a [Field](/docs/api/field)'s Label,
+  or the consumer's `aria-labelledby` / `aria-label`, which win. A RemoveButton is named by the
+  consumer (`aria-label`): primitives name nothing.
+- **Forms**: none: a TagGroup has no `name` and no hidden input. In a Field, the List is the
+  field's control (named, described, `aria-invalid`) and `validate` gets the selected values.
+- **The mechanisms**: the key map and the removal's focus rule are the toolkit's
+  [`/collection`](/docs/api/toolkit) (`tagGroupKeyTarget`, `removalFocusIndex`), the selection
+  rules `/selection`, as Listbox's.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `tag-group-root` | none; holds the state |
+| Label | `span` | `tag-group-label` | names the List |
+| List | `div` | `tag-group-list` | the `grid` (a `group` while it holds no tag) |
+| Tag | `div` | `tag-group-tag` | a `row`, focusable |
+| TagCell | `div` | `tag-group-tag-cell` | the Tag's one `gridcell`: its content and its RemoveButton |
+| RemoveButton | `button` | `tag-group-remove-button` | inside a TagCell: removes its Tag |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { TagGroup } from "@fragiola/primitives-react/tag-group";
+
+const [tags, setTags] = useState(["news", "travel", "gaming"]);
+const [selected, setSelected] = useState<string[]>([]);
+
+<TagGroup.Root
+    selectionMode="multiple"
+    value={selected}
+    onValueChange={setSelected}
+    onRemove={(value) => setTags(tags.filter((tag) => tag !== value))}
+>
+    <TagGroup.Label>Categories</TagGroup.Label>
+    <TagGroup.List>
+        {tags.map((tag) => (
+            <TagGroup.Tag key={tag} value={tag}>
+                <TagGroup.TagCell>
+                    {tag}
+                    <TagGroup.RemoveButton aria-label={`Remove ${tag}`}>×</TagGroup.RemoveButton>
+                </TagGroup.TagCell>
+            </TagGroup.Tag>
+        ))}
+    </TagGroup.List>
+    {tags.length === 0 ? <p>No categories.</p> : null}
+</TagGroup.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <TagGroup.Root
+        v-model:value="selected"
+        selection-mode="multiple"
+        @remove="(value) => (tags = tags.filter((tag) => tag !== value))"
+    >
+        <TagGroup.Label>Categories</TagGroup.Label>
+        <TagGroup.List>
+            <TagGroup.Tag v-for="tag in tags" :key="tag" :value="tag">
+                <TagGroup.TagCell>
+                    {{ tag }}
+                    <TagGroup.RemoveButton :aria-label="`Remove ${tag}`">×</TagGroup.RemoveButton>
+                </TagGroup.TagCell>
+            </TagGroup.Tag>
+        </TagGroup.List>
+    </TagGroup.Root>
+</template>
+```
+
+The tags are removable while the Root has an `@remove` listener.
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [TagGroupRoot, TagGroupLabel, TagGroupList, TagGroupTag, TagGroupTagCell, TagGroupRemoveButton],
+    template: `
+        <div tagGroupRoot selectionMode="multiple" [(value)]="selected" removable (remove)="drop($event.value)">
+            <span tagGroupLabel>Categories</span>
+            <div tagGroupList>
+                @for (tag of tags(); track tag) {
+                    <div tagGroupTag [value]="tag">
+                        <div tagGroupTagCell>
+                            {{ tag }}
+                            <button tagGroupRemoveButton [attr.aria-label]="'Remove ' + tag">×</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    `,
+})
+export class Categories {
+    protected readonly tags = signal(["news", "travel", "gaming"]);
+    protected readonly selected = signal<readonly string[]>([]);
+    protected drop(value: string) {
+        this.tags.update((tags) => tags.filter((tag) => tag !== value));
+    }
+}
+```
+
+Angular cannot tell whether `(remove)` is bound, so `removable` says the tags can be removed (React's
+and Vue's `onRemove` given). `(remove)` emits `{ value, details }`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `@remove`), and Angular as inputs and outputs (`[(value)]`,
+`(valueChangeDetails)` and `(remove)` with `{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `selectionMode` | `"none" \| "single" \| "multiple"` | `"none"` | how many tags can be selected |
+| `value` | `string[]` | | the selected tags' values, controlled, in the tags' order |
+| `defaultValue` | `string[]` | `[]` | the initial selection, uncontrolled |
+| `onValueChange` | `(value: string[], details: { reason }) => void` | | every change (`item-press`, `keyboard`) |
+| `disabledKeys` | `string[]` | `[]` | the values of the disabled tags |
+| `disabled` | `boolean` | `false` | every tag is disabled |
+| `removable` (angular) | `boolean` | `false` | the tags can be removed: Delete, Backspace and the RemoveButtons emit `(remove)` |
+| `onRemove` | `(value: string, details: { reason }) => void` | | a tag asks to be removed (`keyboard`, `chip-remove-press`): remove it in the handler, or keep it; without it no tag is removable (Angular: `removable`) |
+| `loopFocus` | `boolean` | `true` | the arrows wrap from the last tag to the first and back |
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the List's `aria-labelledby` points at |
+
+### List
+
+No props of its own.
+
+### Tag
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the value it selects and removes, unique in the group |
+| `disabled` | `boolean` | `false` | never focused, selected nor removed |
+
+### TagCell
+
+No props of its own.
+
+### RemoveButton
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-empty` (no tag, once mounted) |
+| Label | an `id` (its own unless the consumer gives one) |
+| List | `role="grid"`, or `role="group"` while it holds no tag; `aria-labelledby`; `aria-multiselectable="true"` with `"multiple"`; `data-empty` and `tabindex="-1"` while empty; `data-disabled`; in a Field, `aria-describedby`, `aria-invalid` and the field's states |
+| Tag | `role="row"`, `tabindex` (`0` on the tab stop, `-1` on the others, none when disabled), `aria-selected` (`"true"` or `"false"`, unless `selectionMode="none"`), `data-selected`, `aria-disabled="true"` and `data-disabled` when disabled |
+| TagCell | `role="gridcell"` |
+| RemoveButton | `type="button"`, `tabindex="-1"`, `disabled` and `data-disabled` when its Tag is disabled |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab | enters the List at the tag that last had focus, else the first enabled one; Tab again leaves it |
+| ArrowRight, ArrowDown | the next enabled tag (ArrowLeft in RTL); wraps with `loopFocus` |
+| ArrowLeft, ArrowUp | the previous enabled tag (ArrowRight in RTL); wraps with `loopFocus` |
+| Home, End | the first, the last enabled tag |
+| Space, Enter | `"single"`: selects the focused tag; `"multiple"`: toggles it; `"none"`: nothing |
+| Delete, Backspace | asks to remove the focused tag (`onRemove`, reason `keyboard`) |
+
+A key with Ctrl, Meta, Alt or Shift does nothing (Shift+Tab leaves the List).
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/tag-group` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `TagGroup`, `TagGroupListState`, `TagGroupRemoveButtonState`, `TagGroupRootProps`, `TagGroupRootState`, `TagGroupSelectionMode`, `TagGroupTagProps`, `TagGroupTagState` |
+| `@fragiola/primitives-vue/tag-group` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `TagGroup`, `TagGroupListState`, `TagGroupRemoveButtonState`, `TagGroupRootEmits`, `TagGroupRootProps`, `TagGroupRootState`, `TagGroupSelectionMode`, `TagGroupTagProps`, `TagGroupTagState` |
+| `@fragiola/primitives-angular/tag-group` | `ChangeDetails`, `ChangeReason`, `TagGroupLabel`, `TagGroupList`, `TagGroupListState`, `TagGroupRemoveButton`, `TagGroupRemoveButtonState`, `TagGroupRoot`, `TagGroupRootState`, `TagGroupSelectionMode`, `TagGroupTag`, `TagGroupTagCell`, `TagGroupTagEntry`, `TagGroupTagState`, `ValueChangeEvent` |
