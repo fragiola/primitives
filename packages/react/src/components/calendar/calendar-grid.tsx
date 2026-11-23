@@ -55,13 +55,6 @@ export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
             context.select(context.focusedDate);
             return;
         }
-        if (event.key === "Escape") {
-            if (context.anchor !== null) {
-                event.preventDefault();
-                context.cancelRange();
-            }
-            return;
-        }
         const target = calendarKeyTarget(event.key, context.focusedDate, {
             rtl: getDirection(event.currentTarget, direction) === "rtl",
             firstDayOfWeek: context.firstDay,
