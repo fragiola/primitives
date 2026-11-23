@@ -2,8 +2,17 @@ import type { DateSegment, SegmentFormat } from "@fragiola/primitives/segments";
 import type { ComputedRef, InjectionKey } from "vue";
 import type { FieldControlBinding } from "../../composables/use-field-control.ts";
 
-/** Which root the shared parts sit in: their part attribute names it (spec/date-field.md). */
-export type DateFieldComponent = "date-field" | "time-field";
+/**
+ * Which root the shared parts sit in: their part attribute names it (spec/date-field.md; the
+ * range fields' and the pickers' typed input, spec/date-range-field.md and spec/calendar.md).
+ */
+export type DateFieldComponent =
+    | "date-field"
+    | "time-field"
+    | "date-range-field"
+    | "time-range-field"
+    | "date-picker"
+    | "date-range-picker";
 
 /** The state every part renders with (spec/date-field.md, "State attributes and ARIA"). */
 export interface DateFieldState {
@@ -22,6 +31,8 @@ export interface DateFieldSegmentState extends DateFieldState {
 
 export interface DateFieldContext {
     component: DateFieldComponent;
+    /** The Input's part attribute, when not `<component>-input` (a picker's `-segments`). */
+    inputPart?: string;
     state: ComputedRef<DateFieldState>;
     format: ComputedRef<SegmentFormat>;
     segments: ComputedRef<DateSegment[]>;

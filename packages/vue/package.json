@@ -147,11 +147,29 @@
             "import": "./dist/date-picker.js",
             "default": "./dist/date-picker.js"
         },
+        "./date-picker-input": {
+            "@fragiola/source": "./src/components/date-picker-input/index.ts",
+            "types": "./dist/date-picker-input.d.ts",
+            "import": "./dist/date-picker-input.js",
+            "default": "./dist/date-picker-input.js"
+        },
+        "./date-range-field": {
+            "@fragiola/source": "./src/components/date-range-field/index.ts",
+            "types": "./dist/date-range-field.d.ts",
+            "import": "./dist/date-range-field.js",
+            "default": "./dist/date-range-field.js"
+        },
         "./date-range-picker": {
             "@fragiola/source": "./src/components/date-range-picker/index.ts",
             "types": "./dist/date-range-picker.d.ts",
             "import": "./dist/date-range-picker.js",
             "default": "./dist/date-range-picker.js"
+        },
+        "./date-range-picker-input": {
+            "@fragiola/source": "./src/components/date-range-picker-input/index.ts",
+            "types": "./dist/date-range-picker-input.d.ts",
+            "import": "./dist/date-range-picker-input.js",
+            "default": "./dist/date-range-picker-input.js"
         },
         "./dialog": {
             "@fragiola/source": "./src/components/dialog/index.ts",
@@ -327,6 +345,12 @@
             "import": "./dist/time-field.js",
             "default": "./dist/time-field.js"
         },
+        "./time-range-field": {
+            "@fragiola/source": "./src/components/time-range-field/index.ts",
+            "types": "./dist/time-range-field.d.ts",
+            "import": "./dist/time-range-field.js",
+            "default": "./dist/time-range-field.js"
+        },
         "./toast": {
             "@fragiola/source": "./src/components/toast/index.ts",
             "types": "./dist/toast.d.ts",
@@ -470,10 +494,25 @@
                 "import": "./dist/date-picker.js",
                 "default": "./dist/date-picker.js"
             },
+            "./date-picker-input": {
+                "types": "./dist/date-picker-input.d.ts",
+                "import": "./dist/date-picker-input.js",
+                "default": "./dist/date-picker-input.js"
+            },
+            "./date-range-field": {
+                "types": "./dist/date-range-field.d.ts",
+                "import": "./dist/date-range-field.js",
+                "default": "./dist/date-range-field.js"
+            },
             "./date-range-picker": {
                 "types": "./dist/date-range-picker.d.ts",
                 "import": "./dist/date-range-picker.js",
                 "default": "./dist/date-range-picker.js"
+            },
+            "./date-range-picker-input": {
+                "types": "./dist/date-range-picker-input.d.ts",
+                "import": "./dist/date-range-picker-input.js",
+                "default": "./dist/date-range-picker-input.js"
             },
             "./dialog": {
                 "types": "./dist/dialog.d.ts",
@@ -619,6 +658,11 @@
                 "types": "./dist/time-field.d.ts",
                 "import": "./dist/time-field.js",
                 "default": "./dist/time-field.js"
+            },
+            "./time-range-field": {
+                "types": "./dist/time-range-field.d.ts",
+                "import": "./dist/time-range-field.js",
+                "default": "./dist/time-range-field.js"
             },
             "./toast": {
                 "types": "./dist/toast.d.ts",

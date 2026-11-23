@@ -54,7 +54,8 @@ export const DateFieldInput: PublicComponent<
                         role: "group",
                         "aria-labelledby": aria["aria-labelledby"],
                         "aria-describedby": aria["aria-describedby"],
-                        "data-primitives-part": `${context.component}-input`,
+                        "data-primitives-part":
+                            context.inputPart ?? `${context.component}-input`,
                         ...context.attributes(),
                         ref: context.setInputElement,
                     },
