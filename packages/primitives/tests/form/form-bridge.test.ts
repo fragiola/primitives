@@ -86,4 +86,24 @@ describe("bridgeForm", () => {
         expect(later.defaultPrevented).toBe(false);
         expect(document.activeElement).not.toBe(trigger);
     });
+
+    // Epic #49 review: a control associated by `form="id"` outside the form's element is one of
+    // its controls too; another form's controls are not
+    it("cancels a later control associated by `form` outside the form, not another form's", () => {
+        document.body.innerHTML = `<form id="order"><input id="hidden" required><button id="trigger"></button></form><input id="outside" form="order" required><form><input id="other" required></form>`;
+        const hidden = document.getElementById("hidden") as HTMLInputElement;
+        const outside = document.getElementById("outside") as HTMLInputElement;
+        const other = document.getElementById("other") as HTMLInputElement;
+        const trigger = document.getElementById("trigger") as HTMLElement;
+        const end = bridgeForm(hidden, { invalid: () => trigger });
+        hidden.dispatchEvent(new Event("invalid", { cancelable: true }));
+        const later = new Event("invalid", { cancelable: true });
+        outside.dispatchEvent(later);
+        expect(later.defaultPrevented).toBe(true);
+        const foreign = new Event("invalid", { cancelable: true });
+        other.dispatchEvent(foreign);
+        expect(foreign.defaultPrevented).toBe(false);
+        expect(document.activeElement).toBe(trigger);
+        end();
+    });
 });

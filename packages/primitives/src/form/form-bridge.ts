@@ -34,8 +34,10 @@ export function bridgeForm(
     let timer: ReturnType<typeof setTimeout> | undefined;
     // the validation this bridge took the focus in: the later controls' `invalid` events
     let holding: ReturnType<typeof setTimeout> | undefined;
+    // a control of the form, wherever it is: inside it, or associated by `form="id"` outside it
     const cancelLater = (event: Event) => {
-        if (event.target !== input) {
+        const target = event.target as { form?: unknown } | null;
+        if (event.target !== input && target?.form === form) {
             event.preventDefault();
         }
     };
@@ -43,7 +45,11 @@ export function bridgeForm(
         if (holding !== undefined) {
             clearTimeout(holding);
             holding = undefined;
-            form?.removeEventListener("invalid", cancelLater, true);
+            form?.ownerDocument.removeEventListener(
+                "invalid",
+                cancelLater,
+                true,
+            );
         }
     };
     const onReset = () => {
@@ -66,7 +72,12 @@ export function bridgeForm(
                 // events are canceled (Epic #49). They come in the same task, one per control,
                 // with microtasks between them, so the hold ends with the task
                 if (form !== null && holding === undefined) {
-                    form.addEventListener("invalid", cancelLater, true);
+                    // on the document: a control associated by `form` may be outside the form
+                    form.ownerDocument.addEventListener(
+                        "invalid",
+                        cancelLater,
+                        true,
+                    );
                     holding = setTimeout(release);
                 }
             }
