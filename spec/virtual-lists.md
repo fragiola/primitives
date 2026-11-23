@@ -51,10 +51,14 @@ beyond `@floating-ui/dom`):
 
 The rows keep the list's **flow layout**: no wrapper and no spacer element. Each rendered row gets
 the room before it as its inline `margin-block-start` and the last one the room after it as its
-`margin-block-end` (structural style); the list's `row-gap` is read and counted. So the list must
-lay its rows out in a column with no margin of their own (a flex or grid column, as the recipes'),
-and the rows' spacing is their padding or the list's gap. A measured row that grows above the view
-is kept in place by the browser's scroll anchoring.
+`margin-block-end`, plus `flex-shrink: 0` (a flex column that scrolls would squeeze its rows) and
+`overflow-anchor: none` (structural style); the list's `row-gap` is read and counted. So the list
+must lay its rows out in a column with no margin of their own (a flex or grid column, as the
+recipes'), and the rows' spacing is their padding or the list's gap. Sizes are layout sizes
+(`offsetHeight`, the `ResizeObserver` border box): a popup's opening scale never changes them. A
+measured row above the view that changes size moves the scroll position by the change, so the
+rows in view stay still (the virtualizer's own scroll anchoring: the browser's would also follow
+the rows it adds and removes).
 
 **`@fragiola/primitives/async-list`**: `createAsyncList({ load, filterText, onChange })`, an async
 list framework-free: `reload()` loads the first page, `loadMore()` the next one (with the cursor
@@ -151,7 +155,12 @@ As the component's spec, over **every** item, rendered or not:
 
 ## Pointer and scrolling
 
-A press and a hover on a rendered option are the component's. Scrolling renders the rows in view;
+A press and a hover on a rendered option are the component's. When the highlighted option changes
+(and once the popup is placed), SelectVirtual, ComboboxVirtual and AutocompleteVirtual scroll it
+into view by its offset (`scrollToIndex`), after the Item's own scroll, which reads boxes that a
+popup's opening scale transforms. A virtual list in a popup should be the popup's scroll container
+(the recipes' `max-h-80 overflow-y-auto` on the List): a scrolling listbox that a combobox controls
+is a combobox popup, not a region to focus (axe's `scrollable-region-focusable`). Scrolling renders the rows in view;
 `onLoadMore` runs when the last row comes into view (the next page then renders under it).
 
 ## Forms
@@ -169,15 +178,16 @@ An async list renders with `status` `loading` and no items; it loads once mounte
 
 The items of the virtual scenarios are 10 000 items `{ value: "item-<n>", label: "Item <n>" }`
 for `n` from 1 to 10 000, but item 7777, labelled **"Zulu"**, and item 3, disabled. An option
-renders its label; each part has `itemSize` 32 (the recipes' row height). The async scenarios load
+renders its label; each part has the default `itemSize` (36, the recipes' row height in the light
+theme) and is its own scroll container, 320 px high (`max-h-80`). The async scenarios load
 pages of 50 of those items, filtered by the text (an item matches when its label contains it, case
 ignored), after a latency of **150 ms**, or **800 ms** for the text `1` (a slow load that a
 quicker one replaces). Output values print the value, or `none`.
 
 ### `/listbox-virtual/basic`
 
-A ListboxVirtual Root, `multiple`, `aria-label` **"Items"**, in a box 320 px high, over the
-10 000 items. Output: `value: ...` (the values joined with `,`).
+A ListboxVirtual Root, `multiple`, `aria-label` **"Items"**, 320 px high, over the 10 000 items.
+Output: `count: ...` (the selected values), `last: ...` (the last of them, or `none`).
 
 Checks:
 
@@ -185,11 +195,11 @@ Checks:
    the first is "Item 1" with `aria-setsize="10000"` and `aria-posinset="1"`.
 2. Tab focuses "Item 1". End focuses "Item 10000" (`aria-posinset="10000"`), in view; Home focuses
    "Item 1" again.
-3. PageDown focuses an option a page below (`aria-posinset` between 9 and 11), in view.
+3. PageDown focuses the last option within the list's height from "Item 1" (a page), in view.
 4. Typing `z` focuses "Zulu" (`aria-posinset="7777"`), in view.
-5. Space selects "Zulu" (`value: item-7777`); Ctrl+Shift+End selects every item from "Zulu" to
-   the end (`value` has 2224 values, the last `item-10000`); Ctrl+A selects all but the disabled
-   "Item 3" (9999 values).
+5. Space selects "Zulu" (`count: 1`, `last: item-7777`); Ctrl+Shift+End selects every item from
+   "Zulu" to the end (`count: 2224`, `last: item-10000`); Ctrl+A selects all but the disabled
+   "Item 3" (`count: 9999`).
 6. With "Item 10000" focused, scrolling the box to its top keeps the focused option in the DOM
    and focused.
 7. Axe finds no violation.
@@ -262,9 +272,10 @@ loading, and a ComboboxVirtual List with `loading` and `onLoadMore`. Output: `co
 
 Checks:
 
-1. Type `1`, then at once `2` (the text `12`): once both settled (1 s), the list shows only items
-   containing `12` (`filter: 12`): the slow page for `1` never shows.
-2. While a page loads, the list has `data-loading` and the Status says "Loading…".
+1. Type `1`: while its page loads (800 ms), the list has `data-loading` and `aria-busy="true"` and
+   the Status says "Loading…".
+2. Then type `2` (the text `12`): once both settled (1 s), the list shows only items containing
+   `12` (`filter: 12`): the slow page for `1` never shows.
 3. Scrolling the popup to its end loads the next page of `12` (`count` grows to 100).
 4. Axe finds no violation while open.
 
