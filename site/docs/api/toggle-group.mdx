@@ -1,0 +1,127 @@
+---
+title: ToggleGroup
+description: Toggles sharing one value, one pressed or several, one tab stop moved through with the arrows, in each framework.
+---
+
+A set of [Toggles](/docs/api/toggle) that share one value: one pressed at a time, or several
+with `multiple` (Base UI's ToggleGroup, with the WAI-ARIA APG
+[toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/)'s keys: one tab stop, the
+arrows move between the toggles). ToggleGroup is one component, not a namespace; its toggles come
+from [`/toggle`](/docs/api/toggle).
+
+## Behaviour
+
+- **Value**: the values of the pressed toggles, an array of strings in every mode. Without
+  `multiple`, a press replaces the value and pressing the pressed toggle empties it; with it, a
+  press adds or removes the toggle's value. Every change reports reason `none`.
+- **Focus**: one tab stop (a roving `tabindex`): the toggle that last had focus while it is
+  enabled, else the first enabled one. The arrows of the `orientation` (mirrored in RTL when
+  horizontal), Home and End move the focus only, never the value; they skip disabled toggles and
+  wrap with `loopFocus`.
+- **In a [Toolbar](/docs/api/toolbar)**: the group has no focus of its own. Its toggles are the
+  toolbar's items, the toolbar stays one tab stop, and the group's `orientation` and `loopFocus`
+  are the toolbar's.
+- **Name**: the group is a `role="group"`; name it with `aria-label` or `aria-labelledby`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| ToggleGroup | `div` | `toggle-group-root` | the `group`; holds the value |
+
+Its items are [Toggles](/docs/api/toggle), each with a `value`.
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Toggle } from "@fragiola/primitives-react/toggle";
+import { ToggleGroup } from "@fragiola/primitives-react/toggle-group";
+
+<ToggleGroup aria-label="Alignment" defaultValue={["left"]} onValueChange={(value) => console.log(value)}>
+    <Toggle value="left">Left</Toggle>
+    <Toggle value="center">Center</Toggle>
+    <Toggle value="right">Right</Toggle>
+</ToggleGroup>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ToggleGroup v-model:value="styles" multiple aria-label="Text style">
+        <Toggle value="bold">Bold</Toggle>
+        <Toggle value="italic">Italic</Toggle>
+    </ToggleGroup>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ToggleGroup, Toggle],
+    template: `
+        <div toggleGroup [(value)]="styles" multiple aria-label="Text style">
+            <button toggle value="bold">Bold</button>
+            <button toggle value="italic">Italic</button>
+        </div>
+    `,
+})
+export class TextStyle {
+    protected readonly styles = signal<string[]>([]);
+}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Vue binds them as `v-model:value` and `@value-change`; Angular as `[(value)]` and
+`(valueChangeDetails)`.
+
+### ToggleGroup
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | | the pressed toggles' values, controlled |
+| `defaultValue` | `string[]` | `[]` | the initial values, uncontrolled |
+| `onValueChange` | `(value: string[], details: { reason }) => void` | | every change (reason `none`) |
+| `multiple` | `boolean` | `false` | several toggles may be pressed |
+| `disabled` | `boolean` | `false` | every toggle is disabled |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | which arrow keys move between the toggles; a Toolbar's inside one |
+| `loopFocus` | `boolean` | `true` | whether the arrow keys wrap around; a Toolbar's inside one |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| ToggleGroup | `role="group"`, `data-orientation` (its own, or its Toolbar's), `data-multiple`, `data-disabled` |
+
+Its toggles' attributes are on the [Toggle](/docs/api/toggle) page, with the group's roving
+`tabindex`.
+
+## Keyboard
+
+| key | horizontal | vertical |
+| --- | --- | --- |
+| Tab | enters at the tab stop; Tab again leaves the group | the same |
+| next toggle | ArrowRight (ArrowLeft in RTL) | ArrowDown |
+| previous toggle | ArrowLeft (ArrowRight in RTL) | ArrowUp |
+| Home, End | the first, the last enabled toggle | the same |
+| Enter, Space | presses or releases the focused toggle | the same |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/toggle-group` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `ToggleGroup`, `ToggleGroupProps`, `ToggleGroupState` |
+| `@fragiola/primitives-vue/toggle-group` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `ToggleGroup`, `ToggleGroupEmits`, `ToggleGroupProps`, `ToggleGroupState` |
+| `@fragiola/primitives-angular/toggle-group` | `ChangeDetails`, `ChangeReason`, `ToggleGroup`, `ToggleGroupState`, `ValueChangeEvent` |

@@ -134,6 +134,18 @@
                     "path": "api/button"
                 },
                 {
+                    "label": "Toggle",
+                    "path": "api/toggle"
+                },
+                {
+                    "label": "ToggleGroup",
+                    "path": "api/toggle-group"
+                },
+                {
+                    "label": "Toolbar",
+                    "path": "api/toolbar"
+                },
+                {
                     "label": "Checkbox",
                     "path": "api/checkbox"
                 },

@@ -4,7 +4,7 @@ description: What changes in right to left, when the document's dir is enough, a
 ---
 
 Every component that depends on the reading direction follows it: the arrow keys of Tabs, Slider,
-RadioGroup, Menu, Combobox's chips and the calendars swap, a horizontal Slider runs right to left,
+RadioGroup, ToggleGroup, Toolbar, Menu, Combobox's chips and the calendars swap, a horizontal Slider runs right to left,
 a Progress Indicator grows from the right, and every
 positioned popup resolves its logical sides (`inline-start`, `inline-end`) on the right side. What
 stays yours: setting the direction of your page, and the layout of your own CSS (use logical
@@ -97,6 +97,7 @@ floating element ([the toolkit](/docs/api/toolkit)).
 | [Accordion](/docs/api/accordion) | ArrowLeft moves to the next trigger, ArrowRight to the previous (horizontal) |
 | [Slider](/docs/api/slider) | a horizontal slider has `min` at the right; the arrows swap |
 | [RadioGroup](/docs/api/radio-group) | ArrowLeft moves to the next radio (and checks it), ArrowRight to the previous; ArrowDown and ArrowUp do not change |
+| [ToggleGroup](/docs/api/toggle-group), [Toolbar](/docs/api/toolbar) | horizontal: ArrowLeft moves to the next item, ArrowRight to the previous (a Toolbar.Input's "next" arrow is ArrowLeft); Home, End and a vertical one do not change |
 | [Progress](/docs/api/progress) | the Indicator grows from the inline start: from the right |
 | [Menu](/docs/api/menu) | ArrowLeft opens a submenu, ArrowRight closes it; submenus open to the left |
 | [Combobox](/docs/api/combobox) | the arrows between chips swap |

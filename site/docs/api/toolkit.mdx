@@ -31,14 +31,16 @@ and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
 `/direction`; Select and Combobox add `/collection`, `/overlay` and `/positioning` (Select's `modal` option `/inert` and
 `/scroll-lock`); the date pickers add `/date` to the Popover's mechanisms. Progress uses
-`/range` alone, Avatar `/image` alone; Button and Separator use none. The root entry,
+`/range` alone, Avatar `/image` alone; Button and Separator use none. Toolbar and ToggleGroup use
+the roving focus of `/collection` and `/direction` (a Toggle alone imports neither: its
+composite's root handles the keys). The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
 
 | entry | exports |
 | --- | --- |
-| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |

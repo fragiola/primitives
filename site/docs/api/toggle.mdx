@@ -1,0 +1,118 @@
+---
+title: Toggle
+description: A two-state button with aria-pressed, alone, in a ToggleGroup or in a Toolbar (the APG toggle button), in each framework.
+---
+
+A button the user presses on and off (WAI-ARIA APG [button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/),
+its toggle button): a native `<button>` with `aria-pressed`, or your own element (`render`) with
+the keys a native button has. Inside a [ToggleGroup](/docs/api/toggle-group) it is one of the
+group's values; inside a [Toolbar](/docs/api/toolbar) it is one of the toolbar's items. Toggle is
+one component, not a namespace.
+
+## Behaviour
+
+- **State**: `pressed` (controlled) or `defaultPressed`; every press reports the new state with
+  reason `none`. The accessible name never changes with the state: `aria-pressed` tells it.
+- **Keys**: Enter and Space press and release it, as a native button's click; a non-native
+  Toggle (`nativeButton={false}`) clicks on Enter's key down and Space's key up, and Space does
+  not scroll.
+- **In a ToggleGroup**: it is pressed while the group's value holds its `value` (required
+  there); `pressed` and `defaultPressed` are ignored, `onPressedChange` still reports before the
+  group's `onValueChange`.
+- **In a composite** (a ToggleGroup, a Toolbar): it takes the composite's roving `tabindex`, and
+  the arrow keys reach it; a disabled Toggle is natively disabled and skipped.
+- **Disabled**: it ignores presses and keys; a disabled ToggleGroup, Toolbar or Toolbar.Group
+  disables it too. It never submits a form (`type="button"`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Toggle | `button` | `toggle-root` | a `button` with `aria-pressed` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Toggle } from "@fragiola/primitives-react/toggle";
+
+<Toggle aria-label="Bold" defaultPressed onPressedChange={(pressed) => console.log(pressed)}>
+    B
+</Toggle>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Toggle v-model:pressed="bold" aria-label="Bold">B</Toggle>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Toggle],
+    template: `<button toggle [(pressed)]="bold" aria-label="Bold">B</button>`,
+})
+export class Bold {
+    protected readonly bold = signal(false);
+}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Vue binds them as `v-model:pressed` and `@pressed-change`; Angular as `[(pressed)]` and
+`(pressedChangeDetails)` (`{ value, details }`). Vue and Angular take the click, pointer, key and
+focus listeners as native events (`@click`, `(click)`).
+
+### Toggle
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `pressed` | `boolean` | | whether it is pressed, controlled; ignored in a ToggleGroup |
+| `defaultPressed` | `boolean` | `false` | the initial state, uncontrolled; ignored in a ToggleGroup |
+| `onPressedChange` | `(pressed: boolean, details: { reason }) => void` | | every press (reason `none`), before a group's `onValueChange` |
+| `value` | `string` | | its value in a ToggleGroup (required there) |
+| `disabled` | `boolean` | `false` | ignores presses and keys |
+| `nativeButton` | `boolean` | `true` | whether the rendered element is a native `<button>`; `false` with a `render` that gives another element |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the Toggle's own; not while disabled |
+| `onMouseDown` (react) | `MouseEventHandler` | | not while disabled |
+| `onPointerDown` (react) | `PointerEventHandler` | | not while disabled (its default is prevented) |
+| `onKeyDown` (react) | `KeyboardEventHandler` | | runs before the non-native keys; not while disabled |
+| `onKeyUp` (react) | `KeyboardEventHandler` | | runs before Space's click on a non-native Toggle; not while disabled |
+| `onFocus` (react) | `FocusEventHandler` | | after the composite took note of the focus |
+
+## State and part attributes
+
+| case | attributes |
+| --- | --- |
+| native | `type="button"`, `aria-pressed` (`"true"` / `"false"`), `data-pressed` while pressed, `disabled` and `data-disabled` while disabled |
+| not native | `role="button"`, `aria-pressed`, `data-pressed`, `tabindex="0"` (`-1` while disabled), `aria-disabled="true"` and `data-disabled` while disabled |
+| in a composite | the same, with the roving `tabindex` (`"0"` on the tab stop, `"-1"` elsewhere) |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter | presses or releases it (a click) |
+| Space | presses or releases it (a click); a non-native Toggle's key down does not scroll |
+| Tab | moves on; a disabled Toggle is skipped. In a composite, Tab leaves the composite |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/toggle` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `Toggle`, `ToggleProps`, `ToggleState` |
+| `@fragiola/primitives-vue/toggle` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `Toggle`, `ToggleEmits`, `ToggleProps`, `ToggleState` |
+| `@fragiola/primitives-angular/toggle` | `ChangeDetails`, `ChangeReason`, `Toggle`, `ToggleState`, `ValueChangeEvent` |
