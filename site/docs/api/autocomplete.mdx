@@ -1,0 +1,293 @@
+---
+title: Autocomplete
+description: A free-text input with suggestions whose value is the text, with the APG's four autocomplete behaviours, filtering and native form support.
+---
+
+A free-text input with a list of suggestions (the APG
+[combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with list autocomplete;
+Base UI's Autocomplete). **The value is the text**: a suggestion fills the input, and any other
+text is a value too. A value that must be one of the items is a
+[Combobox](/docs/api/combobox)'s.
+
+<Example id="autocomplete" />
+
+## Behaviour
+
+- **`mode`**: the APG's four autocomplete behaviours, named as Base UI does: `list` (the list
+  follows the text; a highlight leaves the text as it is), `both` (the list follows the text and
+  the input completes inline), `inline` (inline completion over a fixed list), `none` (a fixed
+  list, the text unchanged).
+- **Inline completion** (`both`, `inline`, the APG's): typing a character highlights the first
+  suggestion that starts with the text and shows it in the input, the part not typed selected, so
+  the next character replaces it; a deletion removes it; the arrows show the highlighted
+  suggestion; leaving the input accepts it (reason `input-blur`); Escape drops it.
+- **Filtering** is Combobox's: a locale-aware "contains" (`filter`, `null` for none), `limit`,
+  groups; `items` may change at any time (suggestions loaded as the text changes), and a
+  highlight whose suggestion is gone is dropped.
+- **Opening**: typing opens the list, an empty text closes it; a press on the input opens it only
+  with `openOnInputClick`; ArrowDown opens on the first suggestion. `autoHighlight` highlights the
+  first suggestion after typing (`list`, `none`).
+- **Escape** closes the list, then clears the text. **Enter** chooses the highlighted suggestion,
+  or, with none, closes the list and lets the form submit.
+- **Focus**: DOM focus stays on the input; the highlighted suggestion is announced with
+  `aria-activedescendant`. Disabled suggestions are highlighted, never chosen.
+- **Forms**: the Input is the form control (`name`, `required`, its own validity), with no hidden
+  input. A form reset returns an uncontrolled autocomplete to `defaultValue`. In a
+  [Field](/docs/api/field), the Input takes the field's ids and states.
+- **Shared with Combobox**: through each framework's shared code and the toolkit, never through
+  Combobox's entry, so an app with Autocomplete alone ships no Combobox code.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state |
+| InputGroup | `div` | `autocomplete-input-group` | holds the Input and its buttons, and anchors the list |
+| Input | `input` | `autocomplete-input` | the `combobox`; keeps DOM focus; the form control |
+| Trigger | `button` | `autocomplete-trigger` | toggles the list; not in the tab order |
+| Clear | `button` | `autocomplete-clear` | empties the text; rendered only while there is text |
+| Value | none | | renders the value: the text, or a render function of it |
+| Status | `div` | `autocomplete-status` | a polite live region for the consumer's text |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `autocomplete-positioner` | places the popup under the anchor |
+| Popup | `div` | `autocomplete-popup` | the floating container |
+| Empty | `div` | `autocomplete-empty` | a polite live region; its children show only while the list is empty |
+| List | `div` | `autocomplete-list` | the `listbox` |
+| Group | `div` | `autocomplete-group` | a `group` of suggestions |
+| GroupLabel | `div` | `autocomplete-group-label` | names its Group |
+| Separator | `div` | `autocomplete-separator` | between groups |
+| Item | `div` | `autocomplete-item` | an `option`: a suggestion |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Autocomplete } from "@fragiola/primitives-react/autocomplete";
+
+<Autocomplete.Root items={CITIES} name="city">
+    <label htmlFor="city">City</label>
+    <Autocomplete.InputGroup>
+        <Autocomplete.Input id="city" />
+        <Autocomplete.Clear aria-label="Clear city">×</Autocomplete.Clear>
+    </Autocomplete.InputGroup>
+    <Autocomplete.Portal>
+        <Autocomplete.Positioner sideOffset={4}>
+            <Autocomplete.Popup>
+                <Autocomplete.Empty>No city found.</Autocomplete.Empty>
+                <Autocomplete.List>
+                    {(city: string) => (
+                        <Autocomplete.Item key={city} value={city}>
+                            {city}
+                        </Autocomplete.Item>
+                    )}
+                </Autocomplete.List>
+            </Autocomplete.Popup>
+        </Autocomplete.Positioner>
+    </Autocomplete.Portal>
+</Autocomplete.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Autocomplete.Root v-model:value="city" :items="CITIES" mode="both" name="city">
+        <Autocomplete.InputGroup>
+            <Autocomplete.Input id="city" />
+        </Autocomplete.InputGroup>
+        <Autocomplete.Portal>
+            <Autocomplete.Positioner :side-offset="4">
+                <Autocomplete.Popup>
+                    <Autocomplete.Empty>No city found.</Autocomplete.Empty>
+                    <Autocomplete.List v-slot="{ entry }: { entry: string }">
+                        <Autocomplete.Item :key="entry" :value="entry">{{ entry }}</Autocomplete.Item>
+                    </Autocomplete.List>
+                </Autocomplete.Popup>
+            </Autocomplete.Positioner>
+        </Autocomplete.Portal>
+    </Autocomplete.Root>
+</template>
+```
+
+The List's default scoped slot gets `{ entry, index }`; the Value's, `{ value }` (the text).
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [AutocompleteRoot, AutocompleteInputGroup, AutocompleteInput, AutocompletePortal, AutocompletePositioner, AutocompletePopup, AutocompleteEmpty, AutocompleteList, AutocompleteItem],
+    template: `
+        <ng-container autocompleteRoot [items]="cities" name="city" [(value)]="city">
+            <div autocompleteInputGroup><input autocompleteInput id="city" /></div>
+            <ng-container *autocompletePortal>
+                <div autocompletePositioner [sideOffset]="4">
+                    <div autocompletePopup>
+                        <div autocompleteEmpty>No city found.</div>
+                        <div autocompleteList #list="autocompleteList">
+                            @for (city of list.entries(); track city) {
+                                <div autocompleteItem [value]="city">{{ city }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class CitySearch {
+    protected readonly cities = CITIES;
+    protected readonly city = signal("");
+}
+```
+
+There is no Value directive: the Root's `value()` signal, read through `exportAs`
+(`#autocomplete="autocompleteRoot"`), gives the text; `*autocompleteClear` is structural.
+`injectAutocomplete()` gives a child component the Root.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`v-model:open`), and Angular as inputs and outputs (`[(value)]`, `[(open)]`,
+`(valueChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | the text, controlled |
+| `defaultValue` | `string` | `""` | the initial text, uncontrolled |
+| `onValueChange` | `(value: string, details: { reason }) => void` | | every change (`input-change`, `item-press`, `input-blur`, `clear-press`, `escape-key`, `none`) |
+| `items` | `(Item \| { items: Item[] })[]` | | the suggestions, or groups of them |
+| `mode` | `"list" \| "both" \| "inline" \| "none"` | `"list"` | the autocomplete behaviour (`aria-autocomplete`); `inline` and `none` never filter |
+| `filter` | `(item, query, itemToString) => boolean \| null` | locale-aware "contains" | whether a suggestion matches the text; `null`: no filtering |
+| `limit` | `number` | `-1` | the most suggestions the List renders |
+| `locale` | `string` | the document's | the collator's locale |
+| `itemToStringValue` | `(item) => string` | an object's `label`, else its `value`, else the item | a suggestion's text, written into the input |
+| `openOnInputClick` | `boolean` | `false` | a press on the input opens the list |
+| `autoHighlight` | `boolean` | `false` | typing highlights the first suggestion (`list`, `none`) |
+| `name` | `string` | | the Input's name (a field's wins) |
+| `required` | `boolean` | `false` | the form cannot submit with no text |
+| `disabled` | `boolean` | `false` | disables the input and its buttons |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every open change (`input-change`, `input-clear`, `input-press`, `list-navigation`, `trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`, `none`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+
+### InputGroup
+
+No props of its own.
+
+### Input
+
+No props of its own.
+
+### Trigger
+
+No props of its own.
+
+### Clear
+
+No props of its own.
+
+### Value
+
+No props of its own: its children are the text, or a render function of it (not in Angular).
+
+### Status
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed, `hidden` and `data-closed` |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*autocompletePortal="{ keepMounted: true }"` |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the anchor |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the anchor, in px |
+| `alignOffset` | `number` | `0` | the shift along the anchor's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the InputGroup, else the Input | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+### Empty
+
+No props of its own.
+
+### List
+
+No props of its own: its children are nodes, or, with `items`, a render function of each
+matching entry (a suggestion, or a group with its matching suggestions).
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+No props of its own.
+
+### Separator
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Item` | | required: the suggestion |
+| `disabled` | `boolean` | `false` | highlighted, never chosen nor completed |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| InputGroup | `role="group"`, `data-popup-open`, `data-disabled` |
+| Input | `role="combobox"`, `aria-autocomplete` (the `mode`), `aria-expanded`, `aria-controls`, `aria-activedescendant` (while a suggestion is highlighted), `autocomplete="off"`, `name`, `required`, `data-popup-open`, `data-disabled`; in a Field, the field's states |
+| Trigger | `tabindex="-1"`, `aria-expanded`, `aria-controls`, `data-popup-open`, `data-disabled` |
+| Clear | `type="button"`, `tabindex="-1"`, `data-disabled` |
+| Status, Empty | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
+| Positioner, Popup | as the [Combobox](/docs/api/combobox)'s |
+| List | `role="listbox"`, `data-empty` |
+| Group | `role="group"`, `aria-labelledby` |
+| Separator | `role="presentation"`, `data-orientation="horizontal"` |
+| Item | `role="option"`, `aria-disabled`, `data-highlighted`, `data-disabled`; no `aria-selected` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| typing | changes the text and filters; opens the list (an empty text closes it) |
+| ArrowDown / ArrowUp | closed: opens on the first (last) suggestion; open: the next (previous), then back to the input |
+| Alt+ArrowDown / Alt+ArrowUp | opens without highlighting / closes |
+| Enter | chooses the highlighted suggestion; with none, closes the list and lets the form submit |
+| Escape | open: closes the list, the text kept; closed: clears the text |
+| Tab | closes the list and moves on (`both`, `inline`: accepts the completion) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/autocomplete` | `Align`, `Autocomplete`, `AutocompleteItemProps`, `AutocompleteItemState`, `AutocompleteListProps`, `AutocompleteMode`, `AutocompletePortalProps`, `AutocompletePositionerProps`, `AutocompletePositionerState`, `AutocompleteRootProps`, `AutocompleteValueProps`, `ChangeDetails`, `ChangeReason`, `ItemFilter`, `ItemGroup`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PositionerProps`, `RenderProp`, `Side` |
+| `@fragiola/primitives-vue/autocomplete` | `Align`, `Autocomplete`, `AutocompleteDisabledState`, `AutocompleteFilter`, `AutocompleteItemProps`, `AutocompleteItemState`, `AutocompleteItemToString`, `AutocompleteListSlots`, `AutocompleteListState`, `AutocompleteMode`, `AutocompleteOpenState`, `AutocompletePopupState`, `AutocompletePortalProps`, `AutocompletePositionerState`, `AutocompleteRootEmits`, `AutocompleteRootProps`, `AutocompleteValueSlots`, `ChangeDetails`, `ChangeReason`, `ItemFilter`, `ItemGroup`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PositionerProps`, `RenderSlotProps`, `Side` |
+| `@fragiola/primitives-angular/autocomplete` | `Align`, `AutocompleteClear`, `AutocompleteEmpty`, `AutocompleteGroup`, `AutocompleteGroupLabel`, `AutocompleteInput`, `AutocompleteInputGroup`, `AutocompleteItem`, `AutocompleteItemInfo`, `AutocompleteItemState`, `AutocompleteItemValue`, `AutocompleteList`, `AutocompleteMode`, `AutocompletePending`, `AutocompletePopup`, `AutocompletePortal`, `AutocompletePositioner`, `AutocompleteRoot`, `AutocompleteSeparator`, `AutocompleteShown`, `AutocompleteState`, `AutocompleteStatus`, `AutocompleteTrigger`, `ChangeDetails`, `ChangeReason`, `ItemFilter`, `ItemGroup`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `OverlayPortalOptions`, `Side`, `ValueChangeEvent`, `injectAutocomplete` |

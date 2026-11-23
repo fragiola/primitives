@@ -156,6 +156,8 @@ The tab stop is the focused option while the focus is inside the list. Once the 
 next Tab into the list lands on the first selected option, else the first option (APG). A list
 with no option has no tab stop. Before the options are known (a server render, the first render),
 every option has `tabindex="-1"`, as Toolbar's items; once mounted, the tab stop is computed.
+Angular's options register as they render (as its Radios), so its server render already has the
+tab stop; every framework's hydrated page ends the same (the ssr layer).
 
 ## Forms
 

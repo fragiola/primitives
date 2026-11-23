@@ -8,8 +8,8 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
 
 ## Not in this release
 
-- **Thirty-seven components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
-  Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Calendar,
+- **Thirty-nine components.** Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu, ContextMenu, NavigationMenu, Tabs, Collapsible, Accordion, Field, Fieldset, Form, Label,
+  Button, Toggle, ToggleGroup, Toolbar, Checkbox, CheckboxGroup, RadioGroup, Radio, Switch, Slider, NumberField, OTPField, Select, Combobox, Autocomplete, Listbox, Calendar,
   RangeCalendar, DatePicker, DateRangePicker, Progress, Meter, Avatar and Separator ship today, with two entries that are no component: the
   [direction provider](/docs/api/direction) and the [render utilities](/docs/api/render).
 - **Dates are the first version's.** A plain `{ year, month, day }` in the Gregorian calendar,
@@ -20,8 +20,14 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
   `touched`, the Error's enter and exit animations, and the Form's `onFormSubmit` (read the native
   `submit` event and its `FormData`) and `actionsRef`. A form reset does not reset a field's
   states, as in Base UI.
-- **No Listbox or Autocomplete** yet: they come with later stages. Nor a radio outside a group or
-  a read-only RadioGroup.
+- **Listbox leaves out** `aria-activedescendant` focus (DOM focus moves to the options), item
+  actions, `disallowEmptySelection`, `readOnly`, virtualization and async lists (the next stage),
+  and grid and tree collections (Fragiola's data-grid and tree libraries). A press on a
+  `Field.Label` does not focus a Listbox (a `div` is not labelable). Nor a radio outside a group
+  or a read-only RadioGroup.
+- **Autocomplete leaves out** Base UI's `inline` (a list with no popup), `keepHighlight`,
+  `highlightItemOnHover`, `submitOnItemClick`, `onItemHighlighted`, `autoHighlight="always"`,
+  `readOnly`, and an input inside the popup; Space types (it never chooses).
 - **NumberField leaves out** Base UI's `onValueCommitted`, `inputRef`, `form`, the scrub's
   `teleportDistance`, cancelable change details and the `input-paste` reason (a paste is
   `input-change`); its hidden input has `step="any"` (no step validation).

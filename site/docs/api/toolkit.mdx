@@ -36,7 +36,10 @@ the roving focus of `/collection` and `/direction` (a Toggle alone imports neith
 composite's root handles the keys). NumberField adds `/number` to `/form` (its parsing and
 formatting of localized text, its stepping, the auto repeat of its buttons and its scrub; no
 other component imports it), OTPField uses `/form` (its value rules), `/collection` and
-`/direction`; Meter uses `/range` alone, Label `/form` alone (its press). The root entry,
+`/direction`; Meter uses `/range` alone, Label `/form` alone (its press). Listbox adds
+`/selection`, the collections mechanism (its list model, selection rules and key map; no other
+component imports it yet), to `/collection` (typeahead), `/direction` and `/form`; Autocomplete
+uses Combobox's mechanisms (`/collection`, `/overlay`, `/positioning`, `/form`). The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
@@ -60,6 +63,7 @@ other component imports it), OTPField uses `/form` (its value rules), `/collecti
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `isAnimating`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
+| `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
 
 ## The mechanisms
@@ -150,6 +154,18 @@ other component imports it), OTPField uses `/form` (its value rules), `/collecti
   once; a mouse press keeps the focus). `watchScrub(element, { direction, pixelSensitivity,
   onStart, onScrub, onEnd, onCursor })` reports steps per pixels moved, under the pointer lock for
   a mouse, with the virtual cursor's point wrapped around the viewport.
+- **Selection**: the collections mechanism (Epic #55), pure functions over a list's options; the
+  framework holds the value, the focus and the anchor. `createListModel(nodes)` orders the options
+  (`{ key, textValue, disabled }`) and indexes them. `applySelection(model, state, change,
+  { mode, behavior })` gives the next `{ selected, anchor }` for a `toggle`, a `replace`, a
+  `range` (from the anchor, or `from` a key) or `all` (none when every enabled option already is),
+  in `none`, `single` or `multiple` mode, `toggle` or `replace` behaviour (the APG's two models):
+  a disabled option is never selected and a range passes over it; the selection is in the list's
+  order. `listKeyTarget(event, model, index, options)` gives the option a key focuses and the
+  selection change it makes (the arrows of the orientation, mirrored in RTL, Home, End, PageUp and
+  PageDown through `page`, the typeahead through `typeahead`, Space, Enter, Shift, Ctrl or Meta,
+  Ctrl+A); `listPressSelection` a press's; `pageTarget(elements, index, delta, container,
+  orientation)` the option a visible page away.
 - **Range**: slider math and keys, and a progress bar's value. `progressValue(value, options)`
   clamps the value to `[min, max]` and returns it with its percent (0 to 100), its status
   (`ProgressStatus`: `indeterminate` for `null`, `complete` at `max`, else `progressing`) and its
