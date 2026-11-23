@@ -139,6 +139,14 @@ import TooltipDetached from "../scenarios/tooltip/tooltip-detached.vue";
 import TooltipGroup from "../scenarios/tooltip/tooltip-group.vue";
 import TooltipInDialog from "../scenarios/tooltip/tooltip-in-dialog.vue";
 import TooltipLifecycle from "../scenarios/tooltip/tooltip-lifecycle.vue";
+import AutocompleteVirtualAsync from "../scenarios/virtual-lists/autocomplete-virtual-async.vue";
+import AutocompleteVirtualBasic from "../scenarios/virtual-lists/autocomplete-virtual-basic.vue";
+import ComboboxVirtualAsync from "../scenarios/virtual-lists/combobox-virtual-async.vue";
+import ComboboxVirtualBasic from "../scenarios/virtual-lists/combobox-virtual-basic.vue";
+import ListboxVirtualAsync from "../scenarios/virtual-lists/listbox-virtual-async.vue";
+import ListboxVirtualBasic from "../scenarios/virtual-lists/listbox-virtual-basic.vue";
+import SelectVirtualAsync from "../scenarios/virtual-lists/select-virtual-async.vue";
+import SelectVirtualBasic from "../scenarios/virtual-lists/select-virtual-basic.vue";
 
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
 export const routes: Record<string, Component> = {
@@ -286,4 +294,12 @@ export const routes: Record<string, Component> = {
     "/number-field/scrub": NumberFieldScrub,
     "/otp-field/basic": OtpFieldBasic,
     "/otp-field/field": OtpFieldField,
+    "/listbox-virtual/basic": ListboxVirtualBasic,
+    "/listbox-virtual/async": ListboxVirtualAsync,
+    "/select-virtual/basic": SelectVirtualBasic,
+    "/select-virtual/async": SelectVirtualAsync,
+    "/combobox-virtual/basic": ComboboxVirtualBasic,
+    "/combobox-virtual/async": ComboboxVirtualAsync,
+    "/autocomplete-virtual/basic": AutocompleteVirtualBasic,
+    "/autocomplete-virtual/async": AutocompleteVirtualAsync,
 };
