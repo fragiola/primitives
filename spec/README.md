@@ -33,6 +33,9 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [progress.md](progress.md) | Progress |
 | [avatar.md](avatar.md) | Avatar |
 | [separator.md](separator.md) | Separator |
+| [toggle.md](toggle.md) | Toggle |
+| [toggle-group.md](toggle-group.md) | ToggleGroup (on Toggle) |
+| [toolbar.md](toolbar.md) | Toolbar (with nested composites in its roving focus) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
 The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
@@ -50,6 +53,8 @@ details, the lifecycle controls and Dialog's Viewport and nested dialogs, [below
 Issue #34: AlertDialog, ContextMenu, Menu's checkbox and radio items, and Select's groups,
 separators, item text and optional `items`); then Drawer and NavigationMenu (Epic #38: Issue #36,
 the toolkit's swipe mechanism and Drawer; Issue #37, NavigationMenu), which complete stage 1.
+Stage 2 starts with the toggles and bars (Epic #49, Issue #47: Toggle, ToggleGroup and Toolbar,
+on the toolkit's roving focus, with the rule of [nested composites](toolbar.md#nested-composites)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -102,8 +107,9 @@ The vocabulary is shared by every component:
 | `data-disabled` | the part is disabled |
 | `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox item, select item) |
 | `data-selected` | a selected tab, combobox item or calendar date |
-| `data-pressed` | not used in these specs |
+| `data-pressed` | a pressed Toggle (spec/toggle.md) |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
+| `data-multiple` | a ToggleGroup with `multiple` |
 | `data-activation` | `automatic` or `manual` on Tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one: `left`, `right`, `up`, `down` or `none` (a physical value, [tabs.md](tabs.md#state-attributes-and-aria)) |
 | `data-side` | the side an overlay ended up on (a value: `top`, `bottom`, the logical `inline-start` / `inline-end`, or the physical `left` / `right`, named as the overlay asked for it; Base UI's names, D4 §3 "Naming", [popover.md](popover.md#positioning)) |
@@ -170,6 +176,7 @@ The reasons are shared:
 | concept | name |
 | --- | --- |
 | open state | `open`, `defaultOpen`, `onOpenChange(open, details)` |
+| pressed state | `pressed`, `defaultPressed`, `onPressedChange(pressed, details)` (Toggle) |
 | value | `value`, `defaultValue`, `onValueChange(value, details)` |
 | disabled | `disabled` |
 | orientation | `orientation` |
@@ -388,6 +395,10 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | a menu radio group's value | `value` + `onValueChange(value, details)` (`defaultValue`) on `Menu.RadioGroup` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[menuRadioGroup]` (`defaultValue`; `valueChangeDetails` output) |
 | a part rendered only while checked (menu indicators) | rendered by the part (`keepMounted` keeps it) | rendered by the part (`keep-mounted`) | structural: `*menuCheckboxItemIndicator`, `*menuRadioItemIndicator` (`*menuCheckboxItemIndicator="{ keepMounted: true }"`) |
 | parts shared by two entries (AlertDialog on Dialog's, ContextMenu on Menu's) | `AlertDialog.Popup` is Dialog's Popup, its part attribute named by the enclosing `AlertDialog.Root` | the same (`AlertDialog.Popup`) | the entry's own selectors on the same directives' behaviour: `[alertDialogRoot]`, `[alertDialogTrigger]`, `*alertDialogPortal`, `[alertDialogBackdrop]`, `[alertDialogViewport]`, `[alertDialogPopup]`, `[alertDialogTitle]`, `[alertDialogDescription]`, `[alertDialogClose]`; `[contextMenuRoot]`, `[contextMenuTrigger]`, `*contextMenuPortal`, `[contextMenuPositioner]`, `[contextMenuPopup]`, `[contextMenuItem]`, `[contextMenuCheckboxItem]`, `[contextMenuRadioGroup]`, `[contextMenuRadioItem]`, `[contextMenuSeparator]`, `[contextMenuGroup]`, `[contextMenuGroupLabel]`, `[contextMenuSubmenuRoot]`, `[contextMenuSubmenuTrigger]`, `*contextMenuCheckboxItemIndicator`, `*contextMenuRadioItemIndicator` (each the same behaviour as Menu's directive, its part attribute `context-menu-*`) |
+| a Toggle's state | `pressed` + `onPressedChange(pressed, details)` (`defaultPressed`) | `v-model:pressed` (`default-pressed`, `@pressed-change="(pressed, details) => ..."`) | `[(pressed)]` on `button[toggle]` (`defaultPressed`; `pressedChangeDetails` output `{ value, details }`, as Switch's `checkedChangeDetails`) |
+| a ToggleGroup's value (an array of strings) | `value` + `onValueChange(value, details)` (`defaultValue`) on `ToggleGroup` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[toggleGroup]` (`defaultValue`; `valueChangeDetails` output), as Accordion's |
+| Toolbar's parts | `Toolbar.Root`, `Toolbar.Button`, `Toolbar.Link`, `Toolbar.Input`, `Toolbar.Group`, `Toolbar.Separator` | the same | `[toolbarRoot]`, `button[toolbarButton]`, `a[toolbarLink]`, `input[toolbarInput]`, `[toolbarGroup]`, `[toolbarSeparator]` |
+| the roving focus a composite provides (spec/toolbar.md, "Nested composites") | a context in the package's shared code (`utils/`, `hooks/`), provided by a Toolbar.Root or a ToggleGroup with none around it | `provide` / `inject` of a key in `utils/` or `composables/` | an `InjectionToken` in `/internal`, provided by `[toolbarRoot]` or a `[toggleGroup]` with none around it |
 | Select's new parts | `Select.Group`, `Select.GroupLabel`, `Select.Separator`, `Select.ItemText` | the same | `[selectGroup]`, `[selectGroupLabel]`, `[selectSeparator]`, `[selectItemText]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
