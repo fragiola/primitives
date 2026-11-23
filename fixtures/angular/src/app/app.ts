@@ -10,6 +10,7 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.ts"
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.ts";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.ts";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.ts";
+import { AspectRatioBasic } from "../scenarios/aspect-ratio/aspect-ratio-basic.ts";
 import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.ts";
 import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.ts";
 import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.ts";
@@ -102,6 +103,8 @@ import { NumberFieldFormat } from "../scenarios/number-field/number-field-format
 import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.ts";
 import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.ts";
 import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.ts";
+import { PaginationBasic } from "../scenarios/pagination/pagination-basic.ts";
+import { PaginationLinks } from "../scenarios/pagination/pagination-links.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
@@ -113,6 +116,8 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.ts";
 import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.ts";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.ts";
+import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.ts";
+import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.ts";
 import { SelectBasic } from "../scenarios/select/select-basic.ts";
 import { SelectControlled } from "../scenarios/select/select-controlled.ts";
 import { SelectGroups } from "../scenarios/select/select-groups.ts";
@@ -319,6 +324,11 @@ import { ROUTES } from "./routes.ts";
         HoverCardDetached,
         HoverCardInDialog,
         HoverCardLifecycle,
+        ScrollAreaBasic,
+        ScrollAreaLinks,
+        PaginationBasic,
+        PaginationLinks,
+        AspectRatioBasic,
     ],
     template: `
         @switch (path) {
@@ -482,6 +492,11 @@ import { ROUTES } from "./routes.ts";
             @case ("/hover-card/detached") { <main class="p-6" scenario-hover-card-detached></main> }
             @case ("/hover-card/in-dialog") { <main class="p-6" scenario-hover-card-in-dialog></main> }
             @case ("/hover-card/lifecycle") { <main class="p-6" scenario-hover-card-lifecycle [cancel]="query.cancel"></main> }
+            @case ("/scroll-area/basic") { <main class="p-6" scenario-scroll-area-basic></main> }
+            @case ("/scroll-area/links") { <main class="p-6" scenario-scroll-area-links></main> }
+            @case ("/pagination/basic") { <main class="p-6" scenario-pagination-basic></main> }
+            @case ("/pagination/links") { <main class="p-6" scenario-pagination-links></main> }
+            @case ("/aspect-ratio/basic") { <main class="p-6" scenario-aspect-ratio-basic></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>
