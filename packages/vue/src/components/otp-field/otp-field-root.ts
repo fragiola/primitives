@@ -192,6 +192,11 @@ export const OTPFieldRoot: PartComponent<
                 }
                 current = next;
                 own.set(next, details);
+                // an override for this task only: a consumer that refused the value renders
+                // nothing, and the next key reads the value it kept
+                setTimeout(() => {
+                    current = value.value;
+                });
                 if (next.length === props.length) {
                     emit("valueComplete", next, details);
                 }
@@ -372,6 +377,13 @@ export const OTPFieldRoot: PartComponent<
                                 // the rendered value, which a patch follows (a controlled
                                 // field that refuses the reset keeps its input)
                                 element.value = rendered;
+                                // and the slots' characters: Vue sets `value` as a property only,
+                                // so the browser's reset emptied them, and an unchanged value
+                                // patches nothing
+                                const characters = Array.from(rendered);
+                                ordered.value.forEach((slot, index) => {
+                                    slot.value = characters[index] ?? "";
+                                });
                             },
                             invalid: () =>
                                 ordered.value[

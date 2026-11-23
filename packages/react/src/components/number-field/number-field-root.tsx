@@ -153,6 +153,11 @@ export function NumberFieldRoot({
         const setValue = (next: number | null, details: ChangeDetails) => {
             current.current = next;
             latest.current.setOwnValue(next, details);
+            // an override for the steps of this task only: a consumer that refused the value
+            // renders nothing, and the next task steps from the value it kept
+            setTimeout(() => {
+                current.current = latest.current.value;
+            });
         };
         /** The value a step starts from: the typed text when it reads as a number. */
         const base = (): number | null => {

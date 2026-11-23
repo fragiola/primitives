@@ -171,6 +171,11 @@ export const NumberFieldRoot: PartComponent<
             const setValue = (next: number | null, details: ChangeDetails) => {
                 current = next;
                 own.set(next, details);
+                // an override for the steps of this task only: a consumer that refused the value
+                // renders nothing, and the next task steps from the value it kept
+                setTimeout(() => {
+                    current = own.value.value;
+                });
             };
             const options = () => ({
                 locale: props.locale,
@@ -286,6 +291,16 @@ export const NumberFieldRoot: PartComponent<
                                 // field that refuses the reset keeps its input)
                                 element.value =
                                     rendered === null ? "" : String(rendered);
+                                // and the Input's text: Vue sets `value` as a property only, so
+                                // the browser's reset emptied it, and an unchanged value patches
+                                // nothing
+                                const text = input.value;
+                                if (text instanceof HTMLInputElement) {
+                                    text.value =
+                                        rendered === null
+                                            ? ""
+                                            : formatNumber(rendered, options());
+                                }
                             },
                             invalid: () => input.value,
                         }),

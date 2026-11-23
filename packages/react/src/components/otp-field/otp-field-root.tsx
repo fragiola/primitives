@@ -174,6 +174,11 @@ export function OTPFieldRoot({
             }
             current.current = next;
             state.setOwnValue(next, details);
+            // an override for this task only: a consumer that refused the value renders
+            // nothing, and the next key reads the value it kept
+            setTimeout(() => {
+                current.current = latest.current.value;
+            });
             if (next.length === state.length) {
                 state.onValueComplete?.(next, details);
             }
