@@ -33,6 +33,7 @@ import {
 } from "@fragiola/primitives-angular/internal";
 import {
     type CalendarComponent,
+    type CalendarMath,
     type CalendarMode,
     type CalendarOptions,
     type CalendarValue,
@@ -150,15 +151,13 @@ export class CalendarState {
         return documentLocale(this.document, this.browser);
     });
     /** The calendar system, when one is given (a CalendarView's month and year views use it). */
-    readonly system = computed(() => this.options().calendar);
-    /** The month math: the calendar system's, or the ISO calendar's. */
-    readonly math = computed(() => this.system() ?? ISO_MATH);
+    readonly system = (): CalendarSystem | undefined => this.options().calendar;
+    /** The month math: the calendar system's (its hook), or the ISO calendar's. */
+    readonly math = (): CalendarMath => this.system() ?? ISO_MATH;
     /** The locale `Intl` writes the names in (with a calendar system's `-u-ca-`). */
-    readonly locale = computed(() => {
-        const system = this.system();
-        const locale = this.baseLocale();
-        return system ? system.locale(locale) : locale;
-    });
+    readonly locale = computed(
+        () => this.system()?.locale(this.baseLocale()) ?? this.baseLocale(),
+    );
     readonly firstDay = computed(
         () =>
             this.options().firstDayOfWeek ?? firstDayOfWeek(this.baseLocale()),
