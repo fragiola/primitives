@@ -95,10 +95,10 @@ shown text the value again. Nothing a highlight shows is reported until it is ac
 The APG's "list with inline autocomplete":
 
 - Typing a character that **adds** to the text (not a deletion) highlights the first enabled
-  suggestion whose text starts with the value (case-insensitive), and the Input shows the value
-  followed by the rest of that suggestion's text, **selected** (the completion string), so the
-  next character replaces it. With no such suggestion, nothing is highlighted and nothing is
-  completed.
+  suggestion whose text starts with the value (case-insensitive), and the Input shows that
+  suggestion's text with the part after the typed characters **selected** (the completion
+  string), so the next character replaces it (the APG example's: the text keeps the suggestion's
+  case). With no such suggestion, nothing is highlighted and nothing is completed.
 - A deletion (Backspace, Delete, cutting) removes the completion and highlights nothing.
 - The arrow keys move the highlight; the Input shows the highlighted suggestion's whole text,
   the caret at its end. Back to the input (no highlight), it shows the value.
@@ -115,7 +115,7 @@ In `list` and `none`, the Input always shows the value.
 | part | attributes |
 | --- | --- |
 | InputGroup | `role="group"`, `data-popup-open` while the list is open, `data-disabled` |
-| Input | `role="combobox"`, `aria-autocomplete` (the `mode`: `list`, `both`, `inline`, `none`), `aria-expanded`, `aria-controls` (the List's id, while it exists), `aria-activedescendant` (the highlighted item's id, only while one is highlighted), `autocomplete="off"`, `name`, `required`, `disabled`, `data-popup-open` while the list is open, `data-disabled`; in a Field, the field's ids and states |
+| Input | `role="combobox"`, `aria-autocomplete` (the `mode`: `list`, `both`, `inline`, `none`), `aria-expanded`, `aria-controls` (the List's id), `aria-activedescendant` (the highlighted item's id, only while one is highlighted), `autocomplete="off"`, `name`, `required`, `disabled`, `data-popup-open` while the list is open, `data-disabled`; in a Field, the field's ids and states |
 | Trigger | `tabindex="-1"`, `aria-expanded`, `aria-controls`, `data-popup-open`, `data-disabled` |
 | Clear | `type="button"`, `tabindex="-1"`, `data-disabled` |
 | Status, Empty | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
@@ -238,14 +238,14 @@ Checks:
 1. `aria-autocomplete="both"`.
 2. Type `b`: "Banana" and "Blueberry" listed, "Banana" highlighted; the input shows "Banana"
    with "anana" selected; `value: b`.
-3. Type `l`: the selection is replaced, the value `bl`; "Blueberry" alone, highlighted; the input
-   shows "Blueberry" with "ueberry" selected.
-4. Backspace removes the completion: the input shows `bl`, nothing highlighted, `value: bl`;
-   Backspace again: `b`, "Banana" and "Blueberry" listed, nothing highlighted.
-5. ArrowDown highlights "Banana" and the input shows "Banana" (the list still filtered by `b`);
-   ArrowDown "Blueberry", shown; ArrowDown back to the input, which shows `b`.
-6. Escape after ArrowDown: the list closes, the input shows `b` (`value: b`).
-7. Type `ch` from an empty text: "Cherry" completed; Tab accepts it: `value: Cherry`,
+3. Type `l`: it replaces the selection, so the text is `Bl` (`value: Bl`); "Blueberry" alone,
+   highlighted; the input shows "Blueberry" with "ueberry" selected.
+4. Backspace removes the completion: the input shows `Bl`, nothing highlighted; Backspace again:
+   `B` (`value: B`), "Banana" and "Blueberry" listed, nothing highlighted.
+5. ArrowDown highlights "Banana" and the input shows "Banana" (the list still filtered by `B`);
+   ArrowDown "Blueberry", shown; ArrowDown back to the input, which shows `B`.
+6. ArrowDown, then Escape: the list closes, the input shows `B` (`value: B`).
+7. Escape (clearing the text), then type `ch`: "Cherry" completed; Tab accepts it: `value: Cherry`,
    `reason: input-blur`, the focus on "After".
 8. Type `or`: "Orange" is disabled: nothing highlighted nor completed; the input shows `or`.
 9. Axe finds no violation while open.
@@ -322,7 +322,8 @@ Checks:
 2. A click on the label focuses the input.
 3. "Submit" submits nothing (`form: none`), focuses the input, makes it `aria-invalid="true"`
    and shows "Enter a city."
-4. Type `Lima` (free text, no suggestion) and "Submit": `form: city=Lima`.
+4. Type `Lima` (free text, no suggestion) and press Enter: the list closes and the form submits
+   (`form: city=Lima`).
 5. Select the text, type `kra`, ArrowDown, Enter: the input shows "Kraków"; "Submit" gives
    `form: city=Kraków`.
 6. "Reset" empties the input; "Submit" submits nothing again.

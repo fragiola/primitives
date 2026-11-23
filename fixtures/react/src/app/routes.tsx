@@ -5,6 +5,14 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.tsx";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.tsx";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.tsx";
+import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.tsx";
+import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.tsx";
+import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.tsx";
+import { AutocompleteField } from "../scenarios/autocomplete/autocomplete-field.tsx";
+import { AutocompleteGroups } from "../scenarios/autocomplete/autocomplete-groups.tsx";
+import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inline.tsx";
+import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.tsx";
+import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
@@ -202,6 +210,14 @@ export const routes: Record<
     "/combobox/form": ComboboxForm,
     "/combobox/field": ComboboxField,
     "/combobox/lifecycle": ComboboxLifecycle,
+    "/autocomplete/basic": AutocompleteBasic,
+    "/autocomplete/both": AutocompleteBoth,
+    "/autocomplete/inline": AutocompleteInline,
+    "/autocomplete/none": AutocompleteNone,
+    "/autocomplete/groups": AutocompleteGroups,
+    "/autocomplete/async": AutocompleteAsync,
+    "/autocomplete/field": AutocompleteField,
+    "/autocomplete/lifecycle": AutocompleteLifecycle,
     "/select/basic": SelectBasic,
     "/select/controlled": SelectControlled,
     "/select/modal": SelectModal,
