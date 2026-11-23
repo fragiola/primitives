@@ -1,11 +1,12 @@
 // The entry of @fragiola/primitives-angular/internal: what the components' entries share (state
 // attributes, controllable inputs, the overlay root, presence, the portal, host registration,
 // ids and label ids, change details, the handles and triggers of detached triggers, the hidden form inputs, structural views, own attributes, the
-// provided direction, a disclosure panel's transitions).
+// provided direction, a disclosure panel's transitions, a button's behaviour).
 // ng-packagr builds each entry point from its own folder, and an entry imports another only
 // through its public API: the components' entries import these from here.
 // Not an app's API: it may change in any release.
 
+export * from "./utils/button-behaviour.ts";
 export * from "./utils/change-details.ts";
 export * from "./utils/conditional-view.ts";
 export * from "./utils/controllable.ts";
