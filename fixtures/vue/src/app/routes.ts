@@ -15,6 +15,8 @@ import AutocompleteInline from "../scenarios/autocomplete/autocomplete-inline.vu
 import AutocompleteLifecycle from "../scenarios/autocomplete/autocomplete-lifecycle.vue";
 import AutocompleteNone from "../scenarios/autocomplete/autocomplete-none.vue";
 import AvatarBasic from "../scenarios/avatar/avatar-basic.vue";
+import BreadcrumbsBasic from "../scenarios/breadcrumbs/breadcrumbs-basic.vue";
+import BreadcrumbsCollapsed from "../scenarios/breadcrumbs/breadcrumbs-collapsed.vue";
 import ButtonBasic from "../scenarios/button/button-basic.vue";
 import CalendarMinMax from "../scenarios/calendar/calendar-min-max.vue";
 import CalendarRange from "../scenarios/calendar/calendar-range.vue";
@@ -27,6 +29,11 @@ import CalendarSystemsBasic from "../scenarios/calendar-systems/calendar-systems
 import CalendarSystemsPickers from "../scenarios/calendar-systems/calendar-systems-pickers.vue";
 import CalendarViewPicker from "../scenarios/calendar-view/calendar-view-picker.vue";
 import CalendarViewTyped from "../scenarios/calendar-view/calendar-view-typed.vue";
+import CarouselAutoplay from "../scenarios/carousel/carousel-autoplay.vue";
+import CarouselBasic from "../scenarios/carousel/carousel-basic.vue";
+import CarouselMultiple from "../scenarios/carousel/carousel-multiple.vue";
+import CarouselTabbed from "../scenarios/carousel/carousel-tabbed.vue";
+import CarouselVertical from "../scenarios/carousel/carousel-vertical.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
@@ -95,6 +102,8 @@ import HoverCardDetached from "../scenarios/hover-card/hover-card-detached.vue";
 import HoverCardInDialog from "../scenarios/hover-card/hover-card-in-dialog.vue";
 import HoverCardLifecycle from "../scenarios/hover-card/hover-card-lifecycle.vue";
 import LabelControls from "../scenarios/label/label-controls.vue";
+import LinkBasic from "../scenarios/link/link-basic.vue";
+import LinkRouter from "../scenarios/link/link-router.vue";
 import ListboxField from "../scenarios/listbox/listbox-field.vue";
 import ListboxGroups from "../scenarios/listbox/listbox-groups.vue";
 import ListboxHorizontal from "../scenarios/listbox/listbox-horizontal.vue";
@@ -167,6 +176,8 @@ import SliderLabelValue from "../scenarios/slider/slider-label-value.vue";
 import SliderRange from "../scenarios/slider/slider-range.vue";
 import SliderThumbName from "../scenarios/slider/slider-thumb-name.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
+import StepsBasic from "../scenarios/steps/steps-basic.vue";
+import StepsLinear from "../scenarios/steps/steps-linear.vue";
 import SwitchBasic from "../scenarios/switch/switch-basic.vue";
 import SwitchControlled from "../scenarios/switch/switch-controlled.vue";
 import TabsAnimated from "../scenarios/tabs/tabs-animated.vue";
@@ -446,6 +457,17 @@ export const routes: Record<string, Component> = {
     "/editable/modes": EditableModes,
     "/editable/states": EditableStates,
     "/editable/field": EditableField,
+    "/link/basic": LinkBasic,
+    "/link/router": LinkRouter,
+    "/breadcrumbs/basic": BreadcrumbsBasic,
+    "/breadcrumbs/collapsed": BreadcrumbsCollapsed,
+    "/steps/basic": StepsBasic,
+    "/steps/linear": StepsLinear,
+    "/carousel/basic": CarouselBasic,
+    "/carousel/autoplay": CarouselAutoplay,
+    "/carousel/tabbed": CarouselTabbed,
+    "/carousel/multiple": CarouselMultiple,
+    "/carousel/vertical": CarouselVertical,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
