@@ -41,3 +41,9 @@ describe("the month and year locale data", () => {
         expect(formatYear("en-US", 42)).not.toContain("1942");
     });
 });
+
+describe("formatYearSpan's spaces", () => {
+    it("writes every space as U+0020, whatever the engine's ICU writes", () => {
+        expect(formatYearSpan("en-US", 2016, 2027)).not.toMatch(/[   ]/);
+    });
+});

@@ -38,14 +38,17 @@ export function formatYear(locale: string, year: number): string {
     return format(locale, { year: "numeric" }).format(utcDate(year, 1));
 }
 
-/** "2016 – 2027" (`Intl.DateTimeFormat#formatRange` of two years). */
+/**
+ * "2016 – 2027" (`Intl.DateTimeFormat#formatRange` of two years), every space written as U+0020:
+ * engines differ on the spaces around the dash (Node's ICU and Chromium's), and a server's text
+ * must be the hydrating browser's (the date fields' literals, Epic #73).
+ */
 export function formatYearSpan(
     locale: string,
     first: number,
     last: number,
 ): string {
-    return format(locale, { year: "numeric" }).formatRange(
-        utcDate(first, 1),
-        utcDate(last, 1),
-    );
+    return format(locale, { year: "numeric" })
+        .formatRange(utcDate(first, 1), utcDate(last, 1))
+        .replace(/[\u00a0\u2009\u202f]/g, " ");
 }

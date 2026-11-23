@@ -94,8 +94,9 @@ only hold items outside `min` / `max`. The consumer names them.
 
 **Row**: `row`; children function `(item) => Cell`.
 
-**Cell**: `value` (the month or year). Default content: MonthCalendar the short month name
-(`Intl` `month: "short"`, "Nov"), YearCalendar the year ("2026"). Its `aria-label` defaults to the
+**Cell**: `value` (the month or year). Default content: MonthCalendar the month's name (`Intl`
+`month: "long"`, "November": its visible text is a word of its name, WCAG 2.5.3, which the short
+"Nov" is not), YearCalendar the year ("2026"). Its `aria-label` defaults to the
 full name (MonthCalendar `month: "long", year: "numeric"`, "November 2026"; YearCalendar the
 year), and the consumer can replace it. The locale data exception
 ([README](README.md#no-text-and-the-one-exception)) covers these texts as the Calendar's.
@@ -234,7 +235,7 @@ with PrevButton **"Previous year"**, a Heading, NextButton **"Next year"** and t
 Checks:
 
 1. A `grid` named "2026" with 4 rows of 3 cells; the first cell is named "January 2026" and reads
-   "Jan" (strings computed with `Intl`).
+   "January" (strings computed with `Intl`).
 2. "November 2026" has `aria-current="date"` and `tabindex="0"`; every other cell `tabindex="-1"`.
 3. Tab focuses November 2026. ArrowRight → December 2026; ArrowRight → January 2027 (the grid is
    named "2027"); ArrowLeft → December 2026 ("2026"); ArrowUp → September; ArrowDown → December;
@@ -273,10 +274,12 @@ NextButton **"Next years"**. Output: `value: ...`.
 
 Checks:
 
-1. A `grid` named by the page "2016 – 2027" (`Intl` `formatRange`), 12 cells from 2016 to 2027;
+1. A `grid` named by the page "2016 – 2027" (`Intl` `formatRange`, its spaces written as U+0020,
+   as the date fields' literals), 12 cells from 2016 to 2027;
    2026 has `aria-current="date"` and `tabindex="0"`.
 2. Tab focuses 2026. ArrowDown → 2029 (the grid named "2028 – 2039"); ArrowUp → 2026
-   ("2016 – 2027"); Home → 2025; End → 2027; PageDown → 2039; PageUp → 2027.
+   ("2016 – 2027"); Home → 2025; End → 2027; PageUp → 2015 ("2004 – 2015"); PageDown → 2027;
+   PageDown again does nothing (2039 is after `max`).
 3. Enter: `value: 2027`.
 4. "Previous years": the page 2004 – 2015, 2004 to 2009 disabled; "Previous years" disabled.
    Click 2012: `value: 2012`.
@@ -340,24 +343,24 @@ view has PrevButton **"Previous month"**, a view Trigger holding the Heading, Ne
 month"**, the Grid, and a preset **"Today"**; the month view a MonthCalendar (**"Previous
 year"**, a view Trigger holding its Heading, **"Next year"**, its Grid); the year view a
 YearCalendar (**"Previous years"**, a view Trigger holding its Heading, **"Next years"**, its
-Grid). Output: `value`, `reason` (the open change's), `view`.
+Grid). Output: `value`, `reason` (the open change's).
 
 Checks:
 
 1. Click the trigger: the focus is on November 20, in a grid named "November 2026"; a button
    named "November 2026" (the view Trigger).
-2. Press it: `view: month`; a grid named "2026", the focus on November 2026.
-3. ArrowLeft ×3, Enter (August 2026): `view: day`; the grid is named "August 2026" and the focus
-   is on August 20, 2026; `value: none`.
-4. Press the view Trigger ("August 2026"), then the month view's ("2026"): `view: year`; a grid
+2. Press it: the month view, a grid named "2026"; the focus on November 2026.
+3. ArrowLeft ×3, Enter (August 2026): the day view, a grid named "August 2026", the focus on
+   August 20, 2026; `value: none`.
+4. Press the view Trigger ("August 2026"), then the month view's ("2026"): the year view, a grid
    named "2016 – 2027", the focus on 2026; 2024 is disabled (every day before `min`), 2025 is not.
-5. ArrowRight, Enter (2027): `view: month`, a grid named "2027", the focus on August 2027. Enter:
-   `view: day`, the focus on August 20, 2027. Enter: `value: 2027-08-20`, the popup closes and the
+5. ArrowRight, Enter (2027): a grid named "2027", the focus on August 2027. Enter: a grid named
+   "August 2027", the focus on August 20, 2027. Enter: `value: 2027-08-20`, the popup closes and the
    focus is on the trigger.
-6. Reopen: `view: day`, the focus on August 20, 2027.
+6. Reopen: the day view, the focus on August 20, 2027.
 7. Press the view Trigger, "Next year": in "2028", March 2028 is disabled (after `max`).
 8. Escape: the popup closes (`reason: escape-key`) and the focus is on the trigger; reopening
-   shows the day view (`view: day`).
+   shows the day view (a grid named "August 2027").
 9. Press "Today": `value: 2026-11-20`, the popup closes.
 10. Axe finds no violation in the month view.
 11. Contract layer: the view Trigger carries `calendar-view-trigger` and `data-view`; the month
@@ -366,7 +369,8 @@ Checks:
 
 ### `/calendar-view/typed`
 
-A `Field.Root` **"Arrival"** around a DatePickerInput (en-US): Segments, a Trigger **"Choose
+A `Field.Root` **"Arrival"** around a DatePickerInput (en-US, `min` 2025-01-01, so the years
+typed on the way set no value): Segments, a Trigger **"Choose
 date"**, the Popup **"Choose date"** holding a bound Calendar with the same CalendarView (no
 preset). Output: `value`, `changes`.
 
