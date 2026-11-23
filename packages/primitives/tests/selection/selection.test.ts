@@ -159,6 +159,17 @@ describe("applySelection", () => {
         });
     });
 
+    it("takes an anchor the list no longer has as none", () => {
+        expect(
+            applySelection(
+                model,
+                { selected: ["onions"], anchor: "gone" },
+                { type: "range", key: "peppers" },
+                replace,
+            ),
+        ).toEqual({ selected: ["peppers"], anchor: "peppers" });
+    });
+
     it("starts a range with no anchor at its own option", () => {
         expect(
             applySelection(

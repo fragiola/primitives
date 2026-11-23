@@ -151,6 +151,13 @@ export function listKeyTarget(
                     : { type: "range", key: targetKey, from: focusedKey },
         };
     }
+    if (ctrl && event.shiftKey && (key === "Home" || key === "End")) {
+        // single (or none): as Home / End
+        return {
+            index: target,
+            selection: followFocus(target, model, options),
+        };
+    }
     if (event.shiftKey && multiple && key !== "Home" && key !== "End") {
         // the APG: Shift + an arrow moves to the next option and toggles it
         return target === index

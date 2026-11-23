@@ -100,7 +100,12 @@ export function applySelection(
         case "replace":
             return { selected: [change.key], anchor: change.key };
         case "range": {
-            const from = change.from ?? state.anchor ?? change.key;
+            // an anchor the list no longer has (its option removed) is no anchor
+            const anchor =
+                state.anchor !== null && model.indexOf(state.anchor) !== -1
+                    ? state.anchor
+                    : null;
+            const from = change.from ?? anchor ?? change.key;
             const keys = rangeKeys(model, from, change.key);
             const kept =
                 behavior === "replace"
@@ -111,7 +116,7 @@ export function applySelection(
                 anchor:
                     change.from !== undefined
                         ? change.from
-                        : (state.anchor ?? change.key),
+                        : (anchor ?? change.key),
             };
         }
         case "all": {

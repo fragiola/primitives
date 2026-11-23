@@ -239,6 +239,20 @@ describe("listKeyTarget: single", () => {
         ).toEqual({ index: 2, selection: null });
     });
 
+    it("takes Ctrl+Shift+End as End", () => {
+        expect(
+            listKeyTarget(
+                key("End", { ctrlKey: true, shiftKey: true }),
+                model,
+                0,
+                {
+                    ...single,
+                    behavior: "replace",
+                },
+            ),
+        ).toEqual({ index: 4, selection: { type: "replace", key: "orange" } });
+    });
+
     it("follows the focus in the replace model", () => {
         expect(
             listKeyTarget(key("End"), model, 0, {
