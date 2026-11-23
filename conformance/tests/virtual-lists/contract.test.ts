@@ -100,10 +100,34 @@ test("listbox-virtual / basic: the root, its rows and their room", async ({
 });
 
 test("listbox-virtual / async: the loading state", async ({ page }) => {
+    // the first page takes 150 ms: the root's `data-loading` is recorded as it happens
+    await page.addInitScript(() => {
+        const seen = { loading: false };
+        (window as unknown as { seen: typeof seen }).seen = seen;
+        new MutationObserver(() => {
+            if (
+                document
+                    .querySelector('[data-primitives-part="listbox-root"]')
+                    ?.getAttribute("data-loading") === ""
+            ) {
+                seen.loading = true;
+            }
+        }).observe(document, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+        });
+    });
     await openScenario(page, "/listbox-virtual/async");
     const root = part(page, "listbox", "root");
-    await expect(root).toHaveAttribute("data-loading", "");
     await expectOutput(page, "count", "50");
+    expect(
+        await page.evaluate(
+            () =>
+                (window as unknown as { seen: { loading: boolean } }).seen
+                    .loading,
+        ),
+    ).toBe(true);
     await expect(root).not.toHaveAttribute("data-loading");
     await expectRows(part(page, "listbox", "item"), 50, 0);
     await expectNoFalseStates(parts(page, "listbox"));

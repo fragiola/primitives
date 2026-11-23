@@ -152,11 +152,34 @@ test.describe("listbox-virtual / basic", () => {
 test("listbox-virtual / async: loads its pages as it scrolls", async ({
     page,
 }) => {
+    // the first page takes 150 ms: the loading state is recorded as it happens
+    await page.addInitScript(() => {
+        const seen = { loading: false };
+        (window as unknown as { seen: typeof seen }).seen = seen;
+        new MutationObserver(() => {
+            const list = document.querySelector('[role="listbox"]');
+            if (
+                list?.hasAttribute("data-loading") &&
+                list.getAttribute("aria-busy") === "true"
+            ) {
+                seen.loading = true;
+            }
+        }).observe(document, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+        });
+    });
     await openScenario(page, "/listbox-virtual/async");
     const list = page.getByRole("listbox", { name: "Items" });
-    await expect(list).toHaveAttribute("data-loading", "");
-    await expect(list).toHaveAttribute("aria-busy", "true");
     await expectOutput(page, "count", "50");
+    expect(
+        await page.evaluate(
+            () =>
+                (window as unknown as { seen: { loading: boolean } }).seen
+                    .loading,
+        ),
+    ).toBe(true);
     await expectOutput(page, "status", "idle");
     await expect(list).not.toHaveAttribute("data-loading");
     await expect(list).not.toHaveAttribute("aria-busy");
@@ -270,6 +293,8 @@ test("combobox-virtual / async: no stale page, and load more", async ({
 }) => {
     await openScenario(page, "/combobox-virtual/async");
     const input = page.getByRole("combobox", { name: "Item" });
+    // the first page (150 ms) shown, so the list is not empty (an empty list is hidden)
+    await expectOutput(page, "count", "50");
     await input.click();
     // `1` loads for 800 ms: the list says it loads, then `12` replaces the load
     await input.pressSequentially("1");
