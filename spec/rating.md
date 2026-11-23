@@ -85,7 +85,8 @@ The Item's state (its `render` and `className` functions, its children function)
 control (`aria-labelledby` from the Field's Label, `aria-describedby`, `aria-invalid`, the
 field's state attributes on the Root); `validate` gets the value (a number, `0` for none); the
 Root takes the field's `name` and `disabled`; focus and blur are the focus entering and leaving
-the Root; the validated element is the HiddenInput (none without it); focus target: the tab stop.
+the Root; the validated element is the HiddenInput (none without it); focus target: the tab stop
+(none when the Root, or the field, is disabled: "Focus").
 
 ## State attributes and ARIA
 

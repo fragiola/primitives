@@ -126,7 +126,11 @@ export const RatingRoot: PublicComponent<
             const stars = new Map<number, HTMLElement>();
             let hiddenInput: HTMLInputElement | null = null;
 
+            // a disabled Root has no tab stop: the Field focuses nothing (spec/rating.md, "Focus")
             const tabStopElement = () => {
+                if (disabled()) {
+                    return null;
+                }
                 const current = value.value;
                 return stars.get(current > 0 ? Math.ceil(current) : 1) ?? null;
             };

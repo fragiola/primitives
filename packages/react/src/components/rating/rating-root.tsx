@@ -91,12 +91,19 @@ export function RatingRoot({
     const [hovered, setHovered] = useState<number | null>(null);
     const stars = useRef(new Map<number, HTMLElement>());
     const hiddenInput = useRef<HTMLInputElement | null>(null);
-    const latest = useRef({ value });
-    latest.current = { value };
+    const latest = useRef({ value, disabled: disabledProp });
 
+    // a disabled Root has no tab stop: the Field focuses nothing (spec/rating.md, "Focus")
     const tabStopElement = useCallback(() => {
-        const current = latest.current.value;
-        return stars.current.get(current > 0 ? Math.ceil(current) : 1) ?? null;
+        const current = latest.current;
+        if (current.disabled) {
+            return null;
+        }
+        return (
+            stars.current.get(
+                current.value > 0 ? Math.ceil(current.value) : 1,
+            ) ?? null
+        );
     }, []);
     // inside a Field, the Root is the field's control (spec/field.md, "Integration contract"), as
     // RadioGroup; the validated element is the HiddenInput
@@ -110,6 +117,7 @@ export function RatingRoot({
         focusTarget: tabStopElement,
     });
     const disabled = disabledProp || field.disabled;
+    latest.current = { value, disabled };
     const interactive = !disabled && !readOnly;
 
     const choose = useCallback(
