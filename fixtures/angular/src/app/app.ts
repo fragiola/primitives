@@ -138,6 +138,14 @@ import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.ts";
 import { TooltipLifecycle } from "../scenarios/tooltip/tooltip-lifecycle.ts";
+import { AutocompleteVirtualAsync } from "../scenarios/virtual-lists/autocomplete-virtual-async.ts";
+import { AutocompleteVirtualBasic } from "../scenarios/virtual-lists/autocomplete-virtual-basic.ts";
+import { ComboboxVirtualAsync } from "../scenarios/virtual-lists/combobox-virtual-async.ts";
+import { ComboboxVirtualBasic } from "../scenarios/virtual-lists/combobox-virtual-basic.ts";
+import { ListboxVirtualAsync } from "../scenarios/virtual-lists/listbox-virtual-async.ts";
+import { ListboxVirtualBasic } from "../scenarios/virtual-lists/listbox-virtual-basic.ts";
+import { SelectVirtualAsync } from "../scenarios/virtual-lists/select-virtual-async.ts";
+import { SelectVirtualBasic } from "../scenarios/virtual-lists/select-virtual-basic.ts";
 import { ROUTES } from "./routes.ts";
 
 /**
@@ -284,6 +292,14 @@ import { ROUTES } from "./routes.ts";
         MenubarModal,
         SwitchBasic,
         SwitchControlled,
+        ListboxVirtualBasic,
+        ListboxVirtualAsync,
+        SelectVirtualBasic,
+        SelectVirtualAsync,
+        ComboboxVirtualBasic,
+        ComboboxVirtualAsync,
+        AutocompleteVirtualBasic,
+        AutocompleteVirtualAsync,
     ],
     template: `
         @switch (path) {
@@ -431,6 +447,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/menubar/vertical") { <main class="p-6" scenario-menubar-vertical></main> }
             @case ("/menubar/modal") { <main class="p-6" scenario-menubar-modal></main> }
             @case ("/direction/provider") { <main class="p-6" scenario-direction-provider [directionProvider]="'rtl'"></main> }
+            @case ("/listbox-virtual/basic") { <main class="p-6" scenario-listbox-virtual-basic></main> }
+            @case ("/listbox-virtual/async") { <main class="p-6" scenario-listbox-virtual-async></main> }
+            @case ("/select-virtual/basic") { <main class="p-6" scenario-select-virtual-basic></main> }
+            @case ("/select-virtual/async") { <main class="p-6" scenario-select-virtual-async></main> }
+            @case ("/combobox-virtual/basic") { <main class="p-6" scenario-combobox-virtual-basic></main> }
+            @case ("/combobox-virtual/async") { <main class="p-6" scenario-combobox-virtual-async></main> }
+            @case ("/autocomplete-virtual/basic") { <main class="p-6" scenario-autocomplete-virtual-basic></main> }
+            @case ("/autocomplete-virtual/async") { <main class="p-6" scenario-autocomplete-virtual-async></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>
