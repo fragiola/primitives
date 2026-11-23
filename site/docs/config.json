@@ -214,6 +214,18 @@
                     "path": "api/rating"
                 },
                 {
+                    "label": "PasswordInput",
+                    "path": "api/password-input"
+                },
+                {
+                    "label": "SearchField",
+                    "path": "api/search-field"
+                },
+                {
+                    "label": "Editable",
+                    "path": "api/editable"
+                },
+                {
                     "label": "Select",
                     "path": "api/select"
                 },
@@ -352,6 +364,10 @@
                 {
                     "label": "AspectRatio",
                     "path": "api/aspect-ratio"
+                },
+                {
+                    "label": "Clipboard",
+                    "path": "api/clipboard"
                 }
             ]
         },

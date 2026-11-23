@@ -1,0 +1,150 @@
+---
+title: SearchField
+description: A search query's field, cleared by Escape and a clear button out of the tab order, submitted by Enter, as a form control, in each framework.
+---
+
+A text field for a search query, with a button that clears it: a site search, a filter box. The
+Input is a native `<input type="search">` (the `searchbox` role, the APG's textbox for search; its
+form goes in a `search` landmark, see the APG's
+[landmarks](https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/)); Escape clears it, Enter
+submits the query. It is a form control: the Input carries the `name`, submits, resets and
+validates, alone or in a [Field](/docs/api/field). The APG has no search field pattern and Base
+UI no SearchField: it follows React Aria's SearchField. Suggestions are an
+[Autocomplete](/docs/api/autocomplete) or a [Combobox](/docs/api/combobox).
+
+<Example id="search-field" />
+
+## Behaviour
+
+- **Escape** clears a field that holds a query (its default prevented, so a dialog around it stays
+  open); on an empty field it is not handled and goes on to the page, so a second Escape closes a
+  dialog or a popup around it.
+- **Enter** calls `onSubmit(value)` and the browser goes on with the form's submission.
+- **The ClearButton** empties the field and focuses the Input; it is out of the tab order
+  (`tabindex="-1"`: Escape clears from the keyboard) and stays rendered while the field is empty
+  (`data-empty`, which a style hides it with).
+- **Read-only**: Escape and the ClearButton do not clear it; **disabled**: every part is.
+- **Forms**: the Input is the form control (no hidden input); a reset returns it to its default
+  (reason `none`).
+- **In a [Field](/docs/api/field)**: the Input is the labelable and the validated element; 
+  `validate` gets the query.
+- **Reasons**: `input-change`, `escape-key`, `clear-press`, `none`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `search-field-root` | none; holds the query |
+| Input | `input` | `search-field-input` | `searchbox` (`type="search"`) |
+| ClearButton | `button` | `search-field-clear-button` | button, out of the tab order |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { SearchField } from "@fragiola/primitives-react/search-field";
+
+<search>
+    <label htmlFor="search">Search</label>
+    <SearchField.Root id="search" name="q" onSubmit={(query) => search(query)}>
+        <SearchField.Input placeholder="Lamps, desks…" />
+        <SearchField.ClearButton aria-label="Clear search">×</SearchField.ClearButton>
+    </SearchField.Root>
+</search>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label for="search">Search</label>
+    <SearchField.Root id="search" v-model:value="query" name="q" @submit="search">
+        <SearchField.Input placeholder="Lamps, desks…" />
+        <SearchField.ClearButton aria-label="Clear search">×</SearchField.ClearButton>
+    </SearchField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [SearchFieldRoot, SearchFieldInput, SearchFieldClearButton],
+    template: `
+        <label for="search">Search</label>
+        <div searchFieldRoot [id]="'search'" [name]="'q'" [(value)]="query" (valueSubmit)="search($event)">
+            <input searchFieldInput placeholder="Lamps, desks…" />
+            <button searchFieldClearButton aria-label="Clear search">×</button>
+        </div>
+    `,
+})
+export class Search {
+    readonly query = signal("");
+}
+```
+
+Enter's output is `(valueSubmit)`: an output named `submit` would also listen to the native
+`submit` event of the Root's element.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `@submit`), and Angular as inputs and outputs (`[(value)]`,
+`(valueChangeDetails)` with `{ value, details }`, `(valueSubmit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | the query, controlled |
+| `defaultValue` | `string` | `""` | the initial query, uncontrolled |
+| `onValueChange` | `(value: string, details: { reason }) => void` | | every change of the query |
+| `onSubmit` (react, vue) | `(value: string) => void` | | Enter in the Input (not while disabled or read-only) |
+| `onValueSubmit` (angular) | `(value: string) => void` | | Angular's `(valueSubmit)`: Enter in the Input |
+| `disabled` | `boolean` | `false` | disables the Input and the ClearButton |
+| `readOnly` | `boolean` | `false` | the Input is read-only; nothing clears it |
+| `required` | `boolean` | `false` | the Input is required |
+| `name` | `string` | | the Input's name (a Field's wins) |
+| `id` | `string` | | the Input's `id` (generated when not given) |
+
+### Input
+
+No props of its own.
+
+### ClearButton
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| every part | `data-empty` while the query is `""`, `data-disabled`, `data-readonly`, `data-required` |
+| Root | in a Field, the field's states |
+| Input | `type="search"`, `disabled`, `readonly`, `required`; in a Field, `aria-labelledby`, `aria-describedby`, `aria-invalid` |
+| ClearButton | `type="button"`, `tabindex="-1"`, `aria-controls` (the Input's `id`), `disabled` while disabled or read-only |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Escape | clears a query; on an empty field, goes on to the page |
+| Enter | `onSubmit(value)`, then the form's submission |
+| Tab | the Input; the ClearButton is skipped |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/search-field` | `ChangeDetails`, `ChangeReason`, `RenderProp`, `SearchField`, `SearchFieldClearButtonProps`, `SearchFieldInputProps`, `SearchFieldRootProps`, `SearchFieldState` |
+| `@fragiola/primitives-vue/search-field` | `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `SearchField`, `SearchFieldRootEmits`, `SearchFieldRootProps`, `SearchFieldState` |
+| `@fragiola/primitives-angular/search-field` | `ChangeDetails`, `ChangeReason`, `SearchFieldClearButton`, `SearchFieldInput`, `SearchFieldRoot`, `SearchFieldState`, `ValueChangeEvent` |

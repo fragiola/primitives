@@ -1,0 +1,150 @@
+---
+title: Clipboard
+description: A button that copies a text to the clipboard, shows that it did for a while and announces the app's text politely, in each framework.
+---
+
+A button that copies a text to the system clipboard and shows, for a while, that it did: an
+install command, an API key, a share link, a code block. An optional read-only Input shows the
+text; an Indicator follows the copied state; a polite live region says the app's "Copied" text to
+a screen reader. The Trigger is a plain APG button
+([button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)); the announcement follows
+WAI-ARIA's live regions, as [Toast](/docs/api/toast)'s. The APG has no clipboard pattern and Base
+UI no Clipboard: it follows Zag/Ark's Clipboard. It holds no form value.
+
+<Example id="clipboard" />
+
+## Behaviour
+
+- **Copying**: a press writes the Root's `value` with the asynchronous Clipboard API
+  (`navigator.clipboard.writeText`, the toolkit's [`/clipboard`](/docs/api/toolkit)), which needs a
+  secure context (`https:` or `localhost`). The status becomes `copied` for `timeout`
+  milliseconds (a new copy restarts it), then `idle`.
+- **A failed write** (an insecure context, a denied permission) makes the status `failed`; when an
+  Input is rendered, the focus moves to it with its text selected, so the user copies it by hand.
+  There is no `execCommand("copy")` fallback.
+- **Announcements**: the Root renders, as its last child, a visually hidden polite live region,
+  empty until a copy writes the app's `announcement` (or `failedAnnouncement`) into it as a new
+  text node, so a second copy is announced again; it empties when the status returns to `idle`.
+  Angular's Root appends it once the page renders in the browser.
+- **Focus**: a copy keeps the focus on the Trigger.
+- **Reasons**: `trigger-press` (a copy), `none` (back to `idle`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `clipboard-root` | none; holds the status |
+| Trigger | `button` | `clipboard-trigger` | button |
+| Indicator | `span` | `clipboard-indicator` | hidden from the accessibility tree; the app's icons |
+| Input | `input` | `clipboard-input` | a read-only textbox, optional |
+| (announcer) | `span` | `clipboard-announcer` | the Root's polite live region |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Clipboard } from "@fragiola/primitives-react/clipboard";
+
+<Clipboard.Root value="pnpm add @fragiola/primitives" announcement="Copied">
+    <code>pnpm add @fragiola/primitives</code>
+    <Clipboard.Trigger aria-label="Copy command">
+        <Clipboard.Indicator>{({ copied }) => (copied ? <CheckIcon /> : <CopyIcon />)}</Clipboard.Indicator>
+    </Clipboard.Trigger>
+</Clipboard.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Clipboard.Root value="pnpm add @fragiola/primitives" announcement="Copied">
+        <code>pnpm add @fragiola/primitives</code>
+        <Clipboard.Trigger aria-label="Copy command">
+            <Clipboard.Indicator v-slot="{ state }">
+                <CheckIcon v-if="state.copied" />
+                <CopyIcon v-else />
+            </Clipboard.Indicator>
+        </Clipboard.Trigger>
+    </Clipboard.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ClipboardRoot, ClipboardTrigger, ClipboardIndicator],
+    template: `
+        <div clipboardRoot #clipboard="clipboardRoot" [value]="'pnpm add @fragiola/primitives'" [announcement]="'Copied'">
+            <code>pnpm add @fragiola/primitives</code>
+            <button clipboardTrigger aria-label="Copy command">
+                <span clipboardIndicator>
+                    @if (clipboard.state().copied) { <check-icon /> } @else { <copy-icon /> }
+                </span>
+            </button>
+        </div>
+    `,
+})
+export class CopyCommand {}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`@status-change`), and
+Angular as inputs and an output (`(statusChange)` with `{ status, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the text a copy writes |
+| `timeout` | `number` | `3000` | how long the status stays `copied` or `failed`, in milliseconds |
+| `onStatusChange` | `(status: "idle" \| "copied" \| "failed", details: { reason, error }) => void` | | every status; `error` is what the browser rejected with |
+| `announcement` | `string` | | announced politely after a copy |
+| `failedAnnouncement` | `string` | | announced politely after a failed copy |
+
+### Trigger
+
+No props of its own.
+
+### Indicator
+
+No props of its own. Its children may be a function of the state, `{ status, copied, failed }`
+(Vue: the default scoped slot, `{ state }`; Angular: `state()` through `exportAs`).
+
+### Input
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root, Trigger, Indicator, Input | `data-copied` while copied, `data-failed` while a copy failed |
+| Trigger | `type="button"` |
+| Indicator | `aria-hidden="true"` |
+| Input | `readonly`, the Root's `value` |
+| announcer | `aria-live="polite"`, `aria-atomic="true"`, a visually hidden inline style |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space (on the Trigger) | copies |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/clipboard` | `ChangeDetails`, `ChangeReason`, `Clipboard`, `ClipboardIndicatorProps`, `ClipboardInputProps`, `ClipboardRootProps`, `ClipboardState`, `ClipboardStatus`, `ClipboardStatusDetails`, `ClipboardTriggerProps`, `RenderProp` |
+| `@fragiola/primitives-vue/clipboard` | `ChangeDetails`, `ChangeReason`, `Clipboard`, `ClipboardRootEmits`, `ClipboardRootProps`, `ClipboardState`, `ClipboardStatus`, `ClipboardStatusDetails`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/clipboard` | `ChangeDetails`, `ChangeReason`, `ClipboardIndicator`, `ClipboardInput`, `ClipboardRoot`, `ClipboardState`, `ClipboardStatus`, `ClipboardStatusChangeEvent`, `ClipboardStatusDetails`, `ClipboardTrigger` |

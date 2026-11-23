@@ -224,6 +224,9 @@ describe("the sidebar", () => {
             "api/tags-input",
             "api/segmented-control",
             "api/rating",
+            "api/password-input",
+            "api/search-field",
+            "api/editable",
             "api/select",
             "api/select-virtual",
             "api/combobox",
@@ -259,6 +262,7 @@ describe("the sidebar", () => {
             "api/separator",
             "api/scroll-area",
             "api/aspect-ratio",
+            "api/clipboard",
             "api/direction",
             "api/render",
             "api/async-list",
@@ -301,6 +305,9 @@ describe("the sidebar", () => {
             "api/tags-input",
             "api/segmented-control",
             "api/rating",
+            "api/password-input",
+            "api/search-field",
+            "api/editable",
             "api/select",
             "api/select-virtual",
             "api/combobox",
@@ -333,6 +340,7 @@ describe("the sidebar", () => {
             "api/pagination",
             "api/scroll-area",
             "api/aspect-ratio",
+            "api/clipboard",
         ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
@@ -351,7 +359,9 @@ describe("the sidebar", () => {
             // Pagination links the APG patterns it is the closest to, AspectRatio the APG's index
             // beside CSS's aspect-ratio; TagGroup the APG grid (React Aria's grid of tags),
             // TagsInput the APG's index (no pattern: its Input is a textbox), SegmentedControl
-            // and Rating the APG radio group
+            // and Rating the APG radio group; PasswordInput and Clipboard the APG button,
+            // SearchField the APG landmarks (its search landmark), Editable the APG's index (its
+            // Input is a textbox)
             if (
                 ![
                     "api/field",

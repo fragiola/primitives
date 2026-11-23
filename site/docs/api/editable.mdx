@@ -1,0 +1,201 @@
+---
+title: Editable
+description: A text edited in place, with its activation and submit modes, commit and revert, and the focus returned after an edit, as a form control, in each framework.
+---
+
+A text shown as plain text that turns into a text field to edit it in place: a document's title,
+a list's name, a note. The Preview shows the value; activating it shows the Input (the APG's
+textbox, see the APG's [patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)) with the text
+selected; Enter, a blur or the SubmitTrigger commits the edit, Escape or the CancelTrigger reverts
+it, and the focus goes back to where the edit started. It is a form control: it submits, resets
+and validates, alone or in a [Field](/docs/api/field). The APG has no inline edit pattern and
+Base UI no Editable: it follows Zag/Ark's and Reka UI's Editable.
+
+<Example id="editable" />
+
+## Behaviour
+
+- **Starting an edit** (`activationMode`): `"focus"` (the Preview is a tab stop and focusing it
+  edits), `"click"`, `"dblclick"`, or `"none"` (only the EditTrigger); Enter on a focused Preview
+  edits too. The Input takes the focus with its whole text selected.
+- **Ending it** (`submitMode`): `"enter"` (Enter commits, leaving reverts), `"blur"` (leaving
+  commits, Enter does nothing), `"both"`, or `"none"` (only the SubmitTrigger). Escape and the
+  CancelTrigger revert. In a `textarea` Input, Enter breaks the line and Ctrl+Enter (or Meta+Enter)
+  commits.
+- **The value follows the Input** while editing: `onValueChange` reports every keystroke,
+  `onValueCommit` the value an edit ends with, `onValueRevert` the value a revert goes back to.
+- **The focus returns** after Enter, Escape, the SubmitTrigger or the CancelTrigger to the
+  EditTrigger, else to the Preview (which then starts no new edit); an edit ended by moving the
+  focus elsewhere leaves it there; a press on a spot that takes no focus returns it; the window
+  losing the focus does not end the edit; a form reset ends it (neither committed nor reverted)
+  and returns the focus when it was in the edit.
+- **Forms**: the Input is the form control, always rendered (`hidden` while the Preview shows):
+  it submits the value, a reset returns it to its default (reason `none`), and a failed
+  validation focuses the Preview (which edits in `"focus"` mode), or the Input while editing.
+- **Read-only** and **disabled**: no edit starts, the Preview is not a tab stop and the
+  EditTrigger is disabled.
+- **In a [Field](/docs/api/field)**: the Input is the labelable and the validated element;
+  `validate` gets the value.
+- **Reasons**: `input-change`, `keyboard`, `escape-key`, `submit-press`, `cancel-press`,
+  `input-blur`, `none`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `editable-root` | none; holds the value and the edit |
+| Area | `div` | `editable-area` | holds the Preview and the Input |
+| Preview | `span` | `editable-preview` | none; the value, or the placeholder |
+| Input | `input` | `editable-input` | textbox (or the app's `textarea`), `hidden` until an edit starts |
+| EditTrigger | `button` | `editable-edit-trigger` | button, `hidden` while editing |
+| SubmitTrigger | `button` | `editable-submit-trigger` | button, `hidden` until an edit starts |
+| CancelTrigger | `button` | `editable-cancel-trigger` | button, `hidden` until an edit starts |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Editable } from "@fragiola/primitives-react/editable";
+
+<label htmlFor="title">Title</label>
+<Editable.Root id="title" name="title" defaultValue="Quarterly report" onValueCommit={save}>
+    <Editable.Area>
+        <Editable.Preview />
+        <Editable.Input />
+    </Editable.Area>
+    <Editable.EditTrigger aria-label="Rename">✎</Editable.EditTrigger>
+    <Editable.SubmitTrigger aria-label="Save">✓</Editable.SubmitTrigger>
+    <Editable.CancelTrigger aria-label="Cancel">×</Editable.CancelTrigger>
+</Editable.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <label for="title">Title</label>
+    <Editable.Root id="title" v-model:value="title" name="title" @value-commit="save">
+        <Editable.Area>
+            <Editable.Preview />
+            <Editable.Input />
+        </Editable.Area>
+        <Editable.EditTrigger aria-label="Rename">✎</Editable.EditTrigger>
+        <Editable.SubmitTrigger aria-label="Save">✓</Editable.SubmitTrigger>
+        <Editable.CancelTrigger aria-label="Cancel">×</Editable.CancelTrigger>
+    </Editable.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [EditableRoot, EditableArea, EditablePreview, EditableInput, EditableEditTrigger, EditableSubmitTrigger, EditableCancelTrigger],
+    template: `
+        <label for="title">Title</label>
+        <div editableRoot [id]="'title'" [name]="'title'" [(value)]="title" (valueCommit)="save($event.value)">
+            <div editableArea>
+                <span editablePreview></span>
+                <input editableInput />
+            </div>
+            <button editableEditTrigger aria-label="Rename">✎</button>
+            <button editableSubmitTrigger aria-label="Save">✓</button>
+            <button editableCancelTrigger aria-label="Cancel">×</button>
+        </div>
+    `,
+})
+export class Title {
+    readonly title = signal("Quarterly report");
+}
+```
+
+The Input directive also goes on a `<textarea editableInput>`; the Preview writes its text itself.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `@value-commit`, `@value-revert`), and Angular as inputs and outputs
+(`[(value)]`, `(valueChangeDetails)`, `(valueCommit)` and `(valueRevert)`, each with
+`{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | the text, controlled |
+| `defaultValue` | `string` | `""` | the initial text, uncontrolled |
+| `onValueChange` | `(value: string, details: { reason }) => void` | | every change of the text, keystrokes included |
+| `onValueCommit` | `(value: string, details: { reason }) => void` | | an edit ended by committing |
+| `onValueRevert` | `(value: string, details: { reason }) => void` | | an edit ended by reverting, with the value it went back to |
+| `activationMode` | `"focus" \| "click" \| "dblclick" \| "none"` | `"focus"` | what starts an edit on the Preview |
+| `submitMode` | `"enter" \| "blur" \| "both" \| "none"` | `"both"` | what commits an edit |
+| `placeholder` | `string` | | the Preview's text while empty, and the Input's placeholder |
+| `maxLength` | `number` | | the Input's `maxlength` |
+| `disabled` | `boolean` | `false` | disables every part |
+| `readOnly` | `boolean` | `false` | no edit starts |
+| `required` | `boolean` | `false` | the Input is required |
+| `name` | `string` | | the Input's name (a Field's wins) |
+| `id` | `string` | | the Input's `id` (generated when not given) |
+
+### Area
+
+No props of its own.
+
+### Preview
+
+No props of its own; it renders the value (or the placeholder) and takes no children.
+
+### Input
+
+No props of its own.
+
+### EditTrigger
+
+No props of its own.
+
+### SubmitTrigger
+
+No props of its own.
+
+### CancelTrigger
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| every part | `data-editing` while editing, `data-empty` while the value is `""`, `data-disabled`, `data-readonly`, `data-required` |
+| Root | in a Field, the field's states |
+| Preview | `hidden` while editing; `tabindex="0"` in `"focus"` mode, else `"-1"` (none while disabled or read-only); `data-placeholder` while it shows the placeholder |
+| Input | `hidden` until an edit starts, `placeholder`, `maxlength`, `required`, `disabled`; in a Field, `aria-labelledby`, `aria-describedby`, `aria-invalid` |
+| EditTrigger | `type="button"`, `hidden` while editing, `disabled` while disabled or read-only, `aria-controls` (the Input's `id`) |
+| SubmitTrigger, CancelTrigger | `type="button"`, `hidden` until an edit starts, `disabled` while disabled |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab (to the Preview, `"focus"` mode) | starts an edit |
+| Enter (on the Preview) | starts an edit (not in `"none"` mode) |
+| Enter (in the Input) | commits (`"enter"`, `"both"`); a `textarea` breaks the line |
+| Ctrl+Enter, Meta+Enter (in a `textarea`) | commits (`"enter"`, `"both"`) |
+| Escape (in the Input) | reverts |
+| Tab, Shift+Tab (in the Input) | moves on: the SubmitTrigger and CancelTrigger keep the edit, anything else ends it |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/editable` | `ChangeDetails`, `ChangeReason`, `Editable`, `EditableActivationMode`, `EditableAreaProps`, `EditableCancelTriggerProps`, `EditableEditTriggerProps`, `EditableInputProps`, `EditablePreviewProps`, `EditableRootProps`, `EditableState`, `EditableSubmitMode`, `EditableSubmitTriggerProps`, `RenderProp` |
+| `@fragiola/primitives-vue/editable` | `ChangeDetails`, `ChangeReason`, `Editable`, `EditableActivationMode`, `EditableRootEmits`, `EditableRootProps`, `EditableState`, `EditableSubmitMode`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/editable` | `ChangeDetails`, `ChangeReason`, `EditableActivationMode`, `EditableArea`, `EditableCancelTrigger`, `EditableEditTrigger`, `EditableInput`, `EditablePreview`, `EditableRoot`, `EditableState`, `EditableSubmitMode`, `EditableSubmitTrigger`, `ValueChangeEvent` |

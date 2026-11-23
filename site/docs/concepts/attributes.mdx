@@ -41,13 +41,15 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's; a segmented control's item and its text; a rating's star (the one that holds the value is checked) |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
-| `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch); a read-only rating and its stars |
+| `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch); a read-only rating and its stars; a read-only password input's, search field's or editable's parts |
 | `data-pressed` | a pressed toggle |
 | `data-multiple` | a toggle group or a listbox with `multiple` |
-| `data-placeholder` | a Select showing its placeholder; a date or time field's segment with no value |
+| `data-placeholder` | a Select showing its placeholder; a date or time field's segment with no value; an editable's preview showing its placeholder |
 | `data-type` | a date or time field's segment: its type (`era`, `year`, `month`, `day`, `hour`, `minute`, `second`, `dayPeriod`, `timeZoneName`, `literal`; a value) |
-| `data-empty` | a combobox's or an autocomplete's list with no item; a tag group's root and list with no tag (once mounted); a tags input's root and control with no tag |
-| `data-editing` | a tags input's tag while its tag input edits it |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a tag group's root and list with no tag (once mounted); a tags input's root and control with no tag; a search field's parts and an editable's parts while the value is empty |
+| `data-editing` | a tags input's tag while its tag input edits it; an editable's parts while it edits |
+| `data-visible` | a password input's parts while its text is shown |
+| `data-copied`, `data-failed` | a clipboard's parts while its last copy succeeded, or failed, until its timeout |
 | `data-dragging` | a slider while a pointer drags a thumb |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
