@@ -156,6 +156,17 @@ import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
+import { TagGroupBasic } from "../scenarios/tag-group/tag-group-basic.ts";
+import { TagGroupDisabled } from "../scenarios/tag-group/tag-group-disabled.ts";
+import { TagGroupEmpty } from "../scenarios/tag-group/tag-group-empty.ts";
+import { TagGroupField } from "../scenarios/tag-group/tag-group-field.ts";
+import { TagGroupSelection } from "../scenarios/tag-group/tag-group-selection.ts";
+import { TagGroupSingle } from "../scenarios/tag-group/tag-group-single.ts";
+import { TagsInputBasic } from "../scenarios/tags-input/tags-input-basic.ts";
+import { TagsInputBlur } from "../scenarios/tags-input/tags-input-blur.ts";
+import { TagsInputEdit } from "../scenarios/tags-input/tags-input-edit.ts";
+import { TagsInputField } from "../scenarios/tags-input/tags-input-field.ts";
+import { TagsInputOptions } from "../scenarios/tags-input/tags-input-options.ts";
 import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.ts";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.ts";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.ts";
@@ -383,6 +394,17 @@ import { ROUTES } from "./routes.ts";
         PaginationBasic,
         PaginationLinks,
         AspectRatioBasic,
+        TagGroupBasic,
+        TagGroupSelection,
+        TagGroupSingle,
+        TagGroupDisabled,
+        TagGroupEmpty,
+        TagGroupField,
+        TagsInputBasic,
+        TagsInputOptions,
+        TagsInputEdit,
+        TagsInputBlur,
+        TagsInputField,
         CalendarSystemsBasic,
         CalendarSystemsPickers,
         TimeZonesField,
@@ -580,6 +602,17 @@ import { ROUTES } from "./routes.ts";
             @case ("/pagination/basic") { <main class="p-6" scenario-pagination-basic></main> }
             @case ("/pagination/links") { <main class="p-6" scenario-pagination-links></main> }
             @case ("/aspect-ratio/basic") { <main class="p-6" scenario-aspect-ratio-basic></main> }
+            @case ("/tag-group/basic") { <main class="p-6" scenario-tag-group-basic></main> }
+            @case ("/tag-group/selection") { <main class="p-6" scenario-tag-group-selection></main> }
+            @case ("/tag-group/single") { <main class="p-6" scenario-tag-group-single></main> }
+            @case ("/tag-group/disabled") { <main class="p-6" scenario-tag-group-disabled></main> }
+            @case ("/tag-group/empty") { <main class="p-6" scenario-tag-group-empty></main> }
+            @case ("/tag-group/field") { <main class="p-6" scenario-tag-group-field></main> }
+            @case ("/tags-input/basic") { <main class="p-6" scenario-tags-input-basic></main> }
+            @case ("/tags-input/options") { <main class="p-6" scenario-tags-input-options></main> }
+            @case ("/tags-input/edit") { <main class="p-6" scenario-tags-input-edit></main> }
+            @case ("/tags-input/blur") { <main class="p-6" scenario-tags-input-blur></main> }
+            @case ("/tags-input/field") { <main class="p-6" scenario-tags-input-field></main> }
             @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
             @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
             @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }
