@@ -66,6 +66,8 @@
         "combobox-virtual",
         "autocomplete-virtual",
         "async-list",
+        "toast",
+        "hover-card",
         "tests",
         "*.config.ts"
     ]
