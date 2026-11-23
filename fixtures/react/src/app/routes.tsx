@@ -60,6 +60,7 @@ import { FieldSettings } from "../scenarios/field/field-settings.tsx";
 import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
+import { LabelControls } from "../scenarios/label/label-controls.tsx";
 import { MenuBasic } from "../scenarios/menu/menu-basic.tsx";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.tsx";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.tsx";
@@ -71,8 +72,15 @@ import { MenuSubmenu } from "../scenarios/menu/menu-submenu.tsx";
 import { MenubarBasic } from "../scenarios/menubar/menubar-basic.tsx";
 import { MenubarModal } from "../scenarios/menubar/menubar-modal.tsx";
 import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.tsx";
+import { MeterBasic } from "../scenarios/meter/meter-basic.tsx";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
+import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.tsx";
+import { NumberFieldField } from "../scenarios/number-field/number-field-field.tsx";
+import { NumberFieldFormat } from "../scenarios/number-field/number-field-format.tsx";
+import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.tsx";
+import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.tsx";
+import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
@@ -231,6 +239,14 @@ export const routes: Record<
     "/date-picker/form": DatePickerForm,
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
+    "/label/controls": LabelControls,
+    "/meter/basic": MeterBasic,
+    "/number-field/basic": NumberFieldBasic,
+    "/number-field/field": NumberFieldField,
+    "/number-field/format": NumberFieldFormat,
+    "/number-field/scrub": NumberFieldScrub,
+    "/otp-field/basic": OtpFieldBasic,
+    "/otp-field/field": OtpFieldField,
     "/progress/basic": ProgressBasic,
     "/avatar/basic": AvatarBasic,
     "/separator/basic": SeparatorBasic,
