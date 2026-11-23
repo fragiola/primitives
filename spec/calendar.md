@@ -519,8 +519,8 @@ Checks: the common checks (no "Close with actions"); reopened, focus is on Novem
 ### `/date-picker-input/basic`
 
 A native `<form>` with a `Field.Root` (`name="arrival"`) and `Field.Label` **"Arrival"** around a
-DatePickerInput (`en-US`, `required`, `min` 2026-11-10): Segments rendering each segment through
-its children function, a Trigger with `aria-label` **"Choose date"** and no text (an icon's
+DatePickerInput (`en-US`, `required`, `min` 2026-11-10): Segments rendering every segment, a
+Trigger with `aria-label` **"Choose date"** and no text (an icon's
 place), the Popup (`aria-label` **"Choose date"**) holding a bound Calendar with PrevButton
 **"Previous month"** and NextButton **"Next month"**; a **"Submit"** button. Output: `value`,
 `reason`, `changes` (how many times `onValueChange` ran), `form`.

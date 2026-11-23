@@ -177,8 +177,7 @@ expected names, orders and texts are computed in the browser with its own `Intl`
 
 A `Field.Root` with `Field.Label` **"Stay"** and a DateRangeField (`en-US`), its Inputs
 `aria-label` **"Start date"** (`range="start"`) and **"End date"** (`range="end"`), each rendering
-its segments through a children function, with a literal **"–"** (en dash, `aria-hidden`) between
-them. Output: `value`, `reason`.
+every segment, with a literal **"–"** (en dash, `aria-hidden`) between them. Output: `value`, `reason`.
 
 Checks:
 
