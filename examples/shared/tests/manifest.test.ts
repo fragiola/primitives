@@ -36,6 +36,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     "drawer-side-panel": ["_recipes/dialog.ts"],
     "navigation-menu": ["_recipes/popover.ts"],
     "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
+    // the date and time fields' Field (TimeField's own recipe is DateField's)
+    "date-field": ["_recipes/field.ts"],
+    "time-field": ["_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -60,6 +63,8 @@ const RECIPE_OF: Record<string, string> = {
     "menu-view-options": "menu",
     "drawer-side-panel": "drawer",
     "toast-promise": "toast",
+    // TimeField is built on DateField's parts: DateField's recipe styles it
+    "time-field": "date-field",
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
@@ -117,6 +122,8 @@ describe("the manifest", () => {
                 "otp-field",
                 "date-picker",
                 "calendar",
+                "date-field",
+                "time-field",
                 "progress",
                 "meter",
                 "avatar",
