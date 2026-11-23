@@ -105,7 +105,7 @@ spec/README.md, "API mapping by framework", says:
 | framework | List | Value |
 | --- | --- | --- |
 | React | `children={(entry, index) => ...}` | `children={(value) => ...}` |
-| Vue | default scoped slot, `v-slot="{ entry, index }"` | default scoped slot, `v-slot="{ value }"` |
+| Vue | default scoped slot, `v-slot="{ entry, index }: { entry: Item; index: number }"` (the annotation names the item type) | default scoped slot, `v-slot="{ value }: { value: Item }"` |
 | Angular | `@for` over the directive's `entries()` signal, read through `exportAs` (`#list="comboboxList"`) | the Root's `value()` signal, read through `exportAs` (`#combobox="comboboxRoot"`); there is no Value directive |
 
 **Item**: `value` (any, required), `disabled`. When it is chosen, the input's text becomes
