@@ -3,7 +3,11 @@ import { createContext } from "react";
 import type { CalendarMode } from "./calendar-value.ts";
 
 /** The component a calendar's parts belong to: their part attribute's prefix. */
-export type CalendarComponent = "calendar" | "range-calendar";
+export type CalendarComponent =
+    | "calendar"
+    | "range-calendar"
+    // a Root of its own entry over the Calendar's parts (Epic #79): the type only, no code here
+    | "multiple-calendar";
 
 export interface CalendarCellState {
     today: boolean;

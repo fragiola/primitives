@@ -99,6 +99,12 @@
             "import": "./dist/calendar.js",
             "default": "./dist/calendar.js"
         },
+        "./calendar-preset": {
+            "@fragiola/source": "./src/components/calendar-preset/index.ts",
+            "types": "./dist/calendar-preset.d.ts",
+            "import": "./dist/calendar-preset.js",
+            "default": "./dist/calendar-preset.js"
+        },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
             "types": "./dist/checkbox.d.ts",
@@ -242,6 +248,12 @@
             "types": "./dist/meter.d.ts",
             "import": "./dist/meter.js",
             "default": "./dist/meter.js"
+        },
+        "./multiple-calendar": {
+            "@fragiola/source": "./src/components/multiple-calendar/index.ts",
+            "types": "./dist/multiple-calendar.d.ts",
+            "import": "./dist/multiple-calendar.js",
+            "default": "./dist/multiple-calendar.js"
         },
         "./navigation-menu": {
             "@fragiola/source": "./src/components/navigation-menu/index.ts",
@@ -454,6 +466,11 @@
                 "import": "./dist/calendar.js",
                 "default": "./dist/calendar.js"
             },
+            "./calendar-preset": {
+                "types": "./dist/calendar-preset.d.ts",
+                "import": "./dist/calendar-preset.js",
+                "default": "./dist/calendar-preset.js"
+            },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",
                 "import": "./dist/checkbox.js",
@@ -573,6 +590,11 @@
                 "types": "./dist/meter.d.ts",
                 "import": "./dist/meter.js",
                 "default": "./dist/meter.js"
+            },
+            "./multiple-calendar": {
+                "types": "./dist/multiple-calendar.d.ts",
+                "import": "./dist/multiple-calendar.js",
+                "default": "./dist/multiple-calendar.js"
             },
             "./navigation-menu": {
                 "types": "./dist/navigation-menu.d.ts",
