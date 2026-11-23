@@ -1,7 +1,7 @@
 import { Clipboard } from "@fragiola/primitives-react/clipboard";
 import { styles } from "./styles.ts";
 
-const COMMAND = "pnpm add @fragiola/primitives-react";
+const COMMAND = "pnpm add @fragiola/primitives";
 
 // A code block with a copy button (spec/clipboard.md): a press writes the command to the
 // clipboard, the icon turns into a check for two seconds, and a polite live region says the app's

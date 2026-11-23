@@ -9,7 +9,7 @@ import {
 } from "../helpers.ts";
 
 // clipboard: a copy code block (spec/clipboard.md). A Clipboard Root drawn as a code block, holding
-// `pnpm add @fragiola/primitives-react` in a `<pre><code>` and a Trigger "Copy command" whose
+// `pnpm add @fragiola/primitives` in a `<pre><code>` and a Trigger "Copy command" whose
 // Indicator shows a copy icon, a check while copied (two seconds) and a cross after a failure; its
 // announcement "Copied".
 test.use({ permissions: ["clipboard-read", "clipboard-write"] });
@@ -26,7 +26,7 @@ test("a press copies the command, shows the check and announces it", async ({
         "Copied",
     );
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-        "pnpm add @fragiola/primitives-react",
+        "pnpm add @fragiola/primitives",
     );
     await expect(trigger).toBeFocused();
     // the check lasts two seconds
