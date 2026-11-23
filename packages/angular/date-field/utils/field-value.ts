@@ -1,7 +1,13 @@
 import { type PlainDate, toIsoDate } from "@fragiola/primitives/date";
-import type {
-    SegmentGranularity,
-    SegmentKind,
+import {
+    isSegmentsComplete,
+    type SegmentFormat,
+    type SegmentGranularity,
+    type SegmentKind,
+    type SegmentValues,
+    segmentsToDate,
+    segmentsToDateTime,
+    segmentsToTime,
 } from "@fragiola/primitives/segments";
 import {
     compareDateTimes,
@@ -53,4 +59,44 @@ export function compareValues(
     return kind === "time"
         ? compareTimes(a as PlainTime, b as PlainTime)
         : compareDateTimes(a as PlainDate, b as PlainDate);
+}
+
+/** Whether a value is out of `min` / `max`, or (a date) unavailable (spec/date-field.md). */
+export function isOutOfRange(
+    kind: SegmentKind,
+    value: FieldValue,
+    min: FieldValue | null | undefined,
+    max: FieldValue | null | undefined,
+    isDateUnavailable: ((date: PlainDate) => boolean) | undefined,
+): boolean {
+    return (
+        (min != null && compareValues(kind, value, min) < 0) ||
+        (max != null && compareValues(kind, value, max) > 0) ||
+        (kind === "date" && isDateUnavailable?.(value as PlainDate) === true)
+    );
+}
+
+/** The value complete segment values make (`null` while one is a placeholder). */
+export function composeSegments(
+    format: SegmentFormat,
+    kind: SegmentKind,
+    granularity: SegmentGranularity,
+    values: SegmentValues,
+): FieldValue | null {
+    return !isSegmentsComplete(format, values)
+        ? null
+        : kind === "time"
+          ? segmentsToTime(values)
+          : granularity === "day"
+            ? segmentsToDate(values)
+            : segmentsToDateTime(values);
+}
+
+/** A bound's ISO text for a hidden input's `min` / `max` (`null` with none). */
+export function boundIso(
+    kind: SegmentKind,
+    granularity: SegmentGranularity,
+    edge: FieldValue | null | undefined,
+): string | null {
+    return edge == null ? null : isoOf(kind, granularity, edge);
 }

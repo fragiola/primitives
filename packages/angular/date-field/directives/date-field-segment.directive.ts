@@ -97,7 +97,7 @@ export class DateFieldSegment {
             null,
     );
     protected readonly labelledBy = computed(() => {
-        const label = this.dateField.field.labelledBy();
+        const label = this.dateField.labelledBy();
         return this.editable() && label !== null ? `${label} ${this.id}` : null;
     });
     /** The segment's state: the field's, with its type and placeholder state. */
