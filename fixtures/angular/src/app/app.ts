@@ -136,8 +136,16 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.ts";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.ts";
 import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.ts";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.ts";
+import { RatingBasic } from "../scenarios/rating/rating-basic.ts";
+import { RatingField } from "../scenarios/rating/rating-field.ts";
+import { RatingHalf } from "../scenarios/rating/rating-half.ts";
+import { RatingReadOnly } from "../scenarios/rating/rating-read-only.ts";
 import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.ts";
 import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.ts";
+import { SegmentedControlBasic } from "../scenarios/segmented-control/segmented-control-basic.ts";
+import { SegmentedControlDisabled } from "../scenarios/segmented-control/segmented-control-disabled.ts";
+import { SegmentedControlField } from "../scenarios/segmented-control/segmented-control-field.ts";
+import { SegmentedControlVertical } from "../scenarios/segmented-control/segmented-control-vertical.ts";
 import { SelectBasic } from "../scenarios/select/select-basic.ts";
 import { SelectControlled } from "../scenarios/select/select-controlled.ts";
 import { SelectGroups } from "../scenarios/select/select-groups.ts";
@@ -405,6 +413,14 @@ import { ROUTES } from "./routes.ts";
         TagsInputEdit,
         TagsInputBlur,
         TagsInputField,
+        SegmentedControlBasic,
+        SegmentedControlVertical,
+        SegmentedControlDisabled,
+        SegmentedControlField,
+        RatingBasic,
+        RatingHalf,
+        RatingReadOnly,
+        RatingField,
         CalendarSystemsBasic,
         CalendarSystemsPickers,
         TimeZonesField,
@@ -613,6 +629,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/tags-input/edit") { <main class="p-6" scenario-tags-input-edit></main> }
             @case ("/tags-input/blur") { <main class="p-6" scenario-tags-input-blur></main> }
             @case ("/tags-input/field") { <main class="p-6" scenario-tags-input-field></main> }
+            @case ("/segmented-control/basic") { <main class="p-6" scenario-segmented-control-basic></main> }
+            @case ("/segmented-control/vertical") { <main class="p-6" scenario-segmented-control-vertical></main> }
+            @case ("/segmented-control/disabled") { <main class="p-6" scenario-segmented-control-disabled></main> }
+            @case ("/segmented-control/field") { <main class="p-6" scenario-segmented-control-field></main> }
+            @case ("/rating/basic") { <main class="p-6" scenario-rating-basic></main> }
+            @case ("/rating/half") { <main class="p-6" scenario-rating-half></main> }
+            @case ("/rating/read-only") { <main class="p-6" scenario-rating-read-only></main> }
+            @case ("/rating/field") { <main class="p-6" scenario-rating-field></main> }
             @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
             @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
             @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }
