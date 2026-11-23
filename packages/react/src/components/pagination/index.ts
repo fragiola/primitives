@@ -14,10 +14,14 @@ export type {
     PaginationControlState,
 } from "./pagination-control.tsx";
 export type { PaginationEllipsisProps } from "./pagination-ellipsis.tsx";
+export type { PaginationFirstProps } from "./pagination-first.tsx";
 export type {
     PaginationItemProps,
     PaginationItemState,
 } from "./pagination-item.tsx";
+export type { PaginationLastProps } from "./pagination-last.tsx";
+export type { PaginationNextProps } from "./pagination-next.tsx";
+export type { PaginationPreviousProps } from "./pagination-previous.tsx";
 export type {
     PaginationRenderProps,
     PaginationRootProps,

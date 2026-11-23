@@ -1,11 +1,7 @@
-import { defineComponent } from "vue";
+import type { Slots, VNode } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import type { ChangeReason } from "../../utils/change-details.ts";
-import {
-    type PartComponent,
-    publicComponent,
-} from "../../utils/public-component.ts";
-import { asProp, renderPart } from "../../utils/render-part.ts";
+import { type AsProp, asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { PaginationKey } from "./pagination-context.ts";
 
@@ -49,67 +45,63 @@ export function withoutClick(attrs: Record<string, unknown>): {
     };
 }
 
+/** The props of a Previous, Next, First and Last. */
+export const paginationControlProps = {
+    ...asProp,
+    nativeButton: { type: Boolean, default: true },
+};
+
 type Kind = "previous" | "next" | "first" | "last";
 
-/** A Previous, Next, First or Last component (spec/pagination.md): disabled at its edge. */
-export function paginationControl(
+/**
+ * The setup of a Previous, Next, First or Last (spec/pagination.md): disabled at its edge. Each
+ * part declares its own component with it.
+ */
+export function setupPaginationControl(
     kind: Kind,
-    componentName: string,
     partName: string,
-): PartComponent<PaginationControlProps, PaginationControlState> {
-    return publicComponent(
-        defineComponent({
-            name: componentName,
-            inheritAttrs: false,
-            props: {
-                ...asProp,
-                nativeButton: { type: Boolean, default: true },
+    props: { as: AsProp | undefined; nativeButton: boolean },
+    { attrs, slots }: { attrs: Record<string, unknown>; slots: Slots },
+): () => VNode {
+    const context = useRequiredContext(PaginationKey, partName);
+    return () => {
+        const { page, count, disabled: all } = context.state();
+        const target =
+            kind === "previous"
+                ? page - 1
+                : kind === "next"
+                  ? page + 1
+                  : kind === "first"
+                    ? 1
+                    : count;
+        const atEdge =
+            kind === "previous" || kind === "first" ? page <= 1 : page >= count;
+        const disabled = all || atEdge;
+        const { rest, onClick } = withoutClick(attrs);
+        return renderPart(
+            "button",
+            { attrs: rest, slots },
+            props.as,
+            {
+                page: Math.min(count, Math.max(1, target)),
+                disabled,
             },
-            setup(props, { attrs, slots }) {
-                const context = useRequiredContext(PaginationKey, partName);
-                return () => {
-                    const { page, count, disabled: all } = context.state();
-                    const target =
-                        kind === "previous"
-                            ? page - 1
-                            : kind === "next"
-                              ? page + 1
-                              : kind === "first"
-                                ? 1
-                                : count;
-                    const atEdge =
-                        kind === "previous" || kind === "first"
-                            ? page <= 1
-                            : page >= count;
-                    const disabled = all || atEdge;
-                    const { rest, onClick } = withoutClick(attrs);
-                    return renderPart(
-                        "button",
-                        { attrs: rest, slots },
-                        props.as,
-                        {
-                            page: Math.min(count, Math.max(1, target)),
-                            disabled,
-                        },
-                        {
-                            ...controlAttributes(props.nativeButton, disabled),
-                            onClick: (event: MouseEvent) => {
-                                if (disabled) {
-                                    event.preventDefault();
-                                    return;
-                                }
-                                context.setPage(target, {
-                                    reason: `${kind}-press` as ChangeReason,
-                                    event,
-                                });
-                                onClick?.(event);
-                            },
-                            "data-primitives-part": `pagination-${kind}`,
-                            ...stateAttributes({ disabled }),
-                        },
-                    );
-                };
+            {
+                ...controlAttributes(props.nativeButton, disabled),
+                onClick: (event: MouseEvent) => {
+                    if (disabled) {
+                        event.preventDefault();
+                        return;
+                    }
+                    context.setPage(target, {
+                        reason: `${kind}-press` as ChangeReason,
+                        event,
+                    });
+                    onClick?.(event);
+                },
+                "data-primitives-part": `pagination-${kind}`,
+                ...stateAttributes({ disabled }),
             },
-        }),
-    );
+        );
+    };
 }
