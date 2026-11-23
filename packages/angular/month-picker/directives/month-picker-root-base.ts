@@ -6,6 +6,7 @@ import {
     numberAttribute,
     output,
 } from "@angular/core";
+import type { DatePickerState } from "@fragiola/primitives-angular/date-picker";
 import type {
     OpenChangeEvent,
     OverlayActions,
@@ -56,7 +57,7 @@ export abstract class MonthPickerRootBase implements OverlayActions {
     abstract readonly state: MonthPickerState;
 
     /** The DatePicker's view of it, as `[datePickerRoot]` exposes it. */
-    get picker() {
+    get picker(): DatePickerState {
         return this.state.picker;
     }
 
