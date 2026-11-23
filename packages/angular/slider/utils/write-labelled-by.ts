@@ -39,7 +39,8 @@ export function writeLabelledBy(
  * A Thumb's `aria-labelledby` (spec/slider.md, "API"): the first namer's id, only while the element
  * has no `aria-label` or `aria-labelledby` of the consumer's, read live (Epic #49). A bound
  * `[attr.aria-label]`, or a name the consumer sets later, wins, as in React and Vue; the id this
- * wrote is not the consumer's. In its directive's injection context.
+ * wrote (or a server render wrote before a hydration: the namer's id) is not the consumer's. In its
+ * directive's injection context.
  */
 export function writeThumbLabelledBy(
     host: HTMLElement,
@@ -63,9 +64,11 @@ export function writeThumbLabelledBy(
         const id = firstId(namers);
         untracked(() => {
             const current = host.getAttribute("aria-labelledby");
+            // the namer's own id is never the consumer's: after a hydration, the server wrote it
+            // and nothing was written here yet
             const consumer =
                 host.hasAttribute("aria-label") ||
-                (current !== null && current !== written);
+                (current !== null && current !== written && current !== id);
             if (consumer || !id) {
                 if (written !== null && current === written) {
                     host.removeAttribute("aria-labelledby");
