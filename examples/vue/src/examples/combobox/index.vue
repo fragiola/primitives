@@ -25,8 +25,8 @@ const FRUITS: Fruit[] = [
         <label for="fruits" :class="styles.label">Fruits</label>
         <Combobox.Root multiple :items="FRUITS" :default-value="[FRUITS[0]]" name="fruits">
             <Combobox.Chips :class="styles.chips">
-                <Combobox.Value v-slot="{ value }">
-                    <Combobox.Chip v-for="fruit in (value as Fruit[])" :key="fruit.value" :class="styles.chip">{{ fruit.label }}<Combobox.ChipRemove :aria-label="`Remove ${fruit.label}`" :class="styles.chipRemove">×</Combobox.ChipRemove></Combobox.Chip>
+                <Combobox.Value v-slot="{ value }: { value: Fruit[] }">
+                    <Combobox.Chip v-for="fruit in value" :key="fruit.value" :class="styles.chip">{{ fruit.label }}<Combobox.ChipRemove :aria-label="`Remove ${fruit.label}`" :class="styles.chipRemove">×</Combobox.ChipRemove></Combobox.Chip>
                     <Combobox.Input id="fruits" :class="styles.input" />
                 </Combobox.Value>
             </Combobox.Chips>
@@ -34,8 +34,8 @@ const FRUITS: Fruit[] = [
                 <Combobox.Positioner :side-offset="4" :class="styles.positioner">
                     <Combobox.Popup :class="styles.popup">
                         <Combobox.Empty :class="styles.empty">No fruit found.</Combobox.Empty>
-                        <Combobox.List v-slot="{ entry }" :class="styles.list">
-                            <Combobox.Item :key="(entry as Fruit).value" :value="entry" :class="styles.item">{{ (entry as Fruit).label }}<Combobox.ItemIndicator :class="styles.itemIndicator">✓</Combobox.ItemIndicator></Combobox.Item>
+                        <Combobox.List v-slot="{ entry }: { entry: Fruit }" :class="styles.list">
+                            <Combobox.Item :key="entry.value" :value="entry" :class="styles.item">{{ entry.label }}<Combobox.ItemIndicator :class="styles.itemIndicator">✓</Combobox.ItemIndicator></Combobox.Item>
                         </Combobox.List>
                     </Combobox.Popup>
                 </Combobox.Positioner>

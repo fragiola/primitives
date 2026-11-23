@@ -25,6 +25,11 @@ export interface TabsIndicatorProps {
      * itself (spec/tabs.md, "Server rendering"). Default `false`.
      */
     renderBeforeHydration?: boolean;
+    /**
+     * The `nonce` of the `renderBeforeHydration` script, so it runs under a Content Security
+     * Policy that allows inline scripts by nonce (spec/tabs.md, "Server rendering").
+     */
+    nonce?: string;
 }
 
 /** The inline script of a server-rendered Indicator (`renderBeforeHydration`). */
@@ -43,6 +48,7 @@ export const TabsIndicator: PartComponent<
         props: {
             ...asProp,
             renderBeforeHydration: { type: Boolean, default: false },
+            nonce: { type: String, default: undefined },
         },
         setup(props, { attrs, slots }) {
             const context = useRequiredContext(TabsKey, "Tabs.Indicator");
@@ -97,7 +103,10 @@ export const TabsIndicator: PartComponent<
                 // hydrates
                 const script =
                     props.renderBeforeHydration && typeof window === "undefined"
-                        ? h("script", { innerHTML: BEFORE_HYDRATION })
+                        ? h("script", {
+                              nonce: props.nonce,
+                              innerHTML: BEFORE_HYDRATION,
+                          })
                         : null;
                 return renderPart(
                     "span",

@@ -14,6 +14,7 @@ import CalendarTwoMonths from "../scenarios/calendar/calendar-two-months.vue";
 import CalendarUnavailable from "../scenarios/calendar/calendar-unavailable.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
+import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
 import CheckboxGroupScenario from "../scenarios/checkbox/checkbox-group.vue";
 import CollapsibleBasic from "../scenarios/collapsible/collapsible-basic.vue";
 import CollapsibleHiddenUntilFound from "../scenarios/collapsible/collapsible-hidden-until-found.vue";
@@ -32,6 +33,7 @@ import ContextMenuLifecycle from "../scenarios/context-menu/context-menu-lifecyc
 import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
 import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
 import DatePickerLifecycle from "../scenarios/date-picker/date-picker-lifecycle.vue";
+import DatePickerMixedForm from "../scenarios/date-picker/date-picker-mixed-form.vue";
 import DatePickerRange from "../scenarios/date-picker/date-picker-range.vue";
 import DialogBasic from "../scenarios/dialog/dialog-basic.vue";
 import DialogControlled from "../scenarios/dialog/dialog-controlled.vue";
@@ -49,6 +51,7 @@ import DrawerNested from "../scenarios/drawer/drawer-nested.vue";
 import DrawerSide from "../scenarios/drawer/drawer-side.vue";
 import DrawerSnapPoints from "../scenarios/drawer/drawer-snap-points.vue";
 import FieldAsync from "../scenarios/field/field-async.vue";
+import FieldAsyncBlur from "../scenarios/field/field-async-blur.vue";
 import FieldBasic from "../scenarios/field/field-basic.vue";
 import FieldControls from "../scenarios/field/field-controls.vue";
 import FieldMatch from "../scenarios/field/field-match.vue";
@@ -88,12 +91,15 @@ import SliderBasic from "../scenarios/slider/slider-basic.vue";
 import SliderControlled from "../scenarios/slider/slider-controlled.vue";
 import SliderLabelValue from "../scenarios/slider/slider-label-value.vue";
 import SliderRange from "../scenarios/slider/slider-range.vue";
+import SliderThumbName from "../scenarios/slider/slider-thumb-name.vue";
 import SliderVertical from "../scenarios/slider/slider-vertical.vue";
 import SwitchBasic from "../scenarios/switch/switch-basic.vue";
 import SwitchControlled from "../scenarios/switch/switch-controlled.vue";
 import TabsAnimated from "../scenarios/tabs/tabs-animated.vue";
+import TabsAnimatedDefault from "../scenarios/tabs/tabs-animated-default.vue";
 import TabsAutomatic from "../scenarios/tabs/tabs-automatic.vue";
 import TabsManual from "../scenarios/tabs/tabs-manual.vue";
+import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
@@ -126,6 +132,8 @@ export const routes: Record<string, Component> = {
     "/tabs/vertical": TabsVertical,
     "/tabs/none-selected": TabsNoneSelected,
     "/tabs/animated": TabsAnimated,
+    "/tabs/animated-default": TabsAnimatedDefault,
+    "/tabs/nonce": TabsNonce,
     "/collapsible/basic": CollapsibleBasic,
     "/collapsible/hidden-until-found": CollapsibleHiddenUntilFound,
     "/accordion/basic": AccordionBasic,
@@ -175,6 +183,7 @@ export const routes: Record<string, Component> = {
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
+    "/checkbox/controlled-form": CheckboxControlledForm,
     "/radio-group/basic": RadioGroupBasic,
     "/radio-group/controlled": RadioGroupControlled,
     "/switch/basic": SwitchBasic,
@@ -186,10 +195,12 @@ export const routes: Record<string, Component> = {
     "/slider/rtl": SliderBasic,
     "/slider/controlled": SliderControlled,
     "/slider/label-value": SliderLabelValue,
+    "/slider/thumb-name": SliderThumbName,
     "/field/basic": FieldBasic,
     "/field/validation": FieldValidation,
     "/field/controls": FieldControls,
     "/field/async": FieldAsync,
+    "/field/async-blur": FieldAsyncBlur,
     "/field/match": FieldMatch,
     "/field/more-controls": FieldMoreControls,
     "/field/settings": FieldSettings,
@@ -205,6 +216,7 @@ export const routes: Record<string, Component> = {
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
     "/date-picker/form": DatePickerForm,
+    "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
     "/progress/basic": ProgressBasic,
     "/avatar/basic": AvatarBasic,

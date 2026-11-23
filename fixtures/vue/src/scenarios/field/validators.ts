@@ -38,6 +38,20 @@ export function checkUsername(
     });
 }
 
+/** /field/async-blur: `ada` is taken; every answer takes 400 ms (spec/field.md). */
+export function checkUsernameSlowly(
+    value: unknown,
+    resolved: (value: string) => void,
+): Promise<string | null> {
+    const text = String(value ?? "");
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolved(text);
+            resolve(text === "ada" ? "This username is taken." : null);
+        }, 400);
+    });
+}
+
 /** /field/match: the range error's `match`. */
 export function outOfRange(validity: {
     rangeUnderflow: boolean;
