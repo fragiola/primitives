@@ -103,11 +103,15 @@ const RECIPE_OF: Record<string, string> = {
     "combobox-virtual": "combobox",
 };
 
-/** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
+/**
+ * The examples whose recipes need none of the recipes' shared pieces (no focusable part, or a
+ * focus ring of their own: the tags).
+ */
 const WITHOUT_SHARED: ReadonlySet<string> = new Set([
     "aspect-ratio",
     "avatar",
     "meter",
+    "tag-group",
 ]);
 
 /** The examples that import a toolkit entry themselves, so they install the toolkit too. */
@@ -159,6 +163,10 @@ describe("the manifest", () => {
                 "toolbar",
                 "number-field",
                 "otp-field",
+                "tag-group",
+                "tags-input",
+                "segmented-control",
+                "rating",
                 "date-picker",
                 "calendar",
                 "date-field",
