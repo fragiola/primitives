@@ -60,6 +60,8 @@ export const COMPONENTS = [
     "slider",
     "switch",
     "tabs",
+    "tag-group",
+    "tags-input",
     "time-field",
     "time-range-field",
     "toast",

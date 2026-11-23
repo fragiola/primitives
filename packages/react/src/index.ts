@@ -58,6 +58,8 @@ export * from "./components/separator/index.ts";
 export * from "./components/slider/index.ts";
 export * from "./components/switch/index.ts";
 export * from "./components/tabs/index.ts";
+export * from "./components/tag-group/index.ts";
+export * from "./components/tags-input/index.ts";
 export * from "./components/time-field/index.ts";
 export * from "./components/time-range-field/index.ts";
 export * from "./components/toast/index.ts";

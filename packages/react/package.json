@@ -381,6 +381,18 @@
             "import": "./dist/tabs.js",
             "default": "./dist/tabs.js"
         },
+        "./tag-group": {
+            "@fragiola/source": "./src/components/tag-group/index.ts",
+            "types": "./dist/tag-group.d.ts",
+            "import": "./dist/tag-group.js",
+            "default": "./dist/tag-group.js"
+        },
+        "./tags-input": {
+            "@fragiola/source": "./src/components/tags-input/index.ts",
+            "types": "./dist/tags-input.d.ts",
+            "import": "./dist/tags-input.js",
+            "default": "./dist/tags-input.js"
+        },
         "./time-field": {
             "@fragiola/source": "./src/components/time-field/index.ts",
             "types": "./dist/time-field.d.ts",
@@ -754,6 +766,16 @@
                 "types": "./dist/tabs.d.ts",
                 "import": "./dist/tabs.js",
                 "default": "./dist/tabs.js"
+            },
+            "./tag-group": {
+                "types": "./dist/tag-group.d.ts",
+                "import": "./dist/tag-group.js",
+                "default": "./dist/tag-group.js"
+            },
+            "./tags-input": {
+                "types": "./dist/tags-input.d.ts",
+                "import": "./dist/tags-input.js",
+                "default": "./dist/tags-input.js"
             },
             "./time-field": {
                 "types": "./dist/time-field.d.ts",

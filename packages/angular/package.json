@@ -328,6 +328,16 @@
             "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
         },
+        "./tag-group": {
+            "@fragiola/source": "./tag-group/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-tag-group.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-tag-group.mjs"
+        },
+        "./tags-input": {
+            "@fragiola/source": "./tags-input/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-tags-input.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-tags-input.mjs"
+        },
         "./time-field": {
             "@fragiola/source": "./time-field/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-time-field.d.ts",
