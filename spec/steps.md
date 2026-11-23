@@ -53,7 +53,8 @@ One entry, `/steps` (D8), built on no other component.
 - `linear` (`false`): a step can only be reached once every step before it is valid; the Next
   trigger needs the current step to be valid.
 - `isStepValid(index)` (default: every step is valid): whether a step is valid, read at each
-  render (the app's own state). Only `linear` reads it.
+  render (the app's own state; Angular reads it in the root's computed state, so the state it
+  reads is signals, as any of a template's). Only `linear` reads it.
 - `orientation` (`"horizontal"`): `data-orientation` on the parts; nothing else changes.
 
 **Steps.Item**, **Trigger**, **Indicator**, **Separator**: inside an Item, which takes `index`

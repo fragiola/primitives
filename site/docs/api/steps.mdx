@@ -139,7 +139,7 @@ it forwards. Vue binds them as props (`v-model:step`, `:is-step-valid`), and Ang
 | `onStepChange` | `(step, details) => void` | | every step change, with its reason; Vue `@step-change` (and `update:step`), Angular `(stepChangeDetails)` (and `(stepChange)`, the step alone) |
 | `count` | `number` | required | the number of steps |
 | `linear` | `boolean` | `false` | a step is reached only once every step before it is valid |
-| `isStepValid` | `(index) => boolean` | every step valid | whether a step is valid, read at each render |
+| `isStepValid` | `(index) => boolean` | every step valid | whether a step is valid, read at each render (Angular: in a computed, so it reads signals) |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `data-orientation` on the parts |
 
 ### List
