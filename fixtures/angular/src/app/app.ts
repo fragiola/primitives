@@ -16,6 +16,7 @@ import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts"
 import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
+import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.ts";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.ts";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.ts";
@@ -34,6 +35,7 @@ import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lif
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
+import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.ts";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.ts";
@@ -51,6 +53,7 @@ import { DrawerNested } from "../scenarios/drawer/drawer-nested.ts";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.ts";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.ts";
 import { FieldAsync } from "../scenarios/field/field-async.ts";
+import { FieldAsyncBlur } from "../scenarios/field/field-async-blur.ts";
 import { FieldBasic } from "../scenarios/field/field-basic.ts";
 import { FieldControls } from "../scenarios/field/field-controls.ts";
 import { FieldMatch } from "../scenarios/field/field-match.ts";
@@ -90,11 +93,13 @@ import { SliderBasic } from "../scenarios/slider/slider-basic.ts";
 import { SliderControlled } from "../scenarios/slider/slider-controlled.ts";
 import { SliderLabelValue } from "../scenarios/slider/slider-label-value.ts";
 import { SliderRange } from "../scenarios/slider/slider-range.ts";
+import { SliderThumbName } from "../scenarios/slider/slider-thumb-name.ts";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.ts";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.ts";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.ts";
 import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
+import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.ts";
@@ -131,6 +136,7 @@ import { ROUTES } from "./routes.ts";
         SettingsTabs,
         TabsNoneSelected,
         TabsAnimated,
+        TabsAnimatedDefault,
         CollapsibleBasic,
         CollapsibleHiddenUntilFound,
         AccordionBasic,
@@ -163,6 +169,7 @@ import { ROUTES } from "./routes.ts";
         ContextMenuLifecycle,
         CheckboxBasic,
         CheckboxControlled,
+        CheckboxControlledForm,
         CheckboxGroupScenario,
         ComboboxBasic,
         ComboboxControlled,
@@ -192,9 +199,12 @@ import { ROUTES } from "./routes.ts";
         DatePickerBasic,
         DatePickerRange,
         DatePickerForm,
+        DatePickerMixedForm,
         DatePickerLifecycle,
         SliderLabelValue,
+        SliderThumbName,
         FieldAsync,
+        FieldAsyncBlur,
         FieldMatch,
         FieldMoreControls,
         FieldsetBasic,
@@ -235,6 +245,8 @@ import { ROUTES } from "./routes.ts";
             @case ("/tabs/vertical") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="vertical"></main> }
             @case ("/tabs/none-selected") { <main class="p-6" scenario-tabs-none-selected></main> }
             @case ("/tabs/animated") { <main class="p-6" scenario-tabs-animated></main> }
+            @case ("/tabs/animated-default") { <main class="p-6" scenario-tabs-animated-default></main> }
+            @case ("/tabs/nonce") { <main class="p-6" scenario-settings-tabs activation="automatic" orientation="horizontal" nonce="fixture-nonce"></main> }
             @case ("/collapsible/basic") { <main class="p-6" scenario-collapsible-basic></main> }
             @case ("/collapsible/hidden-until-found") { <main class="p-6" scenario-collapsible-hidden-until-found></main> }
             @case ("/accordion/basic") { <main class="p-6" scenario-accordion-basic></main> }
@@ -284,6 +296,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/checkbox/basic") { <main class="p-6" scenario-checkbox-basic></main> }
             @case ("/checkbox/group") { <main class="p-6" scenario-checkbox-group></main> }
             @case ("/checkbox/controlled") { <main class="p-6" scenario-checkbox-controlled></main> }
+            @case ("/checkbox/controlled-form") { <main class="p-6" scenario-checkbox-controlled-form></main> }
             @case ("/radio-group/basic") { <main class="p-6" scenario-radio-group-basic></main> }
             @case ("/radio-group/controlled") { <main class="p-6" scenario-radio-group-controlled></main> }
             @case ("/switch/basic") { <main class="p-6" scenario-switch-basic></main> }
@@ -295,10 +308,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/slider/rtl") { <main class="p-6" scenario-slider-basic></main> }
             @case ("/slider/controlled") { <main class="p-6" scenario-slider-controlled></main> }
             @case ("/slider/label-value") { <main class="p-6" scenario-slider-label-value></main> }
+            @case ("/slider/thumb-name") { <main class="p-6" scenario-slider-thumb-name></main> }
             @case ("/field/basic") { <main class="p-6" scenario-field-basic></main> }
             @case ("/field/validation") { <main class="p-6" scenario-field-validation></main> }
             @case ("/field/controls") { <main class="p-6" scenario-field-controls></main> }
             @case ("/field/async") { <main class="p-6" scenario-field-async></main> }
+            @case ("/field/async-blur") { <main class="p-6" scenario-field-async-blur></main> }
             @case ("/field/match") { <main class="p-6" scenario-field-match></main> }
             @case ("/field/more-controls") { <main class="p-6" scenario-field-more-controls></main> }
             @case ("/field/settings") { <main class="p-6" scenario-field-settings></main> }
@@ -314,6 +329,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
+            @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }
             @case ("/avatar/basic") { <main class="p-6" scenario-avatar-basic></main> }
