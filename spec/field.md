@@ -223,6 +223,9 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | TagsInput | TagsInput.Input (`input`) | TagsInput.Input | the tags (an array of strings) | its Root (the Input, the tags and its buttons; `touched` once focus leaves it) | its visually hidden input ([tags-input.md](tags-input.md#forms)) |
 | SegmentedControl | none (a `radiogroup`) | SegmentedControl.Root | the value, or `null` | its Items (focus within the Root; `touched` once focus leaves it) | its visually hidden input ([segmented-control.md](segmented-control.md#forms)) |
 | Rating | none (a `radiogroup`) | Rating.Root | the value, a number (`0` for none) | its stars (focus within the Root; `touched` once focus leaves it) | its HiddenInput, when rendered ([rating.md](rating.md#forms)) |
+| PasswordInput | PasswordInput.Input (`input`) | PasswordInput.Input | the text | PasswordInput.Input | the Input ([password-input.md](password-input.md#forms)) |
+| SearchField | SearchField.Input (`input`) | SearchField.Input | the query | SearchField.Input | the Input ([search-field.md](search-field.md#forms)) |
+| Editable | Editable.Input (`input`, `hidden` until an edit starts: a press on the label then does nothing) | Editable.Input | the text | Editable.Input | the Input ([editable.md](editable.md#forms)) |
 
 **A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
 date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival

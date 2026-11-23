@@ -55,6 +55,10 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [tags-input.md](tags-input.md) | TagsInput (no APG pattern and no Base UI component: Zag/Ark's and Reka UI's, decided there; a form control, one hidden input per tag) |
 | [segmented-control.md](segmented-control.md) | SegmentedControl (no APG pattern and no Base UI component: the APG radio group with Tabs' moving Indicator, decided there) |
 | [rating.md](rating.md) | Rating (the APG's rating radio group example, with half steps, a pointer preview and clearing decided there; its value math on the toolkit's `/range`) |
+| [password-input.md](password-input.md) | PasswordInput (no APG pattern and no Base UI component: a native input whose text a toggle button shows, decided there) |
+| [search-field.md](search-field.md) | SearchField (no APG pattern and no Base UI component: React Aria's search field, Escape and a clear button, decided there) |
+| [clipboard.md](clipboard.md) | Clipboard (no APG pattern and no Base UI component: a copy button, its copied state and a polite announcement, on the toolkit's `/clipboard`) |
+| [editable.md](editable.md) | Editable (no APG pattern and no Base UI component: Zag/Ark's and Reka UI's inline edit, its activation, submit modes and focus return decided there) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -96,7 +100,11 @@ Stage 4 starts with the tags and choices (Epic #91, Issue #89: TagGroup and Tags
 [tag-group.md](tag-group.md), [tags-input.md](tags-input.md), with their keys in the toolkit's
 `/collection` and the rules that add and edit a tag in `/form`; Issue #90: SegmentedControl and
 Rating, [segmented-control.md](segmented-control.md), [rating.md](rating.md), with the segment
-Indicator's measurement in `/collection` and the rating's value math in `/range`).
+Indicator's measurement in `/collection` and the rating's value math in `/range`), then the text
+inputs (Epic #94, Issue #92: PasswordInput, SearchField and Clipboard,
+[password-input.md](password-input.md), [search-field.md](search-field.md),
+[clipboard.md](clipboard.md), with the copy and its announcement in the toolkit's new
+`/clipboard`; Issue #93: Editable, [editable.md](editable.md)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -163,16 +171,18 @@ The vocabulary is shared by every component:
 | `data-readonly` | a read-only calendar or switch; a read-only Rating's Root and stars |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
-| `data-empty` | a combobox's or an autocomplete's list with no item; a TagGroup's Root and List with no tag (once mounted); a TagsInput's Root and Control with no tag |
-| `data-editing` | a TagsInput's Tag while its TagInput edits it |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a TagGroup's Root and List with no tag (once mounted); a TagsInput's Root and Control with no tag; a SearchField's parts and an Editable's Root, Area, Preview and Input while the value is `""` |
+| `data-editing` | a TagsInput's Tag while its TagInput edits it; an Editable's Root, Area, Input and Submit and Cancel triggers while it edits |
+| `data-visible` | a PasswordInput's parts while its text is shown |
+| `data-copied`, `data-failed` | a Clipboard's parts while its last copy succeeded, or failed, until its `timeout` |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport ([dialog.md](dialog.md#nested-dialogs)) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present); a switch's, a radio's and a menu checkbox or radio item's (and their indicators') `data-checked` / `data-unchecked`; a SegmentedControl's Item and ItemText, a Rating's star; an indeterminate Progress |
 | `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present); `data-complete` also on every part of an OTPField whose code is `length` long |
 | `data-scrubbing` | every part of a NumberField while its ScrubArea scrubs |
 | `data-required` | a required form control |
-| `data-readonly` (inputs) | a read-only NumberField's, OTPField's, DateField's or TimeField's parts |
-| `data-placeholder` | a Select showing its placeholder; a DateField's or TimeField's segment with no value |
+| `data-readonly` (inputs) | a read-only NumberField's, OTPField's, DateField's, TimeField's, PasswordInput's, SearchField's or Editable's parts |
+| `data-placeholder` | a Select showing its placeholder; a DateField's or TimeField's segment with no value; an Editable's Preview showing its placeholder |
 | `data-type` | a DateField's or TimeField's segment: its type (a value: `year`, `month`, `day`, `hour`, `minute`, `second`, `dayPeriod`, `literal`) |
 | `data-instant` | a tooltip that opened with no delay |
 | `data-dragging` | a slider while a pointer drags a thumb |
@@ -203,23 +213,24 @@ The reasons are shared:
 
 | reason | when |
 | --- | --- |
-| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area) |
+| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area); a PasswordInput's VisibilityTrigger showed or hid its text; a Clipboard's Trigger copied (its status became `copied` or `failed`) |
 | `close-press` | a `Close` part was pressed |
-| `escape-key` | Escape dismissed the overlay |
+| `escape-key` | Escape dismissed the overlay; Escape cleared a SearchField, or reverted an Editable's edit |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
 | `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags |
+| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
-| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md) |
+| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md); the focus leaving an Editable's edit committed or reverted it (spec/editable.md) |
 | `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md), or added a TagsInput's tags (spec/tags-input.md) |
-| `clear-press` | a combobox's or an autocomplete's Clear, or a TagsInput's ClearTrigger, was pressed |
+| `clear-press` | a combobox's or an autocomplete's Clear, a TagsInput's ClearTrigger or a SearchField's ClearButton was pressed |
+| `submit-press`, `cancel-press` | an Editable's SubmitTrigger committed its edit, or its CancelTrigger reverted it |
 | `chip-remove-press` | a combobox chip's remove button, a TagGroup's RemoveButton or a TagsInput's TagRemove was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
@@ -228,7 +239,7 @@ The reasons are shared:
 | `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md) |
 | `previous-press`, `next-press`, `first-press`, `last-press` | a Pagination's Previous, Next, First or Last changed its page (an Item's press is `item-press`) |
 | `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
-| `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed) |
+| `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed; a form reset; a form submission that hid a PasswordInput's text; a Clipboard's status returning to `idle`) |
 
 ### Normalized API names
 
@@ -268,7 +279,7 @@ an uncontrolled control to its default) and, where `required` applies, validates
 native control would. A hidden input is never in the accessibility tree nor in the tab order
 (`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
-`hidden-input`, since its `input` is the visible Input; NumberField, OTPField, DateField, TimeField and TagsInput: `hidden-input` too; Rating's part is `HiddenInput`, `rating-hidden-input`); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
+`hidden-input`, since its `input` is the visible Input; NumberField, OTPField, DateField, TimeField and TagsInput: `hidden-input` too; Rating's part is `HiddenInput`, `rating-hidden-input`); Autocomplete, PasswordInput, SearchField and Editable have none (an Editable's Input stays rendered, `hidden`, while its Preview shows): their visible Input carries `name` and is the form control, as a text
 input is).
 Outside a Field, a control is named by a [Label](label.md) (`for`, or wrapping it), or by the
 consumer's `aria-label` / `aria-labelledby`.
@@ -281,7 +292,7 @@ the toolkit's form bridge cancels the later controls' `invalid` events of that v
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
-DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox, an Autocomplete, a DateField, a TimeField, a TagGroup, a TagsInput, a SegmentedControl or a Rating gives the control:
+DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox, an Autocomplete, a DateField, a TimeField, a TagGroup, a TagsInput, a SegmentedControl, a Rating, a PasswordInput, a SearchField or an Editable gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
