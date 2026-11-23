@@ -194,6 +194,8 @@ describe("the sidebar", () => {
             "api/drawer",
             "api/popover",
             "api/tooltip",
+            "api/hover-card",
+            "api/toast",
             "api/menu",
             "api/context-menu",
             "api/menubar",
@@ -250,6 +252,8 @@ describe("the sidebar", () => {
             "api/drawer",
             "api/popover",
             "api/tooltip",
+            "api/hover-card",
+            "api/toast",
             "api/menu",
             "api/context-menu",
             "api/menubar",
@@ -292,14 +296,17 @@ describe("the sidebar", () => {
                 "Keyboard",
                 "Exports",
             ]);
-            // every component follows an APG pattern but the Field layer and OTPField, which have
-            // none (Base UI's Field, Fieldset, Form and OTP Field)
+            // every component follows an APG pattern but the Field layer, OTPField, HoverCard and
+            // Toast, which have none (Base UI's Field, Fieldset, Form, OTP Field, PreviewCard and
+            // Toast; Toast follows WAI-ARIA's live regions)
             if (
                 ![
                     "api/field",
                     "api/fieldset",
                     "api/form",
                     "api/otp-field",
+                    "api/hover-card",
+                    "api/toast",
                 ].includes(path)
             ) {
                 expect(page, path).toMatch(

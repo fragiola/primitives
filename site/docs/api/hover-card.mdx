@@ -1,0 +1,200 @@
+---
+title: HoverCard
+description: A preview of a link's content, shown on hover and keyboard focus after a delay, hoverable across a safe area, non-modal, with detached triggers.
+---
+
+A preview of the content behind a link, shown while the link is hovered or keyboard-focused
+(Base UI's PreviewCard; the APG has no pattern for it). It is not modal, never takes focus when it
+opens, and stays open while hovered (WCAG 1.4.13). The link stays the way to the content: the
+card is a glance for pointer and keyboard users, not something a reader needs.
+
+<Example id="hover-card" />
+
+## Behaviour
+
+- **Hover**: the pointer entering the Trigger opens it after `delay` (reason `trigger-hover`);
+  leaving before then cancels. A touch tap follows the link and opens nothing.
+- **Hoverable**: leaving the Trigger closes it after `closeDelay`, unless the pointer reaches the
+  card across the safe area between them; it closes `closeDelay` after the pointer left both, or
+  the window. The hover intent and the hover bridge are Tooltip's, from the toolkit.
+- **Keyboard**: keyboard focus on the Trigger opens it after `delay` (`trigger-focus`), with focus
+  staying on the link; blur closes it at once (unless focus moved into the card), and so does
+  focus leaving the card (`focus-out`).
+- **Dismissal**: a non-modal layer: Escape closes it (`escape-key`) before an enclosing dialog,
+  and an outside press closes it (`outside-press`); a press inside it keeps it open.
+- **Positioning**: as the [Popover's](/docs/api/popover), from the Trigger, on the `bottom` by
+  default.
+- **Detached triggers**: Triggers anywhere in the page show the same Root through a `handle`,
+  each with a `payload` the content reads ([detached triggers](/docs/guides/detached-triggers));
+  hovering another trigger of the open card moves it there at once (`data-instant`).
+- **Lifecycle**: `onOpenChange` is called before the change (`details.cancel()` keeps it),
+  `onOpenChangeComplete(open)` reports the end of each transition, the actions `close()` and
+  `unmount()` act from code, and the Portal's `keepMounted` keeps the Positioner in the page while
+  closed (`hidden`, `data-closed`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the state |
+| Trigger | `a` | `hover-card-trigger` | the link, and the anchor |
+| Portal | none | | moves the Backdrop and the Positioner to the end of `body` |
+| Backdrop | `div` | `hover-card-backdrop` | behind the card, takes no pointer (optional) |
+| Positioner | `div` | `hover-card-positioner` | places the card next to the link |
+| Popup | `div` | `hover-card-popup` | the card |
+| Arrow | `div` | `hover-card-arrow` | points at the link (optional) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { HoverCard } from "@fragiola/primitives-react/hover-card";
+
+<HoverCard.Root>
+    <HoverCard.Trigger href="/people/ada">@ada</HoverCard.Trigger>
+    <HoverCard.Portal>
+        <HoverCard.Positioner sideOffset={8}>
+            <HoverCard.Popup>
+                <HoverCard.Arrow />
+                Ada Lovelace, mathematician and writer
+            </HoverCard.Popup>
+        </HoverCard.Positioner>
+    </HoverCard.Portal>
+</HoverCard.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { HoverCard } from "@fragiola/primitives-vue/hover-card";
+</script>
+
+<template>
+    <HoverCard.Root>
+        <HoverCard.Trigger href="/people/ada">@ada</HoverCard.Trigger>
+        <HoverCard.Portal>
+            <HoverCard.Positioner :side-offset="8">
+                <HoverCard.Popup>
+                    <HoverCard.Arrow />
+                    Ada Lovelace, mathematician and writer
+                </HoverCard.Popup>
+            </HoverCard.Positioner>
+        </HoverCard.Portal>
+    </HoverCard.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [HoverCardRoot, HoverCardTrigger, HoverCardPortal, HoverCardPositioner, HoverCardPopup, HoverCardArrow],
+    template: `
+        <ng-container hoverCardRoot>
+            <a hoverCardTrigger href="/people/ada">&#64;ada</a>
+            <ng-container *hoverCardPortal>
+                <div hoverCardPositioner [sideOffset]="8">
+                    <div hoverCardPopup><div hoverCardArrow></div>Ada Lovelace, mathematician and writer</div>
+                </div>
+            </ng-container>
+        </ng-container>
+    `,
+})
+export class AuthorLink {}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:open`,
+`@open-change`), and Angular as inputs and outputs (`[(open)]`, `(openChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-hover`, `trigger-focus`, `focus-out`, `escape-key`, `outside-press`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `handle` | `HoverCardHandle<Payload>` | | connects Triggers rendered outside the Root ([detached triggers](/docs/guides/detached-triggers)) |
+| `triggerId` | `string \| null` | | the active trigger's id, controlled together with `open` |
+| `defaultTriggerId` | `string \| null` | `null` | the initial active trigger, uncontrolled |
+| `delay` | `number` | `600` | ms before a hovered or keyboard-focused trigger opens it |
+| `closeDelay` | `number` | `300` | ms before it closes once the pointer left the trigger and the card |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `handle` | `HoverCardHandle<Payload>` | | the handle of a Root this Trigger opens from anywhere, outside it |
+| `payload` | `Payload` | | what the Root's content receives while this Trigger is the active one |
+| `id` | `string` | generated | the Trigger's id: `triggerId` and the handle's `open(id)` name it |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the content goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed, `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*hoverCardPortal="{ keepMounted: true }"` |
+
+### Backdrop
+
+No props of its own.
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the link; `inline-*` follow the direction |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the link, in px |
+| `alignOffset` | `number` | `0` | the shift along the link's edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the card next to |
+
+### Popup
+
+No props of its own.
+
+### Arrow
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `data-popup-open` on the active trigger while open, an `id`; no ARIA of its own |
+| Backdrop | `role="presentation"`, `pointer-events: none`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`; the anchor CSS variables, as the Popover's; `hidden` while kept mounted and closed |
+| Popup | an `id`, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-instant` (a move to another trigger), `data-starting-style`, `data-ending-style`; no role |
+| Arrow | `aria-hidden="true"`, `data-side`, `data-align` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab onto the Trigger | opens after `delay` |
+| Tab away | closes |
+| Escape | closes, focus stays where it was |
+| Enter | follows the link |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/hover-card` | `HoverCard`, `HoverCardRootProps`, `HoverCardTriggerProps`, `HoverCardPortalProps`, `HoverCardPositionerProps`, `HoverCardPositionerState`, `HoverCardPopupState`, `HoverCardHandle`, `createHoverCardHandle`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootProps`, `OverlayTriggerProps`, `OverlayTriggerRootProps` |
+| `@fragiola/primitives-vue/hover-card` | `HoverCard`, `HoverCardRootProps`, `HoverCardRootEmits`, `HoverCardTriggerProps`, `HoverCardTriggerState`, `HoverCardPortalProps`, `HoverCardPositionerState`, `HoverCardPopupState`, `HoverCardBackdropState`, `HoverCardArrowState`, `HoverCardHandle`, `createHoverCardHandle`, `PositionerProps`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `OverlayRootSlots`, `OverlayTriggerProps`, `OverlayTriggerRootProps` |
+| `@fragiola/primitives-angular/hover-card` | `HoverCardRoot`, `HoverCardTrigger`, `HoverCardPortal`, `HoverCardBackdrop`, `HoverCardPositioner`, `HoverCardPopup`, `HoverCardArrow`, `createHoverCardHandle`, `HoverCardHandle`, `HoverCardState`, `HoverCardTriggerState`, `HoverCardPopupState`, `Side`, `Align`, `ChangeDetails`, `ChangeReason`, `OpenChangeEvent`, `OpenChangeDetails`, `OverlayActions`, `OverlayHandle`, `OverlayPortalOptions` |
