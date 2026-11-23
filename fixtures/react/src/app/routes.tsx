@@ -139,8 +139,15 @@ import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.tsx";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.tsx";
 import { TooltipInDialog } from "../scenarios/tooltip/tooltip-in-dialog.tsx";
 import { TooltipLifecycle } from "../scenarios/tooltip/tooltip-lifecycle.tsx";
-
+import { AutocompleteVirtualAsync } from "../scenarios/virtual-lists/autocomplete-virtual-async.tsx";
+import { AutocompleteVirtualBasic } from "../scenarios/virtual-lists/autocomplete-virtual-basic.tsx";
+import { ComboboxVirtualAsync } from "../scenarios/virtual-lists/combobox-virtual-async.tsx";
+import { ComboboxVirtualBasic } from "../scenarios/virtual-lists/combobox-virtual-basic.tsx";
+import { ListboxVirtualAsync } from "../scenarios/virtual-lists/listbox-virtual-async.tsx";
 /** Every scenario of the specs (spec/<component>.md, "Scenarios"), at `/<component>/<scenario>`. */
+import { ListboxVirtualBasic } from "../scenarios/virtual-lists/listbox-virtual-basic.tsx";
+import { SelectVirtualAsync } from "../scenarios/virtual-lists/select-virtual-async.tsx";
+import { SelectVirtualBasic } from "../scenarios/virtual-lists/select-virtual-basic.tsx";
 export const routes: Record<
     string,
     ComponentType<{ locale?: string; cancel?: boolean }>
@@ -289,4 +296,12 @@ export const routes: Record<
     "/menubar/vertical": MenubarVertical,
     "/menubar/modal": MenubarModal,
     "/direction/provider": DirectionProviderScenario,
+    "/listbox-virtual/basic": ListboxVirtualBasic,
+    "/listbox-virtual/async": ListboxVirtualAsync,
+    "/select-virtual/basic": SelectVirtualBasic,
+    "/select-virtual/async": SelectVirtualAsync,
+    "/combobox-virtual/basic": ComboboxVirtualBasic,
+    "/combobox-virtual/async": ComboboxVirtualAsync,
+    "/autocomplete-virtual/basic": AutocompleteVirtualBasic,
+    "/autocomplete-virtual/async": AutocompleteVirtualAsync,
 };
