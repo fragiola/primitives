@@ -108,7 +108,13 @@ export function watchScrub(
                 ).requestPointerLock?.();
                 request?.then(
                     () => {
-                        if (active !== null && locked()) {
+                        if (!locked()) {
+                            return;
+                        }
+                        if (active === null) {
+                            // granted after a quick click ended the scrub: never kept
+                            doc.exitPointerLock();
+                        } else {
                             options.onCursor?.(cursor);
                         }
                     },
@@ -119,9 +125,17 @@ export function watchScrub(
             }
         }
     };
+    // a lock granted with no promise (Firefox) after the scrub ended is released too
+    const onLockChange = () => {
+        if (active === null && locked()) {
+            doc.exitPointerLock();
+        }
+    };
     element.addEventListener("pointerdown", onDown as EventListener);
+    doc.addEventListener("pointerlockchange", onLockChange);
     return () => {
         element.removeEventListener("pointerdown", onDown as EventListener);
+        doc.removeEventListener("pointerlockchange", onLockChange);
         doc.removeEventListener("pointermove", onMove, true);
         doc.removeEventListener("pointerup", end, true);
         doc.removeEventListener("pointercancel", end, true);

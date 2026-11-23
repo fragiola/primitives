@@ -94,9 +94,11 @@ export function otpInputMode(type: OtpValidationType): "numeric" | "text" {
 
 /**
  * The hidden input's `pattern`: a complete value, `length` accepted characters, so a native form
- * refuses an incomplete code (spec/otp-field.md, "Forms").
+ * refuses an incomplete code (spec/otp-field.md, "Forms"). A `RegExp` type gives `.{length}`:
+ * the value is normalized already, and its flags (`i`) or a source the `v` flag a `pattern` is
+ * compiled with refuses would make the browser refuse valid codes, or ignore the pattern.
  */
 export function otpPattern(type: OtpValidationType, length: number): string {
-    const one = type instanceof RegExp ? `(?:${type.source})` : CLASSES[type];
+    const one = type instanceof RegExp ? "." : CLASSES[type];
     return `${one}{${Math.max(length, 0)}}`;
 }

@@ -51,6 +51,6 @@ describe("an OTP field's value", () => {
     it("gives the hidden input a complete-code pattern", () => {
         expect(otpPattern("numeric", 6)).toBe("\\d{6}");
         expect(otpPattern("alphanumeric", 4)).toBe("[a-zA-Z0-9]{4}");
-        expect(otpPattern(/[A-F]/, 4)).toBe("(?:[A-F]){4}");
+        expect(otpPattern(/[a-f]/i, 4)).toBe(".{4}");
     });
 });

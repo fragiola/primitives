@@ -40,6 +40,12 @@ export function watchAutoRepeat(
             return;
         }
         pressed = false;
+        // the click a release sends comes before this task ends; a press that sends none
+        // (released outside, a long touch, a button disabled at its bound) swallows no later
+        // click
+        view?.setTimeout(() => {
+            swallowClick = false;
+        });
         doc.removeEventListener("pointerup", stop, true);
         doc.removeEventListener("pointercancel", stop, true);
         element.removeEventListener("pointerleave", stop);
@@ -52,6 +58,9 @@ export function watchAutoRepeat(
         stop();
         swallowClick = true;
         if (options.onStep(event) === false) {
+            view?.setTimeout(() => {
+                swallowClick = false;
+            }, 1000);
             return;
         }
         pressed = true;

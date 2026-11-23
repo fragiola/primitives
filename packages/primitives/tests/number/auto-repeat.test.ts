@@ -36,10 +36,9 @@ describe("watchAutoRepeat", () => {
         vi.advanceTimersByTime(1 + 60 * 3);
         expect(onStep).toHaveBeenCalledTimes(4);
         document.dispatchEvent(pointer("pointerup"));
-        vi.advanceTimersByTime(600);
-        expect(onStep).toHaveBeenCalledTimes(4);
-        // the click that ends the press steps no more
+        // the click that ends the press (in the same task) steps no more
         element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        vi.advanceTimersByTime(600);
         expect(onStep).toHaveBeenCalledTimes(4);
         stop();
     });
@@ -78,5 +77,26 @@ describe("watchAutoRepeat", () => {
         element.dispatchEvent(mousedown);
         expect(mousedown.defaultPrevented).toBe(true);
         again();
+    });
+});
+
+describe("watchAutoRepeat, a press that sends no click", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
+    it("swallows no later click once the press ended", () => {
+        const button = document.createElement("button");
+        document.body.append(button);
+        const onStep = vi.fn(() => true);
+        const stop = watchAutoRepeat(button, { onStep });
+        button.dispatchEvent(pointer("pointerdown"));
+        // released outside: the release sends no click
+        document.dispatchEvent(pointer("pointerup"));
+        vi.advanceTimersByTime(1);
+        button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(onStep).toHaveBeenCalledTimes(2);
+        stop();
+        button.remove();
     });
 });
