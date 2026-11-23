@@ -360,15 +360,18 @@ export function DateFieldRootBase<Value extends FieldValue>({
                     segmentTarget(element, "next")?.focus();
                 }
             },
-            onSegmentBlur: (segment: DateSegment, event: FocusEvent) => {
+            onSegmentBlur: (
+                segment: DateSegment,
+                event: FocusEvent,
+                element: HTMLElement,
+            ) => {
                 const { edit: typing } = current.current;
                 if (typing !== null && typing.type === segment.type) {
                     current.current = { ...current.current, edit: null };
                     setEdit(null);
                 }
-                const group = (
-                    event.currentTarget as HTMLElement | null
-                )?.closest('[role="group"]');
+                // the segment itself: a native event's `currentTarget` is React's root
+                const group = element.closest('[role="group"]');
                 const to = event.relatedTarget as Node | null;
                 if (group == null || to === null || !group.contains(to)) {
                     field.onBlur();

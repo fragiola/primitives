@@ -310,8 +310,10 @@ Checks (`en-US`):
    moves the focus to the day.
 7. ArrowUp on an empty month gives the placeholder's month (November, today's).
 8. A press on the label focuses the month.
-9. Axe finds no violation, empty and filled.
-10. Contract layer: the parts, `data-type` on every segment, `data-placeholder` on the empty ones,
+9. Typing `1`, `1` then ArrowRight moves the focus between segments with no blur: the Field
+   has `data-focused` and no `data-touched`; leaving the field gives it `data-touched`.
+10. Axe finds no violation, empty and filled.
+11. Contract layer: the parts, `data-type` on every segment, `data-placeholder` on the empty ones,
     `aria-hidden` literals, the structural bidi style on the numeric segments, no `"false"` state
     attribute; the hidden input (`type="date"`) follows the Root.
 

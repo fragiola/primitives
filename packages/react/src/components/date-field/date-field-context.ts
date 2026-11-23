@@ -44,7 +44,11 @@ export interface DateFieldContextValue extends DateFieldState {
         element: HTMLElement,
     ) => void;
     /** A segment lost the focus. */
-    onSegmentBlur: (segment: DateSegment, event: FocusEvent) => void;
+    onSegmentBlur: (
+        segment: DateSegment,
+        event: FocusEvent,
+        element: HTMLElement,
+    ) => void;
 }
 
 export const DateFieldContext = createContext<DateFieldContextValue | null>(

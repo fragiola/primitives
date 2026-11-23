@@ -130,7 +130,11 @@ export function DateFieldSegment({
             onFocus: () => field.onFocus(),
             onBlur: (event: FocusEvent<HTMLElement>) => {
                 const { context: current, segment: shown } = latest.current;
-                current.onSegmentBlur(shown, event.nativeEvent);
+                current.onSegmentBlur(
+                    shown,
+                    event.nativeEvent,
+                    event.currentTarget,
+                );
             },
         },
         (node: HTMLElement | null) => {

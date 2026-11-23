@@ -195,6 +195,24 @@ test.describe("date-field / basic", () => {
         await expect(month).toHaveAttribute("aria-valuenow", "11");
     });
 
+    test("moving between segments is no blur; leaving the field is", async ({
+        page,
+    }) => {
+        const field = page.locator('[data-primitives-part="field-root"]');
+        const group = fieldGroup(page, "Birth date");
+        await segment(group, "month").focus();
+        await typeKeys(page, "11");
+        await expect(segment(group, "day")).toBeFocused();
+        await page.keyboard.press("ArrowRight");
+        await expect(field).toHaveAttribute("data-focused", "");
+        await expect(field).not.toHaveAttribute("data-touched");
+        await page.evaluate(() =>
+            (document.activeElement as HTMLElement).blur(),
+        );
+        await expect(field).toHaveAttribute("data-touched", "");
+        await expect(field).not.toHaveAttribute("data-focused");
+    });
+
     test("a press on the label focuses the first segment", async ({ page }) => {
         await page.getByText("Birth date", { exact: true }).click();
         await expect(
