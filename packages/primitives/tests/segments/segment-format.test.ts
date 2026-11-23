@@ -91,6 +91,15 @@ describe("segmentFormat", () => {
         ).toBeNull();
     });
 
+    it("writes every literal space as U+0020, whatever the engine's ICU writes", () => {
+        // en-US writes the space before AM/PM as U+202F in some ICU versions, U+0020 in others
+        const { parts } = segmentFormat({ locale: "en-US", kind: "time" });
+        for (const part of parts) {
+            expect(part.literal).not.toMatch(/[\u00a0\u2007\u202f]/);
+        }
+        expect(parts.at(-2)).toEqual({ type: "literal", literal: " " });
+    });
+
     it("reads a time's day granularity as minutes", () => {
         expect(
             segmentFormat({ locale: "de-DE", kind: "time", granularity: "day" })

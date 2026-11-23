@@ -81,6 +81,10 @@ text of ours (spec/README.md, "No text"); the consumer replaces it through the S
 
 A day set past the end of a month the user then sets (31, then February) is clamped into it.
 
+A literal's spaces are written as U+0020: engines write the space before a day period as U+0020,
+U+00A0 or U+202F depending on their ICU (Node and Chromium differ), and a server render and its
+hydration must agree (found by CI's ssr layer). The bidirectional marks stay.
+
 ## Anatomy
 
 DateField and TimeField share their parts; each part's attribute names the root it sits in:

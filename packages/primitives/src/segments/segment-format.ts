@@ -128,6 +128,15 @@ function formatOptions(
     return options;
 }
 
+/**
+ * A literal with its spaces as one kind: engines write the space before a day period as U+0020,
+ * U+00A0 or U+202F depending on their ICU (Node and Chromium differ), so a server render and its
+ * hydration would disagree; the bidirectional marks stay.
+ */
+function normalizeLiteral(text: string): string {
+    return text.replace(/[\u00a0\u2007\u202f]/g, " ");
+}
+
 function partType(type: string): SegmentType {
     return EDITABLE.has(type) || type === "era"
         ? (type as SegmentType)
@@ -202,13 +211,18 @@ export function segmentFormat(options: SegmentFormatOptions): SegmentFormat {
         if (type === "literal" && previous?.type === "literal") {
             parts[parts.length - 1] = {
                 type,
-                literal: previous.literal + part.value,
+                literal: previous.literal + normalizeLiteral(part.value),
             };
             continue;
         }
         parts.push({
             type,
-            literal: type === "literal" || type === "era" ? part.value : "",
+            literal:
+                type === "literal"
+                    ? normalizeLiteral(part.value)
+                    : type === "era"
+                      ? part.value
+                      : "",
         });
     }
     const types = parts
