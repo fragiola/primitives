@@ -69,6 +69,12 @@
             "import": "./dist/autocomplete.js",
             "default": "./dist/autocomplete.js"
         },
+        "./autocomplete-virtual": {
+            "@fragiola/source": "./src/components/autocomplete-virtual/index.ts",
+            "types": "./dist/autocomplete-virtual.d.ts",
+            "import": "./dist/autocomplete-virtual.js",
+            "default": "./dist/autocomplete-virtual.js"
+        },
         "./avatar": {
             "@fragiola/source": "./src/components/avatar/index.ts",
             "types": "./dist/avatar.d.ts",
@@ -110,6 +116,12 @@
             "types": "./dist/combobox.d.ts",
             "import": "./dist/combobox.js",
             "default": "./dist/combobox.js"
+        },
+        "./combobox-virtual": {
+            "@fragiola/source": "./src/components/combobox-virtual/index.ts",
+            "types": "./dist/combobox-virtual.d.ts",
+            "import": "./dist/combobox-virtual.js",
+            "default": "./dist/combobox-virtual.js"
         },
         "./context-menu": {
             "@fragiola/source": "./src/components/context-menu/index.ts",
@@ -170,6 +182,12 @@
             "types": "./dist/listbox.d.ts",
             "import": "./dist/listbox.js",
             "default": "./dist/listbox.js"
+        },
+        "./listbox-virtual": {
+            "@fragiola/source": "./src/components/listbox-virtual/index.ts",
+            "types": "./dist/listbox-virtual.d.ts",
+            "import": "./dist/listbox-virtual.js",
+            "default": "./dist/listbox-virtual.js"
         },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
@@ -243,6 +261,12 @@
             "import": "./dist/select.js",
             "default": "./dist/select.js"
         },
+        "./select-virtual": {
+            "@fragiola/source": "./src/components/select-virtual/index.ts",
+            "types": "./dist/select-virtual.d.ts",
+            "import": "./dist/select-virtual.js",
+            "default": "./dist/select-virtual.js"
+        },
         "./separator": {
             "@fragiola/source": "./src/components/separator/index.ts",
             "types": "./dist/separator.d.ts",
@@ -291,6 +315,12 @@
             "import": "./dist/tooltip.js",
             "default": "./dist/tooltip.js"
         },
+        "./async-list": {
+            "@fragiola/source": "./src/async-list/index.ts",
+            "types": "./dist/async-list.d.ts",
+            "import": "./dist/async-list.js",
+            "default": "./dist/async-list.js"
+        },
         "./direction": {
             "@fragiola/source": "./src/direction/index.ts",
             "types": "./dist/direction.d.ts",
@@ -333,6 +363,11 @@
                 "import": "./dist/autocomplete.js",
                 "default": "./dist/autocomplete.js"
             },
+            "./autocomplete-virtual": {
+                "types": "./dist/autocomplete-virtual.d.ts",
+                "import": "./dist/autocomplete-virtual.js",
+                "default": "./dist/autocomplete-virtual.js"
+            },
             "./avatar": {
                 "types": "./dist/avatar.d.ts",
                 "import": "./dist/avatar.js",
@@ -367,6 +402,11 @@
                 "types": "./dist/combobox.d.ts",
                 "import": "./dist/combobox.js",
                 "default": "./dist/combobox.js"
+            },
+            "./combobox-virtual": {
+                "types": "./dist/combobox-virtual.d.ts",
+                "import": "./dist/combobox-virtual.js",
+                "default": "./dist/combobox-virtual.js"
             },
             "./context-menu": {
                 "types": "./dist/context-menu.d.ts",
@@ -417,6 +457,11 @@
                 "types": "./dist/listbox.d.ts",
                 "import": "./dist/listbox.js",
                 "default": "./dist/listbox.js"
+            },
+            "./listbox-virtual": {
+                "types": "./dist/listbox-virtual.d.ts",
+                "import": "./dist/listbox-virtual.js",
+                "default": "./dist/listbox-virtual.js"
             },
             "./menu": {
                 "types": "./dist/menu.d.ts",
@@ -478,6 +523,11 @@
                 "import": "./dist/select.js",
                 "default": "./dist/select.js"
             },
+            "./select-virtual": {
+                "types": "./dist/select-virtual.d.ts",
+                "import": "./dist/select-virtual.js",
+                "default": "./dist/select-virtual.js"
+            },
             "./separator": {
                 "types": "./dist/separator.d.ts",
                 "import": "./dist/separator.js",
@@ -517,6 +567,11 @@
                 "types": "./dist/tooltip.d.ts",
                 "import": "./dist/tooltip.js",
                 "default": "./dist/tooltip.js"
+            },
+            "./async-list": {
+                "types": "./dist/async-list.d.ts",
+                "import": "./dist/async-list.js",
+                "default": "./dist/async-list.js"
             },
             "./direction": {
                 "types": "./dist/direction.d.ts",
