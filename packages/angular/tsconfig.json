@@ -92,6 +92,10 @@
         "tags-input",
         "segmented-control",
         "rating",
+        "password-input",
+        "search-field",
+        "clipboard",
+        "editable",
         "tests",
         "*.config.ts"
     ]
