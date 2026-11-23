@@ -45,8 +45,10 @@ RadioGroup and Radio rows of `docs/size.md` stay as they are. A Field control
 (`ENTRY_DEPENDENCIES`: `field`). Its Indicator's measurement is the toolkit's
 `segmentIndicatorBox` and `placeSegmentIndicator` (`/collection`, beside the Tabs Indicator's).
 
-The Indicator may sit anywhere inside the Root (the fixtures put it first, under the Items: the
-recipe gives the Items `position: relative`, so they paint above it).
+The Indicator may sit anywhere inside the Root; with `renderBeforeHydration` it comes **after the
+Items**, since its script measures the checked Item as the page parses, when only what precedes it
+exists. The fixtures put it last, after the Items, and the recipe paints it under them
+(`isolation: isolate` on the Root, a negative `z-index` on the Indicator).
 
 ## API
 
@@ -161,7 +163,8 @@ The Indicator follows a measurement, so a server renders none (it appears in pla
 is hydrated). With **`renderBeforeHydration`** (Base UI's name, as Tabs'; Angular:
 `*segmentedControlIndicator="true"`, with `nonce` in its microsyntax), a server render writes the
 Indicator with a small inline script inside it that measures the checked Item (the Root's
-`[data-primitives-part="segmented-control-item"][aria-checked="true"]`) as the page parses, sets
+`[data-primitives-part="segmented-control-item"][aria-checked="true"]`, which must precede the
+Indicator: "Anatomy") as the page parses, sets
 the ten variables and removes itself (the toolkit's self-contained `placeSegmentIndicator`), so
 the hydration finds the Indicator as the browser renders it. **`nonce`**: the script's `nonce`
 attribute, for a Content Security Policy that allows inline scripts by nonce (Angular falls back
@@ -170,7 +173,7 @@ to its `CSP_NONCE` provider, as the Tabs Indicator).
 ## Scenarios
 
 The form scenarios print `form: ...` as in [checkbox.md](checkbox.md#scenarios). Every Item holds
-an ItemText with its label; every Root holds an Indicator as its first child. The recipe draws the
+an ItemText with its label; every Root holds an Indicator as its last child, after the Items. The recipe draws the
 Indicator over the checked Item's whole box (`inset-inline-start`, `inset-block-start`,
 `inline-size`, `block-size` from the variables) and gives the Items equal shares of the Root
 (`flex: 1`).
