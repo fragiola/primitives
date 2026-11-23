@@ -61,6 +61,12 @@ import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
 import LabelControls from "../scenarios/label/label-controls.vue";
+import ListboxField from "../scenarios/listbox/listbox-field.vue";
+import ListboxGroups from "../scenarios/listbox/listbox-groups.vue";
+import ListboxHorizontal from "../scenarios/listbox/listbox-horizontal.vue";
+import ListboxMultiple from "../scenarios/listbox/listbox-multiple.vue";
+import ListboxReplace from "../scenarios/listbox/listbox-replace.vue";
+import ListboxSingle from "../scenarios/listbox/listbox-single.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
 import MenuCheckboxRadio from "../scenarios/menu/menu-checkbox-radio.vue";
 import MenuControlled from "../scenarios/menu/menu-controlled.vue";
@@ -251,6 +257,12 @@ export const routes: Record<string, Component> = {
     "/separator/basic": SeparatorBasic,
     "/direction/provider": DirectionProviderScenario,
     "/label/controls": LabelControls,
+    "/listbox/single": ListboxSingle,
+    "/listbox/multiple": ListboxMultiple,
+    "/listbox/replace": ListboxReplace,
+    "/listbox/groups": ListboxGroups,
+    "/listbox/horizontal": ListboxHorizontal,
+    "/listbox/field": ListboxField,
     "/meter/basic": MeterBasic,
     "/number-field/basic": NumberFieldBasic,
     "/number-field/field": NumberFieldField,

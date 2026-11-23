@@ -21,6 +21,7 @@ export * from "./components/field/index.ts";
 export * from "./components/fieldset/index.ts";
 export * from "./components/form/index.ts";
 export * from "./components/label/index.ts";
+export * from "./components/listbox/index.ts";
 export * from "./components/menu/index.ts";
 export * from "./components/menubar/index.ts";
 export * from "./components/meter/index.ts";
