@@ -173,11 +173,13 @@ Checks:
 4. Delete on "Travel" removes it (`tags: news,gaming,shopping,sports`, `removed: travel`,
    `reason: keyboard`) and focuses "Gaming" (the next). End, then Backspace on "Sports" removes it
    (`tags: news,gaming,shopping`) and focuses "Shopping" (there is no next).
-5. A click on "Remove News" removes it (`tags: gaming,shopping`, `reason: chip-remove-press`) and
-   focuses "Gaming".
-6. Delete removes "Gaming" and focuses "Shopping"; Delete removes "Shopping": no `grid` is left,
-   the List is a `group` named "Categories" that has the focus, with `data-empty` (contract), and
-   "No categories." is shown; Tab moves to "After".
+5. From the page's start, a click on "Remove News" removes it
+   (`tags: travel,gaming,shopping,sports`, `reason: chip-remove-press`), focuses "Travel" and
+   selects nothing.
+6. From "News", Delete five times removes every tag, focusing "Travel", "Gaming", "Shopping" and
+   "Sports" in turn; after the last one (`tags: none`) no `grid` is left: the List is a `group`
+   named "Categories" that has the focus, with `data-empty` (contract), and "No categories." is
+   shown; Tab moves to "After".
 7. Axe finds no violation, with tags and empty.
 
 ### `/tag-group/basic?dir=rtl`
@@ -198,8 +200,9 @@ Checks:
 2. Tab focuses "News" (the first tag: the tab stop does not follow the selection); Space selects
    it (`value: news,gaming`, `reason: keyboard`); ArrowRight and Enter select "Travel"
    (`value: news,travel,gaming`); ArrowRight and Space unselect "Gaming" (`value: news,travel`).
-3. A click on "Shopping" selects and focuses it (`value: news,travel,shopping`,
-   `reason: item-press`); a click on "News" unselects it (`value: travel,shopping`).
+3. From the page's start, a click on "Shopping" selects and focuses it
+   (`value: gaming,shopping`, `reason: item-press`); a click on "Gaming" unselects it
+   (`value: shopping`).
 4. Delete and Backspace on "Shopping" remove nothing (no `onRemove`): five rows.
 5. Axe finds no violation with tags selected.
 
@@ -228,7 +231,7 @@ Checks:
    disabled.
 2. Tab focuses "News"; ArrowRight focuses "Gaming" (passing over "Travel"); End focuses
    "Shopping" (the last enabled); ArrowRight wraps to "News"; ArrowLeft wraps to "Shopping".
-3. A click on "Travel" focuses and selects nothing (`value: none`).
+3. A click on "Travel" selects nothing and does not focus it (`value: none`).
 4. On "Gaming", Delete removes it and focuses "Shopping"; Delete removes "Shopping" and focuses
    "News" (no enabled tag after it: the last enabled one before it, passing over "Travel");
    `tags: news,travel,sports`.
