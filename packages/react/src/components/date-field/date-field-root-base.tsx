@@ -14,10 +14,7 @@ import type { PlainDateTime } from "@fragiola/primitives/time";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
-import type {
-    ChangeDetails,
-    ChangeReason,
-} from "../../utils/change-details.ts";
+import type { ChangeDetails } from "../../utils/change-details.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import {
@@ -33,7 +30,7 @@ import {
     isoOf,
 } from "./field-value.ts";
 import { useDocumentLocale } from "./use-document-locale.ts";
-import { type SegmentEditKind, useSegmentGroup } from "./use-segment-group.ts";
+import { editReason, useSegmentGroup } from "./use-segment-group.ts";
 
 export type { FieldValue } from "./field-value.ts";
 
@@ -66,18 +63,6 @@ export interface DateFieldRootBaseProps<Value extends FieldValue>
 }
 
 const NOOP = () => {};
-
-/** The change reason of an edit (spec/date-field.md, "API"): `null` after an erase clears. */
-export function editReason(
-    edit: SegmentEditKind,
-    value: unknown,
-): ChangeReason {
-    return edit === "step"
-        ? "keyboard"
-        : edit === "erase" && value === null
-          ? "input-clear"
-          : "input-change";
-}
 
 /**
  * The state of a DateField or TimeField (spec/date-field.md): one group of segments

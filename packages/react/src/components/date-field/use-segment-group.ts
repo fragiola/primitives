@@ -14,10 +14,23 @@ import {
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
 import { useCallback, useMemo, useRef, useState } from "react";
+import type { ChangeReason } from "../../utils/change-details.ts";
 import { composeSegments, type FieldValue } from "./field-value.ts";
 
 /** What an edit did: typed a character, erased one (Backspace, Delete), or stepped a segment. */
 export type SegmentEditKind = "type" | "erase" | "step";
+
+/** The change reason of an edit (spec/date-field.md, "API"): `null` after an erase clears. */
+export function editReason(
+    edit: SegmentEditKind,
+    value: unknown,
+): ChangeReason {
+    return edit === "step"
+        ? "keyboard"
+        : edit === "erase" && value === null
+          ? "input-clear"
+          : "input-change";
+}
 
 export interface SegmentGroupOptions {
     format: SegmentFormat;
