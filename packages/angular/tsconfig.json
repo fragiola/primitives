@@ -55,6 +55,10 @@
         "toggle-group",
         "toolbar",
         "menubar",
+        "label",
+        "meter",
+        "number-field",
+        "otp-field",
         "tests",
         "*.config.ts"
     ]
