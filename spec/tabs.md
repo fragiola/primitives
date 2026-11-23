@@ -31,7 +31,7 @@ spaces still gives valid `aria-controls` / `aria-labelledby`), `disabled`.
 once its exit has ended; `true`: it is then rendered with `hidden`). Panels have enter and exit
 states ("Animation").
 
-**Indicator**: `renderBeforeHydration` ("Server rendering"). It exposes the selected tab's box, relative to the List, as structural
+**Indicator**: `renderBeforeHydration` and its script's `nonce` ("Server rendering"). It exposes the selected tab's box, relative to the List, as structural
 CSS variables: the logical `--tabs-indicator-inset-inline-start`, `--tabs-indicator-inset-block-start`,
 `--tabs-indicator-inline-size`, `--tabs-indicator-block-size`, and the physical ones (Base UI's
 names, Epic #32) `--active-tab-left`, `--active-tab-right`, `--active-tab-top`,
@@ -59,7 +59,9 @@ one selected before it, measured on the page: `left` or `right` in horizontal or
 DOM). It is **physical**, as the Indicator's travel and Base UI's: in RTL the next tab sits on the
 left, so moving to it gives `left` (a recipe slides the new panel in from the side the Indicator
 moves toward, in either direction). It is set in the same render as the new selection, so a
-panel's first frame (`data-starting-style`) already carries it.
+panel's first frame (`data-starting-style`) already carries it. It is the last selection step's:
+two keys handled in one task (a framework that renders after the task, not after each event's
+microtasks, sees both before it renders) give the direction of the second key's step (Epic #49).
 
 ## Keyboard
 
@@ -103,7 +105,9 @@ The panels have enter and exit states, through the toolkit's presence (Epic #32;
 animation of its own" before):
 
 - a panel that becomes selected renders with `data-starting-style` for its first frame, so a
-  transition starts from it; a panel shown by the first render (or a server render) has none;
+  transition starts from it; a panel shown by the first render (or a server render) has none. With
+  neither `value` nor `defaultValue`, the first enabled tab is selected after the first render, so
+  its panel enters with `data-starting-style`, in every framework (`/tabs/animated-default`);
 - a panel that stops being selected stays rendered with `data-ending-style` and `inert` until
   every animation on it has finished, then unmounts (or takes `hidden` with `keepMounted`); with
   no transition, in the render that deselects it, before a paint (as before Epic #32);
@@ -126,9 +130,13 @@ first appears in place. **`renderBeforeHydration`** (Base UI's name, default
 `false`; Angular: `*tabsIndicator="true"`): a server render writes a small inline script inside the
 Indicator that measures the selected tab (`aria-selected="true"` in its list) as the page parses,
 sets the four variables, and removes itself, so the hydration finds the Indicator as the browser
-renders it (the toolkit's `placeTabsIndicator`). Off by default: a page whose Content Security
-Policy blocks inline scripts leaves it off. Decided by the behaviour rule: the APG says nothing,
-Base UI has this option.
+renders it (the toolkit's `placeTabsIndicator`). Off by default. **`nonce`** (Epic #49; React and
+Vue a prop, Angular `*tabsIndicator="true; nonce: cspNonce"`, the input `tabsIndicatorNonce`,
+which falls back to Angular's own `CSP_NONCE` provider): the script's `nonce` attribute, so a page
+whose Content Security Policy allows inline scripts by nonce (`script-src 'nonce-…'`) runs it; a
+page that blocks inline scripts with no nonce leaves `renderBeforeHydration` off. Decided by the
+behaviour rule: the APG says nothing, Base UI has `renderBeforeHydration` and a `nonce` for its
+inline scripts.
 
 ## Scenarios
 
@@ -176,6 +184,16 @@ Tabs **"Account"** and **"Password"**, both disabled, with panels "Account setti
 Checks: no tab is selected (`aria-selected="false"`, no `data-selected`), no panel and no
 Indicator is rendered.
 
+### `/tabs/nonce`
+
+The automatic scenario's content, its Indicator with `renderBeforeHydration` and
+`nonce="fixture-nonce"` (Epic #49).
+
+Checks (the ssr layer): served with the header `Content-Security-Policy: script-src
+'nonce-fixture-nonce'` and its scripts blocked (no hydration), the server's page has the
+Indicator covering the selected tab, its script gone (it ran under the policy). Without the
+`nonce` the policy blocks the script, which then stays in the Indicator with no variables set.
+
 ### `/tabs/animated`
 
 Tabs **"Overview"**, **"Projects"**, **"Settings"**, uncontrolled with `defaultValue="overview"`,
@@ -194,6 +212,20 @@ Checks:
 3. A click on "Overview": `data-activation-direction="left"`.
 4. The Indicator's `--active-tab-left` equals `--tabs-indicator-inset-inline-start`, and
    `--active-tab-width` its `--tabs-indicator-inline-size`, in pixels.
+
+Two keys before one render (Epic #49): focus "Overview" and dispatch ArrowRight then ArrowLeft
+in one task, with only a microtask between them (a framework that renders later sees both before
+it renders): "Overview" is selected and every part has `data-activation-direction="left"`, the
+last step's direction, not the one between the first and the last selection.
+
+### `/tabs/animated-default`
+
+The animated scenario's tabs and panels with neither `value` nor `defaultValue` (Epic #49).
+Output: `value: ...`, `reason: ...`.
+
+Checks: "Overview" is selected once the tabs are known (`value: overview`, `reason: none`), and its
+panel carried `data-starting-style` on its first frame (it became selected after the first
+render: "Animation"), in every framework.
 
 ### `/tabs/animated?dir=rtl`
 

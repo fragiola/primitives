@@ -111,7 +111,9 @@ size moves from one to the other. When the menu closes, they keep the last Conte
   `trigger-hover`); while a Content is open, entering another Trigger opens that one at once, as a hover opening (the
   pointer leaving closes it; a press within 500 ms keeps it). The
   pointer leaving the Trigger and the popup (the hover bridge between them, as a Tooltip's) closes
-  it after `closeDelay`, unless it returned.
+  it after `closeDelay`, unless it returned. The pointer leaving the document (the window, or the
+  iframe the page is in) at once counts as leaving them, as a Tooltip's (Epic #49): it closed only
+  on the next move in the page.
 - **Press**: a press on a Trigger toggles its Content (reason `trigger-press`). A press within
   500 ms of a hover opening it keeps it open (Base UI's "patient click": the user aimed for it). A
   Content a press opened (or kept open) stays open when the pointer leaves.
@@ -195,6 +197,9 @@ Checks:
     px (Products', then Learn's after a switch), the Positioner's `--positioner-width` and
     `--positioner-height` the same; the parts carry their state attributes.
 12. Axe finds no violation, closed and open.
+13. The page in an iframe (a host page around it): hovering "Products" opens it; the pointer
+    moving straight out of the iframe, in one move, closes it (`value: none`, `reason:
+    trigger-hover`), while a press-opened Content stays open.
 
 ### `/navigation-menu/nested`
 

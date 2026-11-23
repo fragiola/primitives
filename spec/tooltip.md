@@ -79,6 +79,11 @@ Focus never moves into the popup. A focus by a pointer press does not open it.
   hoverable content), and closes when the pointer leaves it. While the pointer crosses the gap
   towards the popup, inside the hover bridge between the trigger and the popup
   (`@fragiola/primitives/pointer`, `trackHoverBridge`), it stays open.
+- **The pointer leaving the document** (the window, or the iframe the page is in) counts as
+  leaving the Trigger and the popup, even when it leaves at once with no move outside the bridge
+  first: a hover-opened tooltip closes after `closeDelay` (Epic #49; the toolkit's
+  `watchPointerExit`, a mouse or pen `pointerout` with no `relatedTarget`). It stayed open until
+  the pointer's next move in the page.
 - A press on the Trigger closes it (reason `trigger-press`) and it does not reopen until the
   pointer leaves and enters again.
 - **Touch**: a tap never opens a tooltip (`pointerType` `touch` is ignored), as Base UI.
@@ -144,6 +149,8 @@ Checks:
    pointer stays.
 6. A touch tap on "Save" shows no tooltip (checked after the delay has passed).
 7. Axe finds no violation while open.
+8. The page in an iframe (a host page around it): hovering "Save" opens it; the pointer moving
+   straight out of the iframe, in one move, closes it (`reason: trigger-hover`).
 
 ### `/tooltip/group`
 

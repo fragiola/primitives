@@ -204,6 +204,12 @@ native control would. A hidden input is never in the accessibility tree nor in t
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
 `hidden-input`, since its `input` is the visible Input).
 
+When the browser validates a native form and a control's hidden input is the form's first
+invalid control, focus goes to the primitive (its trigger or button) and the browser neither
+shows its bubble on the hidden input nor moves the focus on to a later invalid native control:
+the toolkit's form bridge cancels the later controls' `invalid` events of that validation (Epic
+#49). The submission stays blocked, and the later controls are reached by the next submission.
+
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
 DatePicker or a DateRangePicker gives the control:
