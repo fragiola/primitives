@@ -6,6 +6,7 @@
 
 export * from "@fragiola/primitives-angular/accordion";
 export * from "@fragiola/primitives-angular/alert-dialog";
+export * from "@fragiola/primitives-angular/aspect-ratio";
 export * from "@fragiola/primitives-angular/async-list";
 export * from "@fragiola/primitives-angular/autocomplete";
 export * from "@fragiola/primitives-angular/autocomplete-virtual";
@@ -36,12 +37,14 @@ export * from "@fragiola/primitives-angular/meter";
 export * from "@fragiola/primitives-angular/navigation-menu";
 export * from "@fragiola/primitives-angular/number-field";
 export * from "@fragiola/primitives-angular/otp-field";
+export * from "@fragiola/primitives-angular/pagination";
 export * from "@fragiola/primitives-angular/popover";
 export * from "@fragiola/primitives-angular/progress";
 export * from "@fragiola/primitives-angular/radio";
 export * from "@fragiola/primitives-angular/radio-group";
 export * from "@fragiola/primitives-angular/range-calendar";
 export * from "@fragiola/primitives-angular/render";
+export * from "@fragiola/primitives-angular/scroll-area";
 export * from "@fragiola/primitives-angular/select";
 export * from "@fragiola/primitives-angular/select-virtual";
 export * from "@fragiola/primitives-angular/separator";

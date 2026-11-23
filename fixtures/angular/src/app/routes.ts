@@ -160,4 +160,9 @@ export const ROUTES: readonly string[] = [
     "/hover-card/detached",
     "/hover-card/in-dialog",
     "/hover-card/lifecycle",
+    "/scroll-area/basic",
+    "/scroll-area/links",
+    "/pagination/basic",
+    "/pagination/links",
+    "/aspect-ratio/basic",
 ];

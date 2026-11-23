@@ -63,6 +63,11 @@
             "types": "./dist/types/fragiola-primitives-angular-alert-dialog.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-alert-dialog.mjs"
         },
+        "./aspect-ratio": {
+            "@fragiola/source": "./aspect-ratio/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-aspect-ratio.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-aspect-ratio.mjs"
+        },
         "./autocomplete": {
             "@fragiola/source": "./autocomplete/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-autocomplete.d.ts",
@@ -203,6 +208,11 @@
             "types": "./dist/types/fragiola-primitives-angular-otp-field.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-otp-field.mjs"
         },
+        "./pagination": {
+            "@fragiola/source": "./pagination/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-pagination.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-pagination.mjs"
+        },
         "./popover": {
             "@fragiola/source": "./popover/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-popover.d.ts",
@@ -227,6 +237,11 @@
             "@fragiola/source": "./range-calendar/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-range-calendar.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-range-calendar.mjs"
+        },
+        "./scroll-area": {
+            "@fragiola/source": "./scroll-area/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-scroll-area.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-scroll-area.mjs"
         },
         "./select": {
             "@fragiola/source": "./select/public-api.ts",

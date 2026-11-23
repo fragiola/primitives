@@ -17,11 +17,13 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/overlay` | `openOverlaySession(document, options)`: a layer, the focus-out watch and the focus return of an overlay |
 | `@fragiola/primitives/layers` | `pushLayer(document, options)` (Escape and outside press on the topmost overlay), `watchFocusOutside` |
 | `@fragiola/primitives/focus` | `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `trapFocus`, `focusInitial`, `isKeyboardModality` |
+| `@fragiola/primitives/scroll-area` | a scroll area's DOM side: `createScrollArea` (measures the viewport and its content on scroll and resize, writes the thumbs' sizes and transforms and the overflow variables, runs the thumb drag, the track press and the scrollbar's wheel, reports the overflow edges, scrolling and hover), its geometry (`thumbGeometry`, `scrollFromStart`, `scrollForThumbOffset`) |
 | `@fragiola/primitives/scroll-lock` | `lockScroll(document)` → unlock (counted) |
 | `@fragiola/primitives/inert` | `inertOutside(elements)` → restore |
 | `@fragiola/primitives/positioning` | `anchorFloating(anchor, floating, options)` → cleanup (Floating UI), `toPlacement`, `fromPlacement`, `Side`, `Align` |
 | `@fragiola/primitives/collection` | `stepIndex`, `edgeIndex`, `stepThroughNone`, `tabsKeyTarget`, `menuKeyTarget`, `submenuKeys`, the roving focus (`rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`), `createTypeahead`, the combobox's item helpers, `chipKeyTarget` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
+| `@fragiola/primitives/pagination` | a pagination's range: `paginationRange` (the pages and ellipses around the current page, the boundaries kept), `pageCount`, `clampPage`; pure math |
 | `@fragiola/primitives/pointer` | `startDrag`, `isInSafeArea`, `isInHoverBridge`, `trackHoverBridge` |
 | `@fragiola/primitives/swipe` | `watchSwipe(element, options)` → cleanup (pointer and touch swipes, scroll containment), `swipeRelease`, `swipeMovement`, `swipeProgress`, `resolveSnapPoints` |
 | `@fragiola/primitives/toast` | the toast queue: `createToastManager` (add, update, close, promise toasts, a limit and its queue, priorities, timeouts and pauses; a plain module can import it), `watchToastViewport` (the F6 landmark, the pauses, the live regions), `measureToastHeight` |

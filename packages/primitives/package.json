@@ -114,6 +114,12 @@
             "import": "./dist/overlay.js",
             "default": "./dist/overlay.js"
         },
+        "./pagination": {
+            "@fragiola/source": "./src/pagination/index.ts",
+            "types": "./dist/pagination.d.ts",
+            "import": "./dist/pagination.js",
+            "default": "./dist/pagination.js"
+        },
         "./pointer": {
             "@fragiola/source": "./src/pointer/index.ts",
             "types": "./dist/pointer.d.ts",
@@ -137,6 +143,12 @@
             "types": "./dist/range.d.ts",
             "import": "./dist/range.js",
             "default": "./dist/range.js"
+        },
+        "./scroll-area": {
+            "@fragiola/source": "./src/scroll-area/index.ts",
+            "types": "./dist/scroll-area.d.ts",
+            "import": "./dist/scroll-area.js",
+            "default": "./dist/scroll-area.js"
         },
         "./scroll-lock": {
             "@fragiola/source": "./src/scroll-lock/index.ts",
@@ -248,6 +260,11 @@
                 "import": "./dist/overlay.js",
                 "default": "./dist/overlay.js"
             },
+            "./pagination": {
+                "types": "./dist/pagination.d.ts",
+                "import": "./dist/pagination.js",
+                "default": "./dist/pagination.js"
+            },
             "./pointer": {
                 "types": "./dist/pointer.d.ts",
                 "import": "./dist/pointer.js",
@@ -267,6 +284,11 @@
                 "types": "./dist/range.d.ts",
                 "import": "./dist/range.js",
                 "default": "./dist/range.js"
+            },
+            "./scroll-area": {
+                "types": "./dist/scroll-area.d.ts",
+                "import": "./dist/scroll-area.js",
+                "default": "./dist/scroll-area.js"
             },
             "./scroll-lock": {
                 "types": "./dist/scroll-lock.d.ts",

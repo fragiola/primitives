@@ -63,6 +63,12 @@
             "import": "./dist/alert-dialog.js",
             "default": "./dist/alert-dialog.js"
         },
+        "./aspect-ratio": {
+            "@fragiola/source": "./src/components/aspect-ratio/index.ts",
+            "types": "./dist/aspect-ratio.d.ts",
+            "import": "./dist/aspect-ratio.js",
+            "default": "./dist/aspect-ratio.js"
+        },
         "./autocomplete": {
             "@fragiola/source": "./src/components/autocomplete/index.ts",
             "types": "./dist/autocomplete.d.ts",
@@ -231,6 +237,12 @@
             "import": "./dist/otp-field.js",
             "default": "./dist/otp-field.js"
         },
+        "./pagination": {
+            "@fragiola/source": "./src/components/pagination/index.ts",
+            "types": "./dist/pagination.d.ts",
+            "import": "./dist/pagination.js",
+            "default": "./dist/pagination.js"
+        },
         "./popover": {
             "@fragiola/source": "./src/components/popover/index.ts",
             "types": "./dist/popover.d.ts",
@@ -260,6 +272,12 @@
             "types": "./dist/range-calendar.d.ts",
             "import": "./dist/range-calendar.js",
             "default": "./dist/range-calendar.js"
+        },
+        "./scroll-area": {
+            "@fragiola/source": "./src/components/scroll-area/index.ts",
+            "types": "./dist/scroll-area.d.ts",
+            "import": "./dist/scroll-area.js",
+            "default": "./dist/scroll-area.js"
         },
         "./select": {
             "@fragiola/source": "./src/components/select/index.ts",
@@ -369,6 +387,11 @@
                 "types": "./dist/alert-dialog.d.ts",
                 "import": "./dist/alert-dialog.js",
                 "default": "./dist/alert-dialog.js"
+            },
+            "./aspect-ratio": {
+                "types": "./dist/aspect-ratio.d.ts",
+                "import": "./dist/aspect-ratio.js",
+                "default": "./dist/aspect-ratio.js"
             },
             "./autocomplete": {
                 "types": "./dist/autocomplete.d.ts",
@@ -510,6 +533,11 @@
                 "import": "./dist/otp-field.js",
                 "default": "./dist/otp-field.js"
             },
+            "./pagination": {
+                "types": "./dist/pagination.d.ts",
+                "import": "./dist/pagination.js",
+                "default": "./dist/pagination.js"
+            },
             "./popover": {
                 "types": "./dist/popover.d.ts",
                 "import": "./dist/popover.js",
@@ -534,6 +562,11 @@
                 "types": "./dist/range-calendar.d.ts",
                 "import": "./dist/range-calendar.js",
                 "default": "./dist/range-calendar.js"
+            },
+            "./scroll-area": {
+                "types": "./dist/scroll-area.d.ts",
+                "import": "./dist/scroll-area.js",
+                "default": "./dist/scroll-area.js"
             },
             "./select": {
                 "types": "./dist/select.d.ts",

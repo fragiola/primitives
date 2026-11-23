@@ -5,6 +5,7 @@ import { AccordionMultiple } from "../scenarios/accordion/accordion-multiple.tsx
 import { AlertDialogBasic } from "../scenarios/alert-dialog/alert-dialog-basic.tsx";
 import { AlertDialogDetached } from "../scenarios/alert-dialog/alert-dialog-detached.tsx";
 import { AlertDialogLifecycle } from "../scenarios/alert-dialog/alert-dialog-lifecycle.tsx";
+import { AspectRatioBasic } from "../scenarios/aspect-ratio/aspect-ratio-basic.tsx";
 import { AutocompleteAsync } from "../scenarios/autocomplete/autocomplete-async.tsx";
 import { AutocompleteBasic } from "../scenarios/autocomplete/autocomplete-basic.tsx";
 import { AutocompleteBoth } from "../scenarios/autocomplete/autocomplete-both.tsx";
@@ -99,6 +100,8 @@ import { NumberFieldFormat } from "../scenarios/number-field/number-field-format
 import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.tsx";
 import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.tsx";
 import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.tsx";
+import { PaginationBasic } from "../scenarios/pagination/pagination-basic.tsx";
+import { PaginationLinks } from "../scenarios/pagination/pagination-links.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
@@ -110,6 +113,8 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.tsx";
 import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
+import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.tsx";
+import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
 import { SelectGroups } from "../scenarios/select/select-groups.tsx";
@@ -320,4 +325,9 @@ export const routes: Record<
     "/hover-card/detached": HoverCardDetached,
     "/hover-card/in-dialog": HoverCardInDialog,
     "/hover-card/lifecycle": HoverCardLifecycle,
+    "/scroll-area/basic": ScrollAreaBasic,
+    "/scroll-area/links": ScrollAreaLinks,
+    "/pagination/basic": PaginationBasic,
+    "/pagination/links": PaginationLinks,
+    "/aspect-ratio/basic": AspectRatioBasic,
 };

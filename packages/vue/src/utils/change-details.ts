@@ -24,6 +24,10 @@ export type ChangeReason =
     | "track-press"
     | "drag"
     | "swipe"
+    | "previous-press"
+    | "next-press"
+    | "first-press"
+    | "last-press"
     | "imperative-action"
     | "none";
 

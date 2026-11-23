@@ -1,0 +1,181 @@
+---
+title: ScrollArea
+description: A natively scrolling area with custom scrollbars that drag, take a track press and report its overflow edges, as Base UI's ScrollArea, in each framework.
+---
+
+A scrolling container whose content scrolls natively (keyboard, wheel, touch, find-in-page) and
+whose scrollbars are parts you style: the thumb drags, the track takes a press, and every part
+reports how far the content overflows each edge. The APG has no scroll area pattern: it follows
+Base UI's [ScrollArea](https://base-ui.com/react/components/scroll-area) (the behaviour rule).
+
+<Example id="scroll-area" />
+
+## Behaviour
+
+- **Native scrolling**: the Viewport is the element that scrolls; its native scrollbars are
+  hidden (`scrollbar-width: none`), and the keyboard, the wheel and touch scroll it as the
+  browser does.
+- **Scrollbars**: one per axis, rendered only while that axis overflows (unless `keepMounted`).
+  The thumb's size is the visible fraction of the track (at least 16 px), its position the
+  scroll's fraction of its range. A thumb drag scrolls by its share of the track; a press on the
+  track brings the thumb's center under the pointer, then drags; the wheel over a scrollbar
+  scrolls its axis. A press on a scrollbar moves no focus.
+- **Edges**: `data-overflow-x-start`, `-x-end`, `-y-start`, `-y-end` and the matching
+  `--scroll-area-overflow-*` distances (logical: the x start is the right edge in RTL), for a fade
+  or a shadow at an edge; `overflowEdgeThreshold` sets how far from an edge counts.
+- **Scrolling and hover**: `data-scrolling` while the user scrolls (500 ms after the last scroll;
+  a programmatic scroll sets none), `data-hovering` on the scrollbars while a mouse is over the
+  area.
+- **Focus**: the Viewport takes a tab stop only while it overflows and holds nothing focusable,
+  so a keyboard user can scroll it; a list of links needs none.
+- **Measurement**: on mount, on scroll, and when the viewport or the content resizes
+  (`ResizeObserver`). A server render has no scrollbar and no overflow attribute; the first
+  measurement after hydration adds them.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `scroll-area-root` | the box the scrollbars are placed in (`role="presentation"`) |
+| Viewport | `div` | `scroll-area-viewport` | the element that scrolls |
+| Content | `div` | `scroll-area-content` | the scrolled content, measured (`role="presentation"`) |
+| Scrollbar | `div` | `scroll-area-scrollbar` | the track of one axis (`aria-hidden`) |
+| Thumb | `div` | `scroll-area-thumb` | inside a Scrollbar |
+| Corner | `div` | `scroll-area-corner` | where both scrollbars meet (`aria-hidden`) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ScrollArea } from "@fragiola/primitives-react/scroll-area";
+
+<ScrollArea.Root className="h-64 w-56">
+    <ScrollArea.Viewport role="region" aria-label="Channels">
+        <ScrollArea.Content>{/* the long list */}</ScrollArea.Content>
+    </ScrollArea.Viewport>
+    <ScrollArea.Scrollbar orientation="vertical">
+        <ScrollArea.Thumb />
+    </ScrollArea.Scrollbar>
+    <ScrollArea.Scrollbar orientation="horizontal">
+        <ScrollArea.Thumb />
+    </ScrollArea.Scrollbar>
+    <ScrollArea.Corner />
+</ScrollArea.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ScrollArea.Root class="h-64 w-56">
+        <ScrollArea.Viewport role="region" aria-label="Channels">
+            <ScrollArea.Content><!-- the long list --></ScrollArea.Content>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar orientation="vertical"><ScrollArea.Thumb /></ScrollArea.Scrollbar>
+        <ScrollArea.Scrollbar orientation="horizontal"><ScrollArea.Thumb /></ScrollArea.Scrollbar>
+        <ScrollArea.Corner />
+    </ScrollArea.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [
+        ScrollAreaRoot,
+        ScrollAreaViewport,
+        ScrollAreaContent,
+        ScrollAreaScrollbar,
+        ScrollAreaThumb,
+        ScrollAreaCorner,
+    ],
+    template: `
+        <div scrollAreaRoot class="h-64 w-56">
+            <div scrollAreaViewport role="region" aria-label="Channels">
+                <div scrollAreaContent><!-- the long list --></div>
+            </div>
+            <div *scrollAreaScrollbar="'vertical'"><div scrollAreaThumb></div></div>
+            <div *scrollAreaScrollbar="'horizontal'"><div scrollAreaThumb></div></div>
+            <div *scrollAreaCorner></div>
+        </div>
+    `,
+})
+export class Channels {}
+```
+
+The Scrollbar and the Corner are structural: they render only while their axis (both axes)
+overflow. `*scrollAreaScrollbar="{ orientation: 'horizontal', keepMounted: true }"` keeps one.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`:overflow-edge-threshold`, `keep-mounted`), and Angular as
+inputs.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `overflowEdgeThreshold` | `number \| { xStart?, xEnd?, yStart?, yEnd? }` | `0` | how far, in pixels, the content must be scrolled from an edge before its `data-overflow-*` attribute is set |
+
+### Viewport
+
+No props of its own. Name it when its content needs a name (`role="region"` and `aria-label`).
+
+### Content
+
+No props of its own.
+
+### Scrollbar
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `orientation` (react, vue) | `"vertical" \| "horizontal"` | `"vertical"` | its axis |
+| `keepMounted` (react, vue) | `boolean` | `false` | rendered even when its axis does not overflow |
+| `scrollAreaScrollbar` (angular) | `"vertical" \| "horizontal" \| { orientation?, keepMounted? }` | `"vertical"` | the structural directive's value: the axis, or both options |
+
+### Thumb
+
+No props of its own.
+
+### Corner
+
+No props of its own.
+
+## State and part attributes
+
+The overflow attributes are on the Root, the Viewport, the Content and each Scrollbar:
+`data-has-overflow-x`, `data-has-overflow-y`, `data-overflow-x-start`, `data-overflow-x-end`,
+`data-overflow-y-start`, `data-overflow-y-end`, and `data-scrolling` (a Scrollbar's and a Thumb's:
+their own axis).
+
+| part | attributes |
+| --- | --- |
+| Root | `role="presentation"`; `--scroll-area-corner-width`, `--scroll-area-corner-height`; structural `position: relative` |
+| Viewport | `tabindex="0"` while it overflows with nothing focusable in it; `--scroll-area-overflow-x-start`, `-x-end`, `-y-start`, `-y-end` (pixels to each edge); structural `overflow: scroll`, `scrollbar-width: none` |
+| Content | `role="presentation"`; structural `min-width: fit-content` |
+| Scrollbar | `aria-hidden="true"`, `data-orientation`, `data-hovering`; `--scroll-area-thumb-height` (vertical) or `--scroll-area-thumb-width` (horizontal); structural `position: absolute` at the inline end or the bottom, `touch-action: none`, `user-select: none` |
+| Thumb | `data-orientation`, `data-scrolling`; structural `height: var(--scroll-area-thumb-height)` or `width: var(--scroll-area-thumb-width)`, and the `transform` that places it |
+| Corner | `aria-hidden="true"`; structural `position: absolute`, `width` and `height` from the Root's corner variables |
+
+## Keyboard
+
+The browser's, on the Viewport: the arrows, Page Up, Page Down, Space, Home and End scroll it
+while it, or an element in it, has the focus. The scrollbars take no key and no focus.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/scroll-area` | `ScrollArea`, `RenderProp`, `ScrollAreaContentProps`, `ScrollAreaCornerProps`, `ScrollAreaCornerState`, `ScrollAreaOrientation`, `ScrollAreaRootProps`, `ScrollAreaScrollbarProps`, `ScrollAreaScrollbarState`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `ScrollAreaThumbProps`, `ScrollAreaThumbState`, `ScrollAreaViewportProps` |
+| `@fragiola/primitives-vue/scroll-area` | `ScrollArea`, `RenderSlotProps`, `ScrollAreaCornerState`, `ScrollAreaOrientation`, `ScrollAreaRootProps`, `ScrollAreaScrollbarProps`, `ScrollAreaScrollbarState`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `ScrollAreaThumbState` |
+| `@fragiola/primitives-angular/scroll-area` | `ScrollAreaContent`, `ScrollAreaCorner`, `ScrollAreaOrientation`, `ScrollAreaRoot`, `ScrollAreaScrollbar`, `ScrollAreaScrollbarOptions`, `ScrollAreaScrollbarState`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `ScrollAreaThumb`, `ScrollAreaThumbState`, `ScrollAreaViewport` |

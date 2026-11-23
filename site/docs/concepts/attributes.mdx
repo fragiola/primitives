@@ -59,12 +59,17 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-swiping`, `data-swipe-direction` | a toast while a swipe moves it, and the direction it moves in (a value); a drawer's popup |
 | `data-type` | a toast's type, on its parts (a value: `loading`, `success`, `error`, or the app's own) |
 | `data-priority` | a toast viewport's live region: `low` (polite) or `high` (assertive) |
+| `data-has-overflow-x`, `data-has-overflow-y` | a scroll area whose content is wider (taller) than its viewport, on its root, viewport, content and scrollbars |
+| `data-overflow-x-start`, `data-overflow-x-end`, `data-overflow-y-start`, `data-overflow-y-end` | a scroll area scrolled away from that edge (the x edges logical: the start is the right edge in RTL) |
+| `data-scrolling` | a scroll area's parts while the user scrolls it (a scrollbar and its thumb: their own axis) |
+| `data-hovering` | a scroll area's scrollbars while a mouse or pen is over its root |
+| `data-current` | a pagination item of the current page (with `aria-current="page"`) |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport (a dialog or alert dialog inside another's popup) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
-| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar |
+| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one, on every tabs part (a physical value: `left`, `right`, `up`, `down`, `none`) |
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |
@@ -74,6 +79,11 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 One CSS variable carries the depth of nested dialogs: a dialog's popup has the inline style
 `--nested-dialogs: <n>`, the number of open dialogs nested below it as a chain (`0` when none), to
 scale or offset the parent (`scale: calc(1 - 0.05 * var(--nested-dialogs))`).
+
+A scroll area writes what it measures: its viewport's `--scroll-area-overflow-x-start`, `-x-end`,
+`-y-start` and `-y-end` (the distance to each edge, for a fade), its scrollbars'
+`--scroll-area-thumb-height` / `--scroll-area-thumb-width`, and its root's
+`--scroll-area-corner-width` / `--scroll-area-corner-height`.
 
 A toast carries its place in the stack: `--toast-index`, `--toast-offset-y`, `--toast-height` and
 the swipe's `--toast-swipe-movement-x` / `-y`, with the viewport's `--toast-frontmost-height`.
