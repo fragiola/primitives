@@ -66,7 +66,7 @@ const RECIPE_OF: Record<string, string> = {
 };
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
-const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar", "meter"]);
+const WITHOUT_SHARED: ReadonlySet<string> = new Set(["aspect-ratio", "avatar", "meter"]);
 
 describe("the manifest", () => {
     for (const framework of FRAMEWORKS) {
@@ -89,6 +89,7 @@ describe("the manifest", () => {
                 "toast-promise",
                 "tabs",
                 "navigation-menu",
+                "pagination",
                 "collapsible",
                 "accordion",
                 "field",
@@ -116,6 +117,8 @@ describe("the manifest", () => {
                 "meter",
                 "avatar",
                 "separator",
+                "scroll-area",
+                "aspect-ratio",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];
