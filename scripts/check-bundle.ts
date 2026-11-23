@@ -72,8 +72,11 @@ export const GUARD = {
  * controls (Epic #91); they share nothing with Combobox's chips but the toolkit. SegmentedControl
  * and Rating are Field controls (Epic #91); they share nothing with RadioGroup but the toolkit.
  * PasswordInput, SearchField and Editable are Field controls (Epic #94); Clipboard is built on
- * nothing (it holds no form value), and none of them imports Button's or Toast's entry. Any other
- * component's code in an entry is a leak; a utility entry (UTILITIES) has none.
+ * nothing (it holds no form value), and none of them imports Button's or Toast's entry. Link,
+ * Breadcrumbs, Steps and Carousel are built on nothing (Epic #97): Breadcrumbs' Link shares Link's
+ * behaviour through each framework's own code, its Ellipsis never imports Menu, and Carousel's
+ * tabbed Indicators never import Tabs. Any other component's code in an entry is a leak; a
+ * utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
