@@ -34,6 +34,9 @@ export const COMPONENTS = [
     "slider",
     "switch",
     "tabs",
+    "toggle",
+    "toggle-group",
+    "toolbar",
     "tooltip",
 ] as const;
 

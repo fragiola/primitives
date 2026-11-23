@@ -225,6 +225,24 @@
             "import": "./dist/tabs.js",
             "default": "./dist/tabs.js"
         },
+        "./toggle": {
+            "@fragiola/source": "./src/components/toggle/index.ts",
+            "types": "./dist/toggle.d.ts",
+            "import": "./dist/toggle.js",
+            "default": "./dist/toggle.js"
+        },
+        "./toggle-group": {
+            "@fragiola/source": "./src/components/toggle-group/index.ts",
+            "types": "./dist/toggle-group.d.ts",
+            "import": "./dist/toggle-group.js",
+            "default": "./dist/toggle-group.js"
+        },
+        "./toolbar": {
+            "@fragiola/source": "./src/components/toolbar/index.ts",
+            "types": "./dist/toolbar.d.ts",
+            "import": "./dist/toolbar.js",
+            "default": "./dist/toolbar.js"
+        },
         "./tooltip": {
             "@fragiola/source": "./src/components/tooltip/index.ts",
             "types": "./dist/tooltip.d.ts",
@@ -402,6 +420,21 @@
                 "types": "./dist/tabs.d.ts",
                 "import": "./dist/tabs.js",
                 "default": "./dist/tabs.js"
+            },
+            "./toggle": {
+                "types": "./dist/toggle.d.ts",
+                "import": "./dist/toggle.js",
+                "default": "./dist/toggle.js"
+            },
+            "./toggle-group": {
+                "types": "./dist/toggle-group.d.ts",
+                "import": "./dist/toggle-group.js",
+                "default": "./dist/toggle-group.js"
+            },
+            "./toolbar": {
+                "types": "./dist/toolbar.d.ts",
+                "import": "./dist/toolbar.js",
+                "default": "./dist/toolbar.js"
             },
             "./tooltip": {
                 "types": "./dist/tooltip.d.ts",

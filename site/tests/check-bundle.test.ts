@@ -220,6 +220,11 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["context-menu"]).toEqual(["menu"]);
         expect(ENTRY_DEPENDENCIES.dialog).toBeUndefined();
         expect(ENTRY_DEPENDENCIES.menu).toBeUndefined();
+        // Epic #49: a ToggleGroup on its Toggles' entry (the group's context is the Toggle's);
+        // a Toggle on nothing, and a Toolbar on neither (spec/toolbar.md, "Nested composites")
+        expect(ENTRY_DEPENDENCIES["toggle-group"]).toEqual(["toggle"]);
+        expect(ENTRY_DEPENDENCIES.toggle).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES.toolbar).toBeUndefined();
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [
@@ -256,6 +261,34 @@ describe("the bundle guard, entry by entry", () => {
             ),
         ).toEqual([
             '/select: the component "checkbox": packages/react/src/components/checkbox/checkbox-root.tsx',
+        ]);
+        // a Toolbar that held ToggleGroup's code, or a Toggle the group's, leaks
+        expect(
+            entryLeaks(
+                "react",
+                "toolbar",
+                [
+                    "packages/react/src/components/toolbar/toolbar-root.tsx",
+                    "packages/react/src/hooks/use-roving-composite.ts",
+                    "packages/react/src/components/toggle-group/toggle-group.tsx",
+                ],
+                [],
+            ),
+        ).toEqual([
+            '/toolbar: the component "toggle-group": packages/react/src/components/toggle-group/toggle-group.tsx',
+        ]);
+        expect(
+            entryLeaks(
+                "vue",
+                "toggle",
+                [
+                    "packages/vue/src/components/toggle/toggle.ts",
+                    "packages/vue/src/components/toggle-group/toggle-group.ts",
+                ],
+                [],
+            ),
+        ).toEqual([
+            '/toggle: the component "toggle-group": packages/vue/src/components/toggle-group/toggle-group.ts',
         ]);
     });
 

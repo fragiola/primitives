@@ -59,8 +59,11 @@ export const GUARD = {
  * a Radio on its RadioGroup's (Epic #29), the pickers on the calendars. Collapsible and Accordion
  * share their panel mechanics through each framework's hooks and the toolkit, not each other's
  * code (Epic #32). AlertDialog is built on Dialog's parts and ContextMenu on Menu's (Epic #35),
- * and Drawer on Dialog's (Epic #38), never the other way. Any other component's code
- * in an entry is a leak; a utility entry (UTILITIES) has none.
+ * and Drawer on Dialog's (Epic #38), never the other way. A ToggleGroup is built on its Toggles'
+ * entry, which holds the group's context (Epic #49), never the other way; a Toolbar on neither:
+ * the nested composites meet through each framework's own roving-focus code (spec/toolbar.md,
+ * "Nested composites"). Any other component's code in an entry is a leak; a utility entry
+ * (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
     Partial<Record<ComponentName, readonly ComponentName[]>>
@@ -81,6 +84,7 @@ export const ENTRY_DEPENDENCIES: Readonly<
     select: ["field"],
     slider: ["field"],
     switch: ["field"],
+    "toggle-group": ["toggle"],
 };
 
 /**
