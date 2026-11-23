@@ -22,6 +22,7 @@ import {
     ENTRY_FILES,
     FRAMEWORKS,
     PRIMITIVES_PACKAGES,
+    ROUTER_PACKAGES,
     TOOLKIT_PACKAGE,
 } from "../src/framework.ts";
 
@@ -81,6 +82,7 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
 
 /** The examples that show a component under another id (a second Menu example). */
 const RECIPE_OF: Record<string, string> = {
+    "carousel-tabbed": "carousel",
     "menu-view-options": "menu",
     "drawer-side-panel": "drawer",
     "toast-promise": "toast",
@@ -114,6 +116,9 @@ const WITHOUT_SHARED: ReadonlySet<string> = new Set([
     "tag-group",
 ]);
 
+/** The examples that render their links through the framework's router, so they install it too. */
+const ROUTER_EXAMPLES: ReadonlySet<string> = new Set(["link", "breadcrumbs"]);
+
 /** The examples that import a toolkit entry themselves, so they install the toolkit too. */
 const TOOLKIT_EXAMPLES: ReadonlySet<string> = new Set([
     "calendar-system",
@@ -142,6 +147,9 @@ describe("the manifest", () => {
                 "tabs",
                 "navigation-menu",
                 "pagination",
+                "link",
+                "breadcrumbs",
+                "steps",
                 "collapsible",
                 "accordion",
                 "field",
@@ -189,6 +197,8 @@ describe("the manifest", () => {
                 "scroll-area",
                 "aspect-ratio",
                 "clipboard",
+                "carousel",
+                "carousel-tabbed",
             ]);
             for (const example of manifest.examples) {
                 const entry = ENTRY_FILES[framework];
@@ -210,6 +220,10 @@ describe("the manifest", () => {
                     // a calendar system or a time zone it injects: the toolkit too
                     ...(TOOLKIT_EXAMPLES.has(example.id)
                         ? [TOOLKIT_PACKAGE]
+                        : []),
+                    // its links rendered through the router: the router too
+                    ...(ROUTER_EXAMPLES.has(example.id)
+                        ? [ROUTER_PACKAGES[framework]]
                         : []),
                 ]);
                 expect(example.registry).toEqual([]);

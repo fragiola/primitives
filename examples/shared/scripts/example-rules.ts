@@ -24,11 +24,23 @@ import {
 // into a component (`calendar={persian}`), which then installs the toolkit (manifest.ts).
 const TOOLKIT_ENTRY = /^@fragiola\/primitives\/[a-z-]+$/;
 
+// The framework's router too: Link and Breadcrumbs render their links through it (Epic #97); the
+// manifest then installs it (manifest.ts), and the primitives packages still depend on no router.
 export const ALLOWED_IMPORTS: Record<Framework, readonly RegExp[]> = {
-    react: [/^react$/, /^@fragiola\/primitives-react\/[a-z-]+$/, TOOLKIT_ENTRY],
-    vue: [/^vue$/, /^@fragiola\/primitives-vue\/[a-z-]+$/, TOOLKIT_ENTRY],
+    react: [
+        /^react$/,
+        /^react-router$/,
+        /^@fragiola\/primitives-react\/[a-z-]+$/,
+        TOOLKIT_ENTRY,
+    ],
+    vue: [
+        /^vue$/,
+        /^vue-router$/,
+        /^@fragiola\/primitives-vue\/[a-z-]+$/,
+        TOOLKIT_ENTRY,
+    ],
     angular: [
-        /^@angular\/(core|common)$/,
+        /^@angular\/(core|common|router)$/,
         /^@fragiola\/primitives-angular\/[a-z-]+$/,
         TOOLKIT_ENTRY,
     ],

@@ -58,6 +58,12 @@ describe("the example rules", () => {
             true,
         );
         expect(allowed("angular", "@fragiola/primitives/time-zone")).toBe(true);
+        // the framework's own router, which Link and Breadcrumbs render their links through
+        expect(allowed("react", "react-router")).toBe(true);
+        expect(allowed("vue", "vue-router")).toBe(true);
+        expect(allowed("angular", "@angular/router")).toBe(true);
+        expect(allowed("react", "vue-router")).toBe(false);
+        expect(allowed("react", "react-router-dom")).toBe(false);
         expect(allowed("react", "@fragiola/primitives")).toBe(false);
     });
 });
