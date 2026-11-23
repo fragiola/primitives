@@ -409,7 +409,9 @@ Root that finds the contract:
 - **The opening focus**: an opening the bar asks for may **keep the focus where it is** (the
   pending highlight `keep`, beside `first`, `last` and none): the popup and its items take no
   focus, and the bar's item keeps it (APG: a move between menus keeps the focus on the bar).
-- `closeAll` accepts the reason `list-navigation` (the bar closing a menu as it moves on).
+- **Closing** as the bar moves on: the bar closes the root level only (reason `list-navigation`,
+  which returns no focus there); its open submenus close with it through the overlay tree (reason
+  `none`, which takes no focus from the bar's item).
 
 Outside a bar nothing changes: a Trigger alone, or in a [Toolbar](toolbar.md), has none of the
 above (it joins no roving scope).
