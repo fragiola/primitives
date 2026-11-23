@@ -54,8 +54,10 @@ step of a drag).
 
 **Thumb**: `index` (its value's index; default: its order among the thumbs), `getAriaValueText(value,
 index)` (a string for `aria-valuetext`; it wins over `format`), `disabled`. Its accessible name
-comes from the consumer (`aria-label` or `aria-labelledby`), or the Label. Its `id` is generated
-unless the consumer gives one (the Value's `for` lists them).
+comes from the consumer (`aria-label` or `aria-labelledby`), or the Label. A name the consumer
+binds, or changes later, wins too (Epic #49; Angular: an `[attr.aria-label]` binding, not only a
+static attribute): the Thumb is labelled by the Label only while it has no name of its own. Its
+`id` is generated unless the consumer gives one (the Value's `for` lists them).
 
 **Control**, **Track**, **Indicator**: no props.
 
@@ -185,6 +187,18 @@ Checks:
    "20 € – 80 €".
 5. The Value is an `output` whose `for` lists both thumbs' `id`s, in order; `aria-live="off"`.
 6. Axe finds no violation.
+
+### `/slider/thumb-name`
+
+A Slider with a Label **"Volume"**, `defaultValue` `50`, and one Thumb whose `aria-label` the
+fixture binds from its state (Angular: `[attr.aria-label]`), starting at **"Master volume"**; then
+a button **"Rename"** that sets it to **"Main volume"** (Epic #49).
+
+Checks:
+
+1. A `group` named "Volume" holding a `slider` named "Master volume" (the consumer's name wins
+   over the Label's), with no `aria-labelledby`.
+2. "Rename": the slider is named "Main volume", still with no `aria-labelledby`.
 
 ### `/slider/controlled`
 

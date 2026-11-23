@@ -13,7 +13,7 @@ ends as the browser alone renders it, with the server's ids kept.
 
 - **The reader's language.** A calendar with no `locale` renders `en-US` on the server and in the
   browser's hydration of it, then takes the document's `lang`, else the browser's language, once
-  it is mounted. Angular reads its document's `lang` on the server too.
+  it is mounted, and follows a later change of `lang`. Angular reads its document's `lang` on the server too.
   Pass `locale` to render the reader's language on the server. A Slider's `format` uses the
   runtime's default locale without `locale`: a server's may differ from the browser's, so pass
   `locale` with `format`.
@@ -38,7 +38,10 @@ ends as the browser alone renders it, with the server's ids kept.
   `renderBeforeHydration` (Base UI's name; Angular: `*tabsIndicator="true"`), the server writes a
   small inline script inside the Indicator. It measures the selected tab as the page parses, sets
   the Indicator's variables, and removes itself, so the hydration finds the Indicator as the
-  browser renders it. A page whose Content Security Policy blocks inline scripts leaves it off.
+  browser renders it. Under a Content Security Policy, give the script its `nonce` (`nonce`;
+  Angular: `*tabsIndicator="true; nonce: cspNonce"`, or Angular's own `CSP_NONCE` provider), the
+  one your policy allows (`script-src 'nonce-…'`); a page that blocks inline scripts with no
+  nonce leaves `renderBeforeHydration` off.
 
 <Framework name="react">
 
@@ -46,7 +49,7 @@ ends as the browser alone renders it, with the server's ids kept.
 <Tabs.List aria-label="Settings">
     <Tabs.Tab value="account">Account</Tabs.Tab>
     <Tabs.Tab value="password">Password</Tabs.Tab>
-    <Tabs.Indicator renderBeforeHydration />
+    <Tabs.Indicator renderBeforeHydration nonce={cspNonce} />
 </Tabs.List>
 ```
 
@@ -58,7 +61,7 @@ ends as the browser alone renders it, with the server's ids kept.
 <Tabs.List aria-label="Settings">
     <Tabs.Tab value="account">Account</Tabs.Tab>
     <Tabs.Tab value="password">Password</Tabs.Tab>
-    <Tabs.Indicator render-before-hydration />
+    <Tabs.Indicator render-before-hydration :nonce="cspNonce" />
 </Tabs.List>
 ```
 
@@ -70,7 +73,7 @@ ends as the browser alone renders it, with the server's ids kept.
 <div tabsList aria-label="Settings">
     <button tabsTab value="account">Account</button>
     <button tabsTab value="password">Password</button>
-    <span *tabsIndicator="true"></span>
+    <span *tabsIndicator="true; nonce: cspNonce"></span>
 </div>
 ```
 

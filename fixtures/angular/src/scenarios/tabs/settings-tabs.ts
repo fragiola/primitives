@@ -30,7 +30,7 @@ const TABS = [
                 @for (tab of tabs; track tab.value) {
                     <button tabsTab [value]="tab.value" [disabled]="tab.disabled" [class]="styles.tab">{{ tab.label }}</button>
                 }
-                <span *tabsIndicator="true" [class]="styles.indicator"></span>
+                <span *tabsIndicator="true; nonce: nonce()" [class]="styles.indicator"></span>
             </div>
             @for (tab of tabs; track tab.value) {
                 <div *tabsPanel="tab.value" [class]="styles.panel"><p>@for (run of [tab.label, " settings"]; track $index) {<ng-container>{{ run }}</ng-container>}</p></div>
@@ -45,5 +45,7 @@ export class SettingsTabs {
     protected readonly tabs = TABS;
     readonly activation = input.required<"automatic" | "manual">();
     readonly orientation = input.required<"horizontal" | "vertical">();
+    /** `/tabs/nonce`: the Indicator script's nonce. */
+    readonly nonce = input<string | undefined>(undefined);
     protected readonly value = signal<string | undefined>("account");
 }

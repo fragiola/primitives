@@ -6,6 +6,7 @@ import type {
 } from "@fragiola/primitives/positioning";
 import { createContext, type MutableRefObject } from "react";
 import type { OverlayRoot } from "../../hooks/use-overlay-root.ts";
+import type { MenuBarContextValue } from "./menu-bar-context.ts";
 
 /** Where the pointer left an open submenu's trigger, for the safe hover area (spec/menu.md). */
 export interface SafeArea {
@@ -26,10 +27,15 @@ export interface MenuContextValue extends OverlayRoot {
     /** The menu this one is a submenu of. */
     parent: MenuContextValue | null;
     loopFocus: boolean;
-    /** The root menu's `modal` (a submenu follows it). */
+    /** The root menu's `modal` (a submenu follows it; a menu of a bar follows the bar's). */
     modal: boolean;
-    /** The item to highlight when the popup opens: from the keyboard, the first or the last. */
-    pendingHighlight: MutableRefObject<"first" | "last" | null>;
+    /** The bar the root menu belongs to (spec/menu.md, "In a Menubar"), at every level; or `null`. */
+    bar: MenuBarContextValue | null;
+    /**
+     * The item to highlight when the popup opens: from the keyboard, the first or the last;
+     * `keep` leaves the focus where it is (a bar moving to this menu); `null` focuses the popup.
+     */
+    pendingHighlight: MutableRefObject<PendingHighlight>;
     typeahead: ReturnType<typeof createTypeahead>;
     /** Labels given with the `label` prop, by item element. */
     labels: Map<Element, string>;
@@ -44,6 +50,9 @@ export interface MenuContextValue extends OverlayRoot {
     openSubmenu: MutableRefObject<MenuContextValue | null>;
     safeArea: MutableRefObject<SafeArea | null>;
 }
+
+/** What the popup focuses when it opens (spec/menu.md, "Focus" and "In a Menubar"). */
+export type PendingHighlight = "first" | "last" | "keep" | null;
 
 export const MenuContext = createContext<MenuContextValue | null>(null);
 

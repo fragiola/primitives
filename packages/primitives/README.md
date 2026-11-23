@@ -20,7 +20,7 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/scroll-lock` | `lockScroll(document)` → unlock (counted) |
 | `@fragiola/primitives/inert` | `inertOutside(elements)` → restore |
 | `@fragiola/primitives/positioning` | `anchorFloating(anchor, floating, options)` → cleanup (Floating UI), `toPlacement`, `fromPlacement`, `Side`, `Align` |
-| `@fragiola/primitives/collection` | `stepIndex`, `edgeIndex`, `stepThroughNone`, `tabsKeyTarget`, `menuKeyTarget`, `submenuKeys`, `createTypeahead`, the combobox's item helpers, `chipKeyTarget` |
+| `@fragiola/primitives/collection` | `stepIndex`, `edgeIndex`, `stepThroughNone`, `tabsKeyTarget`, `menuKeyTarget`, `submenuKeys`, the roving focus (`rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`), `createTypeahead`, the combobox's item helpers, `chipKeyTarget` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
 | `@fragiola/primitives/pointer` | `startDrag`, `isInSafeArea`, `isInHoverBridge`, `trackHoverBridge` |
 | `@fragiola/primitives/swipe` | `watchSwipe(element, options)` → cleanup (pointer and touch swipes, scroll containment), `swipeRelease`, `swipeMovement`, `swipeProgress`, `resolveSnapPoints` |

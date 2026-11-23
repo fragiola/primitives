@@ -65,13 +65,6 @@ export const CalendarGrid: PartComponent<
                     context.select(context.focusedDate.value);
                     return;
                 }
-                if (event.key === "Escape") {
-                    if (context.anchor.value !== null) {
-                        event.preventDefault();
-                        context.cancelRange();
-                    }
-                    return;
-                }
                 const target = calendarKeyTarget(
                     event.key,
                     context.focusedDate.value,

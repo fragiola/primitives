@@ -13,11 +13,13 @@ import {
     type PlainDate,
     startOfMonth,
     today,
+    watchDocumentLanguage,
 } from "@fragiola/primitives/date";
 import {
     type ComputedRef,
     computed,
     inject,
+    onBeforeUnmount,
     onMounted,
     shallowRef,
     useId,
@@ -109,6 +111,7 @@ export function useCalendar(
     const min = () => option("min") ?? null;
     const max = () => option("max") ?? null;
     const mountedLocale = shallowRef<string>();
+    let stopLanguage = () => {};
     onMounted(() => {
         const next = documentLocale();
         // another first weekday remakes the rows: a picker's calendar that took the focus as it
@@ -121,7 +124,12 @@ export function useCalendar(
             focusPending.current = true;
         }
         mountedLocale.value = next;
+        // a change of the document's `lang` is followed while mounted (Epic #49)
+        stopLanguage = watchDocumentLanguage(document, () => {
+            mountedLocale.value = documentLocale();
+        });
     });
+    onBeforeUnmount(() => stopLanguage());
     const locale = () =>
         option("locale") ?? mountedLocale.value ?? FIRST_RENDER_LOCALE;
     const firstDay = () => option("firstDayOfWeek") ?? firstDayOfWeek(locale());

@@ -17,7 +17,8 @@ accessible **description** (the control still needs its own name). It follows th
 - **Hover**: the pointer entering the Trigger opens it after `delay` (reason `trigger-hover`);
   leaving before then cancels. A touch tap never opens it.
 - **Hoverable**: leaving the Trigger closes it after `closeDelay`, unless the pointer moves onto
-  the popup (across the gap): it stays open while hovered, and closes when the pointer leaves both.
+  the popup (across the gap): it stays open while hovered, and closes when the pointer leaves both,
+  or leaves the window (or the iframe the page is in) at once.
 - **Keyboard**: keyboard focus on the Trigger opens it at once (`trigger-focus`, `data-instant`);
   blur closes it. Escape closes it (`escape-key`), keeps focus on the trigger, and stops there: an
   enclosing dialog stays open.

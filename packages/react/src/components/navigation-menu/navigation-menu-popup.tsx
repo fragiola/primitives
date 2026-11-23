@@ -1,6 +1,9 @@
 import { getTabbables, nextTabbableAfter } from "@fragiola/primitives/focus";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
-import { isInHoverBridge } from "@fragiola/primitives/pointer";
+import {
+    isInHoverBridge,
+    watchPointerExit,
+} from "@fragiola/primitives/pointer";
 import {
     type CSSProperties,
     type KeyboardEvent,
@@ -72,18 +75,22 @@ export function NavigationMenuPopup({
     }, [open, popup, positioner, setValue, lastReason, hover]);
 
     // a hover-opened Content: the pointer leaving the Trigger and the popup (and the levels
-    // opened from it) closes it after the close delay
+    // opened from it), or the document at once (the window or the iframe), closes it after the
+    // close delay
     useEffect(() => {
         if (!open || popup === null) {
             return undefined;
         }
         const doc = popup.ownerDocument;
+        const hoverOpened = () =>
+            latest.current.openedBy.current.by === "hover" &&
+            latest.current.activeTrigger !== null;
         const onMove = (event: PointerEvent) => {
             const current = latest.current;
             const trigger = current.activeTrigger;
             if (
                 event.pointerType === "touch" ||
-                current.openedBy.current.by !== "hover" ||
+                !hoverOpened() ||
                 trigger === null
             ) {
                 return;
@@ -103,7 +110,15 @@ export function NavigationMenuPopup({
             }
         };
         doc.addEventListener("pointermove", onMove);
-        return () => doc.removeEventListener("pointermove", onMove);
+        const stopExit = watchPointerExit(doc, () => {
+            if (hoverOpened()) {
+                hover.leave(latest.current.closeDelay);
+            }
+        });
+        return () => {
+            doc.removeEventListener("pointermove", onMove);
+            stopExit();
+        };
     }, [open, popup, positioner, hover]);
 
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {

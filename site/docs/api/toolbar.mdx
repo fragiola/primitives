@@ -1,0 +1,191 @@
+---
+title: Toolbar
+description: A set of controls that is one tab stop, the arrows moving between them, nested ToggleGroups included (the APG toolbar), in each framework.
+---
+
+A container for a set of controls that is **one tab stop**, with the arrow keys moving between
+them (WAI-ARIA APG [toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/)): buttons,
+links, a text input, and [Toggles](/docs/api/toggle) and [ToggleGroups](/docs/api/toggle-group),
+whose toggles become the toolbar's own items.
+
+<Example id="toolbar" />
+
+## Behaviour
+
+- **One tab stop**: exactly one item has `tabindex="0"`: the first one that can take focus, then
+  the one that last had focus. Tab enters the toolbar there and leaves it at once.
+- **Arrows**: ArrowRight and ArrowLeft in a horizontal toolbar (mirrored in RTL), ArrowDown and
+  ArrowUp in a vertical one, Home and End, through every item in document order, wrapping with
+  `loopFocus`. The other orientation's arrows are left to the controls.
+- **Nested composites**: a ToggleGroup inside a Toolbar opens no focus of its own; its toggles
+  register with the toolbar, which stays one tab stop. A Toggle placed directly in the toolbar is
+  an item too. A Toolbar.Group only groups its items (and disables them with `disabled`).
+- **Disabled items**: a disabled Button or Input is skipped by the arrows (the APG's "typically
+  not focusable"); with `focusableWhenDisabled` it is `aria-disabled` and reachable, and ignores
+  presses (an Input is also `readonly`).
+- **Text input**: a Toolbar.Input keeps its caret keys: the arrows move the focus out only when
+  the caret is at the text's edge in their direction and nothing is selected, Home and End only
+  when it is empty. The toolbar's keys select its whole text when they move the focus to it.
+- **Name**: the toolbar is a `role="toolbar"`; name it with `aria-label` or `aria-labelledby`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `toolbar-root` | the `toolbar`; holds the roving tab stop |
+| Button | `button` | `toolbar-button` | an item, with Button's behaviour |
+| Link | `a` | `toolbar-link` | an item |
+| Input | `input` | `toolbar-input` | an item that keeps its caret keys |
+| Group | `div` | `toolbar-group` | a `group` of items |
+| Separator | `div` | `toolbar-separator` | a `separator` across the toolbar |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Toggle } from "@fragiola/primitives-react/toggle";
+import { ToggleGroup } from "@fragiola/primitives-react/toggle-group";
+import { Toolbar } from "@fragiola/primitives-react/toolbar";
+
+<Toolbar.Root aria-label="Formatting">
+    <ToggleGroup aria-label="Text style" multiple>
+        <Toggle value="bold">Bold</Toggle>
+        <Toggle value="italic">Italic</Toggle>
+    </ToggleGroup>
+    <Toolbar.Separator />
+    <Toolbar.Group aria-label="History">
+        <Toolbar.Button onClick={undo}>Undo</Toolbar.Button>
+        <Toolbar.Button disabled>Redo</Toolbar.Button>
+    </Toolbar.Group>
+    <Toolbar.Link href="/help">Help</Toolbar.Link>
+    <Toolbar.Input aria-label="Search" />
+</Toolbar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Toolbar.Root aria-label="Formatting">
+        <ToggleGroup v-model:value="styles" aria-label="Text style" multiple>
+            <Toggle value="bold">Bold</Toggle>
+            <Toggle value="italic">Italic</Toggle>
+        </ToggleGroup>
+        <Toolbar.Separator />
+        <Toolbar.Button @click="undo">Undo</Toolbar.Button>
+        <Toolbar.Input aria-label="Search" />
+    </Toolbar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ToolbarRoot, ToolbarButton, ToolbarInput, ToolbarSeparator, ToggleGroup, Toggle],
+    template: `
+        <div toolbarRoot aria-label="Formatting">
+            <div toggleGroup [(value)]="styles" aria-label="Text style" multiple>
+                <button toggle value="bold">Bold</button>
+                <button toggle value="italic">Italic</button>
+            </div>
+            <div toolbarSeparator></div>
+            <button toolbarButton (click)="undo()">Undo</button>
+            <input toolbarInput aria-label="Search" />
+        </div>
+    `,
+})
+export class Formatting {
+    protected readonly styles = signal<string[]>([]);
+    protected undo(): void {}
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue and Angular take the click, pointer, key and focus listeners as native events
+(`@click`, `(click)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | which arrow keys move between the items |
+| `loopFocus` | `boolean` | `true` | whether the arrow keys wrap around |
+| `disabled` | `boolean` | `false` | every Button, Input, Toggle and ToggleGroup in it is disabled |
+
+### Button
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | ignores presses and keys; skipped by the arrows unless `focusableWhenDisabled` |
+| `focusableWhenDisabled` | `boolean` | `false` | a disabled button the arrows still reach (`aria-disabled`) |
+| `nativeButton` | `boolean` | `true` | whether the rendered element is a native `<button>` |
+| `type` | `"button" \| "submit" \| "reset"` | `"button"` (native) | forwarded |
+| `onClick` (react) | `MouseEventHandler` | | a click; not while disabled |
+| `onMouseDown` (react) | `MouseEventHandler` | | not while disabled |
+| `onPointerDown` (react) | `PointerEventHandler` | | not while disabled |
+| `onKeyDown` (react) | `KeyboardEventHandler` | | runs before the non-native keys and the toolbar's; not while disabled |
+| `onKeyUp` (react) | `KeyboardEventHandler` | | not while disabled |
+| `onFocus` (react) | `FocusEventHandler` | | after the toolbar took note of the focus |
+
+### Link
+
+No props of its own (`href` and every attribute are forwarded).
+
+### Input
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | the input is disabled; skipped by the arrows unless `focusableWhenDisabled` |
+| `focusableWhenDisabled` | `boolean` | `false` | a disabled input the arrows still reach: `aria-disabled` and `readonly` |
+
+### Group
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | every item in it is disabled |
+
+### Separator
+
+No props of its own: it runs across the toolbar's orientation.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="toolbar"`, `aria-orientation`, `data-orientation`, `data-disabled` |
+| Button | Button's (`type="button"`, `disabled` or `aria-disabled="true"`), the roving `tabindex`, `data-orientation`, `data-disabled` |
+| Link | the roving `tabindex`, `data-orientation` |
+| Input | the roving `tabindex`, `data-orientation`, `data-disabled`; `disabled`, or `aria-disabled="true"` and `readonly` with `focusableWhenDisabled` |
+| Group | `role="group"`, `data-orientation`, `data-disabled` |
+| Separator | `role="separator"`, `aria-orientation` and `data-orientation` across the toolbar's |
+
+## Keyboard
+
+| key | horizontal | vertical |
+| --- | --- | --- |
+| Tab, Shift+Tab | into and out of the toolbar (one tab stop) | the same |
+| next item | ArrowRight (ArrowLeft in RTL) | ArrowDown |
+| previous item | ArrowLeft (ArrowRight in RTL) | ArrowUp |
+| Home, End | the first, the last item that can take focus | the same |
+| Enter, Space | the item's own (a click, a link, a toggle) | the same |
+
+In a Toolbar.Input, the arrows, Home and End move the caret first ("Behaviour").
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/toolbar` | `RenderProp`, `RovingOrientation`, `Toolbar`, `ToolbarButtonProps`, `ToolbarGroupProps`, `ToolbarInputProps`, `ToolbarItemState`, `ToolbarLinkProps`, `ToolbarLinkState`, `ToolbarRootProps`, `ToolbarRootState`, `ToolbarSeparatorProps`, `ToolbarSeparatorState` |
+| `@fragiola/primitives-vue/toolbar` | `RenderSlotProps`, `RovingOrientation`, `Toolbar`, `ToolbarButtonProps`, `ToolbarGroupProps`, `ToolbarInputProps`, `ToolbarItemState`, `ToolbarLinkState`, `ToolbarRootProps`, `ToolbarRootState`, `ToolbarSeparatorState` |
+| `@fragiola/primitives-angular/toolbar` | `RovingOrientation`, `ToolbarButton`, `ToolbarGroup`, `ToolbarInput`, `ToolbarItemState`, `ToolbarLink`, `ToolbarRoot`, `ToolbarRootState`, `ToolbarSeparator`, `ToolbarSeparatorState` |

@@ -7,7 +7,10 @@ import {
 } from "@angular/core";
 import { getTabbables, nextTabbableAfter } from "@fragiola/primitives/focus";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
-import { isInHoverBridge } from "@fragiola/primitives/pointer";
+import {
+    isInHoverBridge,
+    watchPointerExit,
+} from "@fragiola/primitives/pointer";
 import {
     dataValues,
     registerHost,
@@ -25,8 +28,8 @@ const RETURNS_FOCUS = new Set(["escape-key"]);
 /**
  * The shared popup (spec/navigation-menu.md): `<div navigationMenuPopup>`. A non-modal layer of the
  * overlay tree while a Content is open, sized by the open Content (`--popup-width`,
- * `--popup-height`); the pointer leaving it and the Trigger closes a hover-opened Content after
- * the close delay.
+ * `--popup-height`); the pointer leaving it and the Trigger, or the document at once, closes a
+ * hover-opened Content after the close delay.
  */
 @Directive({
     selector: "[navigationMenuPopup]",
@@ -105,12 +108,16 @@ export class NavigationMenuPopup {
                 });
                 root.layered.set(true);
                 // a hover-opened Content: the pointer leaving the Trigger and the popup (and the
-                // levels opened from it) closes it after the close delay
+                // levels opened from it), or the document at once (the window or the iframe),
+                // closes it after the close delay
+                const hoverOpened = () =>
+                    root.openedBy.by === "hover" &&
+                    untracked(root.activeTrigger) !== null;
                 const onMove = (event: PointerEvent) => {
                     const trigger = untracked(root.activeTrigger);
                     if (
                         event.pointerType === "touch" ||
-                        root.openedBy.by !== "hover" ||
+                        !hoverOpened() ||
                         trigger === null
                     ) {
                         return;
@@ -133,9 +140,15 @@ export class NavigationMenuPopup {
                     }
                 };
                 doc.addEventListener("pointermove", onMove);
+                const stopExit = watchPointerExit(doc, () => {
+                    if (hoverOpened()) {
+                        root.hover.leave(untracked(root.closeDelay));
+                    }
+                });
                 onCleanup(() => {
                     root.layered.set(false);
                     doc.removeEventListener("pointermove", onMove);
+                    stopExit();
                     // a close delay still pending would close a later opening
                     root.hover.cancel();
                     session.end();

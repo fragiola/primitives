@@ -32,7 +32,8 @@ export function MenuPositioner({
     const nested = context.parent !== null;
     const placed = usePositioner(
         { side, align, sideOffset, alignOffset, collisionPadding, anchor },
-        nested
+        // a vertical bar's menus open at its end side, as submenus (spec/menubar.md)
+        nested || context.bar?.orientation === "vertical"
             ? { side: "inline-end", align: "start" }
             : { side: "bottom", align: "start" },
         context.anchor ?? context.trigger,

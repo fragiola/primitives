@@ -51,6 +51,10 @@
         "separator",
         "collapsible",
         "accordion",
+        "toggle",
+        "toggle-group",
+        "toolbar",
+        "menubar",
         "tests",
         "*.config.ts"
     ]

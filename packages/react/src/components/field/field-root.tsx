@@ -166,14 +166,13 @@ export function FieldRoot({
                     current.validationMode,
                     submitted.current,
                 );
-                const apply = (next: FieldValidation) =>
+                const apply = (next: FieldValidation | null) =>
                     setShown((before) =>
                         shownAfterChange(before, next, onChange),
                     );
-                const next = run(input, value, onChange, apply);
-                if (next !== null) {
-                    apply(next);
-                }
+                // a pending run (`null`) still hides a shown error at once when the field does
+                // not validate on change (spec/field.md, "Async validation")
+                apply(run(input, value, onChange, apply));
             },
             focused: () => setFocused(true),
             blurred: (input, value) => {

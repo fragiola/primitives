@@ -104,7 +104,9 @@ When `validate` returns a promise (a thenable), the field validates in two steps
    promise counts as no message.
 
 While the latest run is pending, the field keeps what it showed: no new error, and none cleared
-by that run. When it resolves, the result is shown if the run's event shows results (the table
+by that run. A change that hides a shown error (a field that does not validate on every change,
+"When the result is shown") hides it at once, before its run settles (Epic #49): the rule is the
+change's, not the run's. When it resolves, the result is shown if the run's event shows results (the table
 below): a run started by a change in `onChange` mode, by a blur in `onBlur` mode, or by a
 submission attempt.
 
@@ -361,6 +363,21 @@ Checks:
 4. Replacing the text with `grace` hides the error once it resolves; "Submit" gives
    `form: username=grace`.
 5. Axe finds no violation with the error shown.
+
+### `/field/async-blur`
+
+A field `name="username"`, `validationMode="onBlur"`, not in a form: Label **"Username"**; a
+Control; an Error with no children; then a button **"After"**. Its `validate` returns a promise
+that resolves after 400 ms for every value: **"This username is taken."** for `ada`, `null`
+otherwise (Epic #49). Output: `resolved: <the value of the last promise that resolved>`.
+
+Checks:
+
+1. Typing `ada` shows nothing; leaving it (Tab) shows "This username is taken." once
+   `resolved: ada`, and the textbox is `aria-invalid="true"`.
+2. Typing one more letter (`adax`) hides the error at once: it is gone and the textbox is not
+   `aria-invalid` while `resolved` is still `ada` (the change's run has not settled).
+3. Once `resolved: adax`, nothing is shown; leaving it shows nothing (not taken).
 
 ### `/field/match`
 

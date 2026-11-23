@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     buttonAttributes,
     nativeKeyAction,
-} from "../button/directives/button.directive.ts";
+} from "../internal/utils/button-behaviour.ts";
 
 // spec/button.md, "State attributes and ARIA" and "Keyboard": what React's Button renders and does
 const options = {

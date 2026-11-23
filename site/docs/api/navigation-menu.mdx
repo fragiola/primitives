@@ -16,8 +16,8 @@ nested levels follow Base UI's NavigationMenu. A menu of commands is a [Menu](/d
 ## Behaviour
 
 - **Hover** (mouse and pen): entering a Trigger opens its Content after `delay` (50 ms); while
-  one is open, entering another Trigger switches at once. Leaving the Trigger and the popup closes
-  it after `closeDelay` (50 ms).
+  one is open, entering another Trigger switches at once. Leaving the Trigger and the popup, or
+  the window (or the iframe the page is in) at once, closes it after `closeDelay` (50 ms).
 - **Press**: a press (or Enter, Space) on a Trigger toggles its Content, and focus stays on the
   Trigger. A pressed Content stays open when the pointer leaves; a press within 500 ms of a hover
   opening keeps it open. Touch opens and closes with a tap.

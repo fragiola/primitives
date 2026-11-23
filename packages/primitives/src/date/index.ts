@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/date: the plain date (`{ year, month, day }`, no time zone), its math, the month grid, the calendar key map and the locale data from `Intl`.
+// The entry of @fragiola/primitives/date: the plain date (`{ year, month, day }`, no time zone), its math, the month grid, the calendar key map, the locale data from `Intl` and the document language's watch.
 
 export {
     type CalendarKeyOptions,
@@ -40,3 +40,4 @@ export {
     toIsoDate,
     toLocalDate,
 } from "./plain-date.ts";
+export { watchDocumentLanguage } from "./watch-document-language.ts";

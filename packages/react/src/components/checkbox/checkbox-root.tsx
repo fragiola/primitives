@@ -115,12 +115,15 @@ export function CheckboxRoot({
         }
     };
 
+    // what the hidden input renders checked (a parent checkbox submits nothing)
+    const inputChecked = checked && !(parent && inGroup);
     const latest = useRef({
         group,
         inGroup,
         defaultChecked,
         setOwn,
         reset: field.reset,
+        inputChecked,
     });
     latest.current = {
         group,
@@ -128,6 +131,7 @@ export function CheckboxRoot({
         defaultChecked,
         setOwn,
         reset: field.reset,
+        inputChecked,
     };
     useEffect(() => {
         const element = input.current;
@@ -139,11 +143,14 @@ export function CheckboxRoot({
                 const current = latest.current;
                 if (current.inGroup) {
                     current.group?.reset();
-                    return;
+                } else {
+                    current.reset();
+                    current.setOwn(current.defaultChecked, { reason: "none" });
                 }
-                current.reset();
-                current.setOwn(current.defaultChecked, { reason: "none" });
-                element.checked = current.defaultChecked;
+                // the browser reset the input to its mount-time default: write the rendered state
+                // back, as Radio and Switch (a render that changes it patches it again; a
+                // controlled checkbox that refuses the reset keeps its input)
+                element.checked = current.inputChecked;
             },
             invalid: () => button,
         });
@@ -197,7 +204,7 @@ export function CheckboxRoot({
                 tabIndex={-1}
                 name={parent ? undefined : (group?.name ?? field.name ?? name)}
                 value={value ?? "on"}
-                checked={checked && !(parent && inGroup)}
+                checked={inputChecked}
                 required={required}
                 disabled={disabled}
                 onChange={NOOP}

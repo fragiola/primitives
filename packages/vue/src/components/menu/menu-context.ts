@@ -6,6 +6,7 @@ import type {
 } from "@fragiola/primitives/positioning";
 import type { ComputedRef, InjectionKey, Ref, ShallowRef } from "vue";
 import type { OverlayRoot } from "../../composables/use-overlay-root.ts";
+import type { MenuBarContext } from "./menu-bar-context.ts";
 
 /** Where the pointer left an open submenu's trigger, for the safe hover area (spec/menu.md). */
 export interface SafeArea {
@@ -25,9 +26,15 @@ export interface MenuContext extends OverlayRoot {
     returnTarget: () => HTMLElement | null;
     parent: MenuContext | null;
     loopFocus: () => boolean;
-    /** The root menu's `modal` (a submenu follows it). */
+    /** The root menu's `modal` (a submenu follows it; a menu of a bar follows the bar's). */
     modal: () => boolean;
-    pendingHighlight: { current: "first" | "last" | null };
+    /** The bar the root menu belongs to (spec/menu.md, "In a Menubar"), at every level; or `null`. */
+    bar: MenuBarContext | null;
+    /**
+     * The item to highlight when the popup opens: from the keyboard, the first or the last;
+     * `keep` leaves the focus where it is (a bar moving to this menu); `null` focuses the popup.
+     */
+    pendingHighlight: { current: PendingHighlight };
     typeahead: ReturnType<typeof createTypeahead>;
     labels: Map<Element, string>;
     placed: Ref<{ side: Side; align: Align }>;
@@ -38,6 +45,9 @@ export interface MenuContext extends OverlayRoot {
     openSubmenu: { current: MenuContext | null };
     safeArea: { current: SafeArea | null };
 }
+
+/** What the popup focuses when it opens (spec/menu.md, "Focus" and "In a Menubar"). */
+export type PendingHighlight = "first" | "last" | "keep" | null;
 
 export const MenuKey: InjectionKey<MenuContext> = Symbol("Menu");
 

@@ -70,6 +70,9 @@ parts, DateRangePicker's likewise. The date math and the locale data are the too
   calendar then takes the document's `lang` (else the browser's language) once it is mounted
   (React: at once in a page the browser renders alone); Angular reads its document's `lang` on the server too, and falls back to `en-US` there,
   never to the server's own language. Pass `locale` for a server render in the reader's language.
+  Once mounted, a calendar with no `locale` **follows** the document's `lang`: a change of
+  `<html lang>` after mount re-renders it in the new language, in every framework (Epic #49; Vue
+  read it once, at mount). The toolkit's `watchDocumentLanguage` reports the change.
 - "Today" is read when the calendar renders, on the server and in the browser alike: they agree
   unless their dates differ (a server in another time zone near midnight), which a hydration then
   repairs. A page rendered on a server for readers elsewhere passes a `value` or `defaultValue`
@@ -314,7 +317,9 @@ The single scenario with no `locale` and no `<html lang>` (the browser's languag
 `de-DE` in the check; the server's, in the ssr layer, German too).
 
 Checks: once mounted, the calendar speaks the browser's language (Monday's short name first); its
-server render and hydration (the ssr layer) match the browser's own render.
+server render and hydration (the ssr layer) match the browser's own render. Setting
+`<html lang="fr-FR">` after mount re-renders it in French (the heading "novembre 2026", Monday's
+short name first), with no other event (Epic #49).
 
 ### `/calendar/rtl?locale=he-IL&dir=rtl`
 
@@ -413,6 +418,22 @@ Checks:
    `data-required`, the disabled one `data-disabled`.
 
 The pickers inside a [Field](field.md) are [`/field/more-controls`](field.md#fieldmore-controls).
+
+### `/date-picker/mixed-form`
+
+A native `<form>` mixing a picker and native controls (Epic #49): a DatePicker `name="arrival"`,
+`required` (Trigger **"Arrival: "** and the value, or "none"; Popup `aria-label` **"Choose
+date"**, a bound Calendar), then a native text input `name="guest"`, `required`, labelled
+**"Guest name"** (`<label>` around it), and a **"Submit"** button. "Today" is 2026-11-20. Output:
+`form: ...`.
+
+Checks:
+
+1. "Submit" submits nothing (`form: none`) and focuses "Arrival": the browser does not move the
+   focus on to "Guest name", the later invalid native control (spec/README.md, "Forms").
+2. Choosing November 24 in "Arrival", then "Submit": submits nothing, and the browser focuses
+   "Guest name".
+3. Typing `Ada` in "Guest name", then "Submit": `form: arrival=2026-11-24&guest=Ada`.
 
 ### `/date-picker/lifecycle`
 

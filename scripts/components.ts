@@ -23,6 +23,7 @@ export const COMPONENTS = [
     "fieldset",
     "form",
     "menu",
+    "menubar",
     "navigation-menu",
     "popover",
     "progress",
@@ -34,6 +35,9 @@ export const COMPONENTS = [
     "slider",
     "switch",
     "tabs",
+    "toggle",
+    "toggle-group",
+    "toolbar",
     "tooltip",
 ] as const;
 

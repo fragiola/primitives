@@ -240,3 +240,22 @@ test.describe("slider / label-value", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+// Epic #49 (#46): a name the consumer binds, or changes, wins over the Label's
+test("slider / thumb-name: the consumer's bound name wins over the Label", async ({
+    page,
+}) => {
+    await openScenario(page, "/slider/thumb-name");
+    const group = page.getByRole("group", { name: "Volume", exact: true });
+    await expect(group).toBeVisible();
+    const master = group.getByRole("slider", {
+        name: "Master volume",
+        exact: true,
+    });
+    await expect(master).toBeVisible();
+    await expect(master).not.toHaveAttribute("aria-labelledby");
+    await page.getByRole("button", { name: "Rename" }).click();
+    const main = slider(page, "Main volume");
+    await expect(main).toBeVisible();
+    await expect(main).not.toHaveAttribute("aria-labelledby");
+});

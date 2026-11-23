@@ -263,6 +263,24 @@ test.describe("calendar / single, no locale and no lang", () => {
         await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
     });
 
+    // Epic #49 (#46): the document's language is followed after mount, not read once
+    test("follows a change of the document's language after mount", async ({
+        page,
+    }) => {
+        await openScenario(page, "/calendar/single", {
+            locale: "none",
+            today: true,
+        });
+        await expect(grid(page, 2026, 11, "de-DE")).toBeVisible();
+        await page.evaluate(() => {
+            document.documentElement.lang = "fr-FR";
+        });
+        await expect(grid(page, 2026, 11, "fr-FR")).toBeVisible();
+        await expect(page.getByRole("columnheader").first()).toHaveText(
+            shortWeekday("fr-FR", 2026, 11, 16),
+        );
+    });
+
     test("a picker's calendar keeps the focus it took when it switches language", async ({
         page,
     }) => {
@@ -556,6 +574,38 @@ test("date-picker / range: closes after the end date", async ({ page }) => {
     await expectOutput(page, "value", "2026-11-10..2026-11-13");
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(trigger).toBeFocused();
+});
+
+// Epic #49 (#46), spec/README.md "Forms": a bridge that focused its trigger keeps the focus, the
+// browser does not move it on to a later invalid native control
+test.describe("date-picker / mixed-form", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/date-picker/mixed-form", { today: true });
+    });
+
+    test("the first invalid picker keeps the focus; a later native control gets it next", async ({
+        page,
+    }) => {
+        const arrival = page.getByRole("button", { name: /^Arrival: / });
+        const guest = page.getByRole("textbox", { name: "Guest name" });
+        const submit = page.getByRole("button", {
+            name: "Submit",
+            exact: true,
+        });
+        await submit.click();
+        await expectOutput(page, "form", "none");
+        await expect(arrival).toBeFocused();
+        await expect(guest).not.toBeFocused();
+        await arrival.click();
+        await cell(page, 11, 24).click();
+        await expect(arrival).toHaveText("Arrival: 2026-11-24");
+        await submit.click();
+        await expectOutput(page, "form", "none");
+        await expect(guest).toBeFocused();
+        await guest.fill("Ada");
+        await submit.click();
+        await expectOutput(page, "form", "arrival=2026-11-24&guest=Ada");
+    });
 });
 
 test.describe("date-picker / form", () => {

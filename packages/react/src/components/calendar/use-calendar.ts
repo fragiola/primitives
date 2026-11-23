@@ -14,6 +14,7 @@ import {
     startOfMonth,
     today,
     toIsoDate,
+    watchDocumentLanguage,
 } from "@fragiola/primitives/date";
 import {
     useCallback,
@@ -51,8 +52,9 @@ export interface CalendarStateProps extends CalendarOptions {
 /** The locale of the first render with no `locale`: a server knows neither of the others. */
 const FIRST_RENDER_LOCALE = "en-US";
 const serverLocale = () => FIRST_RENDER_LOCALE;
-// the document's language is read once per render: nothing announces its changes
-const subscribeNever = () => () => {};
+// a change of the document's `lang` renders again (Epic #49: followed after mount)
+const subscribeLanguage = (change: () => void) =>
+    watchDocumentLanguage(document, change);
 
 /**
  * The document's `lang`, then the browser's language (spec/calendar.md, "API"). A server render
@@ -111,7 +113,7 @@ export function useCalendar(
     // the server's snapshot while rendering on a server and hydrating, the document's otherwise:
     // a page rendered in the browser alone reads it at once, with no second render
     const defaultLocale = useSyncExternalStore(
-        subscribeNever,
+        subscribeLanguage,
         documentLocale,
         serverLocale,
     );

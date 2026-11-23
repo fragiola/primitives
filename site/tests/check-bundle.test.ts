@@ -220,6 +220,14 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["context-menu"]).toEqual(["menu"]);
         expect(ENTRY_DEPENDENCIES.dialog).toBeUndefined();
         expect(ENTRY_DEPENDENCIES.menu).toBeUndefined();
+        // Epic #49: a ToggleGroup on its Toggles' entry (the group's context is the Toggle's);
+        // a Toggle on nothing, and a Toolbar on neither (spec/toolbar.md, "Nested composites")
+        expect(ENTRY_DEPENDENCIES["toggle-group"]).toEqual(["toggle"]);
+        expect(ENTRY_DEPENDENCIES.toggle).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES.toolbar).toBeUndefined();
+        // Epic #49 (#48): a Menubar on Menu's entry (the parent-bar contract is Menu's); never
+        // the other way (spec/menu.md, "In a Menubar")
+        expect(ENTRY_DEPENDENCIES.menubar).toEqual(["menu"]);
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [
@@ -256,6 +264,74 @@ describe("the bundle guard, entry by entry", () => {
             ),
         ).toEqual([
             '/select: the component "checkbox": packages/react/src/components/checkbox/checkbox-root.tsx',
+        ]);
+        // a Toolbar that held ToggleGroup's code, or a Toggle the group's, leaks
+        expect(
+            entryLeaks(
+                "react",
+                "toolbar",
+                [
+                    "packages/react/src/components/toolbar/toolbar-root.tsx",
+                    "packages/react/src/hooks/use-roving-composite.ts",
+                    "packages/react/src/components/toggle-group/toggle-group.tsx",
+                ],
+                [],
+            ),
+        ).toEqual([
+            '/toolbar: the component "toggle-group": packages/react/src/components/toggle-group/toggle-group.tsx',
+        ]);
+        expect(
+            entryLeaks(
+                "vue",
+                "toggle",
+                [
+                    "packages/vue/src/components/toggle/toggle.ts",
+                    "packages/vue/src/components/toggle-group/toggle-group.ts",
+                ],
+                [],
+            ),
+        ).toEqual([
+            '/toggle: the component "toggle-group": packages/vue/src/components/toggle-group/toggle-group.ts',
+        ]);
+    });
+
+    it("lets a Menubar hold Menu's code, and fails a Menu holding Menubar's", () => {
+        const menubar = "packages/react/src/components/menubar/menubar.tsx";
+        const contract =
+            "packages/react/src/components/menu/menu-bar-context.ts";
+        expect(entryLeaks("react", "menubar", [menubar, contract], [])).toEqual(
+            [],
+        );
+        expect(
+            entryLeaks(
+                "react",
+                "menu",
+                ["packages/react/src/components/menu/menu-root.tsx", contract],
+                [],
+            ),
+        ).toEqual([]);
+        expect(
+            entryLeaks(
+                "react",
+                "menu",
+                ["packages/react/src/components/menu/menu-root.tsx", menubar],
+                [],
+            ),
+        ).toEqual([
+            '/menu: the component "menubar": packages/react/src/components/menubar/menubar.tsx',
+        ]);
+        expect(
+            entryLeaks(
+                "angular",
+                "menu",
+                [
+                    "packages/angular/menu/utils/menu-bar.ts",
+                    "packages/angular/menubar/directives/menubar.directive.ts",
+                ],
+                ["internal"],
+            ),
+        ).toEqual([
+            '/menu: the component "menubar": packages/angular/menubar/directives/menubar.directive.ts',
         ]);
     });
 

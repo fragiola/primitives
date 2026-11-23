@@ -58,6 +58,9 @@ explain better; Base UI does the same).
 
 A form `reset` (the form's reset button, `form.reset()`) returns each uncontrolled checkbox and
 group to its default; a controlled one reports the default through `on*Change` (reason `none`).
+After the reset, the hidden input is written back to the checkbox's rendered state, as Radio's and
+Switch's: a controlled checkbox that refuses the reset keeps a hidden input that matches it, so the
+form still submits what the checkbox shows (Epic #49).
 
 ## State attributes and ARIA
 
@@ -163,6 +166,19 @@ rejects"). Output: `checked: ...`, `requested: ...`.
 
 Checks: a click reports `requested: false` and the checkbox stays `aria-checked="true"`
 (`checked: true`); Space does the same.
+
+### `/checkbox/controlled-form`
+
+A `<form>` with a checkbox labelled **"Remember me"** (a `<label>` around the Root and the text),
+`name="remember"`, `checked` always `true`: the fixture ignores every `onCheckedChange`, so a
+refused change renders nothing again (a re-render would patch the input anyway); buttons
+**"Submit"** (`type="submit"`) and **"Reset"** (`type="reset"`). Output: `form: ...`.
+
+Checks:
+
+1. "Reset": the checkbox stays `aria-checked="true"`.
+2. "Submit" then gives `form: remember=on`: the hidden input was written back to the rendered
+   state, not left at the browser's reset default.
 
 ## Differences from Base UI
 

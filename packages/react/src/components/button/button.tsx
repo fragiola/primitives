@@ -1,11 +1,9 @@
 import type {
-    KeyboardEvent,
     KeyboardEventHandler,
-    MouseEvent,
     MouseEventHandler,
-    PointerEvent,
     PointerEventHandler,
 } from "react";
+import { buttonProps } from "../../utils/button-props.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 
@@ -52,82 +50,20 @@ export function Button({
     ...props
 }: ButtonProps) {
     const state = { disabled };
-    const focusable = !disabled || focusableWhenDisabled;
-    const native = nativeButton
-        ? {
-              type: type ?? "button",
-              disabled: disabled && !focusableWhenDisabled ? true : undefined,
-              "aria-disabled":
-                  disabled && focusableWhenDisabled ? "true" : undefined,
-              tabIndex,
-          }
-        : {
-              type,
-              role: "button",
-              "aria-disabled": disabled ? "true" : undefined,
-              tabIndex: focusable ? (tabIndex ?? 0) : -1,
-          };
     return renderElement("button", props, state, {
-        ...native,
+        ...buttonProps({
+            disabled,
+            focusableWhenDisabled,
+            nativeButton,
+            type,
+            tabIndex,
+            onClick,
+            onMouseDown,
+            onPointerDown,
+            onKeyDown,
+            onKeyUp,
+        }),
         "data-primitives-part": "button-root",
         ...stateAttributes({ disabled }),
-        onClick: (event: MouseEvent<HTMLElement>) => {
-            // a focusable disabled submit button does not submit
-            if (disabled) {
-                event.preventDefault();
-                return;
-            }
-            onClick?.(event);
-        },
-        onMouseDown: (event: MouseEvent<HTMLElement>) => {
-            if (!disabled) {
-                onMouseDown?.(event);
-            }
-        },
-        onPointerDown: (event: PointerEvent<HTMLElement>) => {
-            if (disabled) {
-                event.preventDefault();
-                return;
-            }
-            onPointerDown?.(event);
-        },
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-            if (disabled) {
-                if (event.key !== "Tab") {
-                    event.preventDefault();
-                }
-                return;
-            }
-            onKeyDown?.(event);
-            if (
-                nativeButton ||
-                event.defaultPrevented ||
-                event.target !== event.currentTarget
-            ) {
-                return;
-            }
-            // a native button's keys: Enter clicks on key down; Space waits for its key up,
-            // and its key down does not scroll the page
-            if (event.key === " ") {
-                event.preventDefault();
-            } else if (event.key === "Enter") {
-                event.preventDefault();
-                event.currentTarget.click();
-            }
-        },
-        onKeyUp: (event: KeyboardEvent<HTMLElement>) => {
-            if (disabled) {
-                return;
-            }
-            onKeyUp?.(event);
-            if (
-                !nativeButton &&
-                !event.defaultPrevented &&
-                event.target === event.currentTarget &&
-                event.key === " "
-            ) {
-                event.currentTarget.click();
-            }
-        },
     });
 }

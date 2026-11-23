@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/pointer: pointer drags, long presses, the submenu's safe area and the hover bridge.
+// The entry of @fragiola/primitives/pointer: pointer drags, long presses, the submenu's safe area, the hover bridge and the pointer leaving the document.
 
 export {
     type DragSessionOptions,
@@ -11,3 +11,4 @@ export {
     type HoverBridgeCallbacks,
     trackHoverBridge,
 } from "./track-hover-bridge.ts";
+export { watchPointerExit } from "./watch-pointer-exit.ts";

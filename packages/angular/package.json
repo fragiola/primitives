@@ -143,6 +143,11 @@
             "types": "./dist/types/fragiola-primitives-angular-menu.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-menu.mjs"
         },
+        "./menubar": {
+            "@fragiola/source": "./menubar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-menubar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-menubar.mjs"
+        },
         "./navigation-menu": {
             "@fragiola/source": "./navigation-menu/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-navigation-menu.d.ts",
@@ -197,6 +202,21 @@
             "@fragiola/source": "./tabs/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
+        },
+        "./toggle": {
+            "@fragiola/source": "./toggle/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-toggle.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-toggle.mjs"
+        },
+        "./toggle-group": {
+            "@fragiola/source": "./toggle-group/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-toggle-group.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-toggle-group.mjs"
+        },
+        "./toolbar": {
+            "@fragiola/source": "./toolbar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-toolbar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-toolbar.mjs"
         },
         "./tooltip": {
             "@fragiola/source": "./tooltip/public-api.ts",

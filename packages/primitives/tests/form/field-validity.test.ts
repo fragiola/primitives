@@ -131,6 +131,15 @@ describe("the change rules", () => {
         expect(shownAfterChange(UNVALIDATED, next, false)).toBe(UNVALIDATED);
         expect(shownAfterChange(UNVALIDATED, next, true)).toBe(next);
     });
+
+    // Epic #49 (#46): a change whose async run is pending (`null`) hides a shown error at once
+    // when the field does not validate on change, and keeps what it showed when it does
+    it("a change with a pending run hides a shown error at once", () => {
+        expect(shownAfterChange(invalid, null, false)).toBe(CLEARED);
+        expect(shownAfterChange(invalid, null, true)).toBe(invalid);
+        expect(shownAfterChange(UNVALIDATED, null, false)).toBe(UNVALIDATED);
+        expect(shownAfterChange(CLEARED, null, true)).toBe(CLEARED);
+    });
 });
 
 describe("fieldErrorShown", () => {

@@ -1,0 +1,176 @@
+---
+title: Menubar
+description: A bar of menus that is one tab stop, the arrows and the pointer moving from one menu to the next (the APG menubar), in each framework.
+---
+
+A persistent bar of menu buttons, an application's "File, Edit, View" (WAI-ARIA APG
+[menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/), with Base UI's Menubar
+API). Menubar is one component, not a namespace: its items are the `Menu.Trigger`s of the
+[Menu](/docs/api/menu)s you place inside it, and everything a Menu has works there: items,
+groups, checkbox and radio items, submenus.
+
+<Example id="menubar" />
+
+## Behaviour
+
+- **One tab stop**: exactly one item of the bar has `tabindex="0"`: the first one, then the one
+  that last had focus. Tab enters the bar there and leaves it at once.
+- **Arrows**: ArrowRight and ArrowLeft in a horizontal bar (mirrored in RTL), ArrowDown and
+  ArrowUp in a vertical one, Home and End, wrapping with `loopFocus`. ArrowDown, ArrowUp, Enter
+  and Space open an item's menu on its first or last item (a vertical bar: ArrowRight, Enter and
+  Space).
+- **Moving between menus**: while a menu is open, the bar's arrows close it and open the next
+  item's menu with the focus kept on that item (APG); ArrowDown then enters it. In a menu, the
+  bar's next arrow on an item with no submenu (ArrowRight in LTR) moves to the next menu, and the
+  previous arrow moves back from a menu of the bar itself (in a submenu it closes the submenu, as
+  in any Menu).
+- **Hover switching**: once a menu is open, hovering another item opens its menu at once. A press
+  right after a hover opening (within 500 ms) keeps the menu open.
+- **Escape** closes the menu and returns the focus to its item; activating an item does too.
+- **Disabled items** stay focusable (`aria-disabled`, the APG's rule for menu items) and open
+  nothing; `disabled` on the bar disables every item.
+- **Modal**: off by default (the APG menubar is non-modal). With `modal`, the open menu locks the
+  scroll and blocks the pointer outside, while the bar keeps taking it.
+- **Name**: the bar is a `role="menubar"`; name it with `aria-label` or `aria-labelledby`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Menubar | `div` | `menubar-root` | the `menubar`; holds the roving tab stop |
+
+Its items are `Menu.Trigger`s (`menu-trigger`, `role="menuitem"` in a bar) inside `Menu.Root`s;
+their menus are Menu's parts and keep Menu's part attributes (`menu-popup`, `menu-item`, ...).
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Menu } from "@fragiola/primitives-react/menu";
+import { Menubar } from "@fragiola/primitives-react/menubar";
+
+<Menubar aria-label="Application">
+    <Menu.Root>
+        <Menu.Trigger>File</Menu.Trigger>
+        <Menu.Portal>
+            <Menu.Positioner sideOffset={4}>
+                <Menu.Popup>
+                    <Menu.Item onClick={create}>New</Menu.Item>
+                    <Menu.Item onClick={print}>Print</Menu.Item>
+                </Menu.Popup>
+            </Menu.Positioner>
+        </Menu.Portal>
+    </Menu.Root>
+    <Menu.Root>
+        <Menu.Trigger>View</Menu.Trigger>
+        <Menu.Portal>
+            <Menu.Positioner sideOffset={4}>
+                <Menu.Popup>
+                    <Menu.CheckboxItem defaultChecked>Show toolbar</Menu.CheckboxItem>
+                </Menu.Popup>
+            </Menu.Positioner>
+        </Menu.Portal>
+    </Menu.Root>
+</Menubar>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Menubar aria-label="Application">
+        <Menu.Root>
+            <Menu.Trigger>File</Menu.Trigger>
+            <Menu.Portal>
+                <Menu.Positioner :side-offset="4">
+                    <Menu.Popup>
+                        <Menu.Item @click="create">New</Menu.Item>
+                        <Menu.Item @click="print">Print</Menu.Item>
+                    </Menu.Popup>
+                </Menu.Positioner>
+            </Menu.Portal>
+        </Menu.Root>
+    </Menubar>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Menubar, MenuRoot, MenuTrigger, MenuPortal, MenuPositioner, MenuPopup, MenuItem],
+    template: `
+        <div menubar aria-label="Application">
+            <ng-container menuRoot>
+                <button menuTrigger>File</button>
+                <ng-container *menuPortal>
+                    <div menuPositioner [sideOffset]="4">
+                        <div menuPopup>
+                            <div menuItem (click)="create()">New</div>
+                            <div menuItem (click)="print()">Print</div>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    `,
+})
+export class ApplicationMenu {
+    protected create(): void {}
+    protected print(): void {}
+}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards. Its menus take [Menu's props](/docs/api/menu#props); in a bar, a `Menu.Root`'s `modal`
+is the bar's and a `Menu.Positioner` defaults to `side="inline-end"` in a vertical bar.
+
+### Menubar
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | which arrow keys move between the items, and where the menus open |
+| `loopFocus` | `boolean` | `true` | whether the arrow keys wrap around |
+| `modal` | `boolean` | `false` | every menu of the bar locks the scroll and blocks the pointer outside while open |
+| `disabled` | `boolean` | `false` | every item is disabled (focusable, opening nothing) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Menubar | `role="menubar"`, `aria-orientation`, `data-orientation`, `data-disabled`; with `modal`, the inline style `pointer-events: auto` |
+| Menu.Trigger (in a bar) | `role="menuitem"`, the roving `tabindex`, `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-popup-open`; disabled: `aria-disabled="true"` and `data-disabled` (never `disabled`) |
+
+The menus' attributes are on the [Menu](/docs/api/menu) page.
+
+## Keyboard
+
+| key | horizontal | vertical |
+| --- | --- | --- |
+| Tab, Shift+Tab | into and out of the bar (one tab stop); an open menu closes | the same |
+| next item | ArrowRight (ArrowLeft in RTL); with a menu open, opens the next item's menu | ArrowDown |
+| previous item | ArrowLeft (ArrowRight in RTL); with a menu open, opens the previous item's menu | ArrowUp |
+| Home, End | the first, the last item | the same |
+| open on the first item | ArrowDown, Enter, Space (into an open menu too) | ArrowRight (ArrowLeft in RTL), Enter, Space |
+| open on the last item | ArrowUp | |
+| in a menu: the next arrow on an item with no submenu | the next item's menu | |
+| in a menu of the bar: the previous arrow | the previous item's menu | closes the menu, back to its item |
+| Escape | closes the menu, the focus on its item | the same |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/menubar` | `Menubar`, `MenubarProps`, `MenubarState`, `RenderProp`, `RovingOrientation` |
+| `@fragiola/primitives-vue/menubar` | `Menubar`, `MenubarProps`, `MenubarState`, `RenderSlotProps`, `RovingOrientation` |
+| `@fragiola/primitives-angular/menubar` | `Menubar`, `MenubarState`, `RovingOrientation` |

@@ -68,7 +68,8 @@ top-left corner.
 | --- | --- |
 | `implementations.ts` | the registered frameworks, and the `--project` parsing |
 | `scenario.ts` | `openScenario(page, path, { locale, dir, today, cancel })` |
-| `output.ts` | `expectOutput(page, key, value)` reads the fixture's `key: value` lines |
+| `output.ts` | `expectOutput(page, key, value)` reads the fixture's `key: value` lines (of a page or a frame) |
+| `frame.ts` | `openInFrame(page, path)`: a scenario inside an iframe of a same-origin host page (the pointer leaving the iframe), `FRAME_BOX` |
 | `focus.ts` | `expectFocusWithin`, `isInertOrHidden` |
 | `axe.ts` | `expectNoAxeViolations` |
 | `contract.ts` | `part(page, component, name)`, `parts(page, component)`, `expectNoFalseStates`, `expectOpenState` (exactly one of `data-open` and `data-closed`) |

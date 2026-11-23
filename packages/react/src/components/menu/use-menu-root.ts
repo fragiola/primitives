@@ -17,10 +17,12 @@ import {
     type OverlayTriggerRootProps,
     useOverlayRoot,
 } from "../../hooks/use-overlay-root.ts";
+import { MenuBarContext } from "./menu-bar-context.ts";
 import {
     type MenuComponent,
     MenuContext,
     type MenuContextValue,
+    type PendingHighlight,
     type SafeArea,
 } from "./menu-context.ts";
 
@@ -46,21 +48,25 @@ export function useMenuRoot(
     options: MenuRootOptions = {},
 ): MenuContextValue {
     const parent = useContext(MenuContext);
+    const enclosingBar = useContext(MenuBarContext);
     const root = useOverlayRoot(props);
-    const pendingHighlight = useRef<"first" | "last" | null>(null);
+    const pendingHighlight = useRef<PendingHighlight>(null);
     const typeahead = useMemo(() => createTypeahead(), []);
     const labels = useMemo(() => new Map<Element, string>(), []);
     const openSubmenu = useRef<MenuContextValue | null>(null);
     const safeArea = useRef<SafeArea | null>(null);
+    const owner = nested ? parent : null;
+    const component = options.component ?? owner?.component ?? "menu";
+    // a root Menu inside a bar is one of its menus (spec/menu.md, "In a Menubar"); its levels
+    // share the bar
+    const bar = owner ? owner.bar : component === "menu" ? enclosingBar : null;
     const [placed, setPlaced] = useState<{ side: Side; align: Align }>(
-        nested
+        nested || bar?.orientation === "vertical"
             ? { side: "inline-end", align: "start" }
             : { side: "bottom", align: "start" },
     );
-    const owner = nested ? parent : null;
-    // a submenu follows its root menu
-    const modal = owner ? owner.modal : modalProp;
-    const component = options.component ?? owner?.component ?? "menu";
+    // a submenu follows its root menu, a menu of a bar the bar
+    const modal = owner ? owner.modal : bar ? bar.modal : modalProp;
     const anchor = options.anchor ?? null;
     const returnTarget = useRef(options.returnTarget);
     returnTarget.current = options.returnTarget;
@@ -85,6 +91,7 @@ export function useMenuRoot(
             parent: owner,
             loopFocus,
             modal,
+            bar,
             pendingHighlight,
             typeahead,
             labels,
@@ -101,6 +108,7 @@ export function useMenuRoot(
             owner,
             loopFocus,
             modal,
+            bar,
             typeahead,
             labels,
             placed,

@@ -135,6 +135,10 @@ export const CheckboxRoot: PartComponent<
                 };
             });
             provide(CheckboxKey, state);
+            // what the hidden input renders checked (a parent checkbox submits nothing)
+            const inputChecked = computed(
+                () => state.value.checked && !(props.parent && inGroup.value),
+            );
 
             watch(
                 () => [group, props.parent, props.value, id.value] as const,
@@ -166,13 +170,17 @@ export const CheckboxRoot: PartComponent<
                             reset: () => {
                                 if (inGroup.value) {
                                     group?.reset();
-                                    return;
+                                } else {
+                                    field.reset();
+                                    own.set(props.defaultChecked, {
+                                        reason: "none",
+                                    });
                                 }
-                                field.reset();
-                                own.set(props.defaultChecked, {
-                                    reason: "none",
-                                });
-                                element.checked = props.defaultChecked;
+                                // the browser reset the input to its mount-time default: write
+                                // the rendered state back, as Radio and Switch (a render that
+                                // changes it patches it again; a controlled checkbox that
+                                // refuses the reset keeps its input)
+                                element.checked = inputChecked.value;
                             },
                             invalid: () => button.value,
                         }),
@@ -248,8 +256,7 @@ export const CheckboxRoot: PartComponent<
                             ? undefined
                             : (field.name() ?? props.name),
                         value: props.value ?? "on",
-                        checked:
-                            current.checked && !(props.parent && inGroup.value),
+                        checked: inputChecked.value,
                         required: current.required,
                         disabled: current.disabled,
                         style: VISUALLY_HIDDEN_INPUT_STYLE,

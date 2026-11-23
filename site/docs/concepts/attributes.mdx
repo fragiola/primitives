@@ -40,6 +40,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-selected` | a selected tab and its panel, a selected select or combobox option, a chosen calendar date |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max` |
+| `data-pressed` | a pressed toggle |
+| `data-multiple` | a toggle group with `multiple` |
 | `data-placeholder` | a Select showing its placeholder |
 | `data-empty` | a combobox list with no item |
 | `data-dragging` | a slider while a pointer drags a thumb |
@@ -54,7 +56,7 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
-| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator |
+| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one, on every tabs part (a physical value: `left`, `right`, `up`, `down`, `none`) |
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |
@@ -65,7 +67,7 @@ One CSS variable carries the depth of nested dialogs: a dialog's popup has the i
 `--nested-dialogs: <n>`, the number of open dialogs nested below it as a chain (`0` when none), to
 scale or offset the parent (`scale: calc(1 - 0.05 * var(--nested-dialogs))`).
 
-ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-checked`, `aria-invalid`,
+ARIA carries the rest: `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`, `aria-invalid`,
 `aria-activedescendant`, `aria-modal`, `aria-controls`, `aria-current`, `aria-readonly`, `aria-valuenow`
 and `aria-valuetext`.
 
