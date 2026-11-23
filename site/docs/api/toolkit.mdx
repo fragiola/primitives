@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); AspectRatio uses none; Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -62,10 +62,12 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
 | `@fragiola/primitives/number` | `formatNumber`, `numberFormatOptions`, `NumberFormatOptions`, `parseNumber`, `isNumberText`, `stepNumber`, `clampNumber`, `NumberStepOptions`, `watchAutoRepeat`, `AutoRepeatOptions`, `watchScrub`, `ScrubOptions`, `ScrubPoint` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason`, `DismissEvent` |
+| `@fragiola/primitives/pagination` | `paginationRange`, `PaginationItem`, `PaginationRangeOptions`, `pageCount`, `PageCountOptions`, `clampPage` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `watchPointerExit`, `LongPressOptions`, `watchLongPress` |
 | `@fragiola/primitives/positioning` | `anchorFloating`, `AnchorOptions`, `Side`, `Align`, `toPlacement`, `fromPlacement`, `AnchorRect`, `VirtualAnchor`, `virtualAnchor` |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations`, `isAnimating`, `measurePanelSize`, `freezePanelSize`, `panelSizeVariables`, `PanelSize`, `watchBeforeMatch`, `BeforeMatchOptions` |
 | `@fragiola/primitives/range` | `snapToStep`, `fractionAlong`, `valueAtFraction`, `valueToPercent`, `nearestThumb`, `moveThumb`, `thumbBounds`, `RangeOptions`, `ThumbOptions`, `sliderKeyTarget`, `SliderKeyOptions`, `progressValue`, `ProgressOptions`, `ProgressStatus`, `ProgressValue` |
+| `@fragiola/primitives/scroll-area` | `createScrollArea`, `ScrollAreaController`, `ScrollAreaOptions`, `ScrollAreaOrientation`, `ScrollAreaPart`, `ScrollAreaState`, `ScrollAreaThreshold`, `ScrollAreaThresholdInput`, `initialScrollAreaState`, `normalizeScrollAreaThreshold`, `thumbGeometry`, `ThumbGeometry`, `ThumbGeometryInput`, `scrollFromStart`, `scrollForThumbOffset`, `MIN_THUMB_SIZE` |
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
@@ -141,6 +143,19 @@ alone: a list that does not opt in imports neither. The root entry,
   hidden-page pauses, two live regions that announce each shown toast by its priority, the focus
   off a closing toast); `measureToastHeight(element)` a toast's natural height
   ([Toast](/docs/api/toast)).
+- **Scroll area**: `createScrollArea(root, { direction, threshold, onStateChange })` is a
+  ScrollArea's DOM side: the parts register as they mount (`setPart("viewport" | "content" |
+  "scrollbar-y" | ..., element)`), and it measures them on mount, on scroll and on resize
+  (`ResizeObserver`), writes the CSS variables (`--scroll-area-overflow-*` on the viewport,
+  `--scroll-area-thumb-*` on the scrollbars, `--scroll-area-corner-*` on the root) and each
+  thumb's transform, runs the scrollbars' thumb drag, track press and wheel, and reports the
+  state (`ScrollAreaState`: the overflow and its edges, `scrolling` per axis, `hovering`, whether
+  the viewport needs a tab stop). `thumbGeometry`, `scrollFromStart` and `scrollForThumbOffset`
+  are its math ([ScrollArea](/docs/api/scroll-area)).
+- **Pagination range**: `paginationRange({ page, count, siblingCount, boundaryCount })` gives the
+  pages and ellipses in order (every page while they fit, else a constant number of items with
+  the window kept whole near the ends, no ellipsis for a single page); `pageCount({ count, total,
+  pageSize })` and `clampPage(page, count)` ([Pagination](/docs/api/pagination)).
 - **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
   delay groups. `watchLongPress(element, { delay, moveTolerance, pointerTypes, onLongPress })`
   (`LongPressOptions`; defaults 500 ms, 10 px, touch only) calls `onLongPress(point, event)` once a

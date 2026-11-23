@@ -112,6 +112,7 @@ describe("the embeds", () => {
         expect(ids[0]).toEqual([
             "accordion",
             "alert-dialog",
+            "aspect-ratio",
             "autocomplete",
             "avatar",
             "button",
@@ -137,9 +138,11 @@ describe("the embeds", () => {
             "navigation-menu",
             "number-field",
             "otp-field",
+            "pagination",
             "popover",
             "progress",
             "radio-group",
+            "scroll-area",
             "select",
             "select-virtual",
             "separator",
@@ -175,6 +178,7 @@ describe("the embeds", () => {
                 "toast-promise",
                 "tabs",
                 "navigation-menu",
+                "pagination",
                 "collapsible",
                 "accordion",
                 "field",
@@ -202,6 +206,8 @@ describe("the embeds", () => {
                 "meter",
                 "avatar",
                 "separator",
+                "scroll-area",
+                "aspect-ratio",
             ]);
             for (const example of manifest.examples) {
                 expect(example.packages, framework).toEqual([

@@ -201,6 +201,7 @@ describe("the sidebar", () => {
             "api/menubar",
             "api/navigation-menu",
             "api/tabs",
+            "api/pagination",
             "api/collapsible",
             "api/accordion",
             "api/field",
@@ -235,6 +236,8 @@ describe("the sidebar", () => {
             "api/meter",
             "api/avatar",
             "api/separator",
+            "api/scroll-area",
+            "api/aspect-ratio",
             "api/direction",
             "api/render",
             "api/async-list",
@@ -259,6 +262,7 @@ describe("the sidebar", () => {
             "api/menubar",
             "api/navigation-menu",
             "api/tabs",
+            "api/pagination",
             "api/collapsible",
             "api/accordion",
             "api/field",
@@ -284,6 +288,9 @@ describe("the sidebar", () => {
             "api/range-calendar",
             "api/date-picker",
             "api/date-range-picker",
+            "api/pagination",
+            "api/scroll-area",
+            "api/aspect-ratio",
         ]) {
             const page = site.pages.get(path) ?? "";
             const headings = [...page.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
@@ -296,9 +303,11 @@ describe("the sidebar", () => {
                 "Keyboard",
                 "Exports",
             ]);
-            // every component follows an APG pattern but the Field layer, OTPField, HoverCard and
-            // Toast, which have none (Base UI's Field, Fieldset, Form, OTP Field, PreviewCard and
-            // Toast; Toast follows WAI-ARIA's live regions)
+            // every component follows an APG pattern but the Field layer, OTPField, HoverCard,
+            // Toast and ScrollArea, which have none (Base UI's Field, Fieldset, Form, OTP Field,
+            // PreviewCard, Toast and ScrollArea; Toast follows WAI-ARIA's live regions);
+            // Pagination links the APG patterns it is the closest to, AspectRatio the APG's index
+            // beside CSS's aspect-ratio
             if (
                 ![
                     "api/field",
@@ -307,6 +316,7 @@ describe("the sidebar", () => {
                     "api/otp-field",
                     "api/hover-card",
                     "api/toast",
+                    "api/scroll-area",
                 ].includes(path)
             ) {
                 expect(page, path).toMatch(

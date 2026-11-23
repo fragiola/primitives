@@ -1,0 +1,200 @@
+---
+title: Pagination
+description: A navigation landmark of page buttons or links with Previous, Next, First, Last and ellipses, the current page marked aria-current, in each framework.
+---
+
+Moves between the pages of a paged list: a results table, a search, an archive. The APG has no
+pagination pattern and Base UI has no Pagination, so the behaviour is the APG-closest one: a
+[navigation landmark](https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html)
+you name, the current page marked `aria-current="page"` as the APG's
+[breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/) marks its current link, and
+native buttons or links in the tab order (no arrow keys: it is no composite widget).
+
+<Example id="pagination" />
+
+## Behaviour
+
+- **Page**: from 1, controlled or not; a page outside `[1, count]` is clamped. `count`, or
+  `total` and `pageSize` (`ceil(total / pageSize)`), never less than 1.
+- **Range**: the Root's children render it (React: a function; Vue: the default scoped slot;
+  Angular: `items()`): every page while they fit in `2 × boundaryCount + 2 × siblingCount + 3`
+  items, else the boundary pages, the window around the current page (kept whole near the ends),
+  and an ellipsis on each side, never one that stands for a single page. With 10 pages and the
+  defaults, page 5 gives `1 … 4 5 6 … 10`.
+- **Controls**: Previous and First are disabled on the first page, Next and Last on the last; a
+  press reports the new page with its reason (`item-press`, `previous-press`, `next-press`,
+  `first-press`, `last-press`); the current page's Item reports nothing.
+- **Links**: `render` a link with `nativeButton={false}`: no `type`, `aria-disabled` instead of
+  `disabled`, and its own navigation (the `href`, your router) goes on.
+- **No text**: name the Root (`aria-label`) and the arrows; an Item is named by its page number.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `nav` | `pagination-root` | the landmark; holds the page and the range |
+| Item | `button` | `pagination-item` | a page |
+| Ellipsis | `span` | `pagination-ellipsis` | the pages left out |
+| Previous | `button` | `pagination-previous` | the page before |
+| Next | `button` | `pagination-next` | the page after |
+| First | `button` | `pagination-first` | the first page |
+| Last | `button` | `pagination-last` | the last page |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Pagination } from "@fragiola/primitives-react/pagination";
+
+<Pagination.Root aria-label="Results pages" total={95} pageSize={10} page={page} onPageChange={setPage}>
+    {({ items }) => (
+        <>
+            <Pagination.Previous aria-label="Previous page">‹</Pagination.Previous>
+            {items.map((item) =>
+                item.type === "page" ? (
+                    <Pagination.Item key={item.value} value={item.value}>
+                        {item.value}
+                    </Pagination.Item>
+                ) : (
+                    <Pagination.Ellipsis key={item.position}>…</Pagination.Ellipsis>
+                ),
+            )}
+            <Pagination.Next aria-label="Next page">›</Pagination.Next>
+        </>
+    )}
+</Pagination.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Pagination.Root v-slot="{ items }" v-model:page="page" aria-label="Results pages" :total="95" :page-size="10">
+        <Pagination.Previous aria-label="Previous page">‹</Pagination.Previous>
+        <template v-for="item in items" :key="item.type === 'page' ? item.value : item.position">
+            <Pagination.Item v-if="item.type === 'page'" :value="item.value">{{ item.value }}</Pagination.Item>
+            <Pagination.Ellipsis v-else>…</Pagination.Ellipsis>
+        </template>
+        <Pagination.Next aria-label="Next page">›</Pagination.Next>
+    </Pagination.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [PaginationRoot, PaginationItem, PaginationEllipsis, PaginationPrevious, PaginationNext],
+    template: `
+        <nav paginationRoot #pager="paginationRoot" aria-label="Results pages" [total]="95" [pageSize]="10" [(page)]="page">
+            <button paginationPrevious aria-label="Previous page">‹</button>
+            @for (item of pager.items(); track $index) {
+                @if (item.type === "page") {
+                    <button paginationItem [value]="item.value">{{ item.value }}</button>
+                } @else {
+                    <span paginationEllipsis>…</span>
+                }
+            }
+            <button paginationNext aria-label="Next page">›</button>
+        </nav>
+    `,
+})
+export class ResultsPager {
+    protected readonly page = signal(1);
+}
+```
+
+`pager.currentPage()` and `pager.pageCount()` read the page and the count (`page` and `count` are
+the Root's inputs).
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`v-model:page`, `:page-size`, `:native-button`), and Angular
+as inputs (`[(page)]`, `[pageSize]`, `[nativeButton]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `page` | `number` | | the current page, from 1 (controlled) |
+| `defaultPage` | `number` | `1` | the page at first |
+| `onPageChange` | `(page, details) => void` | | every page change, with its reason; Vue `@page-change` (and `update:page`), Angular `(pageChangeDetails)` (and `(pageChange)`, the page alone) |
+| `count` | `number` | | the number of pages |
+| `total` | `number` | | the number of rows, with `pageSize`, when `count` is not given |
+| `pageSize` | `number` | `10` | the rows per page |
+| `siblingCount` | `number` | `1` | the pages shown on each side of the current one |
+| `boundaryCount` | `number` | `1` | the pages always shown at each end |
+| `disabled` | `boolean` | `false` | every control is disabled |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `number` | required | its page |
+| `nativeButton` | `boolean` | `true` | `false` when it renders a link: no `type`, `aria-disabled` instead of `disabled` |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the Item's own; not while disabled |
+
+### Ellipsis
+
+No props of its own; its children are its text.
+
+### Previous
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `nativeButton` | `boolean` | `true` | `false` when it renders a link |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the control's own; not while disabled |
+
+### Next
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `nativeButton` | `boolean` | `true` | `false` when it renders a link |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the control's own; not while disabled |
+
+### First
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `nativeButton` | `boolean` | `true` | `false` when it renders a link |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the control's own; not while disabled |
+
+### Last
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `nativeButton` | `boolean` | `true` | `false` when it renders a link |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the control's own; not while disabled |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled` |
+| Item | `aria-current="page"` and `data-current` on the current page; `type="button"`; `data-disabled`, with `disabled` (a button) or `aria-disabled="true"` (a link) |
+| Previous, First | disabled on the first page: `disabled` or `aria-disabled="true"`, `data-disabled` |
+| Next, Last | disabled on the last page, the same |
+| Ellipsis | none |
+
+## Keyboard
+
+The browser's: Tab and Shift+Tab move through the enabled controls, Enter (and Space on a button)
+presses one. A disabled button is out of the tab order; a disabled link stays in it and its press
+does nothing.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/pagination` | `Pagination`, `ChangeDetails`, `ChangeReason`, `PaginationControlProps`, `PaginationControlState`, `PaginationEllipsisProps`, `PaginationFirstProps`, `PaginationItemProps`, `PaginationItemState`, `PaginationLastProps`, `PaginationNextProps`, `PaginationPreviousProps`, `PaginationRangeItem`, `PaginationRenderProps`, `PaginationRootProps`, `PaginationState`, `RenderProp` |
+| `@fragiola/primitives-vue/pagination` | `Pagination`, `ChangeDetails`, `ChangeReason`, `PaginationControlProps`, `PaginationControlState`, `PaginationEllipsisState`, `PaginationItemProps`, `PaginationItemState`, `PaginationRangeItem`, `PaginationRootEmits`, `PaginationRootProps`, `PaginationRootSlots`, `PaginationSlotProps`, `PaginationState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/pagination` | `ChangeDetails`, `ChangeReason`, `PaginationControlState`, `PaginationEllipsis`, `PaginationFirst`, `PaginationItem`, `PaginationItemState`, `PaginationLast`, `PaginationNext`, `PaginationPrevious`, `PaginationRangeItem`, `PaginationRoot`, `PaginationState`, `ValueChangeEvent` |

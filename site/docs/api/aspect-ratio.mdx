@@ -1,0 +1,97 @@
+---
+title: AspectRatio
+description: A box that keeps its content at a width-to-height ratio with one structural style, in each framework.
+---
+
+Keeps its content at a ratio: an image frame, a video embed, a map tile. It is one `div` with a
+structural `aspect-ratio`, and no behaviour. It is a markup-and-CSS component, which the scope
+rule gives to Fragiola UI; it is here because the stage 2 list has it, and kept to that one
+style. The APG has no pattern for it; it follows the CSS
+[`aspect-ratio`](https://www.w3.org/TR/css-sizing-4/#aspect-ratio) property, not a
+[pattern](https://www.w3.org/WAI/ARIA/apg/patterns/).
+
+<Example id="aspect-ratio" />
+
+## Behaviour
+
+- **Ratio**: the width over the height (`16 / 9`); its width is the layout's, its height follows.
+  A ratio that is not a positive finite number is `1`.
+- **Strict**: `min-height: 0`, so a taller child overflows the box instead of stretching it: clip
+  it (`overflow: hidden`) or fit it (`object-fit: cover`).
+- **Nothing else**: no role, no state attribute, no focus, no key.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| AspectRatio | `div` | `aspect-ratio-root` | the box |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { AspectRatio } from "@fragiola/primitives-react/aspect-ratio";
+
+<AspectRatio ratio={16 / 9}>
+    <img src="/hills.jpg" alt="Hills under the sun" className="size-full object-cover" />
+</AspectRatio>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <AspectRatio :ratio="16 / 9">
+        <img src="/hills.jpg" alt="Hills under the sun" class="size-full object-cover" />
+    </AspectRatio>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [AspectRatio],
+    template: `
+        <div aspectRatio [ratio]="16 / 9">
+            <img src="/hills.jpg" alt="Hills under the sun" class="size-full object-cover" />
+        </div>
+    `,
+})
+export class Frame {}
+```
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards.
+
+### AspectRatio
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `ratio` | `number` | `1` | the width over the height |
+
+## State and part attributes
+
+None but its part attribute. Structural style: `aspect-ratio: <ratio>`, `min-height: 0`.
+
+## Keyboard
+
+None.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/aspect-ratio` | `AspectRatio`, `AspectRatioProps`, `AspectRatioState`, `RenderProp` |
+| `@fragiola/primitives-vue/aspect-ratio` | `AspectRatio`, `AspectRatioProps`, `AspectRatioState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/aspect-ratio` | `AspectRatio`, `AspectRatioState` |
