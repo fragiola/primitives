@@ -42,6 +42,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     "toggle-group": ["_recipes/toggle.ts"],
     toolbar: ["_recipes/toggle-group.ts", "_recipes/toggle.ts"],
     menubar: ["_recipes/menu.ts"],
+    // the Label that names the field (Label has no example of its own: these show it)
+    "number-field": ["_recipes/label.ts"],
+    "otp-field": ["_recipes/label.ts"],
     "radio-group": [
         "_recipes/button.ts",
         "_recipes/field.ts",
@@ -57,7 +60,7 @@ const RECIPE_OF: Record<string, string> = {
 };
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
-const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar"]);
+const WITHOUT_SHARED: ReadonlySet<string> = new Set(["avatar", "meter"]);
 
 describe("the manifest", () => {
     for (const framework of FRAMEWORKS) {
@@ -92,9 +95,12 @@ describe("the manifest", () => {
                 "toggle",
                 "toggle-group",
                 "toolbar",
+                "number-field",
+                "otp-field",
                 "date-picker",
                 "calendar",
                 "progress",
+                "meter",
                 "avatar",
                 "separator",
             ]);
