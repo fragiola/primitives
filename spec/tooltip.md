@@ -83,7 +83,9 @@ Focus never moves into the popup. A focus by a pointer press does not open it.
   leaving the Trigger and the popup, even when it leaves at once with no move outside the bridge
   first: a hover-opened tooltip closes after `closeDelay` (Epic #49; the toolkit's
   `watchPointerExit`, a mouse or pen `pointerout` with no `relatedTarget`). It stayed open until
-  the pointer's next move in the page.
+  the pointer's next move in the page. The pointer entering an iframe of the page (its
+  `pointerout` has no `relatedTarget` either, at a point inside the viewport over the frame) is
+  no exit.
 - A press on the Trigger closes it (reason `trigger-press`) and it does not reopen until the
   pointer leaves and enters again.
 - **Touch**: a tap never opens a tooltip (`pointerType` `touch` is ignored), as Base UI.
