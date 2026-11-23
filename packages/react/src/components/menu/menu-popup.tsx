@@ -101,6 +101,10 @@ export function MenuPopup(
         const items = menuItems(popup);
         const highlight = pendingHighlight.current;
         pendingHighlight.current = null;
+        // a bar moving to this menu keeps the focus on its item (spec/menu.md, "In a Menubar")
+        if (highlight === "keep") {
+            return;
+        }
         const target =
             highlight === "first"
                 ? items[0]
@@ -182,6 +186,11 @@ export function MenuPopup(
                 if (nested && event.key === closeKey) {
                     event.preventDefault();
                     setOpen(false, "list-navigation", event.nativeEvent);
+                    return;
+                }
+                // the keys a level leaves go to its bar first (spec/menu.md, "In a Menubar")
+                if (context.bar?.menuKeyDown(event, context)) {
+                    event.preventDefault();
                     return;
                 }
                 if (

@@ -4,6 +4,7 @@ import type {
     OverlayTriggerRootProps,
 } from "../../hooks/use-overlay-root.ts";
 import { useAttachHandle } from "../../hooks/use-overlay-trigger.ts";
+import { MenuBarContext } from "./menu-bar-context.ts";
 import { MenuContext } from "./menu-context.ts";
 import type { MenuHandle } from "./menu-handle.ts";
 import { useMenuRoot } from "./use-menu-root.ts";
@@ -38,11 +39,16 @@ export function MenuRoot<Payload = unknown>({
 }: MenuRootProps<Payload>) {
     const value = useMenuRoot(props, false);
     useAttachHandle(handle, value);
+    // a Menu opened from inside this one's content is no menu of the bar (spec/menu.md)
     return (
         <MenuContext.Provider value={value}>
-            {typeof children === "function"
-                ? children({ payload: value.payload as Payload | undefined })
-                : children}
+            <MenuBarContext.Provider value={null}>
+                {typeof children === "function"
+                    ? children({
+                          payload: value.payload as Payload | undefined,
+                      })
+                    : children}
+            </MenuBarContext.Provider>
         </MenuContext.Provider>
     );
 }
