@@ -137,6 +137,9 @@ describe("the embeds", () => {
             "slider",
             "switch",
             "tabs",
+            "toggle",
+            "toggle-group",
+            "toolbar",
             "tooltip",
         ]);
         for (const list of ids) expect(list).toEqual(ids[0]);
@@ -169,6 +172,9 @@ describe("the embeds", () => {
                 "radio-group",
                 "switch",
                 "button",
+                "toggle",
+                "toggle-group",
+                "toolbar",
                 "date-picker",
                 "calendar",
                 "progress",

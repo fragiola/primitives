@@ -38,6 +38,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     "date-picker": ["_recipes/calendar.ts", "_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
+    // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar
+    "toggle-group": ["_recipes/toggle.ts"],
+    toolbar: ["_recipes/toggle-group.ts", "_recipes/toggle.ts"],
     "radio-group": [
         "_recipes/button.ts",
         "_recipes/field.ts",
@@ -84,6 +87,9 @@ describe("the manifest", () => {
                 "radio-group",
                 "switch",
                 "button",
+                "toggle",
+                "toggle-group",
+                "toolbar",
                 "date-picker",
                 "calendar",
                 "progress",
