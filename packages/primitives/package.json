@@ -156,6 +156,12 @@
             "import": "./dist/scroll-lock.js",
             "default": "./dist/scroll-lock.js"
         },
+        "./segments": {
+            "@fragiola/source": "./src/segments/index.ts",
+            "types": "./dist/segments.d.ts",
+            "import": "./dist/segments.js",
+            "default": "./dist/segments.js"
+        },
         "./selection": {
             "@fragiola/source": "./src/selection/index.ts",
             "types": "./dist/selection.d.ts",
@@ -167,6 +173,12 @@
             "types": "./dist/swipe.d.ts",
             "import": "./dist/swipe.js",
             "default": "./dist/swipe.js"
+        },
+        "./time": {
+            "@fragiola/source": "./src/time/index.ts",
+            "types": "./dist/time.d.ts",
+            "import": "./dist/time.js",
+            "default": "./dist/time.js"
         },
         "./toast": {
             "@fragiola/source": "./src/toast/index.ts",
@@ -295,6 +307,11 @@
                 "import": "./dist/scroll-lock.js",
                 "default": "./dist/scroll-lock.js"
             },
+            "./segments": {
+                "types": "./dist/segments.d.ts",
+                "import": "./dist/segments.js",
+                "default": "./dist/segments.js"
+            },
             "./selection": {
                 "types": "./dist/selection.d.ts",
                 "import": "./dist/selection.js",
@@ -304,6 +321,11 @@
                 "types": "./dist/swipe.d.ts",
                 "import": "./dist/swipe.js",
                 "default": "./dist/swipe.js"
+            },
+            "./time": {
+                "types": "./dist/time.d.ts",
+                "import": "./dist/time.js",
+                "default": "./dist/time.js"
             },
             "./toast": {
                 "types": "./dist/toast.d.ts",

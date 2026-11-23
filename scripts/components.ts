@@ -107,8 +107,10 @@ export const MECHANISMS = [
     "range",
     "scroll-area",
     "scroll-lock",
+    "segments",
     "selection",
     "swipe",
+    "time",
     "toast",
     "virtual",
 ] as const;
