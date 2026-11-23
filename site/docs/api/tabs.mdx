@@ -131,6 +131,7 @@ is selected (Angular's `*tabsIndicator` is structural).
 | prop | type | default | description |
 | --- | --- | --- | --- |
 | `renderBeforeHydration` | `boolean` | `false` | in a server render, places it before hydration: a small inline script inside it measures the selected tab as the page parses, then removes itself ([Server rendering](/docs/server-rendering)) (Angular: `*tabsIndicator="true"`) |
+| `nonce` | `string` | | the `nonce` of that script, so it runs under a Content Security Policy that allows inline scripts by nonce (Angular: `*tabsIndicator="true; nonce: cspNonce"`, else Angular's `CSP_NONCE` provider) |
 
 ### Panel
 

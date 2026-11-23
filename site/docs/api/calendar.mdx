@@ -31,7 +31,7 @@ one.
   days of other months can neither be focused nor chosen.
 - **Pages**: PrevButton and NextButton move by `visibleMonths` and keep the focus; the focused
   date follows. They are disabled when the next page would only hold disabled dates.
-- **Locale**: `locale` (default: the document's `lang`, then the browser's) gives the names and the
+- **Locale**: `locale` (default: the document's `lang`, followed when it changes, then the browser's) gives the names and the
   first day of the week (`firstDayOfWeek` overrides it).
 - **Grid**: six weeks always, so it never changes height. The month Heading of offset 0 is
   announced (`aria-live`).

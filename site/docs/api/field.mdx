@@ -32,7 +32,8 @@ The [forms guide](/docs/guides/forms) walks through them together.
   enclosing [Form](/docs/api/form)'s `validationMode`, else `onSubmit`. Focusing and leaving an
   empty required field shows nothing until the value changed or a submission was attempted. A
   change on a field that shows an error, in a mode that does not validate on every change, hides
-  the error, unless it leaves a required value missing.
+  the error at once, even while an async `validate` runs, unless it leaves a required value
+  missing.
 - **Async validation**: the native validity is checked at once; a native error is shown without
   waiting for the promise. While the latest run is pending, the field keeps what it shows. The
   latest run wins: an answer for an older value is dropped, even when it arrives last. A value
