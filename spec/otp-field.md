@@ -234,4 +234,5 @@ Checks:
 | --- | --- |
 | Base UI ignores (with a warning) an `aria-label` on the first slot and labels it by the field's label | the consumer's name wins on every slot, so each one says its position (Issue #51); a slot with no name takes the field's label |
 | Base UI's `normalizeValue` | `validationType` takes a `RegExp` (the Issue's "a pattern"); uppercasing and other normalizations are the consumer's (`value` + `onValueChange`) |
+| Base UI defers a slot's change during an IME composition (`compositionend`) | not yet: a composing input method commits each update to the slot (a known limit, for `alpha` and wider types; digits are never composed) |
 | Base UI's `autoSubmit`, `form`, `Separator`, cancelable change details | out of scope: `onValueComplete` can submit; a separator is the consumer's own element or a [Separator](separator.md) |

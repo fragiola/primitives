@@ -98,8 +98,12 @@ its text:
    a lone sign changes nothing); a text that is no number (`1.2.3`) changes nothing.
 
 On **blur**, the value is clamped (`clampOnBlur`, reason `input-blur` when it changed) and the
-text becomes the formatted value (empty for `null`). A step, a reset or a controlled value given
-by the consumer writes the formatted value at once.
+text becomes the formatted value (empty for `null`). A step or a reset writes the formatted value
+at once, and so does a controlled value while the Input shows no typed text; while the user is
+typing, the text stays theirs until the blur (the consumer's value is then shown).
+
+A `format` with `notation: "compact"` or `"scientific"` is not supported: its text (`1.5K`,
+`1.2E3`) is refused as typed.
 
 ### Stepping
 
