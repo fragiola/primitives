@@ -61,6 +61,7 @@ export function SelectVirtualList({
     // first, again once the popup is placed), which reads boxes a popup's opening scale transforms
     const active = items.findIndex((item) => item.value === highlighted);
     const { positioner } = context;
+    // biome-ignore lint/correctness/useExhaustiveDependencies: runs again once the popup is placed, after the Item's own scroll
     useLayoutEffect(() => {
         if (active >= 0) {
             virtualizer.scrollToIndex(active);

@@ -71,6 +71,7 @@ export function ComboboxVirtualList<Entry = unknown>({
     // first, again once the popup is placed), which reads boxes a popup's opening scale transforms
     const { virtualizer } = virtual;
     const { positioner } = context;
+    // biome-ignore lint/correctness/useExhaustiveDependencies: runs again once the popup is placed, after the Item's own scroll
     useLayoutEffect(() => {
         if (current !== undefined) {
             virtualizer.scrollToIndex(current);

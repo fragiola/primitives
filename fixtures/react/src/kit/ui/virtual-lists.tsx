@@ -31,13 +31,19 @@ export const ListboxVirtual = {
 
 export const SelectVirtual = {
     List: (props: SelectVirtualListProps) => (
-        <SelectPrimitive.List className={`${select.list} ${SCROLL}`} {...props} />
+        <SelectPrimitive.List
+            className={`${select.list} ${SCROLL}`}
+            {...props}
+        />
     ),
 };
 
 export const ComboboxVirtual = {
     List: <Entry,>(props: ComboboxVirtualListProps<Entry>) => (
-        <ComboboxPrimitive.List<Entry> className={`${combobox.list} ${SCROLL}`} {...props} />
+        <ComboboxPrimitive.List<Entry>
+            className={`${combobox.list} ${SCROLL}`}
+            {...props}
+        />
     ),
 };
 
