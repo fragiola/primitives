@@ -41,7 +41,7 @@ test("meter / basic: parts, the label and the indicator's structural style", asy
         ),
     ).toBe("75%");
     await page.getByRole("button", { name: "Overcharge" }).click();
-    expect(await style("inline-size")).toBe("100%");
+    await expect.poll(() => style("inline-size")).toBe("100%");
     // no state attribute of its own (spec/meter.md, "State attributes and ARIA")
     const dataAttributes = await parts(page, "meter").evaluateAll((elements) =>
         elements.flatMap((element) =>
