@@ -62,6 +62,8 @@ export * from "@fragiola/primitives-angular/separator";
 export * from "@fragiola/primitives-angular/slider";
 export * from "@fragiola/primitives-angular/switch";
 export * from "@fragiola/primitives-angular/tabs";
+export * from "@fragiola/primitives-angular/tag-group";
+export * from "@fragiola/primitives-angular/tags-input";
 export * from "@fragiola/primitives-angular/time-field";
 export * from "@fragiola/primitives-angular/time-range-field";
 export * from "@fragiola/primitives-angular/toast";
