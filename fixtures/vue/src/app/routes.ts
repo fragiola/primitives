@@ -5,6 +5,7 @@ import AccordionMultiple from "../scenarios/accordion/accordion-multiple.vue";
 import AlertDialogBasic from "../scenarios/alert-dialog/alert-dialog-basic.vue";
 import AlertDialogDetached from "../scenarios/alert-dialog/alert-dialog-detached.vue";
 import AlertDialogLifecycle from "../scenarios/alert-dialog/alert-dialog-lifecycle.vue";
+import AspectRatioBasic from "../scenarios/aspect-ratio/aspect-ratio-basic.vue";
 import AutocompleteAsync from "../scenarios/autocomplete/autocomplete-async.vue";
 import AutocompleteBasic from "../scenarios/autocomplete/autocomplete-basic.vue";
 import AutocompleteBoth from "../scenarios/autocomplete/autocomplete-both.vue";
@@ -99,6 +100,8 @@ import NumberFieldFormat from "../scenarios/number-field/number-field-format.vue
 import NumberFieldScrub from "../scenarios/number-field/number-field-scrub.vue";
 import OtpFieldBasic from "../scenarios/otp-field/otp-field-basic.vue";
 import OtpFieldField from "../scenarios/otp-field/otp-field-field.vue";
+import PaginationBasic from "../scenarios/pagination/pagination-basic.vue";
+import PaginationLinks from "../scenarios/pagination/pagination-links.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
 import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
@@ -110,6 +113,8 @@ import PopoverRtl from "../scenarios/popover/popover-rtl.vue";
 import ProgressBasic from "../scenarios/progress/progress-basic.vue";
 import RadioGroupBasic from "../scenarios/radio-group/radio-group-basic.vue";
 import RadioGroupControlled from "../scenarios/radio-group/radio-group-controlled.vue";
+import ScrollAreaBasic from "../scenarios/scroll-area/scroll-area-basic.vue";
+import ScrollAreaLinks from "../scenarios/scroll-area/scroll-area-links.vue";
 import SelectBasic from "../scenarios/select/select-basic.vue";
 import SelectControlled from "../scenarios/select/select-controlled.vue";
 import SelectGroups from "../scenarios/select/select-groups.vue";
@@ -318,4 +323,9 @@ export const routes: Record<string, Component> = {
     "/hover-card/detached": HoverCardDetached,
     "/hover-card/in-dialog": HoverCardInDialog,
     "/hover-card/lifecycle": HoverCardLifecycle,
+    "/scroll-area/basic": ScrollAreaBasic,
+    "/scroll-area/links": ScrollAreaLinks,
+    "/pagination/basic": PaginationBasic,
+    "/pagination/links": PaginationLinks,
+    "/aspect-ratio/basic": AspectRatioBasic,
 };
