@@ -152,4 +152,12 @@ export const ROUTES: readonly string[] = [
     "/combobox-virtual/async",
     "/autocomplete-virtual/basic",
     "/autocomplete-virtual/async",
+    "/toast/basic",
+    "/toast/limit",
+    "/toast/promise",
+    "/toast/swipe",
+    "/hover-card/basic",
+    "/hover-card/detached",
+    "/hover-card/in-dialog",
+    "/hover-card/lifecycle",
 ];
