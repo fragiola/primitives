@@ -185,7 +185,8 @@ Checks:
 1. Two `group`s named "Stay Start date" and "Stay End date", three `spinbutton`s each (month, day,
    year, `en-US`); the start's month is named "Stay Start date" and its `Intl.DisplayNames` name.
 2. Typing `1`, `1`, `2`, `3`, `2`, `0`, `2`, `6` fills the start and moves the focus to the end's
-   month; no change is reported yet (no `value` line: the range needs both ends).
+   month; nothing is reported yet (the output still reads `value: none`, `reason: none`: the
+   range needs both ends).
 3. Typing `1`, `1`, `2`, `7`, `2`, `0`, `2`, `6`: `value: 2026-11-23..2026-11-27`,
    `reason: input-change`.
 4. ArrowLeft from the end's month focuses the start's year; ArrowRight the end's month again.

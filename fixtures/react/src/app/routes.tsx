@@ -48,6 +48,8 @@ import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
+import { DateRangeFieldBasic } from "../scenarios/date-range-field/date-range-field-basic.tsx";
+import { DateRangeFieldForm } from "../scenarios/date-range-field/date-range-field-form.tsx";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.tsx";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.tsx";
 import { DialogDetached } from "../scenarios/dialog/dialog-detached.tsx";
@@ -143,6 +145,7 @@ import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
 import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.tsx";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.tsx";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.tsx";
+import { TimeRangeFieldBasic } from "../scenarios/time-range-field/time-range-field-basic.tsx";
 import { ToastBasic } from "../scenarios/toast/toast-basic.tsx";
 import { ToastLimit } from "../scenarios/toast/toast-limit.tsx";
 import { ToastPromise } from "../scenarios/toast/toast-promise.tsx";
@@ -307,6 +310,9 @@ export const routes: Record<
     "/time-field/basic": TimeFieldBasic,
     "/time-field/min-max": TimeFieldMinMax,
     "/time-field/form": TimeFieldForm,
+    "/date-range-field/basic": DateRangeFieldBasic,
+    "/date-range-field/form": DateRangeFieldForm,
+    "/time-range-field/basic": TimeRangeFieldBasic,
     "/otp-field/basic": OtpFieldBasic,
     "/otp-field/field": OtpFieldField,
     "/progress/basic": ProgressBasic,
