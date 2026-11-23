@@ -42,6 +42,10 @@ import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
 import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.ts";
 import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.ts";
+import { DateFieldBasic } from "../scenarios/date-field/date-field-basic.ts";
+import { DateFieldDateTime } from "../scenarios/date-field/date-field-date-time.ts";
+import { DateFieldForm } from "../scenarios/date-field/date-field-form.ts";
+import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
@@ -136,6 +140,9 @@ import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
+import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.ts";
+import { TimeFieldForm } from "../scenarios/time-field/time-field-form.ts";
+import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.ts";
 import { ToastBasic } from "../scenarios/toast/toast-basic.ts";
 import { ToastLimit } from "../scenarios/toast/toast-limit.ts";
 import { ToastPromise } from "../scenarios/toast/toast-promise.ts";
@@ -289,6 +296,13 @@ import { ROUTES } from "./routes.ts";
         NumberFieldField,
         NumberFieldFormat,
         NumberFieldScrub,
+        DateFieldBasic,
+        DateFieldMinMax,
+        DateFieldForm,
+        DateFieldDateTime,
+        TimeFieldBasic,
+        TimeFieldMinMax,
+        TimeFieldForm,
         OtpFieldBasic,
         OtpFieldField,
         ProgressBasic,
@@ -460,6 +474,13 @@ import { ROUTES } from "./routes.ts";
             @case ("/number-field/field") { <main class="p-6" scenario-number-field-field></main> }
             @case ("/number-field/format") { <main class="p-6" scenario-number-field-format [locale]="query.locale"></main> }
             @case ("/number-field/scrub") { <main class="p-6" scenario-number-field-scrub></main> }
+            @case ("/date-field/basic") { <main class="p-6" scenario-date-field-basic [locale]="query.locale"></main> }
+            @case ("/date-field/min-max") { <main class="p-6" scenario-date-field-min-max></main> }
+            @case ("/date-field/form") { <main class="p-6" scenario-date-field-form></main> }
+            @case ("/date-field/date-time") { <main class="p-6" scenario-date-field-date-time [locale]="query.locale"></main> }
+            @case ("/time-field/basic") { <main class="p-6" scenario-time-field-basic [locale]="query.locale"></main> }
+            @case ("/time-field/min-max") { <main class="p-6" scenario-time-field-min-max></main> }
+            @case ("/time-field/form") { <main class="p-6" scenario-time-field-form></main> }
             @case ("/otp-field/basic") { <main class="p-6" scenario-otp-field-basic></main> }
             @case ("/otp-field/field") { <main class="p-6" scenario-otp-field-field></main> }
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }

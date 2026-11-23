@@ -1,0 +1,136 @@
+---
+title: TimeField
+description: A time of day typed in segments, each an APG spinbutton, with the locale's hour cycle and day period, forms and Field support, in each framework.
+---
+
+A time of day typed in parts: the hour, the minutes (and seconds) and, on a 12-hour clock, the
+day period. It is the [DateField](/docs/api/date-field)'s anatomy over a time: its Input and
+Segment are DateField's, named `time-field-*` inside a TimeField. It works in a native `<form>`
+and in a [Field](/docs/api/field). Each segment is an [APG spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/).
+
+<Example id="time-field" />
+
+## Behaviour
+
+- **The locale's clock**: a 12- or 24-hour cycle from the locale (`hourCycle` overrides it), the
+  day period's text and the segments' names from `Intl`.
+- **Value**: a `PlainTime` (`{ hour, minute, second, millisecond }`, `hour` 0–23), set once every
+  segment is; `null` until then.
+- **The day period**: typed by the first letter of its AM or PM text in the locale; the arrows
+  toggle it. A 12-hour hour steps within its half of the day (11 AM + 1 is 12 AM).
+- **Validation**: a time before `min` or after `max` is invalid; a `min` later than `max` is no
+  range across midnight, and stepping across midnight never makes a time valid.
+- **Forms**: a hidden native `time` input submits the ISO time (`14:30`, `14:30:05` at
+  `second`), with `min` and `max`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `time-field-root` | holds the value; renders the hidden input after it |
+| Input | `div` | `time-field-input` | `group` of the segments |
+| Segment | `span` | `time-field-segment` | `spinbutton`, or a literal hidden from assistive technology |
+| (hidden input) | `input type="time"` | `time-field-hidden-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { TimeField } from "@fragiola/primitives-react/time-field";
+
+<TimeField.Root value={time} onValueChange={setTime} min={opens} max={closes} name="meeting">
+    <TimeField.Input aria-label="Meeting time" />
+</TimeField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <TimeField.Root v-model:value="time" :min="opens" :max="closes" name="meeting">
+        <TimeField.Input aria-label="Meeting time" />
+    </TimeField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [TimeFieldRoot, DateFieldInput, DateFieldSegment],
+    template: `
+        <div timeFieldRoot [(value)]="time" [min]="opens" [max]="closes" name="meeting">
+            <div dateFieldInput #input="dateFieldInput" aria-label="Meeting time">
+                @for (segment of input.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+        </div>
+    `,
+})
+export class Meeting {
+    protected readonly time = signal<PlainTime | null>(null);
+    protected readonly opens = { hour: 9, minute: 0, second: 0, millisecond: 0 };
+    protected readonly closes = { hour: 17, minute: 0, second: 0, millisecond: 0 };
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives.
+Vue binds the value as `v-model:value` with `@value-change`; Angular as `[(value)]` with
+`(valueChangeDetails)`. The Input and the Segment are [DateField's](/docs/api/date-field#input).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainTime \| null` | | the value, controlled |
+| `defaultValue` | `PlainTime \| null` | `null` | the initial value, uncontrolled |
+| `onValueChange` | `(value, details: { reason, event }) => void` | | every change of the value |
+| `granularity` | `"hour" \| "minute" \| "second"` | `"minute"` | the smallest segment |
+| `placeholderValue` | `PlainTime` | midnight | what an arrow on an empty segment starts from |
+| `hourCycle` | `12 \| 24` | the locale's | the clock |
+| `min` | `PlainTime` | | times before it are invalid |
+| `max` | `PlainTime` | | times after it are invalid |
+| `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `required` | `boolean` | `false` | the hidden input is required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |
+| `name` | `string` | | the hidden input's name (a Field's wins) |
+
+### Input
+
+Its children: a function of each segment (Vue: the default slot's `{ segment }`; Angular: `@for`
+over `segments()`); with none, every segment with its own text.
+
+### Segment
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `segment` | `DateSegment` | required | one of the Input's segments |
+
+## State and part attributes
+
+As [DateField's](/docs/api/date-field#state-and-part-attributes), named `time-field-*`. The day
+period's segment has `inputmode="text"` and `aria-valuetext` its AM or PM text.
+
+## Keyboard
+
+As [DateField's](/docs/api/date-field#keyboard); on the day period, a letter sets it and the
+arrows toggle it.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/time-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputProps`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateSegment`, `PlainTime`, `RenderProp`, `SegmentGranularity`, `SegmentType`, `TimeField`, `TimeFieldRootProps` |
+| `@fragiola/primitives-vue/time-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputSlots`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateSegment`, `PlainTime`, `RenderSlotProps`, `SegmentGranularity`, `SegmentType`, `TimeField`, `TimeFieldRootEmits`, `TimeFieldRootProps` |
+| `@fragiola/primitives-angular/time-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInput`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateSegment`, `PlainTime`, `SegmentGranularity`, `SegmentType`, `TimeFieldRoot`, `ValueChangeEvent` |

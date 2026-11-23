@@ -6,6 +6,8 @@ import {
     entryLeaks,
     GUARD,
     type GuardRules,
+    MECHANISM_USERS,
+    mechanismLeaks,
     ownerOf,
 } from "../../scripts/check-bundle.ts";
 import { MECHANISMS } from "../../scripts/components.ts";
@@ -205,6 +207,23 @@ describe("the bundle guard, entry by entry", () => {
         ).toEqual(['/dialog: imports the component entry "/tabs"']);
     });
 
+    // Epic #73: the segment editing and the time values stay out of the calendars and pickers
+    it("fails a toolkit mechanism kept for other components", () => {
+        expect(MECHANISM_USERS.segments).toEqual(["date-field", "time-field"]);
+        expect(MECHANISM_USERS.time).toEqual(["date-field", "time-field"]);
+        expect(
+            mechanismLeaks("date-field", ["date", "form", "segments", "time"]),
+        ).toEqual([]);
+        expect(mechanismLeaks("time-field", ["segments", "time"])).toEqual([]);
+        expect(mechanismLeaks("calendar", ["date", "time"])).toEqual([
+            '/calendar: imports the toolkit mechanism "/time"',
+        ]);
+        expect(
+            mechanismLeaks("date-picker", ["segments", "overlay", "date"]),
+        ).toEqual(['/date-picker: imports the toolkit mechanism "/segments"']);
+        expect(mechanismLeaks("dialog", ["overlay", "focus"])).toEqual([]);
+    });
+
     it("accepts the components an entry is built on, and only those", () => {
         expect(ENTRY_DEPENDENCIES.checkbox).toEqual([
             "checkbox-group",
@@ -232,6 +251,13 @@ describe("the bundle guard, entry by entry", () => {
         // nothing (a Meter shares Progress's toolkit math, not its code)
         expect(ENTRY_DEPENDENCIES["number-field"]).toEqual(["field"]);
         expect(ENTRY_DEPENDENCIES["otp-field"]).toEqual(["field"]);
+        // Epic #73: DateField is a Field control; TimeField is built on DateField's parts, never
+        // the other way
+        expect(ENTRY_DEPENDENCIES["date-field"]).toEqual(["field"]);
+        expect(ENTRY_DEPENDENCIES["time-field"]).toEqual([
+            "date-field",
+            "field",
+        ]);
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [

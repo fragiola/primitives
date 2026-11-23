@@ -33,6 +33,7 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [listbox.md](listbox.md) | Listbox (on the toolkit's collections mechanism, `/selection`) |
 | [virtual-lists.md](virtual-lists.md) | ListboxVirtual, SelectVirtual, ComboboxVirtual and AutocompleteVirtual (the opt-in virtual and async lists, on the toolkit's `/virtual` and `/async-list`), and each framework's `useAsyncList` |
 | [calendar.md](calendar.md) | Calendar, RangeCalendar, DatePicker and DateRangePicker |
+| [date-field.md](date-field.md) | DateField and TimeField (typed in segments, each an APG spinbutton; on the toolkit's `/segments` and `/time`) |
 | [progress.md](progress.md) | Progress |
 | [avatar.md](avatar.md) | Avatar |
 | [separator.md](separator.md) | Separator |
@@ -77,6 +78,9 @@ Listbox on it; Issue #54: Autocomplete, sharing Combobox's behaviour through eac
 shared code); then the virtual lists (Epic #58), Toast and HoverCard (Epic #61); then ScrollArea,
 Pagination and AspectRatio (Epic #64, Issue #62: ScrollArea, on the toolkit's `/scroll-area`;
 Issue #63: Pagination, on the toolkit's `/pagination`, and AspectRatio), which complete stage 2.
+Stage 3 starts with the segmented fields (Epic #73, Issue #71: the toolkit's segment editing,
+`/segments`, and time values, `/time`, and DateField; Issue #72: TimeField and DateField's time
+granularities, [date-field.md](date-field.md)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -149,8 +153,9 @@ The vocabulary is shared by every component:
 | `data-progressing`, `data-complete` | a Progress's status (with `data-indeterminate`: exactly one is present); `data-complete` also on every part of an OTPField whose code is `length` long |
 | `data-scrubbing` | every part of a NumberField while its ScrubArea scrubs |
 | `data-required` | a required form control |
-| `data-readonly` (inputs) | a read-only NumberField's or OTPField's parts |
-| `data-placeholder` | a Select showing its placeholder |
+| `data-readonly` (inputs) | a read-only NumberField's, OTPField's, DateField's or TimeField's parts |
+| `data-placeholder` | a Select showing its placeholder; a DateField's or TimeField's segment with no value |
+| `data-type` | a DateField's or TimeField's segment: its type (a value: `year`, `month`, `day`, `hour`, `minute`, `second`, `dayPeriod`, `literal`) |
 | `data-instant` | a tooltip that opened with no delay |
 | `data-dragging` | a slider while a pointer drags a thumb |
 | `data-current` | a Pagination Item of the current page (with `aria-current="page"`) |
@@ -159,14 +164,15 @@ The vocabulary is shared by every component:
 | `data-has-overflow-x`, `data-has-overflow-y` | a ScrollArea whose content is wider (taller) than its viewport |
 | `data-overflow-x-start`, `data-overflow-x-end`, `data-overflow-y-start`, `data-overflow-y-end` | a ScrollArea scrolled away from that edge (the x edges logical) |
 | `data-index` | a slider thumb's value index; an OTPField slot's index (a value) |
-| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation) |
+| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation); `data-invalid` also on every part of a DateField or TimeField whose value is out of range or unavailable |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTPField slot that holds a character |
 
 ### No text, and the one exception
 
 Primitives render only their children: no UI copy and no accessible name of their own. The
 fixtures give every name (`aria-label`, `<label>`, text children). **The exception is locale data**
-in the calendar family: the month heading, the weekday names, the day numbers and each cell's full
+in the calendar family (and the date and time fields' segments: their texts, values and names,
+[date-field.md](date-field.md#api)): the month heading, the weekday names, the day numbers and each cell's full
 date name come from `Intl` for the given locale. They are data, not copy, and no app could provide
 them cell by cell; the consumer can still replace each one ([calendar.md](calendar.md#api)).
 
@@ -186,16 +192,16 @@ The reasons are shared:
 | `focus-out` | focus left a non-modal overlay |
 | `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's selection; a Pagination Item's press changed its page |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did) |
+| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
-| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; an OTPField slot's character was deleted by the input itself |
+| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
 | `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md) |
 | `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md) |
 | `clear-press` | a combobox's or an autocomplete's Clear was pressed |
 | `chip-remove-press` | a combobox chip's remove button was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's selection |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's selection |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
@@ -238,13 +244,13 @@ Checkbox, Slider and Select.
 ### Forms
 
 The form controls (Select, Checkbox, Switch, RadioGroup, Slider, Combobox, DatePicker,
-DateRangePicker, NumberField, OTPField, Listbox) take `name` and render a **hidden input** that
+DateRangePicker, NumberField, OTPField, Listbox, DateField, TimeField) take `name` and render a **hidden input** that
 carries their value, so a native `<form>` submits them (`FormData`), resets them (`reset` returns
 an uncontrolled control to its default) and, where `required` applies, validates them as the
 native control would. A hidden input is never in the accessibility tree nor in the tab order
 (`aria-hidden="true"`, `tabindex="-1"`, or `type="hidden"`): users meet the primitive's own role
 only. Each hidden input carries the component's part attribute with the value `input` (Combobox:
-`hidden-input`, since its `input` is the visible Input; NumberField and OTPField: `hidden-input` too); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
+`hidden-input`, since its `input` is the visible Input; NumberField, OTPField, DateField and TimeField: `hidden-input` too); Autocomplete has none: its visible Input carries `name` and is the form control, as a text
 input is).
 Outside a Field, a control is named by a [Label](label.md) (`for`, or wrapping it), or by the
 consumer's `aria-label` / `aria-labelledby`.
@@ -257,7 +263,7 @@ the toolkit's form bridge cancels the later controls' `invalid` events of that v
 
 **The Field layer** ([field.md](field.md)) sits above the controls. A `Field.Root` around a
 `Field.Control` (a native input), a Checkbox, a CheckboxGroup, a Switch, a RadioGroup, a Select, a Slider, a Combobox, a
-DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox or an Autocomplete gives the control:
+DatePicker, a DateRangePicker, a NumberField, an OTPField, a Listbox, an Autocomplete, a DateField or a TimeField gives the control:
 
 - its label (`Field.Label`, linked with `for` and `aria-labelledby`);
 - its description (`Field.Description`, in `aria-describedby`);
@@ -446,6 +452,8 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Meter's parts | `Meter.Root`, `.Label`, `.Value`, `.Track`, `.Indicator` | the same | `[meterRoot]`, `[meterLabel]`, `[meterValue]` (`formattedValue()`, `value()` through `exportAs`), `[meterTrack]`, `[meterIndicator]` |
 | OTPField's value (a string) and events | `value` + `onValueChange(value, details)` (`defaultValue`), `onValueComplete`, `onValueInvalid` on `OTPField.Root` | `v-model:value` (`default-value`, `@value-change`, `@value-complete`, `@value-invalid`) | `[(value)]` on `[otpFieldRoot]` (`defaultValue`; `valueChangeDetails`, `valueComplete` and `valueInvalid` outputs, each `{ value, details }`) |
 | OTPField's parts | `OTPField.Root`, `OTPField.Input` | the same | `[otpFieldRoot]`, `input[otpFieldInput]` |
+| DateField's and TimeField's value | `value` + `onValueChange(value, details)` (`defaultValue`) on `DateField.Root` / `TimeField.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[dateFieldRoot]` / `[timeFieldRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
+| DateField's and TimeField's parts (TimeField on DateField's Input and Segment) | `DateField.Root`, `.Input` (children `(segment) => ...`, else every segment), `.Segment` (`segment`); `TimeField.Root`, `.Input`, `.Segment` | the same (the Input's default scoped slot `v-slot="{ segment }"`) | `[dateFieldRoot]`, `[timeFieldRoot]`, `[dateFieldInput]` (`segments()` through `exportAs`), `[dateFieldSegment]="segment"`; a directive has no template, so the consumer always writes `@for (segment of input.segments(); track segment.index) { <span [dateFieldSegment]="segment">{{ segment.text }}</span> }`; `/time-field` re-exports the Input and Segment directives |
 | Listbox's value (a string or `null`, or an array of strings) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Listbox.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[listboxRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
 | Listbox's parts | `Listbox.Root`, `.Item`, `.ItemIndicator`, `.Group`, `.GroupLabel`, `.Separator` | the same | `[listboxRoot]`, `[listboxItem]`, structural `*listboxItemIndicator`, `[listboxGroup]`, `[listboxGroupLabel]`, `[listboxSeparator]` |
 | Autocomplete's value (the text) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Autocomplete.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[autocompleteRoot]` (`valueChangeDetails`); the Root's `value()` signal instead of a Value directive |

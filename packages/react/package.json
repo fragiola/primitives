@@ -135,6 +135,12 @@
             "import": "./dist/context-menu.js",
             "default": "./dist/context-menu.js"
         },
+        "./date-field": {
+            "@fragiola/source": "./src/components/date-field/index.ts",
+            "types": "./dist/date-field.d.ts",
+            "import": "./dist/date-field.js",
+            "default": "./dist/date-field.js"
+        },
         "./date-picker": {
             "@fragiola/source": "./src/components/date-picker/index.ts",
             "types": "./dist/date-picker.d.ts",
@@ -315,6 +321,12 @@
             "import": "./dist/tabs.js",
             "default": "./dist/tabs.js"
         },
+        "./time-field": {
+            "@fragiola/source": "./src/components/time-field/index.ts",
+            "types": "./dist/time-field.d.ts",
+            "import": "./dist/time-field.js",
+            "default": "./dist/time-field.js"
+        },
         "./toast": {
             "@fragiola/source": "./src/components/toast/index.ts",
             "types": "./dist/toast.d.ts",
@@ -447,6 +459,11 @@
                 "types": "./dist/context-menu.d.ts",
                 "import": "./dist/context-menu.js",
                 "default": "./dist/context-menu.js"
+            },
+            "./date-field": {
+                "types": "./dist/date-field.d.ts",
+                "import": "./dist/date-field.js",
+                "default": "./dist/date-field.js"
             },
             "./date-picker": {
                 "types": "./dist/date-picker.d.ts",
@@ -597,6 +614,11 @@
                 "types": "./dist/tabs.d.ts",
                 "import": "./dist/tabs.js",
                 "default": "./dist/tabs.js"
+            },
+            "./time-field": {
+                "types": "./dist/time-field.d.ts",
+                "import": "./dist/time-field.js",
+                "default": "./dist/time-field.js"
             },
             "./toast": {
                 "types": "./dist/toast.d.ts",

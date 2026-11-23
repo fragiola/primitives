@@ -39,6 +39,10 @@ import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
 import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.tsx";
 import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.tsx";
+import { DateFieldBasic } from "../scenarios/date-field/date-field-basic.tsx";
+import { DateFieldDateTime } from "../scenarios/date-field/date-field-date-time.tsx";
+import { DateFieldForm } from "../scenarios/date-field/date-field-form.tsx";
+import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
@@ -136,6 +140,9 @@ import { TabsManual } from "../scenarios/tabs/tabs-manual.tsx";
 import { TabsNonce } from "../scenarios/tabs/tabs-nonce.tsx";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.tsx";
 import { TabsVertical } from "../scenarios/tabs/tabs-vertical.tsx";
+import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.tsx";
+import { TimeFieldForm } from "../scenarios/time-field/time-field-form.tsx";
+import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.tsx";
 import { ToastBasic } from "../scenarios/toast/toast-basic.tsx";
 import { ToastLimit } from "../scenarios/toast/toast-limit.tsx";
 import { ToastPromise } from "../scenarios/toast/toast-promise.tsx";
@@ -293,6 +300,13 @@ export const routes: Record<
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,
     "/number-field/scrub": NumberFieldScrub,
+    "/date-field/basic": DateFieldBasic,
+    "/date-field/min-max": DateFieldMinMax,
+    "/date-field/form": DateFieldForm,
+    "/date-field/date-time": DateFieldDateTime,
+    "/time-field/basic": TimeFieldBasic,
+    "/time-field/min-max": TimeFieldMinMax,
+    "/time-field/form": TimeFieldForm,
     "/otp-field/basic": OtpFieldBasic,
     "/otp-field/field": OtpFieldField,
     "/progress/basic": ProgressBasic,

@@ -71,6 +71,8 @@
         "scroll-area",
         "pagination",
         "aspect-ratio",
+        "date-field",
+        "time-field",
         "tests",
         "*.config.ts"
     ]

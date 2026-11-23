@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 45 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1 and 2 complete:
+Today, 47 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1 and 2 complete, stage 3 under way:
 
 | group | components |
 | --- | --- |
@@ -22,7 +22,7 @@ Today, 45 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1 an
 | forms | **Field**, **Fieldset**, **Form**, **Button**, **Checkbox** and **CheckboxGroup**, **RadioGroup** and **Radio**, **Switch**, **Slider**, **Select**, **Combobox**, **Autocomplete**, **Listbox** (on the collections mechanism) |
 | virtual and async lists | **ListboxVirtual**, **SelectVirtual**, **ComboboxVirtual**, **AutocompleteVirtual** (opt-in entries on the toolkit's virtualizer), and each framework's async list |
 | inputs | **Label**, **NumberField** (localized text, held buttons, scrub), **OTPField** |
-| dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker** |
+| dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker**, **DateField** and **TimeField** (typed in segments, on the toolkit's segment editing and time values) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 
