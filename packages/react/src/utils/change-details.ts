@@ -30,6 +30,8 @@ export type ChangeReason =
     | "next-press"
     | "first-press"
     | "last-press"
+    | "autoplay"
+    | "focus-in"
     | "imperative-action"
     | "none";
 
