@@ -90,7 +90,11 @@ export const Menubar: PartComponent<MenubarProps, MenubarState> =
             },
             setup(props, { attrs, slots }) {
                 const direction = useProvidedDirection();
-                const { scope, onKeydown: rovingKeydown } = useRovingComposite({
+                const {
+                    scope,
+                    onKeydown: rovingKeydown,
+                    ref: rootRef,
+                } = useRovingComposite({
                     orientation: () => props.orientation,
                     loopFocus: () => props.loopFocus,
                     disabled: () => props.disabled,
@@ -345,6 +349,7 @@ export const Menubar: PartComponent<MenubarProps, MenubarState> =
                             "data-primitives-part": "menubar-root",
                             ...stateAttributes({ orientation, disabled }),
                             onKeydown,
+                            ref: rootRef,
                         },
                     );
                 };

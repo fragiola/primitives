@@ -13,7 +13,6 @@ import {
     injectHost,
     injectRovingItem,
     ownAttribute,
-    ROVING_SCOPE,
 } from "@fragiola/primitives-angular/internal";
 import {
     type ToolbarItemState,
@@ -52,12 +51,11 @@ export class ToolbarButton {
     readonly type = input<ButtonType | undefined>(undefined);
 
     private readonly root = inject(ToolbarRoot);
-    private readonly scope = inject(ROVING_SCOPE);
-    private readonly isDisabled = computed(
-        () => this.disabled() || this.scope.disabled(),
-    );
     private readonly item = injectRovingItem(
         () => !this.isDisabled() || this.focusableWhenDisabled(),
+    );
+    private readonly isDisabled = computed(
+        () => this.disabled() || (this.item?.scope()?.disabled() ?? false),
     );
     private readonly ownTabIndex = ownAttribute("tabindex");
     readonly state = computed<ToolbarItemState>(() => ({
@@ -79,7 +77,7 @@ export class ToolbarButton {
         buttonBehaviour(injectHost(), {
             disabled: this.isDisabled,
             nativeButton: this.nativeButton,
-            composite: () => this.scope.keydown,
+            composite: () => this.item?.scope()?.keydown ?? null,
         });
     }
 }

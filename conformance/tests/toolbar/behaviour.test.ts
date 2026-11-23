@@ -241,3 +241,39 @@ test.describe("toolbar / vertical", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+test.describe("toolbar / overlay", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/toolbar/overlay");
+    });
+
+    test("one tab stop with the popover closed", async ({ page }) => {
+        await page.keyboard.press("Tab");
+        await expect(button(page, "Undo")).toBeFocused();
+        await step(page, "Tab", "After");
+    });
+
+    test("the popup's ToggleGroup and Toggle are no items of the toolbar", async ({
+        page,
+    }) => {
+        const toolbar = page.getByRole("toolbar", { name: "Formatting" });
+        await button(page, "More").click();
+        const left = button(page, "Left");
+        await expect(left).toBeVisible();
+        await expect(button(page, "More")).toHaveAttribute("tabindex", "0");
+        // the group in the popup is a scope of its own, the Toggle in none
+        await expect(left).toHaveAttribute("tabindex", "0");
+        await expect(button(page, "Center")).toHaveAttribute("tabindex", "-1");
+        await expect(button(page, "Wrap")).not.toHaveAttribute("tabindex");
+        await expect(toolbar.locator('[tabindex="0"]')).toHaveCount(1);
+
+        await left.focus();
+        await step(page, "ArrowRight", "Center");
+        await step(page, "ArrowRight", "Left");
+        await button(page, "Center").focus();
+        await page.keyboard.press("Space");
+        await expectOutput(page, "align", "center");
+        await expect(button(page, "More")).toHaveAttribute("tabindex", "0");
+        await expect(toolbar.locator('[tabindex="0"]')).toHaveCount(1);
+    });
+});

@@ -15,7 +15,6 @@ import {
     injectHost,
     injectRovingItem,
     ownAttribute,
-    ROVING_SCOPE,
     TOGGLE_GROUP,
     type ValueChangeEvent,
 } from "@fragiola/primitives-angular/internal";
@@ -67,7 +66,8 @@ export class Toggle {
     readonly nativeButton = input(true, { transform: booleanAttribute });
 
     private readonly group = inject(TOGGLE_GROUP, { optional: true });
-    private readonly scope = inject(ROVING_SCOPE, { optional: true });
+    // a disabled Toggle is natively disabled: it cannot take focus (Base UI)
+    private readonly item = injectRovingItem(() => !this.isDisabled());
     private readonly own = controllable<boolean, ChangeDetails>(
         this.pressed,
         this.pressedChange,
@@ -78,10 +78,8 @@ export class Toggle {
         () =>
             this.disabled() ||
             (this.group?.disabled() ?? false) ||
-            (this.scope?.disabled() ?? false),
+            (this.item?.scope()?.disabled() ?? false),
     );
-    // a disabled Toggle is natively disabled: it cannot take focus (Base UI)
-    private readonly item = injectRovingItem(() => !this.isDisabled());
     private readonly ownTabIndex = ownAttribute("tabindex");
 
     readonly state = computed<ToggleState>(() => {
@@ -112,7 +110,7 @@ export class Toggle {
         buttonBehaviour(injectHost(), {
             disabled: this.isDisabled,
             nativeButton: this.nativeButton,
-            composite: () => this.item?.scope.keydown ?? null,
+            composite: () => this.item?.scope()?.keydown ?? null,
         });
     }
 

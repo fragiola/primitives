@@ -109,6 +109,7 @@ import { ToggleControlled } from "../scenarios/toggle/toggle-controlled.ts";
 import { ToggleGroupBasic } from "../scenarios/toggle-group/toggle-group-basic.ts";
 import { ToggleGroupVertical } from "../scenarios/toggle-group/toggle-group-vertical.ts";
 import { ToolbarBasic } from "../scenarios/toolbar/toolbar-basic.ts";
+import { ToolbarOverlay } from "../scenarios/toolbar/toolbar-overlay.ts";
 import { ToolbarVertical } from "../scenarios/toolbar/toolbar-vertical.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.ts";
@@ -232,6 +233,7 @@ import { ROUTES } from "./routes.ts";
         ToggleGroupBasic,
         ToggleGroupVertical,
         ToolbarBasic,
+        ToolbarOverlay,
         ToolbarVertical,
         MenubarBasic,
         MenubarVertical,
@@ -357,6 +359,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/toggle-group/basic") { <main class="p-6" scenario-toggle-group-basic></main> }
             @case ("/toggle-group/vertical") { <main class="p-6" scenario-toggle-group-vertical></main> }
             @case ("/toolbar/basic") { <main class="p-6" scenario-toolbar-basic></main> }
+            @case ("/toolbar/overlay") { <main class="p-6" scenario-toolbar-overlay></main> }
             @case ("/toolbar/vertical") { <main class="p-6" scenario-toolbar-vertical></main> }
             @case ("/menubar/basic") { <main class="p-6" scenario-menubar-basic></main> }
             @case ("/menubar/vertical") { <main class="p-6" scenario-menubar-vertical></main> }

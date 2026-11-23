@@ -8,7 +8,11 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
-import { RovingKey } from "../../utils/roving-context.ts";
+import {
+    forwardingScope,
+    RovingKey,
+    scopeOfElement,
+} from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ToggleGroupKey } from "../toggle/toggle-group-context.ts";
 
@@ -86,22 +90,23 @@ export const ToggleGroup: PartComponent<
                     emit("valueChange", [...next], details);
                 },
             );
-            const outer = inject(RovingKey, null);
+            const around = inject(RovingKey, null);
+            const composite = useRovingComposite({
+                orientation: () => props.orientation,
+                loopFocus: () => props.loopFocus,
+                disabled: () => false,
+            });
+            // a Toolbar's scope around it, unless the group is outside the toolbar's element (in
+            // a popup a Teleport renders from the toolbar: "Nested composites", 6)
+            const outer = () => scopeOfElement(around, composite.scope.root());
             const disabled = () =>
-                props.disabled || (outer?.disabled() ?? false);
-            const orientation = () => outer?.orientation() ?? props.orientation;
-            // inside a Toolbar, the toolbar's root handles the keys
-            const composite =
-                outer === null
-                    ? useRovingComposite({
-                          orientation: () => props.orientation,
-                          loopFocus: () => props.loopFocus,
-                          disabled: () => false,
-                      })
-                    : null;
-            if (composite !== null) {
-                provide(RovingKey, composite.scope);
-            }
+                props.disabled || (outer()?.disabled() ?? false);
+            const orientation = () =>
+                outer()?.orientation() ?? props.orientation;
+            provide(
+                RovingKey,
+                forwardingScope(() => outer() ?? composite.scope),
+            );
             provide(ToggleGroupKey, {
                 value: () => own.value.value,
                 disabled,
@@ -139,7 +144,10 @@ export const ToggleGroup: PartComponent<
                             multiple,
                             disabled: isDisabled,
                         }),
-                        onKeydown: composite?.onKeydown,
+                        // inside a Toolbar, the toolbar's root handles the keys
+                        onKeydown:
+                            outer() === null ? composite.onKeydown : undefined,
+                        ref: composite.ref,
                     },
                 );
             };

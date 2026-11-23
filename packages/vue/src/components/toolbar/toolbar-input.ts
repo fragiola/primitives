@@ -1,4 +1,4 @@
-import { defineComponent, inject } from "vue";
+import { defineComponent } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import { useRovingItem } from "../../composables/use-roving-item.ts";
 import {
@@ -6,7 +6,6 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
-import { RovingKey } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { type ToolbarItemState, ToolbarKey } from "./toolbar-context.ts";
 
@@ -33,12 +32,11 @@ export const ToolbarInput: PartComponent<ToolbarInputProps, ToolbarItemState> =
             },
             setup(props, { attrs, slots }) {
                 const toolbar = useRequiredContext(ToolbarKey, "Toolbar.Input");
-                const scope = inject(RovingKey, null);
-                const disabled = () =>
-                    props.disabled || (scope?.disabled() ?? false);
                 const item = useRovingItem(
                     () => !disabled() || props.focusableWhenDisabled,
                 );
+                const disabled = () =>
+                    props.disabled || (item?.scope()?.disabled() ?? false);
                 const preventWhenDisabled = (event: Event) => {
                     if (disabled()) {
                         event.preventDefault();

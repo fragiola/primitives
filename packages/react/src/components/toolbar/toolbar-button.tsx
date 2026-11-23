@@ -5,12 +5,10 @@ import type {
     MouseEventHandler,
     PointerEventHandler,
 } from "react";
-import { useContext } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { useRovingItem } from "../../hooks/use-roving-item.ts";
 import { buttonProps } from "../../utils/button-props.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
-import { RovingContext } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ToolbarContext, type ToolbarItemState } from "./toolbar-context.ts";
 
@@ -49,9 +47,11 @@ export function ToolbarButton({
         ToolbarContext,
         "Toolbar.Button",
     );
-    const scope = useContext(RovingContext);
-    const disabled = disabledProp || (scope?.disabled ?? false);
-    const item = useRovingItem(!disabled || focusableWhenDisabled);
+    const item = useRovingItem(
+        (scopeDisabled) =>
+            !(disabledProp || scopeDisabled) || focusableWhenDisabled,
+    );
+    const disabled = disabledProp || (item.scope?.disabled ?? false);
     const state = { orientation, disabled };
     return renderElement(
         "button",
@@ -63,7 +63,7 @@ export function ToolbarButton({
                 focusableWhenDisabled,
                 nativeButton,
                 type,
-                tabIndex: item?.tabIndex,
+                tabIndex: item.tabIndex,
                 composite: true,
                 onClick,
                 onMouseDown,
@@ -74,10 +74,10 @@ export function ToolbarButton({
             "data-primitives-part": "toolbar-button",
             ...stateAttributes({ orientation, disabled }),
             onFocus: (event: FocusEvent<HTMLElement>) => {
-                item?.onFocus();
+                item.onFocus();
                 onFocus?.(event);
             },
         },
-        item?.ref,
+        item.ref,
     );
 }

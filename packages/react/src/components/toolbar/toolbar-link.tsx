@@ -13,17 +13,17 @@ export type ToolbarLinkProps = PartProps<ToolbarLinkState>;
 /** A link of a toolbar (spec/toolbar.md): an item of the toolbar's focus; it cannot be disabled. */
 export function ToolbarLink(props: ToolbarLinkProps) {
     const { orientation } = useRequiredContext(ToolbarContext, "Toolbar.Link");
-    const item = useRovingItem(true);
+    const item = useRovingItem(() => true);
     return renderElement(
         "a",
         props,
         { orientation },
         {
-            tabIndex: item?.tabIndex,
+            tabIndex: item.tabIndex,
             "data-primitives-part": "toolbar-link",
             ...stateAttributes({ orientation }),
-            onFocus: item?.onFocus,
+            onFocus: item.onFocus,
         },
-        item?.ref,
+        item.ref,
     );
 }

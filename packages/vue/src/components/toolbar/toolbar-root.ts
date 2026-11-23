@@ -43,7 +43,7 @@ export const ToolbarRoot: PartComponent<ToolbarRootProps, ToolbarRootState> =
                 disabled: { type: Boolean, default: false },
             },
             setup(props, { attrs, slots }) {
-                const { scope, onKeydown } = useRovingComposite({
+                const { scope, onKeydown, ref } = useRovingComposite({
                     orientation: () => props.orientation,
                     loopFocus: () => props.loopFocus,
                     disabled: () => props.disabled,
@@ -63,6 +63,7 @@ export const ToolbarRoot: PartComponent<ToolbarRootProps, ToolbarRootState> =
                             "data-primitives-part": "toolbar-root",
                             ...stateAttributes({ orientation, disabled }),
                             onKeydown,
+                            ref,
                         },
                     );
                 };

@@ -27,6 +27,8 @@ export interface RovingCompositeOptions {
     orientation: RovingOrientation;
     loopFocus: boolean;
     disabled: boolean;
+    /** The scope's root element (only an element inside it is one of its items). */
+    root: HTMLElement | null;
 }
 
 /**
@@ -40,6 +42,7 @@ export function useRovingComposite({
     orientation,
     loopFocus,
     disabled,
+    root,
 }: RovingCompositeOptions): {
     scope: RovingScope;
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
@@ -124,8 +127,8 @@ export function useRovingComposite({
     }, []);
 
     const scope = useMemo(
-        () => ({ orientation, disabled, tabStop, register, focused }),
-        [orientation, disabled, tabStop, register, focused],
+        () => ({ orientation, disabled, root, tabStop, register, focused }),
+        [orientation, disabled, root, tabStop, register, focused],
     );
     return { scope, onKeyDown };
 }

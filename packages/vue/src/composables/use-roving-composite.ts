@@ -10,6 +10,7 @@ import { getDirection } from "@fragiola/primitives/direction";
 import { computed, shallowRef } from "vue";
 import { useProvidedDirection } from "../direction/direction-context.ts";
 import type { RovingScope } from "../utils/roving-context.ts";
+import { elementSetter } from "./use-overlay-root.ts";
 
 interface RovingItem {
     element: HTMLElement;
@@ -36,10 +37,13 @@ export function useRovingComposite({
 }: RovingCompositeOptions): {
     scope: RovingScope;
     onKeydown: (event: KeyboardEvent) => void;
+    /** The template ref of the scope's root element (only an element inside it is an item). */
+    ref: (value: unknown) => void;
 } {
     const direction = useProvidedDirection();
     const items = shallowRef<readonly RovingItem[]>([]);
     const active = shallowRef<HTMLElement | null>(null);
+    const root = shallowRef<HTMLElement | null>(null);
     const ordered = computed(() =>
         inDocumentOrder(items.value, (item) => item.element),
     );
@@ -114,10 +118,12 @@ export function useRovingComposite({
         scope: {
             orientation,
             disabled,
+            root: () => root.value,
             tabStop: () => tabStop.value,
             register,
             focused,
         },
         onKeydown,
+        ref: elementSetter(root),
     };
 }

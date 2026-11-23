@@ -16,6 +16,7 @@ import {
     useRef,
 } from "react";
 import { DirectionContext } from "../../direction/direction-context.ts";
+import { useElement } from "../../hooks/use-element.ts";
 import { useRovingComposite } from "../../hooks/use-roving-composite.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -85,10 +86,12 @@ export function Menubar({
     ...props
 }: MenubarProps) {
     const direction = useContext(DirectionContext);
+    const [element, ref] = useElement<HTMLElement>();
     const { scope, onKeyDown: rovingKeyDown } = useRovingComposite({
         orientation,
         loopFocus,
         disabled,
+        root: element,
     });
     const entries = useRef(
         new Map<HTMLElement, { readonly current: MenuBarEntry }>(),
@@ -329,15 +332,21 @@ export function Menubar({
     const state = { orientation, disabled, modal };
     return (
         <MenuBarContext.Provider value={context}>
-            {renderElement("div", props, state, {
-                role: "menubar",
-                "aria-orientation": orientation,
-                // a modal menu blocks the pointer outside; the bar takes it back (spec/menubar.md)
-                style: modal ? { pointerEvents: "auto" } : undefined,
-                "data-primitives-part": "menubar-root",
-                ...stateAttributes({ orientation, disabled }),
-                onKeyDown,
-            })}
+            {renderElement(
+                "div",
+                props,
+                state,
+                {
+                    role: "menubar",
+                    "aria-orientation": orientation,
+                    // a modal menu blocks the pointer outside; the bar takes it back (spec/menubar.md)
+                    style: modal ? { pointerEvents: "auto" } : undefined,
+                    "data-primitives-part": "menubar-root",
+                    ...stateAttributes({ orientation, disabled }),
+                    onKeyDown,
+                },
+                ref,
+            )}
         </MenuBarContext.Provider>
     );
 }

@@ -1,4 +1,4 @@
-import { defineComponent, inject, type PropType } from "vue";
+import { defineComponent, type PropType } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import { useRovingItem } from "../../composables/use-roving-item.ts";
 import { buttonAttributes } from "../../utils/button-attributes.ts";
@@ -7,7 +7,6 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
-import { RovingKey } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { type ToolbarItemState, ToolbarKey } from "./toolbar-context.ts";
 
@@ -42,12 +41,11 @@ export const ToolbarButton: PartComponent<
         },
         setup(props, { attrs, slots }) {
             const toolbar = useRequiredContext(ToolbarKey, "Toolbar.Button");
-            const scope = inject(RovingKey, null);
-            const disabled = () =>
-                props.disabled || (scope?.disabled() ?? false);
             const item = useRovingItem(
                 () => !disabled() || props.focusableWhenDisabled,
             );
+            const disabled = () =>
+                props.disabled || (item?.scope()?.disabled() ?? false);
             const onFocus = () => item?.onFocus();
             return () => {
                 const orientation = toolbar.orientation();

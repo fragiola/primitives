@@ -110,6 +110,7 @@ import { ToggleControlled } from "../scenarios/toggle/toggle-controlled.tsx";
 import { ToggleGroupBasic } from "../scenarios/toggle-group/toggle-group-basic.tsx";
 import { ToggleGroupVertical } from "../scenarios/toggle-group/toggle-group-vertical.tsx";
 import { ToolbarBasic } from "../scenarios/toolbar/toolbar-basic.tsx";
+import { ToolbarOverlay } from "../scenarios/toolbar/toolbar-overlay.tsx";
 import { ToolbarVertical } from "../scenarios/toolbar/toolbar-vertical.tsx";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.tsx";
 import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.tsx";
@@ -238,6 +239,7 @@ export const routes: Record<
     "/toggle-group/basic": ToggleGroupBasic,
     "/toggle-group/vertical": ToggleGroupVertical,
     "/toolbar/basic": ToolbarBasic,
+    "/toolbar/overlay": ToolbarOverlay,
     "/toolbar/vertical": ToolbarVertical,
     "/menubar/basic": MenubarBasic,
     "/menubar/vertical": MenubarVertical,

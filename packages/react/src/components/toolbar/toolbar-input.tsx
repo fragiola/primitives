@@ -1,9 +1,7 @@
 import type { MouseEvent, PointerEvent } from "react";
-import { useContext } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { useRovingItem } from "../../hooks/use-roving-item.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
-import { RovingContext } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ToolbarContext, type ToolbarItemState } from "./toolbar-context.ts";
 
@@ -24,10 +22,11 @@ export function ToolbarInput({
     ...props
 }: ToolbarInputProps) {
     const { orientation } = useRequiredContext(ToolbarContext, "Toolbar.Input");
-    const scope = useContext(RovingContext);
-    const disabled = disabledProp || (scope?.disabled ?? false);
-    const focusable = !disabled || focusableWhenDisabled;
-    const item = useRovingItem(focusable);
+    const item = useRovingItem(
+        (scopeDisabled) =>
+            !(disabledProp || scopeDisabled) || focusableWhenDisabled,
+    );
+    const disabled = disabledProp || (item.scope?.disabled ?? false);
     const preventWhenDisabled = (
         event: MouseEvent<HTMLElement> | PointerEvent<HTMLElement>,
     ) => {
@@ -44,13 +43,13 @@ export function ToolbarInput({
             "aria-disabled":
                 disabled && focusableWhenDisabled ? "true" : undefined,
             readOnly: disabled && focusableWhenDisabled ? true : undefined,
-            tabIndex: item?.tabIndex,
+            tabIndex: item.tabIndex,
             "data-primitives-part": "toolbar-input",
             ...stateAttributes({ orientation, disabled }),
             onClick: preventWhenDisabled,
             onPointerDown: preventWhenDisabled,
-            onFocus: item?.onFocus,
+            onFocus: item.onFocus,
         },
-        item?.ref,
+        item.ref,
     );
 }

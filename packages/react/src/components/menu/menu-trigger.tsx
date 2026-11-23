@@ -51,7 +51,7 @@ export function MenuTrigger<Payload = unknown>({
     // in a bar: the bar's item (its roving tab stop, its menu registered with it)
     const bar = root?.parent === null ? root.bar : null;
     const disabledNow = disabled || (bar?.disabled ?? false);
-    const roving = useRovingItem(true, bar ? bar.scope : null);
+    const roving = useRovingItem(() => true, bar ? bar.scope : null);
     const entry = useRef<MenuBarEntry | null>(null);
     if (root !== null) {
         entry.current = { menu: root, disabled: disabledNow };
@@ -113,15 +113,15 @@ export function MenuTrigger<Payload = unknown>({
     // hover go to the bar, the consumer's click handler does not run while disabled
     const inBar = bar && {
         role: "menuitem",
-        tabIndex: roving?.tabIndex,
+        tabIndex: roving.tabIndex,
         "aria-disabled": disabledNow ? "true" : undefined,
-        onFocus: (_event: FocusEvent<HTMLElement>) => roving?.onFocus(),
+        onFocus: (_event: FocusEvent<HTMLElement>) => roving.onFocus(),
         onClick: (event: MouseEvent<HTMLElement>) =>
             bar.press(event.currentTarget, event),
         onPointerEnter: (event: PointerEvent<HTMLElement>) =>
             bar.hover(event.currentTarget, event),
     };
-    const rovingRef = roving?.ref;
+    const rovingRef = roving.ref;
     const mergedRef = useMemo(
         () => mergeRefs(ref, rovingRef),
         [ref, rovingRef],

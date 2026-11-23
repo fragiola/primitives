@@ -12,7 +12,6 @@ import { useRovingItem } from "../../hooks/use-roving-item.ts";
 import { buttonProps } from "../../utils/button-props.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
-import { RovingContext } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ToggleGroupContext } from "./toggle-group-context.ts";
 
@@ -75,13 +74,12 @@ export function Toggle({
         group === null
             ? own
             : value !== undefined && group.value.includes(value);
-    const scope = useContext(RovingContext);
-    const disabled =
-        disabledProp ||
-        (group?.disabled ?? false) ||
-        (scope?.disabled ?? false);
+    const ownDisabled = disabledProp || (group?.disabled ?? false);
     // a disabled Toggle is natively disabled: it cannot take focus (Base UI)
-    const item = useRovingItem(!disabled);
+    const item = useRovingItem(
+        (scopeDisabled) => !(ownDisabled || scopeDisabled),
+    );
+    const disabled = ownDisabled || (item.scope?.disabled ?? false);
 
     const press = (event: MouseEvent<HTMLElement>) => {
         const next = !pressed;
@@ -111,8 +109,8 @@ export function Toggle({
                 nativeButton,
                 // a Toggle never submits a form
                 type: nativeButton ? "button" : undefined,
-                tabIndex: item?.tabIndex,
-                composite: item !== null,
+                tabIndex: item.tabIndex,
+                composite: item.scope !== null,
                 onClick: press,
                 onMouseDown,
                 onPointerDown,
@@ -123,10 +121,10 @@ export function Toggle({
             "data-primitives-part": "toggle-root",
             ...stateAttributes({ pressed, disabled }),
             onFocus: (event: FocusEvent<HTMLElement>) => {
-                item?.onFocus();
+                item.onFocus();
                 onFocus?.(event);
             },
         },
-        item?.ref,
+        item.ref,
     );
 }

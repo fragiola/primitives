@@ -102,6 +102,7 @@ export function injectRovingComposite(
 
     return {
         orientation: computed(options.orientation),
+        root: computed(() => host),
         disabled: computed(options.disabled),
         tabStop,
         register: (element, focusable) => {

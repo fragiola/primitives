@@ -9,7 +9,6 @@ import {
     dataValues,
     injectRovingItem,
     ownAttribute,
-    ROVING_SCOPE,
 } from "@fragiola/primitives-angular/internal";
 import {
     type ToolbarItemState,
@@ -47,12 +46,11 @@ export class ToolbarInput {
     });
 
     private readonly root = inject(ToolbarRoot);
-    private readonly scope = inject(ROVING_SCOPE);
-    private readonly isDisabled = computed(
-        () => this.disabled() || this.scope.disabled(),
-    );
     protected readonly item = injectRovingItem(
         () => !this.isDisabled() || this.focusableWhenDisabled(),
+    );
+    private readonly isDisabled = computed(
+        () => this.disabled() || (this.item?.scope()?.disabled() ?? false),
     );
     protected readonly ownTabIndex = ownAttribute("tabindex");
     readonly state = computed<ToolbarItemState>(() => ({

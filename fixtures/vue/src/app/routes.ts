@@ -110,6 +110,7 @@ import ToggleControlled from "../scenarios/toggle/toggle-controlled.vue";
 import ToggleGroupBasic from "../scenarios/toggle-group/toggle-group-basic.vue";
 import ToggleGroupVertical from "../scenarios/toggle-group/toggle-group-vertical.vue";
 import ToolbarBasic from "../scenarios/toolbar/toolbar-basic.vue";
+import ToolbarOverlay from "../scenarios/toolbar/toolbar-overlay.vue";
 import ToolbarVertical from "../scenarios/toolbar/toolbar-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
 import TooltipDetached from "../scenarios/tooltip/tooltip-detached.vue";
@@ -203,6 +204,7 @@ export const routes: Record<string, Component> = {
     "/toggle-group/basic": ToggleGroupBasic,
     "/toggle-group/vertical": ToggleGroupVertical,
     "/toolbar/basic": ToolbarBasic,
+    "/toolbar/overlay": ToolbarOverlay,
     "/toolbar/vertical": ToolbarVertical,
     "/menubar/basic": MenubarBasic,
     "/menubar/vertical": MenubarVertical,

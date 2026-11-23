@@ -1,36 +1,59 @@
 import { useContext, useLayoutEffect } from "react";
-import { RovingContext, type RovingScope } from "../utils/roving-context.ts";
+import {
+    RovingContext,
+    type RovingScope,
+    scopeOfElement,
+} from "../utils/roving-context.ts";
 import { useElement } from "./use-element.ts";
 
+export interface RovingItem {
+    /**
+     * The scope it is an item of: the nearest one (or `explicit`), unless its element is outside
+     * that scope's root (a popup rendered through a portal); `null` outside any.
+     */
+    scope: RovingScope | null;
+    /** The roving `tabIndex`; `undefined` outside any scope. */
+    tabIndex: number | undefined;
+    /**
+     * The item's element, attached whenever a scope is around it (also while it is outside the
+     * scope's root, so the item keeps knowing where it is); `undefined` with no scope around it.
+     */
+    ref: ((node: HTMLElement | null) => void) | undefined;
+    onFocus: () => void;
+}
+
 /**
- * An item of the nearest roving-focus scope (spec/toolbar.md, "Nested composites"), or `null`
- * outside any: it registers its element, takes the roving `tabIndex` (`0` on the scope's tab
- * stop, `-1` on every other item and before the items are known) and tells the scope when it
- * takes focus. `explicit` names the scope instead of the nearest one (a Menubar's, which its
- * Triggers read from the bar's contract; `null`: none).
+ * An item of the nearest roving-focus scope (spec/toolbar.md, "Nested composites"): it registers
+ * its element, takes the roving `tabIndex` (`0` on the scope's tab stop, `-1` on every other item
+ * and before the items are known) and tells the scope when it takes focus. An element outside the
+ * scope's root (rendered through a portal) is in no scope ("Nested composites", 6). `focusable`
+ * reads the scope's `disabled`; `explicit` names the scope instead of the nearest one (a
+ * Menubar's, which its Triggers read from the bar's contract; `null`: none).
  */
 export function useRovingItem(
-    focusable: boolean,
+    focusable: (scopeDisabled: boolean) => boolean,
     explicit?: RovingScope | null,
-): {
-    scope: RovingScope;
-    tabIndex: number;
-    ref: (node: HTMLElement | null) => void;
-    onFocus: () => void;
-} | null {
+): RovingItem {
     const nearest = useContext(RovingContext);
-    const scope = explicit === undefined ? nearest : explicit;
     const [element, ref] = useElement<HTMLElement>();
+    const around = explicit === undefined ? nearest : explicit;
+    const scope = scopeOfElement(around, element);
     const register = scope?.register;
+    const canFocus = scope === null ? false : focusable(scope.disabled);
     useLayoutEffect(
         () =>
             register === undefined || element === null
                 ? undefined
-                : register(element, focusable),
-        [register, element, focusable],
+                : register(element, canFocus),
+        [register, element, canFocus],
     );
     if (scope === null) {
-        return null;
+        return {
+            scope,
+            tabIndex: undefined,
+            ref: around === null ? undefined : ref,
+            onFocus: () => {},
+        };
     }
     return {
         scope,

@@ -86,6 +86,13 @@ before the implementations):
    that is not one (a menu's popup rendered from a toolbar button) is not the toolbar's.
 5. **A disabled scope disables its items.** A disabled Toolbar.Root or Toolbar.Group disables the
    items registered inside it, a ToggleGroup's Toggles included.
+6. **Only an element inside the scope's root is one of its items.** A popup rendered from a
+   toolbar's item through a portal (a Popover, a Menu) is elsewhere in the document while each
+   framework's context passes through the portal: a Toolbar.Button, Toolbar.Link, Toolbar.Input or
+   Toggle whose element is outside the Toolbar.Root's element is in no scope (no roving
+   `tabindex`, never the tab stop, not disabled by the toolbar), and a ToggleGroup outside it opens
+   its own scope, as with no Toolbar around it. Where an element is cannot be known before it is
+   rendered: on a server and in the first render it is taken as inside (`tabindex="-1"`, "Focus").
 
 A [Menubar](menubar.md) (Issue #48) is no nested composite of a toolbar: it is a composite widget
 of its own (`role="menubar"`, which the APG never places in a toolbar), with its own scope that
@@ -223,6 +230,23 @@ Checks:
    nothing (the group's own horizontal keys are not used); Home → "Select"; End → "Fill".
 4. Space on "Snap" presses it (`snap: true`); Enter on "Fit" presses it (`zoom: fit`).
 5. Axe finds no violation.
+
+### `/toolbar/overlay`
+
+A Toolbar labelled **"Formatting"** holding a Toolbar.Button **"Undo"** and a Toolbar.Button
+**"More"** that is a [Popover](popover.md)'s Trigger; the popover's popup (in its portal) holds a
+ToggleGroup labelled **"Alignment"** with the Toggles **"Left"** (`left`) and **"Center"**
+(`center`), and a Toggle **"Wrap"**; then a button **"After"**. Output: `align: <the ToggleGroup's
+last onValueChange, joined by ",">` (`none` before any).
+
+Checks:
+
+1. Tab from the page start focuses "Undo"; Tab again focuses "After" (one tab stop).
+2. A click on "More" opens the popup; "More" holds the toolbar's tab stop. The ToggleGroup in the
+   popup is a scope of its own: "Left" has `tabindex="0"`, "Center" `tabindex="-1"`; "Wrap" has
+   no `tabindex`; exactly one element inside the toolbar has `tabindex="0"`.
+3. Focused on "Left", ArrowRight → "Center"; ArrowRight wraps to "Left" (the group's keys); Space
+   on "Center" presses it (`align: center`). "More" still holds the toolbar's tab stop.
 
 ## Differences from Base UI
 

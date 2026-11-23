@@ -1,5 +1,6 @@
 import type { RovingOrientation } from "@fragiola/primitives/collection";
 import { useMemo } from "react";
+import { useElement } from "../../hooks/use-element.ts";
 import { useRovingComposite } from "../../hooks/use-roving-composite.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { RovingContext } from "../../utils/roving-context.ts";
@@ -30,23 +31,31 @@ export function ToolbarRoot({
     disabled = false,
     ...props
 }: ToolbarRootProps) {
+    const [element, ref] = useElement<HTMLElement>();
     const { scope, onKeyDown } = useRovingComposite({
         orientation,
         loopFocus,
         disabled,
+        root: element,
     });
     const context = useMemo(() => ({ orientation }), [orientation]);
     const state = { orientation, disabled };
     return (
         <ToolbarContext.Provider value={context}>
             <RovingContext.Provider value={scope}>
-                {renderElement("div", props, state, {
-                    role: "toolbar",
-                    "aria-orientation": orientation,
-                    "data-primitives-part": "toolbar-root",
-                    ...stateAttributes({ orientation, disabled }),
-                    onKeyDown,
-                })}
+                {renderElement(
+                    "div",
+                    props,
+                    state,
+                    {
+                        role: "toolbar",
+                        "aria-orientation": orientation,
+                        "data-primitives-part": "toolbar-root",
+                        ...stateAttributes({ orientation, disabled }),
+                        onKeyDown,
+                    },
+                    ref,
+                )}
             </RovingContext.Provider>
         </ToolbarContext.Provider>
     );

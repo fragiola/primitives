@@ -8,7 +8,6 @@ import {
     publicComponent,
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
-import { RovingKey } from "../../utils/roving-context.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
 import { ToggleGroupKey } from "./toggle-group-context.ts";
 
@@ -66,7 +65,6 @@ export const Toggle: PartComponent<ToggleProps, ToggleState, ToggleEmits> =
             },
             setup(props, { attrs, slots, emit }) {
                 const group = inject(ToggleGroupKey, null);
-                const scope = inject(RovingKey, null);
                 const own = useControllable<boolean, ChangeDetails>(
                     () => props.pressed,
                     props.defaultPressed,
@@ -80,12 +78,12 @@ export const Toggle: PartComponent<ToggleProps, ToggleState, ToggleEmits> =
                         ? own.value.value
                         : props.value !== undefined &&
                           group.value().includes(props.value);
+                // a disabled Toggle is natively disabled: it cannot take focus (Base UI)
+                const item = useRovingItem(() => !disabled());
                 const disabled = () =>
                     props.disabled ||
                     (group?.disabled() ?? false) ||
-                    (scope?.disabled() ?? false);
-                // a disabled Toggle is natively disabled: it cannot take focus (Base UI)
-                const item = useRovingItem(() => !disabled());
+                    (item?.scope()?.disabled() ?? false);
 
                 const press = (event: MouseEvent) => {
                     const next = !pressed();
@@ -111,7 +109,7 @@ export const Toggle: PartComponent<ToggleProps, ToggleState, ToggleEmits> =
                             // a Toggle never submits a form
                             type: props.nativeButton ? "button" : undefined,
                             tabIndex: item?.tabIndex(),
-                            composite: item !== null,
+                            composite: (item?.scope() ?? null) !== null,
                             onPress: press,
                         },
                         attrs,
