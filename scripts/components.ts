@@ -23,6 +23,7 @@ export const COMPONENTS = [
     "fieldset",
     "form",
     "label",
+    "listbox",
     "menu",
     "menubar",
     "meter",

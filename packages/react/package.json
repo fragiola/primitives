@@ -159,6 +159,12 @@
             "import": "./dist/label.js",
             "default": "./dist/label.js"
         },
+        "./listbox": {
+            "@fragiola/source": "./src/components/listbox/index.ts",
+            "types": "./dist/listbox.d.ts",
+            "import": "./dist/listbox.js",
+            "default": "./dist/listbox.js"
+        },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
             "types": "./dist/menu.d.ts",
@@ -395,6 +401,11 @@
                 "types": "./dist/label.d.ts",
                 "import": "./dist/label.js",
                 "default": "./dist/label.js"
+            },
+            "./listbox": {
+                "types": "./dist/listbox.d.ts",
+                "import": "./dist/listbox.js",
+                "default": "./dist/listbox.js"
             },
             "./menu": {
                 "types": "./dist/menu.d.ts",
