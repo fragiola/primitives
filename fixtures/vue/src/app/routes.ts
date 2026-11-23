@@ -68,6 +68,10 @@ import FieldSettings from "../scenarios/field/field-settings.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
+import HoverCardBasic from "../scenarios/hover-card/hover-card-basic.vue";
+import HoverCardDetached from "../scenarios/hover-card/hover-card-detached.vue";
+import HoverCardInDialog from "../scenarios/hover-card/hover-card-in-dialog.vue";
+import HoverCardLifecycle from "../scenarios/hover-card/hover-card-lifecycle.vue";
 import LabelControls from "../scenarios/label/label-controls.vue";
 import ListboxField from "../scenarios/listbox/listbox-field.vue";
 import ListboxGroups from "../scenarios/listbox/listbox-groups.vue";
@@ -127,6 +131,10 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
+import ToastBasic from "../scenarios/toast/toast-basic.vue";
+import ToastLimit from "../scenarios/toast/toast-limit.vue";
+import ToastPromise from "../scenarios/toast/toast-promise.vue";
+import ToastSwipe from "../scenarios/toast/toast-swipe.vue";
 import ToggleBasic from "../scenarios/toggle/toggle-basic.vue";
 import ToggleControlled from "../scenarios/toggle/toggle-controlled.vue";
 import ToggleGroupBasic from "../scenarios/toggle-group/toggle-group-basic.vue";
@@ -302,4 +310,12 @@ export const routes: Record<string, Component> = {
     "/combobox-virtual/async": ComboboxVirtualAsync,
     "/autocomplete-virtual/basic": AutocompleteVirtualBasic,
     "/autocomplete-virtual/async": AutocompleteVirtualAsync,
+    "/toast/basic": ToastBasic,
+    "/toast/limit": ToastLimit,
+    "/toast/promise": ToastPromise,
+    "/toast/swipe": ToastSwipe,
+    "/hover-card/basic": HoverCardBasic,
+    "/hover-card/detached": HoverCardDetached,
+    "/hover-card/in-dialog": HoverCardInDialog,
+    "/hover-card/lifecycle": HoverCardLifecycle,
 };
