@@ -60,6 +60,7 @@ import FieldSettings from "../scenarios/field/field-settings.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
+import LabelControls from "../scenarios/label/label-controls.vue";
 import MenuBasic from "../scenarios/menu/menu-basic.vue";
 import MenuCheckboxRadio from "../scenarios/menu/menu-checkbox-radio.vue";
 import MenuControlled from "../scenarios/menu/menu-controlled.vue";
@@ -71,8 +72,15 @@ import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
 import MenubarBasic from "../scenarios/menubar/menubar-basic.vue";
 import MenubarModal from "../scenarios/menubar/menubar-modal.vue";
 import MenubarVertical from "../scenarios/menubar/menubar-vertical.vue";
+import MeterBasic from "../scenarios/meter/meter-basic.vue";
 import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
 import NavigationMenuNested from "../scenarios/navigation-menu/navigation-menu-nested.vue";
+import NumberFieldBasic from "../scenarios/number-field/number-field-basic.vue";
+import NumberFieldField from "../scenarios/number-field/number-field-field.vue";
+import NumberFieldFormat from "../scenarios/number-field/number-field-format.vue";
+import NumberFieldScrub from "../scenarios/number-field/number-field-scrub.vue";
+import OtpFieldBasic from "../scenarios/otp-field/otp-field-basic.vue";
+import OtpFieldField from "../scenarios/otp-field/otp-field-field.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
 import PopoverBasic from "../scenarios/popover/popover-basic.vue";
 import PopoverControlled from "../scenarios/popover/popover-controlled.vue";
@@ -242,4 +250,12 @@ export const routes: Record<string, Component> = {
     "/avatar/basic": AvatarBasic,
     "/separator/basic": SeparatorBasic,
     "/direction/provider": DirectionProviderScenario,
+    "/label/controls": LabelControls,
+    "/meter/basic": MeterBasic,
+    "/number-field/basic": NumberFieldBasic,
+    "/number-field/field": NumberFieldField,
+    "/number-field/format": NumberFieldFormat,
+    "/number-field/scrub": NumberFieldScrub,
+    "/otp-field/basic": OtpFieldBasic,
+    "/otp-field/field": OtpFieldField,
 };
