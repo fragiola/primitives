@@ -96,6 +96,12 @@
             "import": "./dist/layers.js",
             "default": "./dist/layers.js"
         },
+        "./number": {
+            "@fragiola/source": "./src/number/index.ts",
+            "types": "./dist/number.d.ts",
+            "import": "./dist/number.js",
+            "default": "./dist/number.js"
+        },
         "./overlay": {
             "@fragiola/source": "./src/overlay/index.ts",
             "types": "./dist/overlay.d.ts",
@@ -202,6 +208,11 @@
                 "types": "./dist/layers.d.ts",
                 "import": "./dist/layers.js",
                 "default": "./dist/layers.js"
+            },
+            "./number": {
+                "types": "./dist/number.d.ts",
+                "import": "./dist/number.js",
+                "default": "./dist/number.js"
             },
             "./overlay": {
                 "types": "./dist/overlay.d.ts",

@@ -82,6 +82,7 @@ export const MECHANISMS = [
     "image",
     "inert",
     "layers",
+    "number",
     "overlay",
     "pointer",
     "positioning",
