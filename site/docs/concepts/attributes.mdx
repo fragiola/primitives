@@ -50,8 +50,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-editing` | a tags input's tag while its tag input edits it; an editable's parts while it edits |
 | `data-visible` | a password input's parts while its text is shown |
 | `data-copied`, `data-failed` | a clipboard's parts while its last copy succeeded, or failed, until its timeout |
-| `data-dragging` | a slider while a pointer drags a thumb |
-| `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index (a value) |
+| `data-dragging` | a slider while a pointer drags a thumb; a carousel's slides' container while a mouse drags them |
+| `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index; a carousel slide's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
 | `data-required` | a required checkbox, switch, radio group, segmented control or rating, and its radios; every part of a required number field, OTP field, date or time field, or range field |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid; `data-invalid` also on every part of a date, time or range field whose value is out of range or unavailable (a range: or whose end is before its start), and on a typed picker's segments whose complete entry is |
@@ -68,13 +68,16 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-overflow-x-start`, `data-overflow-x-end`, `data-overflow-y-start`, `data-overflow-y-end` | a scroll area scrolled away from that edge (the x edges logical: the start is the right edge in RTL) |
 | `data-scrolling` | a scroll area's parts while the user scrolls it (a scrollbar and its thumb: their own axis) |
 | `data-hovering` | a scroll area's scrollbars while a mouse or pen is over its root |
-| `data-current` | a pagination item of the current page (with `aria-current="page"`) |
+| `data-current` | a pagination item of the current page (with `aria-current="page"`); a link or a breadcrumbs link to the current page; the current step's parts (with `aria-current="step"` on its item and trigger) and its content; a carousel indicator of the current page |
+| `data-completed`, `data-incomplete` | a step's parts before or after the current step (`data-completed` on every step, and on the steps root, once the process is completed) |
+| `data-inview` | a carousel slide on the current page (the others are `inert`) |
+| `data-playing`, `data-paused` | a carousel and its autoplay trigger while the slides rotate; a carousel while a hover pauses the rotation |
 | `data-nested` | a submenu's positioner and popup; a nested dialog's popup, backdrop and viewport (a dialog or alert dialog inside another's popup) |
 | `data-nested-dialog-open` | a dialog's popup, backdrop and viewport while a dialog nested in it is open |
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
-| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb, a segmented control and its parts |
+| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb, a segmented control and its parts, the steps' parts, a carousel and its slides' container and indicator group |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one, on every tabs part (a physical value: `left`, `right`, `up`, `down`, `none`) |
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |

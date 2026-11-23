@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); AspectRatio uses none; Clipboard uses `/clipboard` alone (its copy and its announcement, which no other component imports); Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); Carousel `/carousel` (its pages, its scrolling and mouse drag, its hover and focus watch and its rotation delay, which no other component imports) with `/collection` and `/direction` (the tabbed Indicators' keys); Link and Breadcrumbs use none; Steps uses none; AspectRatio uses none; Clipboard uses `/clipboard` alone (its copy and its announcement, which no other component imports); Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -78,6 +78,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/layers` | `pushLayer`, `Layer`, `LayerOptions`, `watchFocusOutside`, `interceptEscape` |
 | `@fragiola/primitives/number` | `formatNumber`, `numberFormatOptions`, `NumberFormatOptions`, `parseNumber`, `isNumberText`, `stepNumber`, `clampNumber`, `NumberStepOptions`, `watchAutoRepeat`, `AutoRepeatOptions`, `watchScrub`, `ScrubOptions`, `ScrubPoint` |
 | `@fragiola/primitives/overlay` | `openOverlaySession`, `OverlaySession`, `OverlaySessionOptions`, `DismissReason`, `DismissEvent` |
+| `@fragiola/primitives/carousel` | `carouselPages`, `CarouselPagesOptions`, `clampCarouselPage`, `slidesInView`, `stepCarouselPage`, `CarouselOrientation`, `groupScrollPosition`, `nearestCarouselPage`, `slideScrollPosition`, `createRotationTimer`, `RotationTimer`, `CarouselController`, `CarouselWatchOptions`, `watchCarousel` |
 | `@fragiola/primitives/clipboard` | `writeClipboard`, `announceText` |
 | `@fragiola/primitives/pagination` | `paginationRange`, `PaginationItem`, `PaginationRangeOptions`, `pageCount`, `PageCountOptions`, `clampPage` |
 | `@fragiola/primitives/pointer` | `startDrag`, `DragSessionOptions`, `isInSafeArea`, `Point`, `isInHoverBridge`, `trackHoverBridge`, `HoverBridgeCallbacks`, `watchPointerExit`, `LongPressOptions`, `watchLongPress` |
@@ -181,6 +182,16 @@ alone: a list that does not opt in imports neither. The root entry,
   state (`ScrollAreaState`: the overflow and its edges, `scrolling` per axis, `hovering`, whether
   the viewport needs a tab stop). `thumbGeometry`, `scrollFromStart` and `scrollForThumbOffset`
   are its math ([ScrollArea](/docs/api/scroll-area)).
+- **Carousel**: `carouselPages({ slideCount, slidesPerPage, slidesPerMove })` gives each page's
+  first slide (the last page always full), with `clampCarouselPage`, `slidesInView` and
+  `stepCarouselPage` (pure math). `watchCarousel(root, group, options)` is a carousel's DOM side,
+  all native listeners: it scrolls the group to a page (`scrollToPage`, smooth unless reduced
+  motion), reports the page a scroll the user made settled on (`swipe`) or a mouse drag released
+  on (`drag`, over `/pointer`'s drag session, snapping off while it runs), the hover (but over
+  the AutoplayTrigger) and focus entering, and whether the group needs a tab stop
+  (`needsTabStop`); `slideScrollPosition` and `nearestCarouselPage` are its geometry, RTL
+  included. `createRotationTimer(element)` is the rotation's delay, paused with the time it had
+  left ([Carousel](/docs/api/carousel)).
 - **Clipboard**: `writeClipboard(element, text)` writes the text with the asynchronous Clipboard
   API of the element's window (`navigator.clipboard.writeText`) and returns its promise, which
   rejects where the API is missing (an insecure context) or the browser refuses the write: there

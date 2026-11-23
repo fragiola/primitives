@@ -30,6 +30,16 @@ export const PRIMITIVES_PACKAGES: Record<Framework, string> = {
  */
 export const TOOLKIT_PACKAGE = "@fragiola/primitives";
 
+/**
+ * Each framework's router, which an example also installs when it renders its links through it
+ * (Link and Breadcrumbs compose with the app's router; the packages depend on none, Epic #97).
+ */
+export const ROUTER_PACKAGES: Record<Framework, string> = {
+    react: "react-router",
+    vue: "vue-router",
+    angular: "@angular/router",
+};
+
 export function isFramework(value: unknown): value is Framework {
     return FRAMEWORKS.includes(value as Framework);
 }

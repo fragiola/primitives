@@ -1,7 +1,7 @@
 // The entry of @fragiola/primitives-angular/internal: what the components' entries share (state
 // attributes, controllable inputs, the overlay root, presence, the portal, host registration,
 // ids and label ids, change details, the handles and triggers of detached triggers, the hidden form inputs, structural views, own attributes, the
-// provided direction, a disclosure panel's transitions, a button's behaviour, the roving-focus scope and a
+// provided direction, a disclosure panel's transitions, a button's behaviour, a disabled link's press, the roving-focus scope and a
 // ToggleGroup's context, the virtual lists' rows).
 // ng-packagr builds each entry point from its own folder, and an entry imports another only
 // through its public API: the components' entries import these from here.
@@ -17,6 +17,7 @@ export * from "./utils/host-element.ts";
 export * from "./utils/inject-enclosing.ts";
 export * from "./utils/inject-id.ts";
 export * from "./utils/label-id.ts";
+export * from "./utils/link-press.ts";
 export * from "./utils/overlay-handle.ts";
 export * from "./utils/overlay-root.ts";
 export * from "./utils/overlay-trigger.ts";

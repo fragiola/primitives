@@ -1,0 +1,216 @@
+---
+title: Steps
+description: A process in a fixed number of steps, an ordered list with aria-current="step", the step's content, Previous, Next and linear validation.
+---
+
+A process in a fixed number of steps: a checkout, an onboarding, a setup wizard. The
+[APG](https://www.w3.org/WAI/ARIA/apg/patterns/) has no stepper pattern and Base UI has no Steps, so the semantics are the APG-closest ones: an ordered
+list of the steps with the current one `aria-current="step"` (the value WAI-ARIA defines for the
+current step of a process), each step's trigger a native button in the tab order, the current
+step's content shown, and Previous and Next. In a **linear** process a step is reached only once
+every step before it is valid.
+
+<Example id="steps" />
+
+## Behaviour
+
+- **Step**: from 0, controlled or not; `count` is the **completed** state (the CompletedContent
+  shows, Next is disabled). A step outside `[0, count]` is clamped.
+- **Reaching a step**: a step before the current one always; a later one always, unless `linear`,
+  where it needs every step before it to be valid (`isStepValid(index)`, read at each render,
+  every step valid by default). Next needs the current step to be valid with `linear`.
+- **Changes**: a Trigger reports `trigger-press`, Previous `previous-press`, Next `next-press`; a
+  Trigger of the current step reports nothing.
+- **Semantics**: a list, not a tablist: the server render cannot know whether triggers will
+  render, and a list holds both a clickable stepper and a display-only one.
+- **No text**: name the List (`aria-label`); the triggers are named by their text (the Indicator
+  is hidden from assistive technology).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `steps-root` | holds the step and the validation |
+| List | `ol` | `steps-list` | the steps |
+| Item | `li` | `steps-item` | one step |
+| Trigger | `button` | `steps-trigger` | moves to its step |
+| Indicator | `span` | `steps-indicator` | its number or check mark, hidden |
+| Separator | `div` | `steps-separator` | the line to the next step, hidden |
+| Content | `div` | `steps-content` | a step's content, hidden unless current |
+| PrevTrigger | `button` | `steps-prev-trigger` | the step before |
+| NextTrigger | `button` | `steps-next-trigger` | the step after |
+| CompletedContent | `div` | `steps-completed-content` | shown once completed |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Steps } from "@fragiola/primitives-react/steps";
+
+<Steps.Root count={3} linear isStepValid={(index) => valid[index]}>
+    <Steps.List aria-label="Checkout">
+        {["Shipping", "Payment", "Review"].map((title, index) => (
+            <Steps.Item key={title} index={index}>
+                <Steps.Trigger>
+                    <Steps.Indicator>{index + 1}</Steps.Indicator>
+                    {title}
+                </Steps.Trigger>
+                <Steps.Separator />
+            </Steps.Item>
+        ))}
+    </Steps.List>
+    <Steps.Content index={0}>…</Steps.Content>
+    <Steps.Content index={1}>…</Steps.Content>
+    <Steps.Content index={2}>…</Steps.Content>
+    <Steps.CompletedContent>Order placed</Steps.CompletedContent>
+    <Steps.PrevTrigger>Back</Steps.PrevTrigger>
+    <Steps.NextTrigger>Continue</Steps.NextTrigger>
+</Steps.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Steps.Root v-model:step="step" :count="3" linear :is-step-valid="(index) => valid[index]">
+        <Steps.List aria-label="Checkout">
+            <Steps.Item v-for="(title, index) in titles" :key="title" :index="index">
+                <Steps.Trigger><Steps.Indicator>{{ index + 1 }}</Steps.Indicator>{{ title }}</Steps.Trigger>
+                <Steps.Separator />
+            </Steps.Item>
+        </Steps.List>
+        <Steps.Content v-for="(title, index) in titles" :key="title" :index="index">…</Steps.Content>
+        <Steps.CompletedContent>Order placed</Steps.CompletedContent>
+        <Steps.PrevTrigger>Back</Steps.PrevTrigger>
+        <Steps.NextTrigger>Continue</Steps.NextTrigger>
+    </Steps.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [StepsRoot, StepsList, StepsItem, StepsTrigger, StepsIndicator, StepsSeparator, StepsContent, StepsCompletedContent, StepsPrevTrigger, StepsNextTrigger],
+    template: `
+        <div stepsRoot [count]="3" linear [isStepValid]="isValid" [(step)]="step">
+            <ol stepsList aria-label="Checkout">
+                @for (title of titles; track title; let index = $index) {
+                    <li stepsItem [index]="index">
+                        <button stepsTrigger><span stepsIndicator>{{ index + 1 }}</span>{{ title }}</button>
+                        <div stepsSeparator></div>
+                    </li>
+                }
+            </ol>
+            @for (title of titles; track title; let index = $index) {
+                <div stepsContent [index]="index">…</div>
+            }
+            <div stepsCompletedContent>Order placed</div>
+            <button stepsPrevTrigger>Back</button>
+            <button stepsNextTrigger>Continue</button>
+        </div>
+    `,
+})
+export class Checkout {
+    protected readonly step = signal(0);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`v-model:step`, `:is-step-valid`), and Angular as inputs
+(`[(step)]`, `[isStepValid]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `step` | `number` | | the current step, from 0; `count` is the completed state (controlled) |
+| `defaultStep` | `number` | `0` | the step at first |
+| `onStepChange` | `(step, details) => void` | | every step change, with its reason; Vue `@step-change` (and `update:step`), Angular `(stepChangeDetails)` (and `(stepChange)`, the step alone) |
+| `count` | `number` | required | the number of steps |
+| `linear` | `boolean` | `false` | a step is reached only once every step before it is valid |
+| `isStepValid` | `(index) => boolean` | every step valid | whether a step is valid, read at each render (Angular: in a computed, so it reads signals) |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `data-orientation` on the parts |
+
+### List
+
+No props of its own; name it with `aria-label`.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | required | its step, from 0 |
+
+### Trigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the Trigger's own; not while disabled |
+
+### Indicator
+
+No props of its own.
+
+### Separator
+
+No props of its own.
+
+### Content
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `index` | `number` | required | its step, from 0 |
+
+### PrevTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the trigger's own; not while disabled |
+
+### NextTrigger
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `onClick` (react) | `MouseEventHandler` | | a click, after the trigger's own; not while disabled |
+
+### CompletedContent
+
+No props of its own.
+
+## State and part attributes
+
+A part's state is its step's: current, completed (before the step, or the process completed) or
+incomplete (after it).
+
+| part | attributes |
+| --- | --- |
+| Root | `data-orientation`; `data-completed` once completed |
+| Item | `aria-current="step"` on the current one; `data-current`, `data-completed`, `data-incomplete`; `data-disabled` while out of reach; `data-orientation` |
+| Trigger | `type="button"`; `aria-current="step"` on the current one; `aria-controls` its Content; `disabled` while out of reach; the Item's `data-*` |
+| Indicator, Separator | `aria-hidden="true"`; the Item's `data-current`, `data-completed`, `data-incomplete` |
+| Content | `hidden` unless current; `data-current` |
+| PrevTrigger, NextTrigger | `type="button"`; `disabled` and `data-disabled` where they cannot move |
+| CompletedContent | `hidden` unless completed |
+
+## Keyboard
+
+The browser's: Tab and Shift+Tab move through the enabled triggers, Enter or Space presses one.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/steps` | `Steps`, `ChangeDetails`, `ChangeReason`, `RenderProp`, `StepsCompletedContentProps`, `StepsContentProps`, `StepsIndicatorProps`, `StepsItemProps`, `StepsItemState`, `StepsListProps`, `StepsNextTriggerProps`, `StepsPrevTriggerProps`, `StepsRootProps`, `StepsSeparatorProps`, `StepsState`, `StepsStepTriggerProps`, `StepsStepTriggerState`, `StepsTriggerProps` |
+| `@fragiola/primitives-vue/steps` | `Steps`, `ChangeDetails`, `ChangeReason`, `RenderSlotProps`, `StepsContentProps`, `StepsItemProps`, `StepsItemState`, `StepsRootEmits`, `StepsRootProps`, `StepsState`, `StepsStepTriggerState` |
+| `@fragiola/primitives-angular/steps` | `ChangeDetails`, `ChangeReason`, `StepsCompletedContent`, `StepsContent`, `StepsIndicator`, `StepsItem`, `StepsItemState`, `StepsList`, `StepsNextTrigger`, `StepsPrevTrigger`, `StepsRoot`, `StepsSeparator`, `StepsState`, `StepsStepTriggerState`, `StepsTrigger`, `ValueChangeEvent` |

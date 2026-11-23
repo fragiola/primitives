@@ -83,6 +83,11 @@
             "types": "./dist/types/fragiola-primitives-angular-avatar.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-avatar.mjs"
         },
+        "./breadcrumbs": {
+            "@fragiola/source": "./breadcrumbs/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-breadcrumbs.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-breadcrumbs.mjs"
+        },
         "./button": {
             "@fragiola/source": "./button/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-button.d.ts",
@@ -102,6 +107,11 @@
             "@fragiola/source": "./calendar-view/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-calendar-view.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-calendar-view.mjs"
+        },
+        "./carousel": {
+            "@fragiola/source": "./carousel/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-carousel.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-carousel.mjs"
         },
         "./checkbox": {
             "@fragiola/source": "./checkbox/public-api.ts",
@@ -207,6 +217,11 @@
             "@fragiola/source": "./label/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-label.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-label.mjs"
+        },
+        "./link": {
+            "@fragiola/source": "./link/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-link.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-link.mjs"
         },
         "./listbox": {
             "@fragiola/source": "./listbox/public-api.ts",
@@ -347,6 +362,11 @@
             "@fragiola/source": "./slider/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-slider.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-slider.mjs"
+        },
+        "./steps": {
+            "@fragiola/source": "./steps/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-steps.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-steps.mjs"
         },
         "./switch": {
             "@fragiola/source": "./switch/public-api.ts",

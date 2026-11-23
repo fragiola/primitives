@@ -8,7 +8,11 @@
 
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
-import { PRIMITIVES_PACKAGES, TOOLKIT_PACKAGE } from "../src/framework.ts";
+import {
+    PRIMITIVES_PACKAGES,
+    ROUTER_PACKAGES,
+    TOOLKIT_PACKAGE,
+} from "../src/framework.ts";
 import { DEFAULT_HEIGHT } from "../src/meta-types.ts";
 import {
     type ExamplesApp,
@@ -53,10 +57,20 @@ function importsToolkit(app: ExamplesApp, files: readonly string[]): boolean {
     );
 }
 
+/** Whether an example's files import its framework's router (a Link rendered through it). */
+function importsRouter(app: ExamplesApp, files: readonly string[]): boolean {
+    return files.some((file) =>
+        importsOf(readFileSync(fileOf(app, file), "utf-8")).includes(
+            ROUTER_PACKAGES[app.framework],
+        ),
+    );
+}
+
 /**
  * The manifest of one framework's app. Every example installs its framework's primitives package
- * (which brings the toolkit), and the toolkit itself when it imports one of its entries (a
- * calendar system, a time zone); there is no registry.
+ * (which brings the toolkit), the toolkit itself when it imports one of its entries (a calendar
+ * system, a time zone), and its framework's router when it renders links through it; there is no
+ * registry.
  */
 export async function buildManifest(app: ExamplesApp): Promise<Manifest> {
     const entries = await loadExamples(app);
@@ -92,6 +106,9 @@ export async function buildManifest(app: ExamplesApp): Promise<Manifest> {
             packages: [
                 PRIMITIVES_PACKAGES[app.framework],
                 ...(importsToolkit(app, files) ? [TOOLKIT_PACKAGE] : []),
+                ...(importsRouter(app, files)
+                    ? [ROUTER_PACKAGES[app.framework]]
+                    : []),
             ],
         }),
     );

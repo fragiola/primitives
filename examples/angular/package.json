@@ -24,6 +24,7 @@
         "@analogjs/vite-plugin-angular": "2.9.7",
         "@angular/build": "22.2.7",
         "@angular/compiler-cli": "22.2.6",
+        "@angular/router": "22.2.6",
         "@playwright/test": "1.65.1",
         "@tailwindcss/vite": "4.3.5",
         "@types/node": "26.6.6",

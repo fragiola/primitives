@@ -15,6 +15,8 @@ import { AutocompleteInline } from "../scenarios/autocomplete/autocomplete-inlin
 import { AutocompleteLifecycle } from "../scenarios/autocomplete/autocomplete-lifecycle.tsx";
 import { AutocompleteNone } from "../scenarios/autocomplete/autocomplete-none.tsx";
 import { AvatarBasic } from "../scenarios/avatar/avatar-basic.tsx";
+import { BreadcrumbsBasic } from "../scenarios/breadcrumbs/breadcrumbs-basic.tsx";
+import { BreadcrumbsCollapsed } from "../scenarios/breadcrumbs/breadcrumbs-collapsed.tsx";
 import { ButtonBasic } from "../scenarios/button/button-basic.tsx";
 import { CalendarMinMax } from "../scenarios/calendar/calendar-min-max.tsx";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.tsx";
@@ -27,6 +29,11 @@ import { CalendarSystemsBasic } from "../scenarios/calendar-systems/calendar-sys
 import { CalendarSystemsPickers } from "../scenarios/calendar-systems/calendar-systems-pickers.tsx";
 import { CalendarViewPicker } from "../scenarios/calendar-view/calendar-view-picker.tsx";
 import { CalendarViewTyped } from "../scenarios/calendar-view/calendar-view-typed.tsx";
+import { CarouselAutoplay } from "../scenarios/carousel/carousel-autoplay.tsx";
+import { CarouselBasic } from "../scenarios/carousel/carousel-basic.tsx";
+import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.tsx";
+import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.tsx";
+import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
@@ -95,6 +102,8 @@ import { HoverCardDetached } from "../scenarios/hover-card/hover-card-detached.t
 import { HoverCardInDialog } from "../scenarios/hover-card/hover-card-in-dialog.tsx";
 import { HoverCardLifecycle } from "../scenarios/hover-card/hover-card-lifecycle.tsx";
 import { LabelControls } from "../scenarios/label/label-controls.tsx";
+import { LinkBasic } from "../scenarios/link/link-basic.tsx";
+import { LinkRouter } from "../scenarios/link/link-router.tsx";
 import { ListboxField } from "../scenarios/listbox/listbox-field.tsx";
 import { ListboxGroups } from "../scenarios/listbox/listbox-groups.tsx";
 import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.tsx";
@@ -167,6 +176,8 @@ import { SliderLabelValue } from "../scenarios/slider/slider-label-value.tsx";
 import { SliderRange } from "../scenarios/slider/slider-range.tsx";
 import { SliderThumbName } from "../scenarios/slider/slider-thumb-name.tsx";
 import { SliderVertical } from "../scenarios/slider/slider-vertical.tsx";
+import { StepsBasic } from "../scenarios/steps/steps-basic.tsx";
+import { StepsLinear } from "../scenarios/steps/steps-linear.tsx";
 import { SwitchBasic } from "../scenarios/switch/switch-basic.tsx";
 import { SwitchControlled } from "../scenarios/switch/switch-controlled.tsx";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.tsx";
@@ -448,6 +459,17 @@ export const routes: Record<
     "/editable/modes": EditableModes,
     "/editable/states": EditableStates,
     "/editable/field": EditableField,
+    "/link/basic": LinkBasic,
+    "/link/router": LinkRouter,
+    "/breadcrumbs/basic": BreadcrumbsBasic,
+    "/breadcrumbs/collapsed": BreadcrumbsCollapsed,
+    "/steps/basic": StepsBasic,
+    "/steps/linear": StepsLinear,
+    "/carousel/basic": CarouselBasic,
+    "/carousel/autoplay": CarouselAutoplay,
+    "/carousel/tabbed": CarouselTabbed,
+    "/carousel/multiple": CarouselMultiple,
+    "/carousel/vertical": CarouselVertical,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,

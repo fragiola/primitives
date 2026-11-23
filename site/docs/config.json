@@ -126,6 +126,22 @@
                     "path": "api/pagination"
                 },
                 {
+                    "label": "Link",
+                    "path": "api/link"
+                },
+                {
+                    "label": "Breadcrumbs",
+                    "path": "api/breadcrumbs"
+                },
+                {
+                    "label": "Steps",
+                    "path": "api/steps"
+                },
+                {
+                    "label": "Carousel",
+                    "path": "api/carousel"
+                },
+                {
                     "label": "Collapsible",
                     "path": "api/collapsible"
                 },

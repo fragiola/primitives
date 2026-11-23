@@ -9,6 +9,7 @@ import {
 import {
     FRAMEWORKS,
     PRIMITIVES_PACKAGES,
+    ROUTER_PACKAGES,
     TOOLKIT_PACKAGE,
 } from "../../examples/shared/src/framework.ts";
 import { FRAMEWORKS as PACKAGE_FRAMEWORKS } from "../../scripts/components.ts";
@@ -96,6 +97,9 @@ describe("the frameworks of project.json", () => {
 /** The examples that import a toolkit entry themselves (a calendar system, a time zone). */
 const TOOLKIT_EXAMPLES = ["calendar-system", "date-field-time-zone"];
 
+/** The examples that render their links through the framework's router: it is installed too. */
+const ROUTER_EXAMPLES = ["link", "breadcrumbs"];
+
 describe("the embeds", () => {
     it("are built under <base>/embed/<framework>/", () => {
         expect(normalizeBase("/primitives")).toBe("/primitives");
@@ -123,10 +127,13 @@ describe("the embeds", () => {
             "aspect-ratio",
             "autocomplete",
             "avatar",
+            "breadcrumbs",
             "button",
             "calendar",
             "calendar-preset",
             "calendar-system",
+            "carousel",
+            "carousel-tabbed",
             "checkbox",
             "clipboard",
             "collapsible",
@@ -146,6 +153,7 @@ describe("the embeds", () => {
             "fieldset",
             "form",
             "hover-card",
+            "link",
             "listbox",
             "menu",
             "menu-view-options",
@@ -169,6 +177,7 @@ describe("the embeds", () => {
             "select-virtual",
             "separator",
             "slider",
+            "steps",
             "switch",
             "tabs",
             "tag-group",
@@ -205,6 +214,9 @@ describe("the embeds", () => {
                 "tabs",
                 "navigation-menu",
                 "pagination",
+                "link",
+                "breadcrumbs",
+                "steps",
                 "collapsible",
                 "accordion",
                 "field",
@@ -252,6 +264,8 @@ describe("the embeds", () => {
                 "scroll-area",
                 "aspect-ratio",
                 "clipboard",
+                "carousel",
+                "carousel-tabbed",
             ]);
             for (const example of manifest.examples) {
                 expect(example.packages, framework).toEqual([
@@ -261,6 +275,14 @@ describe("the embeds", () => {
                     // an injected calendar system or time zone: the toolkit too
                     ...(TOOLKIT_EXAMPLES.includes(example.id)
                         ? [TOOLKIT_PACKAGE]
+                        : []),
+                    // links rendered through the router: the router too
+                    ...(ROUTER_EXAMPLES.includes(example.id)
+                        ? [
+                              ROUTER_PACKAGES[
+                                  framework as keyof typeof ROUTER_PACKAGES
+                              ],
+                          ]
                         : []),
                 ]);
                 expect(example.registry).toEqual([]);

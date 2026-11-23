@@ -1,0 +1,154 @@
+---
+title: Breadcrumbs
+description: The APG breadcrumb, a named navigation of links to the parent pages, the current one marked, its middle collapsing into a Menu, in each framework.
+---
+
+The trail of links to the parent pages of the current page, before the main content. It is the
+APG [breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/): a navigation landmark you
+name, an ordered list of links, `aria-current="page"` on the current page. A long trail collapses
+its middle into an Ellipsis you open as a [Menu](/docs/api/menu).
+
+<Example id="breadcrumbs" />
+
+## Behaviour
+
+- **Links**: Breadcrumbs' Link is [Link](/docs/api/link): `current` and `disabled`, and your
+  router's link through `render` (React), `as` (Vue) or on its anchor (Angular).
+- **Current page**: a Link with `current`, or a Current (no link) with `aria-current="page"`.
+- **Separators**: list items hidden from assistive technology (`aria-hidden="true"`), so the
+  list holds only list items and a reader counts only the pages.
+- **Collapsed middle**: the Ellipsis is a native button you name and compose with a Menu's
+  trigger (React `render={<Menu.Trigger />}`, Vue `:as="Menu.Trigger"`, Angular `menuTrigger` on
+  the same button); the Menu's items are your links. Breadcrumbs never imports Menu.
+- **Keyboard**: the browser's Tab through the links; the Menu's keys once open.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `nav` | `breadcrumbs-root` | the landmark |
+| List | `ol` | `breadcrumbs-list` | the trail |
+| Item | `li` | `breadcrumbs-item` | one page of the trail |
+| Link | `a` | `breadcrumbs-link` | a parent page (Link's behaviour) |
+| Current | `span` | `breadcrumbs-current` | the current page when it is no link |
+| Separator | `li` | `breadcrumbs-separator` | between two Items, hidden |
+| Ellipsis | `button` | `breadcrumbs-ellipsis` | the collapsed middle, a Menu's trigger |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Breadcrumbs } from "@fragiola/primitives-react/breadcrumbs";
+
+<Breadcrumbs.Root aria-label="Breadcrumb">
+    <Breadcrumbs.List>
+        <Breadcrumbs.Item>
+            <Breadcrumbs.Link href="/">Home</Breadcrumbs.Link>
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Separator>/</Breadcrumbs.Separator>
+        <Breadcrumbs.Item>
+            <Breadcrumbs.Link href="/docs" current>
+                Docs
+            </Breadcrumbs.Link>
+        </Breadcrumbs.Item>
+    </Breadcrumbs.List>
+</Breadcrumbs.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Breadcrumbs.Root aria-label="Breadcrumb">
+        <Breadcrumbs.List>
+            <Breadcrumbs.Item><Breadcrumbs.Link href="/">Home</Breadcrumbs.Link></Breadcrumbs.Item>
+            <Breadcrumbs.Separator>/</Breadcrumbs.Separator>
+            <Breadcrumbs.Item><Breadcrumbs.Link href="/docs" current>Docs</Breadcrumbs.Link></Breadcrumbs.Item>
+        </Breadcrumbs.List>
+    </Breadcrumbs.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [BreadcrumbsRoot, BreadcrumbsList, BreadcrumbsItem, BreadcrumbsLink, BreadcrumbsSeparator],
+    template: `
+        <nav breadcrumbsRoot aria-label="Breadcrumb">
+            <ol breadcrumbsList>
+                <li breadcrumbsItem><a breadcrumbsLink href="/">Home</a></li>
+                <li breadcrumbsSeparator>/</li>
+                <li breadcrumbsItem><a breadcrumbsLink href="/docs" current>Docs</a></li>
+            </ol>
+        </nav>
+    `,
+})
+export class Trail {}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards.
+
+### Root
+
+No props of its own; name it with `aria-label`.
+
+### List
+
+No props of its own.
+
+### Item
+
+No props of its own.
+
+### Link
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `current` | `boolean` | `false` | it links to the current page: `aria-current="page"` |
+| `disabled` | `boolean` | `false` | unavailable, as [Link](/docs/api/link)'s |
+
+### Current
+
+No props of its own.
+
+### Separator
+
+No props of its own; its children are your separator.
+
+### Ellipsis
+
+No props of its own; name it, and compose it with a Menu's trigger.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Link | `aria-current="page"` and `data-current` when current; `aria-disabled="true"` and `data-disabled` when disabled |
+| Current | `aria-current="page"` |
+| Separator | `aria-hidden="true"` |
+| Ellipsis | `type="button"`; the Menu's attributes when composed |
+
+## Keyboard
+
+The browser's: Tab and Shift+Tab move through the links and the Ellipsis, Enter follows a link,
+Enter or Space opens the Ellipsis's Menu, whose keys then apply.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/breadcrumbs` | `Breadcrumbs`, `BreadcrumbsCurrentProps`, `BreadcrumbsEllipsisProps`, `BreadcrumbsItemProps`, `BreadcrumbsLinkProps`, `BreadcrumbsLinkState`, `BreadcrumbsListProps`, `BreadcrumbsRootProps`, `BreadcrumbsSeparatorProps`, `RenderProp` |
+| `@fragiola/primitives-vue/breadcrumbs` | `Breadcrumbs`, `BreadcrumbsLinkProps`, `BreadcrumbsLinkState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/breadcrumbs` | `BreadcrumbsCurrent`, `BreadcrumbsEllipsis`, `BreadcrumbsItem`, `BreadcrumbsLink`, `BreadcrumbsLinkState`, `BreadcrumbsList`, `BreadcrumbsRoot`, `BreadcrumbsSeparator` |

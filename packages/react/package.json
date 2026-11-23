@@ -87,6 +87,12 @@
             "import": "./dist/avatar.js",
             "default": "./dist/avatar.js"
         },
+        "./breadcrumbs": {
+            "@fragiola/source": "./src/components/breadcrumbs/index.ts",
+            "types": "./dist/breadcrumbs.d.ts",
+            "import": "./dist/breadcrumbs.js",
+            "default": "./dist/breadcrumbs.js"
+        },
         "./button": {
             "@fragiola/source": "./src/components/button/index.ts",
             "types": "./dist/button.d.ts",
@@ -110,6 +116,12 @@
             "types": "./dist/calendar-view.d.ts",
             "import": "./dist/calendar-view.js",
             "default": "./dist/calendar-view.js"
+        },
+        "./carousel": {
+            "@fragiola/source": "./src/components/carousel/index.ts",
+            "types": "./dist/carousel.d.ts",
+            "import": "./dist/carousel.js",
+            "default": "./dist/carousel.js"
         },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
@@ -236,6 +248,12 @@
             "types": "./dist/label.d.ts",
             "import": "./dist/label.js",
             "default": "./dist/label.js"
+        },
+        "./link": {
+            "@fragiola/source": "./src/components/link/index.ts",
+            "types": "./dist/link.d.ts",
+            "import": "./dist/link.js",
+            "default": "./dist/link.js"
         },
         "./listbox": {
             "@fragiola/source": "./src/components/listbox/index.ts",
@@ -405,6 +423,12 @@
             "import": "./dist/slider.js",
             "default": "./dist/slider.js"
         },
+        "./steps": {
+            "@fragiola/source": "./src/components/steps/index.ts",
+            "types": "./dist/steps.d.ts",
+            "import": "./dist/steps.js",
+            "default": "./dist/steps.js"
+        },
         "./switch": {
             "@fragiola/source": "./src/components/switch/index.ts",
             "types": "./dist/switch.d.ts",
@@ -558,6 +582,11 @@
                 "import": "./dist/avatar.js",
                 "default": "./dist/avatar.js"
             },
+            "./breadcrumbs": {
+                "types": "./dist/breadcrumbs.d.ts",
+                "import": "./dist/breadcrumbs.js",
+                "default": "./dist/breadcrumbs.js"
+            },
             "./button": {
                 "types": "./dist/button.d.ts",
                 "import": "./dist/button.js",
@@ -577,6 +606,11 @@
                 "types": "./dist/calendar-view.d.ts",
                 "import": "./dist/calendar-view.js",
                 "default": "./dist/calendar-view.js"
+            },
+            "./carousel": {
+                "types": "./dist/carousel.d.ts",
+                "import": "./dist/carousel.js",
+                "default": "./dist/carousel.js"
             },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",
@@ -682,6 +716,11 @@
                 "types": "./dist/label.d.ts",
                 "import": "./dist/label.js",
                 "default": "./dist/label.js"
+            },
+            "./link": {
+                "types": "./dist/link.d.ts",
+                "import": "./dist/link.js",
+                "default": "./dist/link.js"
             },
             "./listbox": {
                 "types": "./dist/listbox.d.ts",
@@ -822,6 +861,11 @@
                 "types": "./dist/slider.d.ts",
                 "import": "./dist/slider.js",
                 "default": "./dist/slider.js"
+            },
+            "./steps": {
+                "types": "./dist/steps.d.ts",
+                "import": "./dist/steps.js",
+                "default": "./dist/steps.js"
             },
             "./switch": {
                 "types": "./dist/switch.d.ts",

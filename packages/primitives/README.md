@@ -23,6 +23,7 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/positioning` | `anchorFloating(anchor, floating, options)` → cleanup (Floating UI), `toPlacement`, `fromPlacement`, `Side`, `Align` |
 | `@fragiola/primitives/collection` | `stepIndex`, `edgeIndex`, `stepThroughNone`, `tabsKeyTarget`, `menuKeyTarget`, `submenuKeys`, the roving focus (`rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`), `createTypeahead`, the combobox's item helpers, `chipKeyTarget`, the tags' keys (`tagGroupKeyTarget`, `removalFocusIndex`, `tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`), a segmented control's Indicator (`segmentIndicatorBox`, `placeSegmentIndicator`) |
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
+| `@fragiola/primitives/carousel` | a carousel's DOM side: its pages (`carouselPages`, pure math), the scroll to a page and the page a scroll settled on, the mouse drag, the hover and focus watch (`watchCarousel`, native listeners) and the rotation's delay (`createRotationTimer`) |
 | `@fragiola/primitives/clipboard` | a copy to the clipboard: `writeClipboard` (the asynchronous Clipboard API, no `execCommand` fallback) and `announceText` (a live region's text, a new node each time) |
 | `@fragiola/primitives/pagination` | a pagination's range: `paginationRange` (the pages and ellipses around the current page, the boundaries kept), `pageCount`, `clampPage`; pure math |
 | `@fragiola/primitives/pointer` | `startDrag`, `isInSafeArea`, `isInHoverBridge`, `trackHoverBridge` |

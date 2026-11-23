@@ -48,6 +48,12 @@
             "import": "./dist/calendar-systems.js",
             "default": "./dist/calendar-systems.js"
         },
+        "./carousel": {
+            "@fragiola/source": "./src/carousel/index.ts",
+            "types": "./dist/carousel.d.ts",
+            "import": "./dist/carousel.js",
+            "default": "./dist/carousel.js"
+        },
         "./clipboard": {
             "@fragiola/source": "./src/clipboard/index.ts",
             "types": "./dist/clipboard.d.ts",
@@ -240,6 +246,11 @@
                 "types": "./dist/calendar-systems.d.ts",
                 "import": "./dist/calendar-systems.js",
                 "default": "./dist/calendar-systems.js"
+            },
+            "./carousel": {
+                "types": "./dist/carousel.d.ts",
+                "import": "./dist/carousel.js",
+                "default": "./dist/carousel.js"
             },
             "./clipboard": {
                 "types": "./dist/clipboard.d.ts",
