@@ -192,7 +192,7 @@ export function CarouselRoot({
     }, [root, group, baseId, orientation]);
 
     // the page's first slide at the group's start: at once on mount, smoothly after
-    // biome-ignore lint/correctness/useExhaustiveDependencies: `root` and `group` re-run it once watched
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `root`, `group` and `orientation` re-run it on a new watch (a new timer)
     useLayoutEffect(() => {
         if (controller.current === null) {
             return;
@@ -203,7 +203,7 @@ export function CarouselRoot({
     }, [page, pages, root, group, orientation]);
 
     // the rotation: each page while playing starts the whole delay again
-    // biome-ignore lint/correctness/useExhaustiveDependencies: `root` and `group` re-run it once watched
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `root`, `group` and `orientation` re-run it on a new watch (a new timer)
     useLayoutEffect(() => {
         const current = timer.current;
         if (current === null) {
@@ -222,15 +222,15 @@ export function CarouselRoot({
                 },
             );
         });
-    }, [playing, page, delay, root, group]);
-    // biome-ignore lint/correctness/useExhaustiveDependencies: `root` and `group` re-run it once watched
+    }, [playing, page, delay, root, group, orientation]);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `root`, `group` and `orientation` re-run it on a new watch (a new timer)
     useLayoutEffect(() => {
         if (paused) {
             timer.current?.pause();
         } else {
             timer.current?.resume();
         }
-    }, [paused, root, group]);
+    }, [paused, root, group, orientation]);
 
     const context = {
         page,

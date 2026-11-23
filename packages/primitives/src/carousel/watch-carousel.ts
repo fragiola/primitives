@@ -187,14 +187,21 @@ export function watchCarousel(
         }
     };
     // a pointer press on the AutoplayTrigger focuses it without stopping the rotation: the
-    // press itself toggles it
+    // press itself toggles it. The press ends a task after the pointer's release, since a touch
+    // focuses with its compatibility `mousedown`, which follows `pointerup`
     let pressing = false;
+    let pressTimer: number | undefined;
     const onPressEnd = () => {
-        pressing = false;
         view?.removeEventListener("pointerup", onPressEnd, true);
         view?.removeEventListener("pointercancel", onPressEnd, true);
+        pressTimer = view?.setTimeout(() => {
+            pressing = false;
+        }, 0);
     };
     const onPressStart = () => {
+        if (pressTimer !== undefined) {
+            view?.clearTimeout(pressTimer);
+        }
         pressing = true;
         view?.addEventListener("pointerup", onPressEnd, true);
         view?.addEventListener("pointercancel", onPressEnd, true);
@@ -249,6 +256,7 @@ export function watchCarousel(
     // the swipe's lock distance along the axis. `/swipe`'s `watchSwipe` hands a move over a
     // scroller to that scroller (its scroll containment), and the group is that scroller
     let stopDrag: (() => void) | null = null;
+    let destroyed = false;
     const onPointerDown = (event: PointerEvent) => {
         const target = event.target;
         if (
@@ -302,6 +310,12 @@ export function watchCarousel(
                 if (!started) {
                     return;
                 }
+                if (destroyed) {
+                    // the watch ends (an unmount, another axis): no page to report
+                    dragging = false;
+                    restoreSnap();
+                    return;
+                }
                 dragging = false;
                 options.onDraggingChange(false);
                 group.addEventListener("click", swallowClick, true);
@@ -343,7 +357,11 @@ export function watchCarousel(
         needsTabStop: () => getTabbables(group).length === 0,
         scrollToPage,
         destroy: () => {
+            destroyed = true;
             stopDrag?.();
+            if (pressTimer !== undefined) {
+                view?.clearTimeout(pressTimer);
+            }
             group.removeEventListener("pointerdown", onPointerDown);
             root.removeEventListener("pointerdown", onPressStart);
             view?.removeEventListener("pointerup", onPressEnd, true);
