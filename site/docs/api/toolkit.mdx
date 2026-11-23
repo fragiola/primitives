@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`, which no other component imports; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -69,6 +69,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/scroll-lock` | `lockScroll` |
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
+| `@fragiola/primitives/toast` | `createToastManager`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `watchToastViewport`, `ToastViewportWatch`, `ToastViewportWatchOptions`, `measureToastHeight` |
 | `@fragiola/primitives/virtual` | `createVirtualizer`, `Virtualizer`, `VirtualizerOptions`, `VirtualAlign`, `scrollContainer`, `virtualLayout`, `VirtualLayoutOptions`, `VirtualRange`, `VirtualRow`, `rowStarts`, `rowAt`, `activeSticky`, `pageIndex` |
 
 ## The mechanisms
@@ -130,7 +131,16 @@ alone: a list that does not opt in imports neither. The root entry,
   dismiss past half the size or on a flick (0.5 px per ms), or settle (on the closest snap point,
   `resolveSnapPoints` measuring them in px). `swipeMovement` damps a move past the fully open
   position, `swipeProgress` gives the share of the way to closed. A drawer's swipe
-  ([Drawer](/docs/api/drawer)); a toast can reuse it.
+  ([Drawer](/docs/api/drawer)) and a toast's ([Toast](/docs/api/toast)).
+- **Toast queue**: `createToastManager({ limit, timeout })` holds an app's notifications outside
+  every framework, so a plain module can import it: `add`, `update`, `close`, `promise` (a
+  `loading` toast that becomes `success` or `error`), `toasts()` newest first with what a stack
+  needs (`limited` past the limit, `index`, `height`, `offsetY`, `closing`), `subscribe`; each
+  toast's timer runs while it shows and nothing `pause`s the queue. `watchToastViewport(viewport,
+  manager, { onExpandedChange })` is a Viewport's DOM side (the F6 landmark, the hover, focus and
+  hidden-page pauses, two live regions that announce each shown toast by its priority, the focus
+  off a closing toast); `measureToastHeight(element)` a toast's natural height
+  ([Toast](/docs/api/toast)).
 - **Pointer and hover**: pointer drags, a submenu's safe area and hover bridge, hover intent and
   delay groups. `watchLongPress(element, { delay, moveTolerance, pointerTypes, onLongPress })`
   (`LongPressOptions`; defaults 500 ms, 10 px, touch only) calls `onLongPress(point, event)` once a

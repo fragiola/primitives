@@ -59,6 +59,7 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
 const RECIPE_OF: Record<string, string> = {
     "menu-view-options": "menu",
     "drawer-side-panel": "drawer",
+    "toast-promise": "toast",
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
@@ -83,6 +84,9 @@ describe("the manifest", () => {
                 "drawer",
                 "drawer-side-panel",
                 "menubar",
+                "hover-card",
+                "toast",
+                "toast-promise",
                 "tabs",
                 "navigation-menu",
                 "collapsible",

@@ -1,0 +1,227 @@
+---
+title: Toast
+description: Notifications on a toast queue outside every framework, announced through live regions, with an F6 landmark, pausing, a limit, promises and swipe.
+---
+
+Brief notifications that appear in a stack, announce themselves to assistive technology and close
+on their own after a timeout. The toasts live in a **toast queue** outside every framework
+(`createToastManager`, from the toolkit's `@fragiola/primitives/toast`): a plain module can create
+it, import it anywhere and add toasts with no component, and the Provider renders from it. The
+APG has no toast pattern: the announcements follow WAI-ARIA live regions, the keyboard follows
+Base UI (an F6 landmark, Escape on a toast).
+
+<Example id="toast" />
+
+## Behaviour
+
+- **The queue**: `add`, `update`, `close`, `promise` (a `loading` toast that becomes `success` or
+  `error`), newest first. The newest `limit` toasts show; the older ones are **queued**
+  (`data-limited`, `inert`) and show again as the newer ones close.
+- **Timers**: each toast closes `timeout` ms after it shows (its own, else the queue's; `0`
+  never). A queued toast's timer waits until it shows; a `loading` toast has none.
+- **Pausing**: every timer pauses while the pointer is over the Viewport, while the keyboard is in
+  it, while the page is hidden and while a toast is swiped; each keeps what it had left.
+- **Announcements**: two live regions inside the Viewport, polite and assertive, hold the title
+  and description of each shown toast by its `priority`, appended in the order they show; an
+  update (a promise's result) changes the text in place. The toasts themselves are not live, so
+  nothing is announced twice.
+- **Keyboard**: F6 focuses the Viewport (a `region` landmark the app names), F6 or Shift+Tab on it
+  go back; each toast is a tab stop; Escape closes the focused toast, and focus moves to the next
+  one, else back where it was.
+- **Swipe**: a drag along the Root's `swipeDirection` (mouse, pen or touch) moves it
+  (`data-swiping`, `--toast-swipe-movement-x` / `-y`); past half its size, or a flick, it closes.
+- **Stacking**: `--toast-index`, `--toast-offset-y`, `--toast-height` and the Viewport's
+  `--toast-frontmost-height` let a stylesheet stack the toasts collapsed or expanded
+  (`data-expanded` while hovered or focused).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Provider | none | | gives its parts the queue |
+| Portal | none | | moves the Viewport to the end of `body` |
+| Viewport | `div` | `toast-viewport` | the `region` landmark of the toasts, with the live regions (`toast-announcer`, `toast-announcement`) first inside it |
+| Root | `div` | `toast-root` | one toast |
+| Title | `h2` | `toast-title` | its name (default: the toast's `title`) |
+| Description | `p` | `toast-description` | its description (default: the toast's `description`) |
+| Action | `button` | `toast-action` | an action the app wires |
+| Close | `button` | `toast-close` | closes the toast |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { createToastManager, Toast } from "@fragiola/primitives-react/toast";
+
+// a plain module: import it anywhere and call notifications.add(...)
+export const notifications = createToastManager();
+
+function Toasts() {
+    const { toasts } = Toast.useToastManager();
+    return toasts.map((toast) => (
+        <Toast.Root key={toast.id} toast={toast}>
+            <Toast.Title />
+            <Toast.Description />
+            <Toast.Close>Dismiss</Toast.Close>
+        </Toast.Root>
+    ));
+}
+
+<Toast.Provider toastManager={notifications}>
+    <App />
+    <Toast.Portal>
+        <Toast.Viewport aria-label="Notifications">
+            <Toasts />
+        </Toast.Viewport>
+    </Toast.Portal>
+</Toast.Provider>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { Toast, useToastManager } from "@fragiola/primitives-vue/toast";
+
+// inside a component under Toast.Provider
+const { toasts } = useToastManager();
+</script>
+
+<template>
+    <Toast.Portal>
+        <Toast.Viewport aria-label="Notifications">
+            <Toast.Root v-for="toast in toasts" :key="toast.id" :toast="toast">
+                <Toast.Title />
+                <Toast.Description />
+                <Toast.Close>Dismiss</Toast.Close>
+            </Toast.Root>
+        </Toast.Viewport>
+    </Toast.Portal>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ToastPortal, ToastViewport, ToastRoot, ToastTitle, ToastDescription, ToastClose],
+    template: `
+        <ng-container *toastPortal>
+            <div toastViewport aria-label="Notifications">
+                @for (toast of manager.toasts(); track toast.id) {
+                    <div toastRoot [toast]="toast">
+                        <h2 toastTitle>{{ toast.title }}</h2>
+                        <p toastDescription>{{ toast.description }}</p>
+                        <button toastClose>Dismiss</button>
+                    </div>
+                }
+            </div>
+        </ng-container>
+    `,
+})
+export class Toasts {
+    // under an element with toastProvider [toastManager]="notifications"
+    protected readonly manager = injectToastManager();
+}
+```
+
+</Framework>
+
+**The queue.** `createToastManager({ limit, timeout })` returns a `ToastManager`: `add(options)` (returns the
+id; an open toast's `id` updates it), `update(id, updates)`, `close(id?)`,
+`promise(promise, { loading, success, error })`, `toasts()`, `subscribe(listener)`. React's
+`Toast.useToastManager()`, Vue's `useToastManager()` and Angular's `injectToastManager()` give a
+component the Provider's queue, with its toasts as the framework's reactive value.
+
+| option | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the toast's id; adding an open one's id updates it |
+| `title`, `description` | `string` | | what it says, and what is announced |
+| `type` | `string` | | free-form (`data-type`); `loading` never closes by itself |
+| `timeout` | `number` | the queue's | ms before it closes; `0` never |
+| `priority` | `"low" \| "high"` | `"low"` | announced politely, or assertively (an `alertdialog`) |
+| `data` | `Data` | | the app's own data |
+| `onClose`, `onRemove` | `() => void` | | once it closes; once it left the list after its exit |
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue and Angular bind them the same way.
+
+### Provider
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `toastManager` | `ToastManager` | a queue of its own | a queue the app created, for instance in a plain module |
+| `limit` | `number` | `3` | how many toasts show at once (given to a `toastManager` only when set) |
+| `timeout` | `number` | `5000` | the default ms before a toast closes (idem) |
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Viewport goes |
+| `options` (angular) | `Element \| { container? }` | `{}` | the container: `*toastPortal="element"` |
+
+### Viewport
+
+No props of its own; the app names it (`aria-label`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `toast` | `ToastObject` | | the toast of the queue it renders |
+| `swipeDirection` | `"up" \| "down" \| "left" \| "right"` | `"right"` | the edge a swipe dismisses it towards |
+
+### Title
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the Root's `aria-labelledby` points at; React and Vue take it as a plain attribute |
+
+### Description
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` (angular) | `string` | generated | the id the Root's `aria-describedby` points at; React and Vue take it as a plain attribute |
+
+### Action
+
+No props of its own.
+
+### Close
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Viewport | `role="region"`, `tabindex="-1"`, `data-expanded`, `--toast-frontmost-height` |
+| live regions | `aria-live="polite"` / `"assertive"`, `aria-atomic="false"`, `aria-relevant="additions text"`, `data-priority`; visually hidden |
+| Root | `role="dialog"` (`alertdialog` for a high priority), `aria-modal="false"`, `aria-labelledby`, `aria-describedby`, `tabindex="0"`, `data-type`, `data-expanded`, `data-limited` and `inert`, `data-swiping`, `data-swipe-direction`, `data-starting-style`, `data-ending-style`; `--toast-index`, `--toast-offset-y`, `--toast-height`, `--toast-swipe-movement-x`, `--toast-swipe-movement-y` |
+| Title, Description | an `id`, `data-type` |
+| Action, Close | `type="button"`, `data-type` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| F6 | focuses the Viewport; F6 again (or Shift+Tab on it) goes back |
+| Tab | through the toasts and their buttons |
+| Escape | closes the focused toast |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/toast` | `Toast`, `createToastManager`, `useToastManager`, `UseToastManagerValue`, `ToastProviderProps`, `ToastPortalProps`, `ToastRootProps`, `ToastRootState`, `ToastViewportState`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `SwipeDirection`, `OverlayPortalProps`, `RenderProp` |
+| `@fragiola/primitives-vue/toast` | `Toast`, `createToastManager`, `useToastManager`, `UseToastManagerValue`, `ToastProviderProps`, `ToastPortalProps`, `ToastRootProps`, `ToastRootState`, `ToastViewportState`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `SwipeDirection`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/toast` | `ToastProvider`, `ToastPortal`, `ToastViewport`, `ToastRoot`, `ToastTitle`, `ToastDescription`, `ToastAction`, `ToastClose`, `createToastManager`, `injectToastManager`, `InjectedToastManager`, `ToastRootState`, `ToastViewportState`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `SwipeDirection`, `OverlayPortalOptions` |

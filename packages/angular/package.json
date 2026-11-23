@@ -153,6 +153,11 @@
             "types": "./dist/types/fragiola-primitives-angular-form.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-form.mjs"
         },
+        "./hover-card": {
+            "@fragiola/source": "./hover-card/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-hover-card.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-hover-card.mjs"
+        },
         "./label": {
             "@fragiola/source": "./label/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-label.d.ts",
@@ -252,6 +257,11 @@
             "@fragiola/source": "./tabs/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
+        },
+        "./toast": {
+            "@fragiola/source": "./toast/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-toast.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-toast.mjs"
         },
         "./toggle": {
             "@fragiola/source": "./toggle/public-api.ts",

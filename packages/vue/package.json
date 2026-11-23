@@ -171,6 +171,12 @@
             "import": "./dist/form.js",
             "default": "./dist/form.js"
         },
+        "./hover-card": {
+            "@fragiola/source": "./src/components/hover-card/index.ts",
+            "types": "./dist/hover-card.d.ts",
+            "import": "./dist/hover-card.js",
+            "default": "./dist/hover-card.js"
+        },
         "./label": {
             "@fragiola/source": "./src/components/label/index.ts",
             "types": "./dist/label.d.ts",
@@ -290,6 +296,12 @@
             "types": "./dist/tabs.d.ts",
             "import": "./dist/tabs.js",
             "default": "./dist/tabs.js"
+        },
+        "./toast": {
+            "@fragiola/source": "./src/components/toast/index.ts",
+            "types": "./dist/toast.d.ts",
+            "import": "./dist/toast.js",
+            "default": "./dist/toast.js"
         },
         "./toggle": {
             "@fragiola/source": "./src/components/toggle/index.ts",
@@ -448,6 +460,11 @@
                 "import": "./dist/form.js",
                 "default": "./dist/form.js"
             },
+            "./hover-card": {
+                "types": "./dist/hover-card.d.ts",
+                "import": "./dist/hover-card.js",
+                "default": "./dist/hover-card.js"
+            },
             "./label": {
                 "types": "./dist/label.d.ts",
                 "import": "./dist/label.js",
@@ -547,6 +564,11 @@
                 "types": "./dist/tabs.d.ts",
                 "import": "./dist/tabs.js",
                 "default": "./dist/tabs.js"
+            },
+            "./toast": {
+                "types": "./dist/toast.d.ts",
+                "import": "./dist/toast.js",
+                "default": "./dist/toast.js"
             },
             "./toggle": {
                 "types": "./dist/toggle.d.ts",

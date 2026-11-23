@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
 import { isInertOrHidden } from "../../src/focus.ts";
-import { LIFECYCLE_OVERLAYS } from "../../src/lifecycle.ts";
+import { LIFECYCLE_OVERLAYS, lifecyclePopup } from "../../src/lifecycle.ts";
 import { expectOutput } from "../../src/output.ts";
 import {
     isSameElement,
@@ -19,7 +19,7 @@ const part = (page: Page, name: string) =>
 
 for (const [name, overlay] of Object.entries(LIFECYCLE_OVERLAYS)) {
     test.describe(`lifecycle / ${name}`, () => {
-        const popup = (page: Page) => page.getByRole(overlay.role);
+        const popup = (page: Page) => lifecyclePopup(page, overlay);
 
         test("is kept mounted, hidden, before the first opening", async ({
             page,

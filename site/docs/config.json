@@ -94,6 +94,14 @@
                     "path": "api/tooltip"
                 },
                 {
+                    "label": "HoverCard",
+                    "path": "api/hover-card"
+                },
+                {
+                    "label": "Toast",
+                    "path": "api/toast"
+                },
+                {
                     "label": "Menu",
                     "path": "api/menu"
                 },

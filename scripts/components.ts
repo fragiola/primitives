@@ -25,6 +25,7 @@ export const COMPONENTS = [
     "field",
     "fieldset",
     "form",
+    "hover-card",
     "label",
     "listbox",
     "listbox-virtual",
@@ -45,6 +46,7 @@ export const COMPONENTS = [
     "slider",
     "switch",
     "tabs",
+    "toast",
     "toggle",
     "toggle-group",
     "toolbar",
@@ -102,6 +104,7 @@ export const MECHANISMS = [
     "scroll-lock",
     "selection",
     "swipe",
+    "toast",
     "virtual",
 ] as const;
 
