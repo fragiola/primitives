@@ -34,6 +34,8 @@ import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.ts";
+import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.ts";
+import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.ts";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.ts";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
@@ -125,6 +127,9 @@ import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.ts";
 import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.ts";
 import { PaginationBasic } from "../scenarios/pagination/pagination-basic.ts";
 import { PaginationLinks } from "../scenarios/pagination/pagination-links.ts";
+import { PasswordInputBasic } from "../scenarios/password-input/password-input-basic.ts";
+import { PasswordInputField } from "../scenarios/password-input/password-input-field.ts";
+import { PasswordInputStates } from "../scenarios/password-input/password-input-states.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
@@ -142,6 +147,9 @@ import { RatingHalf } from "../scenarios/rating/rating-half.ts";
 import { RatingReadOnly } from "../scenarios/rating/rating-read-only.ts";
 import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.ts";
 import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.ts";
+import { SearchFieldBasic } from "../scenarios/search-field/search-field-basic.ts";
+import { SearchFieldField } from "../scenarios/search-field/search-field-field.ts";
+import { SearchFieldStates } from "../scenarios/search-field/search-field-states.ts";
 import { SegmentedControlBasic } from "../scenarios/segmented-control/segmented-control-basic.ts";
 import { SegmentedControlDisabled } from "../scenarios/segmented-control/segmented-control-disabled.ts";
 import { SegmentedControlField } from "../scenarios/segmented-control/segmented-control-field.ts";
@@ -423,6 +431,14 @@ import { ROUTES } from "./routes.ts";
         RatingHalf,
         RatingReadOnly,
         RatingField,
+        PasswordInputBasic,
+        PasswordInputStates,
+        PasswordInputField,
+        SearchFieldBasic,
+        SearchFieldStates,
+        SearchFieldField,
+        ClipboardBasic,
+        ClipboardFailure,
         CalendarSystemsBasic,
         CalendarSystemsPickers,
         TimeZonesField,
@@ -640,6 +656,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/rating/half") { <main class="p-6" scenario-rating-half></main> }
             @case ("/rating/read-only") { <main class="p-6" scenario-rating-read-only></main> }
             @case ("/rating/field") { <main class="p-6" scenario-rating-field></main> }
+            @case ("/password-input/basic") { <main class="p-6" scenario-password-input-basic></main> }
+            @case ("/password-input/states") { <main class="p-6" scenario-password-input-states></main> }
+            @case ("/password-input/field") { <main class="p-6" scenario-password-input-field></main> }
+            @case ("/search-field/basic") { <main class="p-6" scenario-search-field-basic></main> }
+            @case ("/search-field/states") { <main class="p-6" scenario-search-field-states></main> }
+            @case ("/search-field/field") { <main class="p-6" scenario-search-field-field></main> }
+            @case ("/clipboard/basic") { <main class="p-6" scenario-clipboard-basic></main> }
+            @case ("/clipboard/failure") { <main class="p-6" scenario-clipboard-failure></main> }
             @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
             @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
             @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }
