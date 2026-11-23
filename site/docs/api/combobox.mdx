@@ -117,7 +117,7 @@ renders a Chip per value, then the Input.
             <Combobox.Positioner :side-offset="4">
                 <Combobox.Popup>
                     <Combobox.Empty>No fruit found.</Combobox.Empty>
-                    <Combobox.List v-slot="{ entry }">
+                    <Combobox.List v-slot="{ entry }: { entry: (typeof FRUITS)[number] }">
                         <Combobox.Item :key="entry.value" :value="entry">{{ entry.label }}</Combobox.Item>
                     </Combobox.List>
                 </Combobox.Popup>
@@ -127,7 +127,9 @@ renders a Chip per value, then the Input.
 </template>
 ```
 
-The List's default scoped slot gets `{ entry, index }`; the Value's, `{ value }`.
+The List's default scoped slot gets `{ entry, index }`; the Value's, `{ value }`. The slot's
+annotation names the consumer's item type, with no cast (`v-slot="{ value }: { value: Country[] }"`
+with `multiple`), as React's render function infers it from its parameter.
 
 </Framework>
 
