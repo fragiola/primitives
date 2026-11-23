@@ -290,6 +290,7 @@ describe("the bundle guard, entry by entry", () => {
             "calendar",
             "date-field",
             "date-picker",
+            "date-range-field",
             "field",
         ]);
         expect(ENTRY_DEPENDENCIES["date-picker"]).toEqual([

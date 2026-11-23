@@ -84,7 +84,14 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "context-menu": ["menu"],
     "date-field": ["field"],
     "date-picker": ["calendar", "field"],
-    "date-picker-input": ["calendar", "date-field", "date-picker", "field"],
+    // its root serves both typed pickers: the range's helpers are DateRangeField's
+    "date-picker-input": [
+        "calendar",
+        "date-field",
+        "date-picker",
+        "date-range-field",
+        "field",
+    ],
     "date-range-field": ["date-field", "field"],
     "date-range-picker": ["calendar", "date-picker", "field"],
     "date-range-picker-input": [
