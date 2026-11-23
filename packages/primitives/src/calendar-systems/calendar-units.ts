@@ -94,9 +94,7 @@ function nearestDay(
 ): PlainDate | undefined {
     const at = toEpochDay(place);
     const distance = (date: PlainDate) => Math.abs(toEpochDay(date) - at);
-    return days
-        .filter(enabled)
-        .sort((a, b) => distance(a) - distance(b))[0];
+    return days.filter(enabled).sort((a, b) => distance(a) - distance(b))[0];
 }
 
 /** A year page's size: 12 years from a multiple of 12, as the ISO calendar's (`/month-year`). */

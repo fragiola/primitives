@@ -58,6 +58,11 @@ from `timeZone("America/New_York")`, and **inject** it: no component imports `/t
 field given none bundles none of its code (the bundle guard's `MECHANISM_USERS` lists no entry).
 TimeField and TimeRangeField have no date, so no zone.
 
+The zone carries the code it changes (Epic #88): the segments call its hooks (`segmentOptions`
+for the `timeZoneName` part, `segmentText` for its name, `wallTime` for a value from another zone,
+`segmentsToDateTime` for the typed wall time resolved), and a picker its `choose` (`reject` read
+as `compatible`), so a field given no zone pays only for the hook calls.
+
 - The values are **`ZonedDateTime`s in that zone**. A value from another zone is shown at the
   same instant in the field's zone.
 - With a time granularity, the field shows a **time zone segment** where the locale writes the

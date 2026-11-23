@@ -81,6 +81,15 @@ import { persian } from "@fragiola/primitives/calendar-systems";
 
 TimeField and TimeRangeField have no date: they take no `calendar`.
 
+**The system carries the code it changes (Epic #88).** The shared parts call the injected object
+through one optional hook per concern, never a branch of their own: the day calendars run on the
+system's month math (`addMonths`, `monthGrid`, `keyTarget`, `fullDate`, ...) in place of the ISO
+calendar's; the month and year calendars, their pickers and CalendarView on its `units(kind)`
+(`index`, `page`, `today`, `nearest`, the names, the form's ISO text); the segments
+(`/segments`) on its segment hooks (`segmentFormat`, `segmentRange`, `segmentSample`,
+`segmentValuesOf`, `segmentsToDate`: the editable era, 13-month years, the system's fields). So an
+app that passes no `calendar` pays only for the hook calls (`docs/size.md`, "Date budgets").
+
 **The locale's `-u-ca-` keyword is honoured only through a calendar object.** A component never
 maps a string to a system (it would bundle every system); with no `calendar`, a locale whose
 calendar is not Gregorian (`fa-IR`, `th-TH`, `ar-SA`, or a `-u-ca-` keyword) keeps the ISO grid

@@ -23,9 +23,9 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 112,463 B | 38,781 B |
+| `@fragiola/primitives` | 113,397 B | 39,128 B |
 | `@fragiola/primitives/async-list` | 839 B | 447 B |
-| `@fragiola/primitives/calendar-systems` | 7,898 B | 2,980 B |
+| `@fragiola/primitives/calendar-systems` | 9,711 B | 3,608 B |
 | `@fragiola/primitives/collection` | 7,330 B | 2,979 B |
 | `@fragiola/primitives/date` | 3,703 B | 1,624 B |
 | `@fragiola/primitives/direction` | 151 B | 135 B |
@@ -46,11 +46,11 @@ No peers: everything is bundled.
 | `@fragiola/primitives/range` | 1,738 B | 851 B |
 | `@fragiola/primitives/scroll-area` | 7,657 B | 2,997 B |
 | `@fragiola/primitives/scroll-lock` | 510 B | 306 B |
-| `@fragiola/primitives/segments` | 9,930 B | 3,874 B |
+| `@fragiola/primitives/segments` | 8,519 B | 3,447 B |
 | `@fragiola/primitives/selection` | 4,203 B | 1,693 B |
 | `@fragiola/primitives/swipe` | 4,854 B | 2,064 B |
 | `@fragiola/primitives/time` | 3,358 B | 1,230 B |
-| `@fragiola/primitives/time-zone` | 4,348 B | 1,978 B |
+| `@fragiola/primitives/time-zone` | 4,867 B | 2,149 B |
 | `@fragiola/primitives/toast` | 6,102 B | 2,427 B |
 | `@fragiola/primitives/virtual` | 4,245 B | 1,966 B |
 
@@ -60,7 +60,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 302,788 B | 95,463 B | 214,702 B | 64,612 B |
+| `@fragiola/primitives-react` | 300,568 B | 94,822 B | 213,914 B | 64,306 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -70,19 +70,19 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/button` | 2,413 B | 1,028 B | 2,413 B | 1,028 B |
 | `@fragiola/primitives-react/calendar` | 12,982 B | 5,123 B | 10,049 B | 3,982 B |
 | `@fragiola/primitives-react/calendar-preset` | 13,940 B | 5,399 B | 11,007 B | 4,254 B |
-| `@fragiola/primitives-react/calendar-view` | 24,546 B | 8,333 B | 20,485 B | 6,950 B |
+| `@fragiola/primitives-react/calendar-view` | 23,566 B | 8,034 B | 19,653 B | 6,662 B |
 | `@fragiola/primitives-react/checkbox` | 7,098 B | 3,011 B | 5,820 B | 2,555 B |
 | `@fragiola/primitives-react/checkbox-group` | 5,033 B | 2,250 B | 4,579 B | 2,082 B |
 | `@fragiola/primitives-react/collapsible` | 5,502 B | 2,265 B | 4,609 B | 1,983 B |
 | `@fragiola/primitives-react/combobox` | 46,661 B | 16,858 B | 20,659 B | 7,495 B |
 | `@fragiola/primitives-react/combobox-virtual` | 52,619 B | 19,134 B | 22,546 B | 8,246 B |
 | `@fragiola/primitives-react/context-menu` | 45,670 B | 16,215 B | 19,061 B | 6,821 B |
-| `@fragiola/primitives-react/date-field` | 23,466 B | 8,941 B | 11,693 B | 4,647 B |
+| `@fragiola/primitives-react/date-field` | 22,052 B | 8,538 B | 11,693 B | 4,647 B |
 | `@fragiola/primitives-react/date-picker` | 37,464 B | 14,249 B | 12,547 B | 5,000 B |
-| `@fragiola/primitives-react/date-picker-input` | 58,110 B | 21,073 B | 22,957 B | 8,502 B |
-| `@fragiola/primitives-react/date-range-field` | 25,036 B | 9,448 B | 13,266 B | 5,181 B |
+| `@fragiola/primitives-react/date-picker-input` | 56,637 B | 20,679 B | 22,904 B | 8,479 B |
+| `@fragiola/primitives-react/date-range-field` | 23,619 B | 9,039 B | 13,266 B | 5,181 B |
 | `@fragiola/primitives-react/date-range-picker` | 37,474 B | 14,255 B | 12,557 B | 5,006 B |
-| `@fragiola/primitives-react/date-range-picker-input` | 58,498 B | 21,192 B | 23,345 B | 8,623 B |
+| `@fragiola/primitives-react/date-range-picker-input` | 57,025 B | 20,798 B | 23,292 B | 8,599 B |
 | `@fragiola/primitives-react/dialog` | 17,619 B | 6,524 B | 12,074 B | 4,701 B |
 | `@fragiola/primitives-react/drawer` | 26,399 B | 9,527 B | 16,278 B | 6,170 B |
 | `@fragiola/primitives-react/field` | 9,796 B | 3,982 B | 7,585 B | 3,176 B |
@@ -95,10 +95,10 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/menu` | 46,150 B | 16,505 B | 21,085 B | 7,465 B |
 | `@fragiola/primitives-react/menubar` | 7,672 B | 3,148 B | 6,087 B | 2,486 B |
 | `@fragiola/primitives-react/meter` | 3,027 B | 1,377 B | 2,642 B | 1,211 B |
-| `@fragiola/primitives-react/month-calendar` | 11,474 B | 4,763 B | 9,703 B | 3,966 B |
-| `@fragiola/primitives-react/month-picker` | 41,104 B | 15,124 B | 15,101 B | 5,504 B |
-| `@fragiola/primitives-react/month-range-calendar` | 11,723 B | 4,798 B | 9,951 B | 3,998 B |
-| `@fragiola/primitives-react/month-range-picker` | 41,114 B | 15,132 B | 15,111 B | 5,513 B |
+| `@fragiola/primitives-react/month-calendar` | 11,062 B | 4,630 B | 9,432 B | 3,868 B |
+| `@fragiola/primitives-react/month-picker` | 39,606 B | 14,574 B | 14,583 B | 5,303 B |
+| `@fragiola/primitives-react/month-range-calendar` | 11,311 B | 4,664 B | 9,681 B | 3,899 B |
+| `@fragiola/primitives-react/month-range-picker` | 39,616 B | 14,584 B | 14,593 B | 5,312 B |
 | `@fragiola/primitives-react/multiple-calendar` | 14,838 B | 5,672 B | 11,906 B | 4,540 B |
 | `@fragiola/primitives-react/navigation-menu` | 37,702 B | 13,802 B | 13,541 B | 5,064 B |
 | `@fragiola/primitives-react/number-field` | 16,835 B | 6,295 B | 10,707 B | 4,109 B |
@@ -116,17 +116,17 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/slider` | 12,820 B | 5,089 B | 10,055 B | 4,119 B |
 | `@fragiola/primitives-react/switch` | 6,488 B | 2,706 B | 5,210 B | 2,247 B |
 | `@fragiola/primitives-react/tabs` | 9,522 B | 3,710 B | 7,330 B | 2,971 B |
-| `@fragiola/primitives-react/time-field` | 23,354 B | 8,905 B | 11,676 B | 4,650 B |
-| `@fragiola/primitives-react/time-range-field` | 24,927 B | 9,410 B | 13,248 B | 5,183 B |
+| `@fragiola/primitives-react/time-field` | 21,939 B | 8,508 B | 11,676 B | 4,650 B |
+| `@fragiola/primitives-react/time-range-field` | 23,509 B | 9,010 B | 13,248 B | 5,183 B |
 | `@fragiola/primitives-react/toast` | 17,213 B | 6,407 B | 6,969 B | 2,836 B |
 | `@fragiola/primitives-react/toggle` | 3,788 B | 1,624 B | 3,788 B | 1,624 B |
 | `@fragiola/primitives-react/toggle-group` | 5,350 B | 2,426 B | 3,847 B | 1,740 B |
 | `@fragiola/primitives-react/toolbar` | 7,901 B | 3,058 B | 6,398 B | 2,398 B |
 | `@fragiola/primitives-react/tooltip` | 32,985 B | 12,538 B | 11,967 B | 4,741 B |
-| `@fragiola/primitives-react/year-calendar` | 11,710 B | 4,796 B | 9,938 B | 3,997 B |
-| `@fragiola/primitives-react/year-picker` | 41,101 B | 15,124 B | 15,098 B | 5,504 B |
-| `@fragiola/primitives-react/year-range-calendar` | 11,720 B | 4,805 B | 9,948 B | 4,006 B |
-| `@fragiola/primitives-react/year-range-picker` | 41,111 B | 15,133 B | 15,108 B | 5,514 B |
+| `@fragiola/primitives-react/year-calendar` | 11,298 B | 4,663 B | 9,668 B | 3,900 B |
+| `@fragiola/primitives-react/year-picker` | 39,603 B | 14,575 B | 14,580 B | 5,303 B |
+| `@fragiola/primitives-react/year-range-calendar` | 11,308 B | 4,672 B | 9,678 B | 3,909 B |
+| `@fragiola/primitives-react/year-range-picker` | 39,613 B | 14,585 B | 14,590 B | 5,313 B |
 | `@fragiola/primitives-react/async-list` | 1,245 B | 606 B | 501 B | 308 B |
 | `@fragiola/primitives-react/direction` | 291 B | 201 B | 291 B | 201 B |
 | `@fragiola/primitives-react/render` | 1,543 B | 697 B | 1,543 B | 697 B |
@@ -137,7 +137,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 342,098 B | 96,043 B | 253,931 B | 64,935 B |
+| `@fragiola/primitives-vue` | 339,736 B | 95,334 B | 252,983 B | 64,494 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -147,19 +147,19 @@ External: `vue`.
 | `@fragiola/primitives-vue/button` | 2,154 B | 1,018 B | 2,154 B | 1,018 B |
 | `@fragiola/primitives-vue/calendar` | 13,980 B | 5,173 B | 11,094 B | 4,033 B |
 | `@fragiola/primitives-vue/calendar-preset` | 14,991 B | 5,432 B | 12,105 B | 4,294 B |
-| `@fragiola/primitives-vue/calendar-view` | 27,341 B | 8,424 B | 23,353 B | 7,068 B |
+| `@fragiola/primitives-vue/calendar-view` | 26,201 B | 8,058 B | 22,358 B | 6,716 B |
 | `@fragiola/primitives-vue/checkbox` | 7,135 B | 2,902 B | 5,895 B | 2,454 B |
 | `@fragiola/primitives-vue/checkbox-group` | 4,483 B | 2,011 B | 4,067 B | 1,841 B |
 | `@fragiola/primitives-vue/collapsible` | 5,296 B | 2,140 B | 4,403 B | 1,852 B |
 | `@fragiola/primitives-vue/combobox` | 48,319 B | 16,669 B | 22,328 B | 7,222 B |
 | `@fragiola/primitives-vue/combobox-virtual` | 55,519 B | 19,308 B | 25,436 B | 8,376 B |
 | `@fragiola/primitives-vue/context-menu` | 47,810 B | 16,157 B | 21,218 B | 6,671 B |
-| `@fragiola/primitives-vue/date-field` | 23,616 B | 8,800 B | 11,886 B | 4,532 B |
+| `@fragiola/primitives-vue/date-field` | 22,199 B | 8,407 B | 11,886 B | 4,532 B |
 | `@fragiola/primitives-vue/date-picker` | 37,097 B | 13,982 B | 12,217 B | 4,719 B |
-| `@fragiola/primitives-vue/date-picker-input` | 57,895 B | 20,509 B | 22,760 B | 7,908 B |
-| `@fragiola/primitives-vue/date-range-field` | 25,834 B | 9,483 B | 14,094 B | 5,228 B |
+| `@fragiola/primitives-vue/date-picker-input` | 56,436 B | 20,103 B | 22,723 B | 7,883 B |
+| `@fragiola/primitives-vue/date-range-field` | 24,418 B | 9,089 B | 14,094 B | 5,228 B |
 | `@fragiola/primitives-vue/date-range-picker` | 37,112 B | 13,988 B | 12,232 B | 4,725 B |
-| `@fragiola/primitives-vue/date-range-picker-input` | 58,828 B | 20,781 B | 23,694 B | 8,174 B |
+| `@fragiola/primitives-vue/date-range-picker-input` | 57,373 B | 20,376 B | 23,657 B | 8,148 B |
 | `@fragiola/primitives-vue/dialog` | 17,150 B | 6,114 B | 11,609 B | 4,276 B |
 | `@fragiola/primitives-vue/drawer` | 26,499 B | 9,047 B | 16,390 B | 5,668 B |
 | `@fragiola/primitives-vue/field` | 9,878 B | 3,801 B | 7,704 B | 2,998 B |
@@ -172,10 +172,10 @@ External: `vue`.
 | `@fragiola/primitives-vue/menu` | 47,636 B | 16,185 B | 22,593 B | 7,065 B |
 | `@fragiola/primitives-vue/menubar` | 6,834 B | 2,921 B | 5,287 B | 2,268 B |
 | `@fragiola/primitives-vue/meter` | 3,319 B | 1,301 B | 2,934 B | 1,135 B |
-| `@fragiola/primitives-vue/month-calendar` | 12,205 B | 4,756 B | 10,472 B | 3,961 B |
-| `@fragiola/primitives-vue/month-picker` | 41,055 B | 14,971 B | 15,094 B | 5,333 B |
-| `@fragiola/primitives-vue/month-range-calendar` | 12,377 B | 4,783 B | 10,644 B | 3,988 B |
-| `@fragiola/primitives-vue/month-range-picker` | 41,070 B | 14,980 B | 15,109 B | 5,342 B |
+| `@fragiola/primitives-vue/month-calendar` | 11,796 B | 4,618 B | 10,206 B | 3,864 B |
+| `@fragiola/primitives-vue/month-picker` | 39,561 B | 14,409 B | 14,570 B | 5,115 B |
+| `@fragiola/primitives-vue/month-range-calendar` | 11,968 B | 4,646 B | 10,378 B | 3,889 B |
+| `@fragiola/primitives-vue/month-range-picker` | 39,576 B | 14,418 B | 14,585 B | 5,125 B |
 | `@fragiola/primitives-vue/multiple-calendar` | 16,340 B | 5,777 B | 13,452 B | 4,645 B |
 | `@fragiola/primitives-vue/navigation-menu` | 38,394 B | 13,570 B | 14,261 B | 4,780 B |
 | `@fragiola/primitives-vue/number-field` | 16,983 B | 6,192 B | 10,891 B | 3,995 B |
@@ -193,17 +193,17 @@ External: `vue`.
 | `@fragiola/primitives-vue/slider` | 13,277 B | 4,876 B | 10,566 B | 3,914 B |
 | `@fragiola/primitives-vue/switch` | 6,274 B | 2,573 B | 5,034 B | 2,115 B |
 | `@fragiola/primitives-vue/tabs` | 9,676 B | 3,572 B | 7,484 B | 2,840 B |
-| `@fragiola/primitives-vue/time-field` | 23,282 B | 8,731 B | 11,646 B | 4,496 B |
-| `@fragiola/primitives-vue/time-range-field` | 25,484 B | 9,408 B | 13,838 B | 5,183 B |
+| `@fragiola/primitives-vue/time-field` | 21,865 B | 8,340 B | 11,646 B | 4,496 B |
+| `@fragiola/primitives-vue/time-range-field` | 24,068 B | 9,005 B | 13,838 B | 5,183 B |
 | `@fragiola/primitives-vue/toast` | 17,561 B | 6,348 B | 7,321 B | 2,763 B |
 | `@fragiola/primitives-vue/toggle` | 3,733 B | 1,675 B | 3,771 B | 1,697 B |
 | `@fragiola/primitives-vue/toggle-group` | 5,157 B | 2,339 B | 3,692 B | 1,670 B |
 | `@fragiola/primitives-vue/toolbar` | 8,388 B | 3,057 B | 6,923 B | 2,411 B |
 | `@fragiola/primitives-vue/tooltip` | 32,230 B | 12,069 B | 11,228 B | 4,181 B |
-| `@fragiola/primitives-vue/year-calendar` | 12,358 B | 4,781 B | 10,625 B | 3,987 B |
-| `@fragiola/primitives-vue/year-picker` | 41,051 B | 14,972 B | 15,090 B | 5,334 B |
-| `@fragiola/primitives-vue/year-range-calendar` | 12,373 B | 4,790 B | 10,640 B | 3,996 B |
-| `@fragiola/primitives-vue/year-range-picker` | 41,066 B | 14,982 B | 15,105 B | 5,344 B |
+| `@fragiola/primitives-vue/year-calendar` | 11,949 B | 4,645 B | 10,359 B | 3,888 B |
+| `@fragiola/primitives-vue/year-picker` | 39,557 B | 14,411 B | 14,566 B | 5,116 B |
+| `@fragiola/primitives-vue/year-range-calendar` | 11,964 B | 4,653 B | 10,374 B | 3,897 B |
+| `@fragiola/primitives-vue/year-range-picker` | 39,572 B | 14,420 B | 14,581 B | 5,128 B |
 | `@fragiola/primitives-vue/async-list` | 1,324 B | 629 B | 580 B | 333 B |
 | `@fragiola/primitives-vue/direction` | 380 B | 248 B | 380 B | 248 B |
 | `@fragiola/primitives-vue/render` | 577 B | 381 B | 577 B | 381 B |
@@ -214,7 +214,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 870,619 B | 146,103 B | 782,491 B | 113,556 B |
+| `@fragiola/primitives-angular` | 868,072 B | 145,400 B | 781,297 B | 112,981 B |
 | `@fragiola/primitives-angular/internal` | 39,584 B | 14,364 B | 17,713 B | 6,268 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -223,21 +223,21 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/autocomplete-virtual` | 99,132 B | 24,746 B | 68,091 B | 13,275 B |
 | `@fragiola/primitives-angular/avatar` | 7,406 B | 2,077 B | 7,007 B | 1,897 B |
 | `@fragiola/primitives-angular/button` | 5,304 B | 1,741 B | 5,496 B | 1,781 B |
-| `@fragiola/primitives-angular/calendar` | 31,895 B | 7,189 B | 29,124 B | 6,102 B |
-| `@fragiola/primitives-angular/calendar-preset` | 33,621 B | 7,353 B | 30,850 B | 6,256 B |
-| `@fragiola/primitives-angular/calendar-view` | 61,666 B | 10,588 B | 57,853 B | 9,211 B |
+| `@fragiola/primitives-angular/calendar` | 31,756 B | 7,177 B | 28,985 B | 6,089 B |
+| `@fragiola/primitives-angular/calendar-preset` | 33,482 B | 7,339 B | 30,711 B | 6,243 B |
+| `@fragiola/primitives-angular/calendar-view` | 60,511 B | 10,233 B | 56,773 B | 8,904 B |
 | `@fragiola/primitives-angular/checkbox` | 39,089 B | 8,157 B | 36,187 B | 7,107 B |
 | `@fragiola/primitives-angular/checkbox-group` | 28,306 B | 6,245 B | 26,236 B | 5,470 B |
 | `@fragiola/primitives-angular/collapsible` | 10,432 B | 3,110 B | 9,693 B | 2,860 B |
 | `@fragiola/primitives-angular/combobox` | 97,744 B | 23,316 B | 69,930 B | 13,255 B |
 | `@fragiola/primitives-angular/combobox-virtual` | 107,907 B | 26,406 B | 76,017 B | 14,529 B |
 | `@fragiola/primitives-angular/context-menu` | 96,408 B | 20,897 B | 69,829 B | 11,495 B |
-| `@fragiola/primitives-angular/date-field` | 61,058 B | 14,895 B | 47,649 B | 9,889 B |
-| `@fragiola/primitives-angular/date-picker` | 102,337 B | 24,838 B | 73,140 B | 14,216 B |
-| `@fragiola/primitives-angular/date-picker-input` | 165,019 B | 36,801 B | 125,816 B | 22,608 B |
-| `@fragiola/primitives-angular/date-range-field` | 78,797 B | 16,566 B | 65,383 B | 11,571 B |
-| `@fragiola/primitives-angular/date-range-picker` | 104,381 B | 24,880 B | 75,178 B | 14,266 B |
-| `@fragiola/primitives-angular/date-range-picker-input` | 171,366 B | 36,220 B | 132,158 B | 22,039 B |
+| `@fragiola/primitives-angular/date-field` | 59,502 B | 14,497 B | 47,510 B | 9,882 B |
+| `@fragiola/primitives-angular/date-picker` | 102,198 B | 24,801 B | 73,001 B | 14,202 B |
+| `@fragiola/primitives-angular/date-picker-input` | 163,275 B | 36,344 B | 125,492 B | 22,558 B |
+| `@fragiola/primitives-angular/date-range-field` | 77,241 B | 16,179 B | 65,244 B | 11,574 B |
+| `@fragiola/primitives-angular/date-range-picker` | 104,242 B | 24,843 B | 75,039 B | 14,252 B |
+| `@fragiola/primitives-angular/date-range-picker-input` | 169,622 B | 35,775 B | 131,834 B | 22,008 B |
 | `@fragiola/primitives-angular/dialog` | 35,482 B | 8,217 B | 30,095 B | 6,434 B |
 | `@fragiola/primitives-angular/drawer` | 56,212 B | 11,692 B | 46,249 B | 8,338 B |
 | `@fragiola/primitives-angular/field` | 24,018 B | 5,787 B | 21,948 B | 5,006 B |
@@ -250,11 +250,11 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/menu` | 79,401 B | 19,549 B | 54,391 B | 10,571 B |
 | `@fragiola/primitives-angular/menubar` | 86,403 B | 21,170 B | 60,090 B | 11,668 B |
 | `@fragiola/primitives-angular/meter` | 9,052 B | 2,103 B | 8,859 B | 1,956 B |
-| `@fragiola/primitives-angular/month-calendar` | 27,483 B | 6,571 B | 25,838 B | 5,772 B |
-| `@fragiola/primitives-angular/month-picker` | 134,942 B | 30,024 B | 104,668 B | 18,975 B |
-| `@fragiola/primitives-angular/month-range-calendar` | 29,988 B | 6,581 B | 28,343 B | 5,790 B |
-| `@fragiola/primitives-angular/month-range-picker` | 137,820 B | 30,074 B | 107,545 B | 19,029 B |
-| `@fragiola/primitives-angular/multiple-calendar` | 35,526 B | 7,787 B | 32,754 B | 6,709 B |
+| `@fragiola/primitives-angular/month-calendar` | 27,038 B | 6,405 B | 25,563 B | 5,673 B |
+| `@fragiola/primitives-angular/month-picker` | 134,707 B | 29,968 B | 104,366 B | 18,915 B |
+| `@fragiola/primitives-angular/month-range-calendar` | 29,558 B | 6,431 B | 28,083 B | 5,700 B |
+| `@fragiola/primitives-angular/month-range-picker` | 137,585 B | 30,020 B | 107,243 B | 18,975 B |
+| `@fragiola/primitives-angular/multiple-calendar` | 35,387 B | 7,773 B | 32,615 B | 6,696 B |
 | `@fragiola/primitives-angular/navigation-menu` | 56,817 B | 15,519 B | 32,697 B | 6,797 B |
 | `@fragiola/primitives-angular/number-field` | 55,582 B | 11,723 B | 47,815 B | 8,887 B |
 | `@fragiola/primitives-angular/otp-field` | 42,738 B | 9,763 B | 38,779 B | 8,336 B |
@@ -263,7 +263,7 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/progress` | 11,465 B | 2,320 B | 11,272 B | 2,192 B |
 | `@fragiola/primitives-angular/radio` | 37,814 B | 8,190 B | 34,366 B | 6,966 B |
 | `@fragiola/primitives-angular/radio-group` | 31,132 B | 6,878 B | 28,516 B | 5,911 B |
-| `@fragiola/primitives-angular/range-calendar` | 33,544 B | 7,225 B | 30,773 B | 6,136 B |
+| `@fragiola/primitives-angular/range-calendar` | 33,405 B | 7,212 B | 30,634 B | 6,123 B |
 | `@fragiola/primitives-angular/scroll-area` | 21,804 B | 5,574 B | 14,658 B | 3,011 B |
 | `@fragiola/primitives-angular/select` | 83,131 B | 21,183 B | 55,742 B | 11,301 B |
 | `@fragiola/primitives-angular/select-virtual` | 93,002 B | 24,108 B | 61,535 B | 12,488 B |
@@ -271,17 +271,96 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/slider` | 48,275 B | 9,952 B | 43,849 B | 8,419 B |
 | `@fragiola/primitives-angular/switch` | 33,516 B | 7,271 B | 30,614 B | 6,211 B |
 | `@fragiola/primitives-angular/tabs` | 20,077 B | 5,185 B | 17,960 B | 4,513 B |
-| `@fragiola/primitives-angular/time-field` | 63,837 B | 14,894 B | 50,430 B | 9,892 B |
-| `@fragiola/primitives-angular/time-range-field` | 81,695 B | 16,628 B | 68,284 B | 11,629 B |
+| `@fragiola/primitives-angular/time-field` | 62,281 B | 14,493 B | 50,291 B | 9,885 B |
+| `@fragiola/primitives-angular/time-range-field` | 80,139 B | 16,237 B | 68,145 B | 11,637 B |
 | `@fragiola/primitives-angular/toast` | 27,276 B | 7,597 B | 17,188 B | 4,038 B |
 | `@fragiola/primitives-angular/toggle` | 7,896 B | 2,507 B | 8,088 B | 2,552 B |
 | `@fragiola/primitives-angular/toggle-group` | 9,331 B | 3,139 B | 7,941 B | 2,483 B |
 | `@fragiola/primitives-angular/toolbar` | 18,653 B | 4,076 B | 17,263 B | 3,456 B |
 | `@fragiola/primitives-angular/tooltip` | 47,536 B | 14,090 B | 26,653 B | 6,309 B |
-| `@fragiola/primitives-angular/year-calendar` | 29,951 B | 6,579 B | 28,306 B | 5,787 B |
-| `@fragiola/primitives-angular/year-picker` | 137,783 B | 30,072 B | 107,508 B | 19,025 B |
-| `@fragiola/primitives-angular/year-range-calendar` | 29,981 B | 6,590 B | 28,336 B | 5,799 B |
-| `@fragiola/primitives-angular/year-range-picker` | 137,813 B | 30,084 B | 107,538 B | 19,037 B |
+| `@fragiola/primitives-angular/year-calendar` | 29,521 B | 6,428 B | 28,046 B | 5,697 B |
+| `@fragiola/primitives-angular/year-picker` | 137,548 B | 30,019 B | 107,206 B | 18,971 B |
+| `@fragiola/primitives-angular/year-range-calendar` | 29,551 B | 6,440 B | 28,076 B | 5,708 B |
+| `@fragiola/primitives-angular/year-range-picker` | 137,578 B | 30,030 B | 107,236 B | 18,982 B |
 | `@fragiola/primitives-angular/async-list` | 1,655 B | 762 B | 911 B | 482 B |
 | `@fragiola/primitives-angular/direction` | 2,056 B | 810 B | 2,248 B | 857 B |
 | `@fragiola/primitives-angular/render` | 913 B | 479 B | 1,105 B | 528 B |
+
+## Date budgets
+
+The date rows' budgets (Epic #88, `scripts/size-budgets.ts`), in the "min + gzip" column
+(the toolkit bundled) of an app that passes no `calendar` and no `timeZone`: the size at
+8072819 (before the calendar systems and time zones) plus 100 B, or, where that cannot be
+met, the best measured size and its reason (`docs/decisions.md`, "Date family size").
+`pnpm size` and `pnpm size --check` fail when an entry is over its budget by more than 16 B
+(zlib's slack between Node versions).
+
+| entry | at 8072819, min + gzip | budget, min + gzip | now, min + gzip | over the +100 B target because |
+| --- | ---: | ---: | ---: | --- |
+| `@fragiola/primitives/date` | 1,624 B | 1,724 B | 1,624 B |  |
+| `@fragiola/primitives/month-year` | 772 B | 872 B | 772 B |  |
+| `@fragiola/primitives/segments` | 3,277 B | 3,447 B | 3,447 B | the calls of the calendar's and the zone's hooks (one per concern: format, range, sample, values, dates; Intl options, zone text) and the era and zone segment types |
+| `@fragiola/primitives/time` | 1,230 B | 1,330 B | 1,230 B |  |
+| `@fragiola/primitives-react/calendar` | 4,973 B | 5,123 B | 5,123 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-react/calendar-preset` | 5,240 B | 5,399 B | 5,399 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-react/calendar-view` | 7,653 B | 8,034 B | 8,034 B | the day and month calendars it is built on (above) and its calendar system branch |
+| `@fragiola/primitives-react/date-field` | 8,280 B | 8,538 B | 8,538 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-react/date-picker` | 14,235 B | 14,335 B | 14,249 B |  |
+| `@fragiola/primitives-react/date-picker-input` | 20,388 B | 20,679 B | 20,679 B | `/segments` (above), the field's system props and the day calendar it opens (below) |
+| `@fragiola/primitives-react/date-range-field` | 8,787 B | 9,039 B | 9,039 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-react/date-range-picker` | 14,242 B | 14,342 B | 14,255 B |  |
+| `@fragiola/primitives-react/date-range-picker-input` | 20,509 B | 20,798 B | 20,798 B | `/segments` (above), the field's system props and the day calendar it opens (below) |
+| `@fragiola/primitives-react/month-calendar` | 4,489 B | 4,630 B | 4,630 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-react/month-picker` | 14,524 B | 14,624 B | 14,574 B |  |
+| `@fragiola/primitives-react/month-range-calendar` | 4,520 B | 4,664 B | 4,664 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-react/month-range-picker` | 14,534 B | 14,634 B | 14,584 B |  |
+| `@fragiola/primitives-react/multiple-calendar` | 5,514 B | 5,672 B | 5,672 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-react/range-calendar` | 4,978 B | 5,129 B | 5,129 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-react/time-field` | 8,243 B | 8,508 B | 8,508 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-react/time-range-field` | 8,754 B | 9,010 B | 9,010 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-react/year-calendar` | 4,520 B | 4,663 B | 4,663 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-react/year-picker` | 14,524 B | 14,624 B | 14,575 B |  |
+| `@fragiola/primitives-react/year-range-calendar` | 4,529 B | 4,672 B | 4,672 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-react/year-range-picker` | 14,534 B | 14,634 B | 14,585 B |  |
+| `@fragiola/primitives-vue/calendar` | 5,036 B | 5,173 B | 5,173 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-vue/calendar-preset` | 5,292 B | 5,432 B | 5,432 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-vue/calendar-view` | 7,751 B | 8,058 B | 8,058 B | the day and month calendars it is built on (above) and its calendar system branch |
+| `@fragiola/primitives-vue/date-field` | 8,137 B | 8,407 B | 8,407 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-vue/date-picker` | 13,969 B | 14,069 B | 13,982 B |  |
+| `@fragiola/primitives-vue/date-picker-input` | 19,802 B | 20,103 B | 20,103 B | `/segments` (above), the field's system props and the day calendar it opens (below) |
+| `@fragiola/primitives-vue/date-range-field` | 8,807 B | 9,089 B | 9,089 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-vue/date-range-picker` | 13,975 B | 14,075 B | 13,988 B |  |
+| `@fragiola/primitives-vue/date-range-picker-input` | 20,068 B | 20,376 B | 20,376 B | `/segments` (above), the field's system props and the day calendar it opens (below) |
+| `@fragiola/primitives-vue/month-calendar` | 4,476 B | 4,618 B | 4,618 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-vue/month-picker` | 14,363 B | 14,463 B | 14,409 B |  |
+| `@fragiola/primitives-vue/month-range-calendar` | 4,503 B | 4,646 B | 4,646 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-vue/month-range-picker` | 14,372 B | 14,472 B | 14,418 B |  |
+| `@fragiola/primitives-vue/multiple-calendar` | 5,624 B | 5,777 B | 5,777 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-vue/range-calendar` | 5,041 B | 5,179 B | 5,179 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop |
+| `@fragiola/primitives-vue/time-field` | 8,098 B | 8,340 B | 8,340 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-vue/time-range-field` | 8,769 B | 9,005 B | 9,005 B | `/segments` (above) and the field's `calendar`, `timeZone`, `hideTimeZone` and `disambiguation` props |
+| `@fragiola/primitives-vue/year-calendar` | 4,501 B | 4,645 B | 4,645 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-vue/year-picker` | 14,365 B | 14,465 B | 14,411 B |  |
+| `@fragiola/primitives-vue/year-range-calendar` | 4,510 B | 4,653 B | 4,653 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop |
+| `@fragiola/primitives-vue/year-range-picker` | 14,374 B | 14,474 B | 14,420 B |  |
+| `@fragiola/primitives-angular/calendar` | 6,972 B | 7,177 B | 7,177 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/calendar-preset` | 7,139 B | 7,339 B | 7,339 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/calendar-view` | 9,796 B | 10,233 B | 10,233 B | the day and month calendars it is built on (above) and its calendar system branch |
+| `@fragiola/primitives-angular/date-field` | 13,962 B | 14,497 B | 14,497 B | `/segments` (above) and the Ivy input metadata of DateField's four system inputs, in the date-field entry every field is built on |
+| `@fragiola/primitives-angular/date-picker` | 24,564 B | 24,801 B | 24,801 B | the day calendar entry it is built on (above) and its `calendar` input's Ivy metadata |
+| `@fragiola/primitives-angular/date-picker-input` | 35,333 B | 36,344 B | 36,344 B | `/segments` (above), the date field, date picker and day calendar entries it is built on (below) and its three zone inputs' Ivy metadata |
+| `@fragiola/primitives-angular/date-range-field` | 15,616 B | 16,179 B | 16,179 B | `/segments` (above) and the Ivy input metadata of DateField's four system inputs, in the date-field entry every field is built on |
+| `@fragiola/primitives-angular/date-range-picker` | 24,608 B | 24,843 B | 24,843 B | the day calendar entry it is built on (above) and its `calendar` input's Ivy metadata |
+| `@fragiola/primitives-angular/date-range-picker-input` | 34,761 B | 35,775 B | 35,775 B | `/segments` (above), the date field, date picker and day calendar entries it is built on (below) and its three zone inputs' Ivy metadata |
+| `@fragiola/primitives-angular/month-calendar` | 6,207 B | 6,405 B | 6,405 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/month-picker` | 29,458 B | 29,968 B | 29,968 B | the month calendar, date picker and day calendar entries it is built on (above) |
+| `@fragiola/primitives-angular/month-range-calendar` | 6,227 B | 6,431 B | 6,431 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/month-range-picker` | 29,512 B | 30,020 B | 30,020 B | the month calendar, date picker and day calendar entries it is built on (above) |
+| `@fragiola/primitives-angular/multiple-calendar` | 7,570 B | 7,773 B | 7,773 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/range-calendar` | 7,007 B | 7,212 B | 7,212 B | the ISO month math a `calendar` replaces (one object of eight `/date` functions) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/time-field` | 13,985 B | 14,493 B | 14,493 B | `/segments` (above) and the Ivy input metadata of DateField's four system inputs, in the date-field entry every field is built on |
+| `@fragiola/primitives-angular/time-range-field` | 15,673 B | 16,237 B | 16,237 B | `/segments` (above) and the Ivy input metadata of DateField's four system inputs, in the date-field entry every field is built on |
+| `@fragiola/primitives-angular/year-calendar` | 6,225 B | 6,428 B | 6,428 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/year-picker` | 29,511 B | 30,019 B | 30,019 B | the month calendar, date picker and day calendar entries it is built on (above) |
+| `@fragiola/primitives-angular/year-range-calendar` | 6,236 B | 6,440 B | 6,440 B | the ISO months or years a `calendar`'s units replace (one object per kind: paging, names, today) and the `calendar` prop, with its input's Ivy metadata |
+| `@fragiola/primitives-angular/year-range-picker` | 29,522 B | 30,030 B | 30,030 B | the month calendar, date picker and day calendar entries it is built on (above) |
