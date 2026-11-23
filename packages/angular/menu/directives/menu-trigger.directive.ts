@@ -1,6 +1,8 @@
 import {
+    afterNextRender,
     booleanAttribute,
     computed,
+    DestroyRef,
     Directive,
     inject,
     input,
@@ -8,8 +10,11 @@ import {
 import {
     type ChangeReason,
     dataValues,
+    injectRovingItem,
     overlayTrigger,
+    ownAttribute,
 } from "@fragiola/primitives-angular/internal";
+import type { MenuBar } from "../utils/menu-bar.ts";
 import type { MenuHandle } from "../utils/menu-handle.ts";
 import { MenuRootBase } from "./menu-root-base.ts";
 
@@ -20,7 +25,8 @@ export interface MenuTriggerState {
 
 /**
  * Opens the root menu (spec/menu.md, "Keyboard": on the Trigger): `<button menuTrigger>`, or
- * anywhere with a handle (`[handle]`, `[payload]`, `id`).
+ * anywhere with a handle (`[handle]`, `[payload]`, `id`). In a `[menubar]`, an item of the bar
+ * that hands its keys, press and hover to it (spec/menu.md, "In a Menubar").
  */
 @Directive({
     selector: "[menuTrigger]",
@@ -30,7 +36,12 @@ export interface MenuTriggerState {
         "aria-haspopup": "menu",
         "data-primitives-part": "menu-trigger",
         "[attr.id]": "trigger.id()",
-        "[attr.disabled]": "data().disabled",
+        // in a bar: a menuitem with the bar's roving tabindex, focusable while disabled
+        "[attr.role]": "bar ? 'menuitem' : ownRole",
+        "[attr.tabindex]": "item ? item.tabIndex() : ownTabIndex",
+        "[attr.disabled]": "bar ? null : data().disabled",
+        "[attr.aria-disabled]":
+            "bar && state().disabled ? 'true' : ownAriaDisabled",
         "[attr.aria-expanded]": "String(state().open)",
         "[attr.aria-controls]":
             "state().open ? (trigger.root()?.overlay?.popupId ?? null) : null",
@@ -41,6 +52,7 @@ export interface MenuTriggerState {
         "(click)": "onClick($event)",
         "(keydown)": "onKeyDown($event)",
         "(keyup)": "onKeyUp($event)",
+        "(pointerenter)": "onPointerEnter($event)",
     },
 })
 export class MenuTrigger<Payload = unknown> {
@@ -51,14 +63,27 @@ export class MenuTrigger<Payload = unknown> {
     readonly payload = input<Payload | undefined>(undefined);
     /** The trigger's id (generated when not given). */
     readonly id = input<string | undefined>(undefined);
-    protected readonly trigger = overlayTrigger(
-        inject(MenuRootBase, { optional: true }),
-        this,
-        { prefix: "primitives-menu", selector: "menuTrigger" },
+    private readonly enclosing = inject(MenuRootBase, { optional: true });
+    protected readonly trigger = overlayTrigger(this.enclosing, this, {
+        prefix: "primitives-menu",
+        selector: "menuTrigger",
+    });
+    /** The bar this Trigger is an item of: its root menu's (spec/menu.md, "In a Menubar"). */
+    protected readonly bar: MenuBar | null =
+        this.enclosing?.parent === null ? this.enclosing.bar : null;
+    private readonly isDisabled = computed(
+        () => this.disabled() || (this.bar?.disabled() ?? false),
     );
+    protected readonly item = injectRovingItem(
+        () => true,
+        this.bar?.scope ?? null,
+    );
+    protected readonly ownRole = ownAttribute("role");
+    protected readonly ownTabIndex = ownAttribute("tabindex");
+    protected readonly ownAriaDisabled = ownAttribute("aria-disabled");
     readonly state = computed<MenuTriggerState>(() => ({
         open: this.trigger.active(),
-        disabled: this.disabled(),
+        disabled: this.isDisabled(),
     }));
     protected readonly data = computed(() => dataValues(this.state()));
     protected readonly modalOpen = computed(() => {
@@ -67,7 +92,40 @@ export class MenuTrigger<Payload = unknown> {
     });
     protected readonly String = String;
 
+    constructor() {
+        const bar = this.bar;
+        const menu = this.enclosing;
+        if (bar === null || menu === null) {
+            return;
+        }
+        const host = this.trigger.host;
+        // registered once rendered, as its roving item (never on a server)
+        let unregister: (() => void) | null = null;
+        afterNextRender(() => {
+            unregister = bar.register(host, {
+                menu,
+                disabled: this.isDisabled,
+            });
+        });
+        // while disabled, the consumer's click handler does not run (at the target, a capturing
+        // listener runs before the template's)
+        const guard = (event: Event) => {
+            if (this.isDisabled()) {
+                event.stopImmediatePropagation();
+            }
+        };
+        host.addEventListener("click", guard, { capture: true });
+        inject(DestroyRef).onDestroy(() => {
+            unregister?.();
+            host.removeEventListener("click", guard, { capture: true });
+        });
+    }
+
     protected onClick(event: MouseEvent): void {
+        if (this.bar !== null) {
+            this.bar.press(this.trigger.host, event);
+            return;
+        }
         const level = this.trigger.root();
         if (level === null) {
             return;
@@ -82,6 +140,10 @@ export class MenuTrigger<Payload = unknown> {
     }
 
     protected onKeyDown(event: KeyboardEvent): void {
+        // in a bar, its keys reach the bar's element
+        if (this.bar !== null) {
+            return;
+        }
         const openWith = (
             highlight: "first" | "last",
             reason: ChangeReason,
@@ -109,6 +171,10 @@ export class MenuTrigger<Payload = unknown> {
             event.preventDefault();
             openWith("first", "trigger-press");
         }
+    }
+
+    protected onPointerEnter(event: PointerEvent): void {
+        this.bar?.hover(this.trigger.host, event);
     }
 
     protected onKeyUp(event: KeyboardEvent): void {

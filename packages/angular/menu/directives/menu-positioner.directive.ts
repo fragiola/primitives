@@ -58,7 +58,8 @@ export class MenuPositioner {
         const positioner = registerHost(overlay.positioner);
         positionOverlay(
             this,
-            this.level.nested
+            // a vertical bar's menus open at its end side, as submenus (spec/menubar.md)
+            this.level.nested || this.level.bar?.orientation() === "vertical"
                 ? { side: "inline-end", align: "start" }
                 : { side: "bottom", align: "start" },
             {

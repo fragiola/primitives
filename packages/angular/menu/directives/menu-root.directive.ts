@@ -10,6 +10,7 @@ import {
     attachHandle,
     type OpenChangeEvent,
 } from "@fragiola/primitives-angular/internal";
+import { MENU_BAR } from "../utils/menu-bar.ts";
 import type { MenuHandle } from "../utils/menu-handle.ts";
 import { MenuRootBase } from "./menu-root-base.ts";
 
@@ -18,12 +19,15 @@ import { MenuRootBase } from "./menu-root-base.ts";
  * or `<ng-container menuSubmenuRoot>` for a nested level, whose trigger is a `menuSubmenuTrigger`
  * item of the parent menu. One directive for both: the attribute tells them apart. Its `payload()`
  * is the active trigger's payload (`#menu="menuRoot"`); `close()` and `unmount()` are its actions.
+ * A root menu inside a `[menubar]` is one of the bar's menus (spec/menu.md, "In a Menubar").
  */
 @Directive({
     selector: "[menuRoot], [menuSubmenuRoot]",
     exportAs: "menuRoot",
     providers: [
         { provide: MenuRootBase, useExisting: forwardRef(() => MenuRoot) },
+        // a Menu opened from inside this one's content is no menu of the bar (spec/menu.md)
+        { provide: MENU_BAR, useValue: null },
     ],
 })
 export class MenuRoot<Payload = unknown> extends MenuRootBase {
