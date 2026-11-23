@@ -101,6 +101,12 @@ import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
+import { ToggleBasic } from "../scenarios/toggle/toggle-basic.ts";
+import { ToggleControlled } from "../scenarios/toggle/toggle-controlled.ts";
+import { ToggleGroupBasic } from "../scenarios/toggle-group/toggle-group-basic.ts";
+import { ToggleGroupVertical } from "../scenarios/toggle-group/toggle-group-vertical.ts";
+import { ToolbarBasic } from "../scenarios/toolbar/toolbar-basic.ts";
+import { ToolbarVertical } from "../scenarios/toolbar/toolbar-vertical.ts";
 import { TooltipBasic } from "../scenarios/tooltip/tooltip-basic.ts";
 import { TooltipDetached } from "../scenarios/tooltip/tooltip-detached.ts";
 import { TooltipGroup } from "../scenarios/tooltip/tooltip-group.ts";
@@ -218,6 +224,12 @@ import { ROUTES } from "./routes.ts";
         RadioGroupBasic,
         RadioGroupControlled,
         SeparatorBasic,
+        ToggleBasic,
+        ToggleControlled,
+        ToggleGroupBasic,
+        ToggleGroupVertical,
+        ToolbarBasic,
+        ToolbarVertical,
         SwitchBasic,
         SwitchControlled,
     ],
@@ -334,6 +346,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }
             @case ("/avatar/basic") { <main class="p-6" scenario-avatar-basic></main> }
             @case ("/separator/basic") { <main class="p-6" scenario-separator-basic></main> }
+            @case ("/toggle/basic") { <main class="p-6" scenario-toggle-basic></main> }
+            @case ("/toggle/controlled") { <main class="p-6" scenario-toggle-controlled></main> }
+            @case ("/toggle-group/basic") { <main class="p-6" scenario-toggle-group-basic></main> }
+            @case ("/toggle-group/vertical") { <main class="p-6" scenario-toggle-group-vertical></main> }
+            @case ("/toolbar/basic") { <main class="p-6" scenario-toolbar-basic></main> }
+            @case ("/toolbar/vertical") { <main class="p-6" scenario-toolbar-vertical></main> }
             @case ("/direction/provider") { <main class="p-6" scenario-direction-provider [directionProvider]="'rtl'"></main> }
             @default {
                 <main class="p-6">
