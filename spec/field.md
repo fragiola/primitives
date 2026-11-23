@@ -219,6 +219,8 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | NumberField | NumberField.Input (`input`) | NumberField.Input | the value, a number or `null` | NumberField.Input | its hidden `number` input ([number-field.md](number-field.md#forms)) |
 | DateField, TimeField | none (a `group`; a press on the label focuses the first segment) | the Input (`group`) gets `aria-labelledby` and `aria-describedby`; every segment `aria-labelledby` (the label, then itself) and `aria-invalid` | the value, or `null` | its segments (focus within the Input; `touched` once focus leaves it) | its visually hidden `date`, `datetime-local` or `time` input ([date-field.md](date-field.md#forms)) |
 | OTPField | its first slot (`input`) | the Root (`group`) gets `aria-labelledby` and `aria-describedby`; every slot `aria-invalid`, and `aria-labelledby` when it has no name of its own | the value, a string | its slots (focus within the group; `touched` once focus leaves it) | its visually hidden input ([otp-field.md](otp-field.md#forms)) |
+| TagGroup | none (a `grid`) | TagGroup.List | the selected values (an array) | its Tags (focus within the List; `touched` once focus leaves it) | none: it has no hidden input ([tag-group.md](tag-group.md#forms)) |
+| TagsInput | TagsInput.Input (`input`) | TagsInput.Input | the tags (an array of strings) | its Root (the Input, the tags and its buttons; `touched` once focus leaves it) | its visually hidden input ([tags-input.md](tags-input.md#forms)) |
 
 **A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
 date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival
