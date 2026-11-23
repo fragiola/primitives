@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, accordions, menus and radio groups, the roving focus of toolbars, toggle groups and menu bars, a tab's activation direction, typeahead, the combobox's item helpers and chip keys, the tag groups' and tags inputs' keys, the Tabs Indicator's placement before hydration.
+// The entry of @fragiola/primitives/collection: list navigation, the key maps of tabs, accordions, menus and radio groups, the roving focus of toolbars, toggle groups and menu bars, a tab's activation direction, typeahead, the combobox's item helpers and chip keys, the tag groups' and tags inputs' keys, the Tabs and SegmentedControl Indicators' measurement and placement before hydration.
 
 export {
     type ActivationDirection,
@@ -53,6 +53,11 @@ export {
     textFieldKeepsKey,
 } from "./roving-focus.ts";
 export { scrollIntoViewWithin } from "./scroll-into-view.ts";
+export {
+    placeSegmentIndicator,
+    type SegmentIndicatorBox,
+    segmentIndicatorBox,
+} from "./segment-indicator.ts";
 export {
     placeTabsIndicator,
     type TabsIndicatorBox,
