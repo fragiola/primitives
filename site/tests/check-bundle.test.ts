@@ -207,6 +207,40 @@ describe("the bundle guard, entry by entry", () => {
         ).toEqual(['/dialog: imports the component entry "/tabs"']);
     });
 
+    // Epic #79: the month and year values stay out of the day calendars and pickers
+    it("keeps /month-year to the month and year entries and the views", () => {
+        expect(MECHANISM_USERS["month-year"]).toContain("calendar-view");
+        expect(MECHANISM_USERS["month-year"]).toContain("year-range-picker");
+        expect(mechanismLeaks("month-picker", ["date", "month-year"])).toEqual(
+            [],
+        );
+        expect(mechanismLeaks("calendar", ["date", "month-year"])).toEqual([
+            '/calendar: imports the toolkit mechanism "/month-year"',
+        ]);
+        expect(
+            mechanismLeaks("date-picker", ["date", "month-year", "overlay"]),
+        ).toEqual([
+            '/date-picker: imports the toolkit mechanism "/month-year"',
+        ]);
+        expect(
+            mechanismLeaks("multiple-calendar", ["date", "month-year"]),
+        ).toEqual([
+            '/multiple-calendar: imports the toolkit mechanism "/month-year"',
+        ]);
+    });
+
+    it("builds the calendar variants on the calendars, never the other way (Epic #79)", () => {
+        expect(ENTRY_DEPENDENCIES["multiple-calendar"]).toEqual(["calendar"]);
+        expect(ENTRY_DEPENDENCIES["calendar-preset"]).toEqual(["calendar"]);
+        expect(ENTRY_DEPENDENCIES["year-calendar"]).toEqual(["month-calendar"]);
+        expect(ENTRY_DEPENDENCIES["month-calendar"]).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES.calendar).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES["date-picker"]).toEqual([
+            "calendar",
+            "field",
+        ]);
+    });
+
     // Epic #73: the segment editing and the time values stay out of the calendars and pickers
     it("fails a toolkit mechanism kept for other components", () => {
         // Epic #76: the range fields and the pickers' typed input are segmented too

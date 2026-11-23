@@ -77,6 +77,10 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "alert-dialog": ["dialog"],
     autocomplete: ["field"],
     "autocomplete-virtual": ["autocomplete", "field"],
+    // a preset and the views sit in a calendar's root (Epic #79); their entries export the
+    // Calendar's namespace too, so its modules stay one chunk
+    "calendar-preset": ["calendar"],
+    "calendar-view": ["calendar", "month-calendar"],
     checkbox: ["checkbox-group", "field"],
     "checkbox-group": ["field"],
     combobox: ["field"],
@@ -109,6 +113,18 @@ export const ENTRY_DEPENDENCIES: Readonly<
     listbox: ["field"],
     "listbox-virtual": ["listbox", "field"],
     menubar: ["menu"],
+    // the month and year calendars are built on MonthCalendar's state and parts, their pickers on
+    // the DatePicker's parts and MonthPicker's root (Epic #79)
+    "month-picker": ["calendar", "date-picker", "field", "month-calendar"],
+    "month-range-calendar": ["month-calendar"],
+    "month-range-picker": [
+        "calendar",
+        "date-picker",
+        "field",
+        "month-calendar",
+        "month-picker",
+    ],
+    "multiple-calendar": ["calendar"],
     "number-field": ["field"],
     "otp-field": ["field"],
     radio: ["radio-group", "field"],
@@ -121,6 +137,22 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "time-field": ["date-field", "field"],
     "time-range-field": ["date-field", "date-range-field", "field"],
     "toggle-group": ["toggle"],
+    "year-calendar": ["month-calendar"],
+    "year-picker": [
+        "calendar",
+        "date-picker",
+        "field",
+        "month-calendar",
+        "month-picker",
+    ],
+    "year-range-calendar": ["month-calendar"],
+    "year-range-picker": [
+        "calendar",
+        "date-picker",
+        "field",
+        "month-calendar",
+        "month-picker",
+    ],
 };
 
 /** The entries that type dates and times in segments (Epics #73, #76). */
@@ -133,6 +165,19 @@ const SEGMENTED = [
     "date-range-picker-input",
 ];
 
+/** The entries of the month and year calendars, their pickers and the calendar views (Epic #79). */
+const MONTH_YEAR = [
+    "calendar-view",
+    "month-calendar",
+    "month-range-calendar",
+    "year-calendar",
+    "year-range-calendar",
+    "month-picker",
+    "month-range-picker",
+    "year-picker",
+    "year-range-picker",
+];
+
 /**
  * The toolkit mechanisms only some component entries may import (D8: heavy optional parts stay
  * out of the components that do not need them). The segment editing and the time values are the
@@ -140,6 +185,8 @@ const SEGMENTED = [
  * the pickers never import them, so their entries stay as they were.
  */
 export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
+    // the month and year values, grid and names (Epic #79): the day calendars never import them
+    "month-year": MONTH_YEAR,
     segments: SEGMENTED,
     time: SEGMENTED,
 };
