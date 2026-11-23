@@ -3,6 +3,7 @@ import type {
     CalendarUnits,
 } from "@fragiola/primitives/calendar-systems";
 import {
+    currentYearMonth,
     formatMonthName,
     formatYear,
     formatYearMonth,
@@ -11,8 +12,6 @@ import {
     monthIndex,
     type PlainYear,
     type PlainYearMonth,
-    toIsoYear,
-    toIsoYearMonth,
     UNIT_PAGE_SIZE,
     unitKeyTarget,
     unitPageStart,
@@ -58,52 +57,53 @@ export type MonthCalendarUnits = Pick<
     | "item"
     | "pageStart"
     | "pageSize"
+    | "page"
     | "rows"
     | "keyTarget"
     | "text"
     | "name"
     | "heading"
-    | "iso"
+    | "today"
 >;
 
-const size = () => UNIT_PAGE_SIZE;
-
-/** The ISO calendar's months and years (`/month-year`), when no system is given. */
-export const ISO_UNITS: Record<MonthCalendarKind, MonthCalendarUnits> = {
-    month: {
-        index: (item) => monthIndex(item as PlainYearMonth),
-        item: fromMonthIndex,
-        pageStart: unitPageStart,
-        pageSize: size,
-        rows: unitRows,
-        keyTarget: unitKeyTarget,
-        text: (locale, index) =>
-            formatMonthName(locale, fromMonthIndex(index), "long"),
-        name: (locale, index) => formatYearMonth(locale, fromMonthIndex(index)),
-        heading: (locale, start) => formatYear(locale, start / UNIT_PAGE_SIZE),
-        iso: (index) => toIsoYearMonth(fromMonthIndex(index)),
-    },
-    year: {
-        index: (item) => item.year,
-        item: (year) => ({ year }),
-        pageStart: unitPageStart,
-        pageSize: size,
-        rows: unitRows,
-        keyTarget: unitKeyTarget,
-        text: formatYear,
-        name: formatYear,
-        heading: (locale, start) =>
-            formatYearSpan(locale, start, start + UNIT_PAGE_SIZE - 1),
-        iso: (year) => toIsoYear({ year }),
-    },
-};
-
-/** The units of a kind: the calendar system's, else the ISO calendar's. */
+/**
+ * The units of a kind: the calendar system's (its hook), else the ISO calendar's months or years
+ * (`/month-year`, pages of 12).
+ */
 export function unitsOf(
     kind: MonthCalendarKind,
     calendar: CalendarSystem | undefined,
 ): MonthCalendarUnits {
-    return calendar ? calendar.units(kind) : ISO_UNITS[kind];
+    if (calendar) {
+        return calendar.units(kind);
+    }
+    const month = kind === "month";
+    return {
+        index: (item) =>
+            month ? monthIndex(item as PlainYearMonth) : item.year,
+        item: (index) => (month ? fromMonthIndex(index) : { year: index }),
+        pageStart: unitPageStart,
+        pageSize: () => UNIT_PAGE_SIZE,
+        page: (start, delta) => start + delta * UNIT_PAGE_SIZE,
+        rows: unitRows,
+        keyTarget: unitKeyTarget,
+        text: (locale, index) =>
+            month
+                ? formatMonthName(locale, fromMonthIndex(index), "long")
+                : formatYear(locale, index),
+        name: (locale, index) =>
+            month
+                ? formatYearMonth(locale, fromMonthIndex(index))
+                : formatYear(locale, index),
+        heading: (locale, start) =>
+            month
+                ? formatYear(locale, start / UNIT_PAGE_SIZE)
+                : formatYearSpan(locale, start, start + UNIT_PAGE_SIZE - 1),
+        today: () => {
+            const now = currentYearMonth();
+            return month ? monthIndex(now) : now.year;
+        },
+    };
 }
 
 export function isItemRange(

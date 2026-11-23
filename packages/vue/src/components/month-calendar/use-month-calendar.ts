@@ -1,4 +1,3 @@
-import { currentYearMonth, monthIndex } from "@fragiola/primitives/month-year";
 import { computed, inject, shallowRef, useId, watch } from "vue";
 import { useControllable } from "../../composables/use-controllable.ts";
 import type { ChangeDetails } from "../../utils/change-details.ts";
@@ -63,7 +62,8 @@ export function useMonthCalendar(
     });
     // a calendar system's months or years (spec/calendar-systems.md), else the ISO calendar's
     const system = () => option("calendar");
-    const units = () => unitsOf(kind, system());
+    const cached = computed(() => unitsOf(kind, system()));
+    const units = () => cached.value;
     const minIndex = () => {
         const min = option("min");
         return min == null ? null : units().index(min);
@@ -76,19 +76,7 @@ export function useMonthCalendar(
     const columns = () => Math.max(1, Math.floor(option("columns") ?? 3));
     const disabled = () => props.disabled ?? false;
     const readOnly = () => props.readOnly ?? binding.value?.readOnly() ?? false;
-    const todayIndex = (() => {
-        const calendar = system();
-        if (calendar) {
-            const now = new Date();
-            return calendar.units(kind).fromDate({
-                year: now.getFullYear(),
-                month: now.getMonth() + 1,
-                day: now.getDate(),
-            });
-        }
-        const now = currentYearMonth();
-        return kind === "month" ? monthIndex(now) : now.year;
-    })();
+    const todayIndex = units().today();
     const isOutOfBounds = (index: number) => {
         const min = minIndex();
         const max = maxIndex();
@@ -161,11 +149,6 @@ export function useMonthCalendar(
               }
             : null;
     };
-    // the first item of the next or previous page (a system's year can have 13 months)
-    const nextStart = (delta: 1 | -1) =>
-        delta > 0
-            ? pageStart.value + units().pageSize(pageStart.value)
-            : units().pageStart(pageStart.value - 1);
     const focusPending = {
         current:
             (binding.value?.focusOnMount() ?? false) &&
@@ -224,7 +207,8 @@ export function useMonthCalendar(
             return true;
         },
         canPage(delta) {
-            const start = nextStart(delta);
+            // the next or previous page (a system's year can have 13 months)
+            const start = units().page(pageStart.value, delta);
             const end = start + units().pageSize(start);
             for (let index = start; index < end; index++) {
                 if (!isOutOfBounds(index)) {
@@ -237,7 +221,7 @@ export function useMonthCalendar(
             if (!context.canPage(delta)) {
                 return;
             }
-            const start = nextStart(delta);
+            const start = units().page(pageStart.value, delta);
             const size = units().pageSize(start);
             const target =
                 start + Math.min(focused.value - pageStart.value, size - 1);

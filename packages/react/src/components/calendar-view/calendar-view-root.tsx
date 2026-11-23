@@ -1,9 +1,7 @@
-import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { daysInMonth, type PlainDate } from "@fragiola/primitives/date";
 import {
     fromMonthIndex,
     monthIndex,
-    type PlainYear,
     type PlainYearMonth,
 } from "@fragiola/primitives/month-year";
 import {
@@ -55,65 +53,6 @@ const days = (year: number, month: number): PlainDate[] =>
 
 const enabled = (calendar: CalendarContextValue, date: PlainDate) =>
     !calendar.cellState(date, date).disabled;
-
-const dayNumber = (date: PlainDate) =>
-    Date.UTC(date.year, date.month - 1, date.day) / 86_400_000;
-
-/**
- * A view's binding in a calendar system (spec/calendar-systems.md): its months or years are the
- * system's; a choice goes to the enabled day of the unit nearest to the focused date's place in it
- * (the same day of the month, the same month and day of the year).
- */
-function systemBinding(
-    calendar: CalendarContextValue,
-    system: CalendarSystem,
-    kind: "month" | "year",
-    change: (next: CalendarViewName, reason: "item-press") => void,
-): Pick<
-    MonthCalendarBinding,
-    "options" | "focus" | "isDisabled" | "isSelected" | "choose"
-> {
-    const units = system.units(kind);
-    const { focusedDate } = calendar;
-    return {
-        options: { locale: calendar.locale, calendar: system },
-        focus: units.fromDate(focusedDate),
-        isDisabled: (index) =>
-            !units.days(index).some((date) => enabled(calendar, date)),
-        isSelected: (index) =>
-            units
-                .days(index)
-                .some((date) => calendar.cellState(date, date).selected),
-        choose: (item) => {
-            if (item === null || "start" in item) {
-                return;
-            }
-            const index = units.index(item);
-            const fields = system.fields(focusedDate);
-            const place =
-                kind === "month"
-                    ? system.fromFields({
-                          ...system.fromMonthIndex(index),
-                          day: fields.day,
-                      })
-                    : system.addYears(focusedDate, item.year - fields.year);
-            const target = units
-                .days(index)
-                .filter((date) => enabled(calendar, date))
-                .sort(
-                    (a, b) =>
-                        Math.abs(dayNumber(a) - dayNumber(place)) -
-                        Math.abs(dayNumber(b) - dayNumber(place)),
-                )[0];
-            if (target !== undefined && calendar.moveFocus(target)) {
-                if (kind === "month") {
-                    calendar.requestFocus();
-                }
-                change(kind === "month" ? "day" : "month", "item-press");
-            }
-        },
-    };
-}
 
 /** The enabled day of the month nearest to `day`, or `null` when every day is disabled. */
 function nearestDay(
@@ -223,56 +162,66 @@ export function CalendarViewRoot({
             (test: (year: number, month: number) => boolean) =>
             (year: number) =>
                 months(year).some(([y, m]) => test(y, m));
+        // a calendar system's months or years (its hook), when the calendar has one
+        const units = calendar.calendar?.units(kind);
+        const month = kind === "month";
         return {
             kind,
             mode: "single",
             open,
             focusOnMount: switched.current || (picker !== null && open),
             value: null,
-            options: { locale: calendar.locale },
+            options: { locale: calendar.locale, calendar: calendar.calendar },
             readOnly: false,
             focus:
-                kind === "month" ? monthIndex(focusedDate) : focusedDate.year,
-            isDisabled:
-                kind === "month"
-                    ? (index) => !byMonth(monthEnabled)(index)
-                    : (year) => !byYear(monthEnabled)(year),
-            isSelected:
-                kind === "month"
-                    ? byMonth(monthSelected)
-                    : byYear(monthSelected),
+                units?.fromDate(focusedDate) ??
+                (month ? monthIndex(focusedDate) : focusedDate.year),
+            isDisabled: units
+                ? (index) =>
+                      !units.days(index).some((date) => enabled(calendar, date))
+                : month
+                  ? (index) => !byMonth(monthEnabled)(index)
+                  : (year) => !byYear(monthEnabled)(year),
+            isSelected: units
+                ? (index) =>
+                      units
+                          .days(index)
+                          .some(
+                              (date) => calendar.cellState(date, date).selected,
+                          )
+                : month
+                  ? byMonth(monthSelected)
+                  : byYear(monthSelected),
             choose: (item: MonthCalendarValue) => {
                 if (item === null || "start" in item) {
                     return;
                 }
-                if (kind === "month") {
-                    // a month goes down to its days, on the same day (clamped, then enabled)
-                    const { year, month } = item as PlainYearMonth;
-                    const target = nearestDay(
-                        calendar,
-                        year,
-                        month,
-                        focusedDate.day,
-                    );
-                    if (target !== null && calendar.moveFocus(target)) {
-                        calendar.requestFocus();
-                        change("day", "item-press");
-                    }
-                    return;
-                }
-                // a year goes down to its months, on the same month and day
-                const target = nearestInYear(
-                    calendar,
-                    (item as PlainYear).year,
-                    focusedDate.month,
-                    focusedDate.day,
-                );
+                // a month goes down to its days, on the same day (clamped, then enabled); a year
+                // to its months, on the same month and day; a system's, to its nearest enabled day
+                const target = units
+                    ? (units.nearest(units.index(item), focusedDate, (date) =>
+                          enabled(calendar, date),
+                      ) ?? null)
+                    : month
+                      ? nearestDay(
+                            calendar,
+                            item.year,
+                            (item as PlainYearMonth).month,
+                            focusedDate.day,
+                        )
+                      : nearestInYear(
+                            calendar,
+                            item.year,
+                            focusedDate.month,
+                            focusedDate.day,
+                        );
                 if (target !== null && calendar.moveFocus(target)) {
-                    change("month", "item-press");
+                    if (month) {
+                        calendar.requestFocus();
+                    }
+                    change(month ? "day" : "month", "item-press");
                 }
             },
-            ...(calendar.calendar &&
-                systemBinding(calendar, calendar.calendar, kind, change)),
         };
     }, [kind, open, picker, calendar, focusedDate, change]);
 
