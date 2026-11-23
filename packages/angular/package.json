@@ -123,6 +123,11 @@
             "types": "./dist/types/fragiola-primitives-angular-context-menu.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-context-menu.mjs"
         },
+        "./date-field": {
+            "@fragiola/source": "./date-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-date-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-date-field.mjs"
+        },
         "./date-picker": {
             "@fragiola/source": "./date-picker/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-date-picker.d.ts",
@@ -272,6 +277,11 @@
             "@fragiola/source": "./tabs/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tabs.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tabs.mjs"
+        },
+        "./time-field": {
+            "@fragiola/source": "./time-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-time-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-time-field.mjs"
         },
         "./toast": {
             "@fragiola/source": "./toast/public-api.ts",
