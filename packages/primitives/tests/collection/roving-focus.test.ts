@@ -172,3 +172,27 @@ describe("inDocumentOrder", () => {
         ).toEqual(["a", "b", "c"]);
     });
 });
+
+// Epic #49 review: a comparator that called a disconnected element equal to every other one was
+// inconsistent, so the sort could leave it anywhere and misorder the connected ones around it
+describe("inDocumentOrder, with disconnected elements", () => {
+    it("sorts the connected entries and keeps the disconnected ones last, in their order", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        const make = (id: string) => {
+            const element = document.createElement("span");
+            element.id = id;
+            return element;
+        };
+        const [a, b, c] = [make("a"), make("b"), make("c")];
+        root.append(a, b, c);
+        const [x, y] = [make("x"), make("y")];
+        const entries = [c, x, a, y, b].map((element) => ({ element }));
+        expect(
+            inDocumentOrder(entries, (entry) => entry.element).map(
+                (entry) => entry.element.id,
+            ),
+        ).toEqual(["a", "b", "c", "x", "y"]);
+        root.remove();
+    });
+});

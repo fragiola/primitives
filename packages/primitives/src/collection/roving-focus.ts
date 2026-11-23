@@ -162,23 +162,38 @@ export function textFieldKeepsKey(
 
 /**
  * The entries in their elements' document order (a roving composite's items registered in any
- * order: spec/toolbar.md, "Nested composites"). Disconnected elements keep their relative order
- * last.
+ * order: spec/toolbar.md, "Nested composites"). The order is taken in one tree: the document's
+ * when an element is connected, else the first element's; the entries whose element is in another
+ * tree (disconnected) come last, in their relative order.
  */
 export function inDocumentOrder<Entry>(
     entries: readonly Entry[],
     element: (entry: Entry) => Node,
 ): Entry[] {
-    return [...entries].sort((a, b) => {
-        const first = element(a);
-        const second = element(b);
-        if (first === second) {
+    const first =
+        entries.find((entry) => element(entry).isConnected) ?? entries[0];
+    if (first === undefined) {
+        return [];
+    }
+    const tree = element(first).getRootNode();
+    const inTree: Entry[] = [];
+    const elsewhere: Entry[] = [];
+    for (const entry of entries) {
+        (element(entry).getRootNode() === tree ? inTree : elsewhere).push(
+            entry,
+        );
+    }
+    // within one tree, every two nodes are ordered: a consistent comparator
+    inTree.sort((a, b) => {
+        const left = element(a);
+        const right = element(b);
+        if (left === right) {
             return 0;
         }
-        const position = first.compareDocumentPosition(second);
-        if (position & Node.DOCUMENT_POSITION_DISCONNECTED) {
-            return 0;
-        }
-        return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        return left.compareDocumentPosition(right) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+            ? -1
+            : 1;
     });
+    return [...inTree, ...elsewhere];
 }
