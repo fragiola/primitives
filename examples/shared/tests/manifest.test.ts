@@ -59,6 +59,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
 const RECIPE_OF: Record<string, string> = {
     "menu-view-options": "menu",
     "drawer-side-panel": "drawer",
+    // a virtual part is its component's part: its component's recipe styles it
+    "select-virtual": "select",
+    "combobox-virtual": "combobox",
 };
 
 /** The examples whose recipes need none of the recipes' shared pieces (no focusable part). */
@@ -91,6 +94,8 @@ describe("the manifest", () => {
                 "combobox",
                 "autocomplete",
                 "listbox",
+                "select-virtual",
+                "combobox-virtual",
                 "fieldset",
                 "form",
                 "radio-group",

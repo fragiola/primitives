@@ -5,7 +5,7 @@ export default {
     description:
         "A button that stays focusable while it is busy, so the keyboard keeps its place, and a span that behaves as a button: Enter and Space press it, and it leaves the tab order while disabled.",
     category: "forms",
-    order: 12,
+    order: 14,
     features: ["Button", "focusableWhenDisabled", "nativeButton", "render"],
     docs: "/docs/api/button",
     height: 200,
