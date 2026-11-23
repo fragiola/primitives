@@ -63,6 +63,12 @@ import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { LabelControls } from "../scenarios/label/label-controls.ts";
+import { ListboxField } from "../scenarios/listbox/listbox-field.ts";
+import { ListboxGroups } from "../scenarios/listbox/listbox-groups.ts";
+import { ListboxHorizontal } from "../scenarios/listbox/listbox-horizontal.ts";
+import { ListboxMultiple } from "../scenarios/listbox/listbox-multiple.ts";
+import { ListboxReplace } from "../scenarios/listbox/listbox-replace.ts";
+import { ListboxSingle } from "../scenarios/listbox/listbox-single.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
@@ -233,6 +239,12 @@ import { ROUTES } from "./routes.ts";
         ButtonBasic,
         FieldSettings,
         LabelControls,
+        ListboxField,
+        ListboxGroups,
+        ListboxHorizontal,
+        ListboxMultiple,
+        ListboxReplace,
+        ListboxSingle,
         MeterBasic,
         NumberFieldBasic,
         NumberFieldField,
@@ -368,6 +380,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
             @case ("/label/controls") { <main class="p-6" scenario-label-controls></main> }
+            @case ("/listbox/single") { <main class="p-6" scenario-listbox-single></main> }
+            @case ("/listbox/multiple") { <main class="p-6" scenario-listbox-multiple></main> }
+            @case ("/listbox/replace") { <main class="p-6" scenario-listbox-replace></main> }
+            @case ("/listbox/groups") { <main class="p-6" scenario-listbox-groups></main> }
+            @case ("/listbox/horizontal") { <main class="p-6" scenario-listbox-horizontal></main> }
+            @case ("/listbox/field") { <main class="p-6" scenario-listbox-field></main> }
             @case ("/meter/basic") { <main class="p-6" scenario-meter-basic></main> }
             @case ("/number-field/basic") { <main class="p-6" scenario-number-field-basic></main> }
             @case ("/number-field/field") { <main class="p-6" scenario-number-field-field></main> }

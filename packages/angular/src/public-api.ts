@@ -23,6 +23,7 @@ export * from "@fragiola/primitives-angular/field";
 export * from "@fragiola/primitives-angular/fieldset";
 export * from "@fragiola/primitives-angular/form";
 export * from "@fragiola/primitives-angular/label";
+export * from "@fragiola/primitives-angular/listbox";
 export * from "@fragiola/primitives-angular/menu";
 export * from "@fragiola/primitives-angular/menubar";
 export * from "@fragiola/primitives-angular/meter";

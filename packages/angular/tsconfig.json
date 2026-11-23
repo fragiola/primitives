@@ -59,6 +59,7 @@
         "meter",
         "number-field",
         "otp-field",
+        "listbox",
         "tests",
         "*.config.ts"
     ]

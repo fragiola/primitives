@@ -143,6 +143,11 @@
             "types": "./dist/types/fragiola-primitives-angular-label.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-label.mjs"
         },
+        "./listbox": {
+            "@fragiola/source": "./listbox/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-listbox.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-listbox.mjs"
+        },
         "./menu": {
             "@fragiola/source": "./menu/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-menu.d.ts",
