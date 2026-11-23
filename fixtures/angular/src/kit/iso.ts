@@ -58,3 +58,27 @@ export function isoTimeRange(
 ): string | undefined {
     return range ? `${isoTime(range.start)}..${isoTime(range.end)}` : undefined;
 }
+
+/** `2026-11`: a month (spec/month-calendar.md, "Values"). */
+export function isoMonth(
+    month: { year: number; month: number } | null | undefined,
+): string | undefined {
+    return month
+        ? `${String(month.year).padStart(4, "0")}-${String(month.month).padStart(2, "0")}`
+        : undefined;
+}
+
+/** `2026`: a year. */
+export function isoYear(
+    year: { year: number } | null | undefined,
+): string | undefined {
+    return year ? String(year.year).padStart(4, "0") : undefined;
+}
+
+/** `2026-03..2026-06`, `2020..2024`: a range of months or years. */
+export function isoPeriod<T>(
+    range: { start: T; end: T } | null | undefined,
+    print: (item: T) => string | undefined,
+): string | undefined {
+    return range ? `${print(range.start)}..${print(range.end)}` : undefined;
+}

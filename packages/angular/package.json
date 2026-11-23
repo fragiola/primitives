@@ -98,6 +98,11 @@
             "types": "./dist/types/fragiola-primitives-angular-calendar-preset.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-calendar-preset.mjs"
         },
+        "./calendar-view": {
+            "@fragiola/source": "./calendar-view/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-calendar-view.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-calendar-view.mjs"
+        },
         "./checkbox": {
             "@fragiola/source": "./checkbox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-checkbox.d.ts",
@@ -218,6 +223,26 @@
             "types": "./dist/types/fragiola-primitives-angular-meter.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-meter.mjs"
         },
+        "./month-calendar": {
+            "@fragiola/source": "./month-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-month-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-month-calendar.mjs"
+        },
+        "./month-picker": {
+            "@fragiola/source": "./month-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-month-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-month-picker.mjs"
+        },
+        "./month-range-calendar": {
+            "@fragiola/source": "./month-range-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-month-range-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-month-range-calendar.mjs"
+        },
+        "./month-range-picker": {
+            "@fragiola/source": "./month-range-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-month-range-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-month-range-picker.mjs"
+        },
         "./multiple-calendar": {
             "@fragiola/source": "./multiple-calendar/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-multiple-calendar.d.ts",
@@ -337,6 +362,26 @@
             "@fragiola/source": "./tooltip/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-tooltip.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-tooltip.mjs"
+        },
+        "./year-calendar": {
+            "@fragiola/source": "./year-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-year-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-year-calendar.mjs"
+        },
+        "./year-picker": {
+            "@fragiola/source": "./year-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-year-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-year-picker.mjs"
+        },
+        "./year-range-calendar": {
+            "@fragiola/source": "./year-range-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-year-range-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-year-range-calendar.mjs"
+        },
+        "./year-range-picker": {
+            "@fragiola/source": "./year-range-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-year-range-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-year-range-picker.mjs"
         },
         "./async-list": {
             "@fragiola/source": "./async-list/public-api.ts",

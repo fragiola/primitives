@@ -16,7 +16,8 @@ import {
     CalendarRow,
     type PlainDate,
 } from "@fragiola/primitives-angular/calendar";
-import { calendar } from "examples-shared/recipes/calendar";
+import { CalendarViewTrigger } from "@fragiola/primitives-angular/calendar-view";
+import { calendar, calendarView } from "examples-shared/recipes/calendar";
 
 /**
  * The month header and one grid, as every calendar scenario shows them. The component is the
@@ -36,6 +37,7 @@ import { calendar } from "examples-shared/recipes/calendar";
         CalendarGridBody,
         CalendarRow,
         CalendarCell,
+        CalendarViewTrigger,
     ],
     host: { class: "flex flex-col gap-2" },
     template: `
@@ -45,7 +47,11 @@ import { calendar } from "examples-shared/recipes/calendar";
             } @else {
                 <span class="size-8"></span>
             }
-            <h2 calendarHeading #heading="calendarHeading" [offset]="offset()" [class]="styles.heading">{{ heading.month() }}</h2>
+            @if (viewTrigger()) {
+                <button calendarViewTrigger [class]="viewStyles.trigger"><span calendarHeading #heading="calendarHeading" [offset]="offset()" [class]="styles.heading">{{ heading.month() }}</span></button>
+            } @else {
+                <h2 calendarHeading #heading="calendarHeading" [offset]="offset()" [class]="styles.heading">{{ heading.month() }}</h2>
+            }
             @if (withButtons()) {
                 <button calendarNextButton aria-label="Next month" [class]="styles['next-button']">›</button>
             } @else {
@@ -74,8 +80,11 @@ import { calendar } from "examples-shared/recipes/calendar";
 })
 export class MonthView {
     protected readonly styles = calendar;
+    protected readonly viewStyles = calendarView;
     readonly offset = input(0, { transform: numberAttribute });
     readonly withButtons = input(true);
+    /** The Heading inside a CalendarView Trigger (spec/month-calendar.md, "Views"). */
+    readonly viewTrigger = input(false);
 
     protected key(date: PlainDate | undefined): string {
         return date ? `${date.year}-${date.month}-${date.day}` : "";

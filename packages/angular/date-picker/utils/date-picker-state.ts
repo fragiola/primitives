@@ -39,6 +39,14 @@ import {
 /** The component a picker's parts belong to: their part attribute's prefix. */
 export type DatePickerComponent = "date-picker" | "date-range-picker";
 
+/** The pickers whose root provides `DATE_PICKER`: the month and year pickers' too (Epic #79). */
+export type PickerComponent =
+    | DatePickerComponent
+    | "month-picker"
+    | "month-range-picker"
+    | "year-picker"
+    | "year-range-picker";
+
 /** The inputs a DatePicker or DateRangePicker root hands its state. */
 export interface DatePickerInputs {
     open: Signal<boolean | undefined>;
@@ -69,7 +77,7 @@ export interface DatePickerTriggerData {
  * name the calendar entry's types by its specifier.
  */
 export interface DatePickerState {
-    component: DatePickerComponent;
+    component: PickerComponent;
     mode: CalendarMode;
     overlay: OverlayRoot;
     value: Signal<CalendarValue>;
