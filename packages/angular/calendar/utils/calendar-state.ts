@@ -1,6 +1,7 @@
 import {
     afterEveryRender,
     computed,
+    DestroyRef,
     DOCUMENT,
     effect,
     InjectionToken,
@@ -27,6 +28,7 @@ import {
     startOfMonth,
     today,
     toIsoDate,
+    watchDocumentLanguage,
 } from "@fragiola/primitives/date";
 import {
     type ChangeDetails,
@@ -137,11 +139,16 @@ export class CalendarState {
     private readonly document = inject(DOCUMENT);
     // `"browser"` or `"server"` (`isPlatformBrowser` lives in @angular/common, not a peer)
     private readonly browser = inject(PLATFORM_ID) === "browser";
-    readonly locale = computed(
-        () =>
-            this.options().locale ??
-            documentLocale(this.document, this.browser),
-    );
+    /** Bumped by a change of the document's `lang` in the browser (Epic #49: followed after mount). */
+    private readonly language = signal(0);
+    readonly locale = computed(() => {
+        const own = this.options().locale;
+        if (own !== undefined) {
+            return own;
+        }
+        this.language();
+        return documentLocale(this.document, this.browser);
+    });
     readonly firstDay = computed(
         () => this.options().firstDayOfWeek ?? firstDayOfWeek(this.locale()),
     );
@@ -192,6 +199,12 @@ export class CalendarState {
         // after every render while a focus is pending: the focused date's cell may mount later
         // than the keyboard moved to it (a new month, a picker opening; AGENTS.md "Porting", 5)
         afterEveryRender(() => this.applyPendingFocus());
+        if (this.browser) {
+            const stop = watchDocumentLanguage(this.document, () =>
+                this.language.update((count) => count + 1),
+            );
+            inject(DestroyRef).onDestroy(stop);
+        }
         // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels
         // a started range, and reopening starts again from the value, as a fresh calendar would
         let wasOpen: boolean | null = null;

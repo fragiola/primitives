@@ -20,9 +20,8 @@ import {
     injectFlush,
     injectHost,
     injectId,
-    ownAttribute,
 } from "@fragiola/primitives-angular/internal";
-import { writeLabelledBy } from "../utils/write-labelled-by.ts";
+import { writeThumbLabelledBy } from "../utils/write-labelled-by.ts";
 import { SliderRoot } from "./slider-root.directive.ts";
 
 export interface SliderThumbState {
@@ -148,10 +147,9 @@ export class SliderThumb {
             "aria-describedby": field.describedBy,
             "aria-invalid": field.ariaInvalid,
         });
-        // the field's label, or the Label, names a thumb that has no name of its own
-        if (ownAttribute("aria-label") === null) {
-            writeLabelledBy(this.host, [field.labelledBy, this.root.labelId]);
-        }
+        // the field's label, or the Label, names a thumb that has no name of its own, read live
+        // (a bound or later `aria-label` wins)
+        writeThumbLabelledBy(this.host, [field.labelledBy, this.root.labelId]);
         // its id by its value's index, for the Value's `for`
         effect((onCleanup) => {
             const index = this.position();

@@ -81,7 +81,8 @@ export class TabsRoot {
      * Where the selected tab sits from the one selected before it (spec/tabs.md,
      * `data-activation-direction`): derived from the selection, so the render that selects a tab
      * (and its panel's first frame) already carries it. Measured on the page, before that render
-     * (the tabs do not move when the selection changes).
+     * (the tabs do not move when the selection changes), and read at each `select` so every step
+     * is measured from the one before it.
      */
     readonly activationDirection = linkedSignal<
         string | undefined,
@@ -129,6 +130,9 @@ export class TabsRoot {
 
     select(value: string, reason: ChangeReason): void {
         this.selection.set(value, { reason });
+        // measured at each step, not when a render first reads it: two keys handled before one
+        // render give the last step's direction (Epic #49, spec/tabs.md `data-activation-direction`)
+        untracked(this.activationDirection);
     }
 
     // A value may hold any character (`"my account"`): it is encoded, so the id holds no
