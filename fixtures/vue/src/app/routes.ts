@@ -102,6 +102,12 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
+import ToggleBasic from "../scenarios/toggle/toggle-basic.vue";
+import ToggleControlled from "../scenarios/toggle/toggle-controlled.vue";
+import ToggleGroupBasic from "../scenarios/toggle-group/toggle-group-basic.vue";
+import ToggleGroupVertical from "../scenarios/toggle-group/toggle-group-vertical.vue";
+import ToolbarBasic from "../scenarios/toolbar/toolbar-basic.vue";
+import ToolbarVertical from "../scenarios/toolbar/toolbar-vertical.vue";
 import TooltipBasic from "../scenarios/tooltip/tooltip-basic.vue";
 import TooltipDetached from "../scenarios/tooltip/tooltip-detached.vue";
 import TooltipGroup from "../scenarios/tooltip/tooltip-group.vue";
@@ -189,6 +195,12 @@ export const routes: Record<string, Component> = {
     "/switch/basic": SwitchBasic,
     "/switch/controlled": SwitchControlled,
     "/button/basic": ButtonBasic,
+    "/toggle/basic": ToggleBasic,
+    "/toggle/controlled": ToggleControlled,
+    "/toggle-group/basic": ToggleGroupBasic,
+    "/toggle-group/vertical": ToggleGroupVertical,
+    "/toolbar/basic": ToolbarBasic,
+    "/toolbar/vertical": ToolbarVertical,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,
