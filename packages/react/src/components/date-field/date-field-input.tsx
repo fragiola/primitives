@@ -38,7 +38,8 @@ export function DateFieldInput({ children, ...props }: DateFieldInputProps) {
             role: "group",
             "aria-labelledby": field.aria["aria-labelledby"],
             "aria-describedby": field.aria["aria-describedby"],
-            "data-primitives-part": `${context.component}-input`,
+            "data-primitives-part":
+                context.inputPart ?? `${context.component}-input`,
             ...context.attributes,
         },
         context.setInputElement,
