@@ -11,3 +11,12 @@ export const dateField: Recipe<"root" | "input" | "segment"> = {
     segment:
         "rounded-sm px-0.5 caret-transparent outline-hidden focus:bg-palette-contrast focus:text-palette-base data-placeholder:text-palette-accent data-[type=literal]:px-0 data-[type=literal]:text-palette-accent",
 };
+
+// spec/date-range-field.md, "Anatomy": the two ends' Inputs side by side (start, then end, in the
+// page's direction) with the consumer's separator between them; each Input and Segment as
+// DateField's.
+export const dateRangeField: Recipe<"root" | "ends" | "separator"> = {
+    root: dateField.root,
+    ends: "flex items-center gap-1",
+    separator: "text-palette-accent",
+};

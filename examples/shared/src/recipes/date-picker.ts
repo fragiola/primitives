@@ -9,3 +9,10 @@ export const datePicker: Recipe<"trigger" | "positioner" | "popup"> = {
     positioner: "z-50",
     popup: `${FLOATING_BOX} p-4 ${FOCUS_RING}`,
 };
+
+// spec/calendar.md, "Typed input": the typed segments (the date field's recipe) with the Trigger
+// beside them as the calendar button, an icon's width
+export const datePickerInput: Recipe<"group" | "trigger"> = {
+    group: "inline-flex items-center gap-1",
+    trigger: `${BUTTON} px-2 data-popup-open:bg-palette-soft`,
+};

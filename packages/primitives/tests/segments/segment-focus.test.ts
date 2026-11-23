@@ -61,6 +61,28 @@ describe("segmentTarget", () => {
         expect(segmentTarget(month as HTMLElement, "next")).toBe(year);
         expect(segmentTarget(month as HTMLElement, "right")).toBe(year);
     });
+
+    // spec/date-range-field.md, "Typing and keys": a range's two ends are one sequence
+    it("crosses the groups it is given, and stays in its own by default", () => {
+        const [startMonth, , startYear] = group([0, 30, 60]);
+        const [endMonth, endDay] = group([100, 130, 160]);
+        const groups = [startYear, endMonth].flatMap(
+            (segment) => (segment as HTMLElement).parentElement ?? [],
+        );
+        expect(segmentTarget(startYear as HTMLElement, "next")).toBeNull();
+        expect(segmentTarget(startYear as HTMLElement, "next", groups)).toBe(
+            endMonth,
+        );
+        expect(segmentTarget(endMonth as HTMLElement, "previous", groups)).toBe(
+            startYear,
+        );
+        expect(segmentTarget(startYear as HTMLElement, "right", groups)).toBe(
+            endMonth,
+        );
+        expect(segmentTarget(endDay as HTMLElement, "first", groups)).toBe(
+            startMonth,
+        );
+    });
 });
 
 describe("focusOnLabelPress", () => {

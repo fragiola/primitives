@@ -41,7 +41,7 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
-| `data-readonly` | a read-only number field's, OTP field's, date field's or time field's parts (and a read-only calendar or switch) |
+| `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch) |
 | `data-pressed` | a pressed toggle |
 | `data-multiple` | a toggle group or a listbox with `multiple` |
 | `data-placeholder` | a Select showing its placeholder; a date or time field's segment with no value |
@@ -50,8 +50,8 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-dragging` | a slider while a pointer drags a thumb |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
-| `data-required` | a required checkbox, switch or radio group, and its radios; every part of a required number field, OTP field, date field or time field |
-| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid; `data-invalid` also on every part of a date or time field whose value is out of range or unavailable |
+| `data-required` | a required checkbox, switch or radio group, and its radios; every part of a required number field, OTP field, date or time field, or range field |
+| `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid; `data-invalid` also on every part of a date, time or range field whose value is out of range or unavailable (a range: or whose end is before its start), and on a typed picker's segments whose complete entry is |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTP field slot that holds a character |
 | `data-highlighted` | the menu item, select, combobox or autocomplete option the keyboard or the pointer points at; a listbox's focused option |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group); a hover card moved to another of its triggers |

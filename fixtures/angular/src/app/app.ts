@@ -51,6 +51,11 @@ import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
+import { DatePickerInputBasic } from "../scenarios/date-picker-input/date-picker-input-basic.ts";
+import { DatePickerInputDateTime } from "../scenarios/date-picker-input/date-picker-input-date-time.ts";
+import { DatePickerInputRange } from "../scenarios/date-picker-input/date-picker-input-range.ts";
+import { DateRangeFieldBasic } from "../scenarios/date-range-field/date-range-field-basic.ts";
+import { DateRangeFieldForm } from "../scenarios/date-range-field/date-range-field-form.ts";
 import { DialogBasic } from "../scenarios/dialog/dialog-basic.ts";
 import { DialogControlled } from "../scenarios/dialog/dialog-controlled.ts";
 import { DialogDetached } from "../scenarios/dialog/dialog-detached.ts";
@@ -143,6 +148,7 @@ import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
 import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.ts";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.ts";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.ts";
+import { TimeRangeFieldBasic } from "../scenarios/time-range-field/time-range-field-basic.ts";
 import { ToastBasic } from "../scenarios/toast/toast-basic.ts";
 import { ToastLimit } from "../scenarios/toast/toast-limit.ts";
 import { ToastPromise } from "../scenarios/toast/toast-promise.ts";
@@ -303,6 +309,12 @@ import { ROUTES } from "./routes.ts";
         TimeFieldBasic,
         TimeFieldMinMax,
         TimeFieldForm,
+        DateRangeFieldBasic,
+        DateRangeFieldForm,
+        TimeRangeFieldBasic,
+        DatePickerInputBasic,
+        DatePickerInputRange,
+        DatePickerInputDateTime,
         OtpFieldBasic,
         OtpFieldField,
         ProgressBasic,
@@ -481,6 +493,12 @@ import { ROUTES } from "./routes.ts";
             @case ("/time-field/basic") { <main class="p-6" scenario-time-field-basic [locale]="query.locale"></main> }
             @case ("/time-field/min-max") { <main class="p-6" scenario-time-field-min-max></main> }
             @case ("/time-field/form") { <main class="p-6" scenario-time-field-form></main> }
+            @case ("/date-range-field/basic") { <main class="p-6" scenario-date-range-field-basic></main> }
+            @case ("/date-range-field/form") { <main class="p-6" scenario-date-range-field-form></main> }
+            @case ("/time-range-field/basic") { <main class="p-6" scenario-time-range-field-basic></main> }
+            @case ("/date-picker-input/basic") { <main class="p-6" scenario-date-picker-input-basic></main> }
+            @case ("/date-picker-input/range") { <main class="p-6" scenario-date-picker-input-range></main> }
+            @case ("/date-picker-input/date-time") { <main class="p-6" scenario-date-picker-input-date-time></main> }
             @case ("/otp-field/basic") { <main class="p-6" scenario-otp-field-basic></main> }
             @case ("/otp-field/field") { <main class="p-6" scenario-otp-field-field></main> }
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }

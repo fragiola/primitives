@@ -14,6 +14,16 @@ export interface PlainTime {
 export type TimeField = "hour" | "minute" | "second" | "millisecond";
 
 /** An amount to add to a time, field by field (each may be negative). */
+/**
+ * A range of times of day, `{ start, end }` (a TimeRangeField's value, spec/date-range-field.md):
+ * the time counterpart of `/date`'s `DateRange`. An end before its start is a value too, an
+ * invalid one (no range across midnight).
+ */
+export interface TimeRange {
+    readonly start: PlainTime;
+    readonly end: PlainTime;
+}
+
 export interface TimeDuration {
     readonly hours?: number;
     readonly minutes?: number;

@@ -1,0 +1,142 @@
+---
+title: TimeRangeField
+description: A start and an end time of day typed in segments as one control, no range across midnight, two form values and Field support, in each framework.
+---
+
+A start time and an end time of day typed in parts, opening hours or a meeting's slot: the
+[DateRangeField](/docs/api/date-range-field)'s anatomy over two [times](/docs/api/time-field). Its
+Input is DateRangeField's and its Segment DateField's, named `time-range-field-*` inside a
+TimeRangeField. Each segment is an [APG spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/).
+
+## Behaviour
+
+- **Value**: a `TimeRange` (`{ start, end }` of `PlainTime`s), set once every segment of both ends
+  is; `null` until then.
+- **One sequence**: typing moves on from the start into the end, Backspace and the arrows cross
+  back, as a DateRangeField's.
+- **No range across midnight**: an end before the start is invalid, as TimeField's reversed
+  `min` / `max`; a time before `min` or after `max` too.
+- **Forms**: two hidden native `time` inputs, `startName` and `endName`, with crossed bounds.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `time-range-field-root` | holds the value; renders the hidden inputs after it |
+| Input | `div` | `time-range-field-input` | `group` of one end's segments (`range`) |
+| Segment | `span` | `time-range-field-segment` | `spinbutton`, or a literal hidden from assistive technology |
+| (hidden inputs) | `input type="time"` ×2 | `time-range-field-hidden-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { TimeRangeField } from "@fragiola/primitives-react/time-range-field";
+
+<TimeRangeField.Root value={hours} onValueChange={setHours} startName="opens" endName="closes">
+    <TimeRangeField.Input range="start" aria-label="Opens" />
+    <span aria-hidden="true">–</span>
+    <TimeRangeField.Input range="end" aria-label="Closes" />
+</TimeRangeField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <TimeRangeField.Root v-model:value="hours" start-name="opens" end-name="closes">
+        <TimeRangeField.Input range="start" aria-label="Opens" />
+        <span aria-hidden="true">–</span>
+        <TimeRangeField.Input range="end" aria-label="Closes" />
+    </TimeRangeField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [TimeRangeFieldRoot, DateRangeFieldInput, DateFieldSegment],
+    template: `
+        <div timeRangeFieldRoot [(value)]="hours" startName="opens" endName="closes">
+            <div dateRangeFieldInput range="start" aria-label="Opens" #start="dateRangeFieldInput">
+                @for (segment of start.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+            <span aria-hidden="true">–</span>
+            <div dateRangeFieldInput range="end" aria-label="Closes" #end="dateRangeFieldInput">
+                @for (segment of end.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+        </div>
+    `,
+})
+export class OpeningHours {
+    protected readonly hours = signal<TimeRange | null>(null);
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives.
+Vue binds the value as `v-model:value` with `@value-change`; Angular as `[(value)]` with
+`(valueChangeDetails)`. The Input is [DateRangeField's](/docs/api/date-range-field#input), the
+Segment [DateField's](/docs/api/date-field#segment).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `TimeRange \| null` | | the range, controlled |
+| `defaultValue` | `TimeRange \| null` | `null` | the initial range, uncontrolled |
+| `onValueChange` | `(value, details: { reason, event }) => void` | | every change of the range |
+| `granularity` | `"hour" \| "minute" \| "second"` | `"minute"` | the smallest segment |
+| `placeholderValue` | `PlainTime` | midnight | what an arrow on an empty segment starts from |
+| `hourCycle` | `12 \| 24` | the locale's | the clock |
+| `min` | `PlainTime` | | times before it are invalid |
+| `max` | `PlainTime` | | times after it are invalid |
+| `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `required` | `boolean` | `false` | both hidden inputs are required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |
+| `startName` | `string` | | the start's hidden input name |
+| `endName` | `string` | | the end's hidden input name |
+
+### Input
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `range` | `"start" \| "end"` | required | the end whose segments it holds |
+
+### Segment
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `segment` | `DateSegment` | required | one of the Input's segments |
+
+## State and part attributes
+
+As [DateRangeField's](/docs/api/date-range-field#state-and-part-attributes), named
+`time-range-field-*`.
+
+## Keyboard
+
+As [DateRangeField's](/docs/api/date-range-field#keyboard); on a day period, a letter sets it and
+the arrows toggle it.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/time-range-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateRangeFieldInputProps`, `DateRangeFieldRootSharedProps`, `DateSegment`, `PlainTime`, `RangeEnd`, `RenderProp`, `SegmentGranularity`, `SegmentType`, `TimeRange`, `TimeRangeField`, `TimeRangeFieldRootProps` |
+| `@fragiola/primitives-vue/time-range-field` | `ChangeDetails`, `ChangeReason`, `DateFieldInputSlots`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateRangeFieldInputProps`, `DateRangeFieldRootSharedProps`, `DateSegment`, `PlainTime`, `RangeEnd`, `RenderSlotProps`, `SegmentGranularity`, `SegmentType`, `TimeRange`, `TimeRangeField`, `TimeRangeFieldRootEmits`, `TimeRangeFieldRootProps` |
+| `@fragiola/primitives-angular/time-range-field` | `ChangeDetails`, `ChangeReason`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateRangeFieldInput`, `DateSegment`, `PlainTime`, `RangeEnd`, `SegmentGranularity`, `SegmentType`, `TimeRange`, `TimeRangeFieldRoot`, `ValueChangeEvent` |

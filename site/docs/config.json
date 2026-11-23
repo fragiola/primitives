@@ -254,6 +254,22 @@
                     "path": "api/time-field"
                 },
                 {
+                    "label": "DateRangeField",
+                    "path": "api/date-range-field"
+                },
+                {
+                    "label": "TimeRangeField",
+                    "path": "api/time-range-field"
+                },
+                {
+                    "label": "DatePickerInput",
+                    "path": "api/date-picker-input"
+                },
+                {
+                    "label": "DateRangePickerInput",
+                    "path": "api/date-range-picker-input"
+                },
+                {
                     "label": "Progress",
                     "path": "api/progress"
                 },

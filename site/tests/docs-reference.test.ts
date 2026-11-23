@@ -307,8 +307,7 @@ function vueProps(component: string, sources: Sources) {
             // the part's own file, else the component file that declares it (Menu's
             // `MenuSubmenuRoot`, beside `MenuRoot`), else the component it shares its parts with
             // (RangeCalendar's are the Calendar's); read from its declaration on
-            const base = SHARED_PARTS[component];
-            const folders = [component, ...(base ? [base] : [])].map(
+            const folders = [component, ...sharedBases(component)].map(
                 (name) => `${dir}/components/${name}`,
             );
             const folder = folders[0] ?? "";
@@ -372,17 +371,49 @@ function vueProps(component: string, sources: Sources) {
  * The components whose parts, but their Root, are another component's (spec/calendar.md): their
  * namespace lists that component's parts, each framework implements them once, in its folder.
  */
-const SHARED_PARTS: Record<string, string> = {
+const SHARED_PARTS: Record<string, string | readonly string[]> = {
     "range-calendar": "calendar",
     "date-range-picker": "date-picker",
     // spec/date-field.md: TimeField on DateField's Input and Segment
     "time-field": "date-field",
+    // spec/date-range-field.md: the range fields' Segment is DateField's, TimeRangeField's Input
+    // DateRangeField's; spec/calendar.md "Typed input": the typed pickers' Segments and Segment
+    // are the fields' (their Root is their own)
+    "date-range-field": "date-field",
+    "time-range-field": ["date-range-field", "date-field"],
+    "date-picker-input": ["date-field", "date-picker"],
+    "date-range-picker-input": [
+        "date-range-field",
+        "date-field",
+        "date-picker-input",
+        "date-range-picker",
+        "date-picker",
+    ],
     // spec/alert-dialog.md, spec/context-menu.md, spec/drawer.md: built on Dialog's and Menu's
     // parts (Angular gives them their own selectors, as subclasses of Dialog's and Menu's
     // directives)
     "alert-dialog": "dialog",
     "context-menu": "menu",
     drawer: "dialog",
+};
+
+/** The components a component's parts come from (SHARED_PARTS), in the order they are tried. */
+function sharedBases(component: string): string[] {
+    const shared = SHARED_PARTS[component];
+    return shared === undefined
+        ? []
+        : typeof shared === "string"
+          ? [shared]
+          : [...shared];
+}
+
+/**
+ * The Angular directive of a part named otherwise in the namespace (`component.Part`): the typed
+ * pickers' Segments is the fields' Input directive (spec/calendar.md, "Typed input").
+ */
+const ANGULAR_DIRECTIVE: Record<string, string> = {
+    "date-picker-input.Segments": "DateFieldInput",
+    "date-range-picker-input.Segments": "DateRangeFieldInput",
 };
 
 /** The parts Angular has no directive for: their API is another part's (`component.Part`). */
@@ -401,18 +432,25 @@ function angularProps(
             // a component that is no namespace is its one part (CheckboxGroup); a shared part is
             // its own directive when its entry has one (`[alertDialogPopup]`, a subclass of
             // `DialogPopup`), else its base component's (RangeCalendar's Cell is `[calendarCell]`)
-            const shared = SHARED_PARTS[component];
+            // (a part with another name, ANGULAR_DIRECTIVE, is that directive, in its folder)
+            const named = ANGULAR_DIRECTIVE[`${component}.${part}`];
             const ownFile = `packages/angular/${component}/directives/${kebab(`${pascal(component)}${part}`)}.directive.ts`;
             const owner =
                 part !== "Root" &&
-                shared &&
                 !sources
                     .files(`packages/angular/${component}/directives`)
                     .includes(ownFile)
-                    ? shared
+                    ? (sharedBases(component).find((base) =>
+                          sources
+                              .files(`packages/angular/${base}/directives`)
+                              .includes(
+                                  `packages/angular/${base}/directives/${kebab(named ?? `${pascal(base)}${part}`)}.directive.ts`,
+                              ),
+                      ) ?? component)
                     : component;
             const directive =
-                part === pascal(component) ? part : `${pascal(owner)}${part}`;
+                named ??
+                (part === pascal(component) ? part : `${pascal(owner)}${part}`);
             const dir = `packages/angular/${owner}/directives`;
             const own = `${dir}/${kebab(directive)}.directive.ts`;
             // a part may share another part's directive, which lists its selector too (Menu's
@@ -441,9 +479,9 @@ function angularProps(
             // (`CalendarRoot extends CalendarRootBase`), found in its entry or its base's
             const dirs = [
                 ...new Set(
-                    [component, owner, SHARED_PARTS[component]]
-                        .filter((name) => name !== undefined)
-                        .map((name) => `packages/angular/${name}/directives`),
+                    [component, owner, ...sharedBases(component)].map(
+                        (name) => `packages/angular/${name}/directives`,
+                    ),
                 ),
             ];
             let text = sources.read(file);

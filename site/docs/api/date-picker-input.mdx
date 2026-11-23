@@ -1,0 +1,174 @@
+---
+title: DatePickerInput
+description: A DatePicker you can also type into, its DateField segments bound both ways to the picker's value, opt-in in an entry of its own.
+---
+
+A [DatePicker](/docs/api/date-picker) whose date is also typed into
+segments: the user types the date into [DateField](/docs/api/date-field) segments, or opens
+the Calendar with the Trigger, now the calendar button beside them. `DatePickerInput.Root` replaces the
+picker's Root; the picker's Trigger, Portal, Positioner and Popup and the bound Calendar are used
+as they are (this entry exports `DatePicker` too). It is **opt-in, in an entry of its own**: a
+picker without it imports no segment editing, and `/date-picker` is unchanged.
+
+The APG has no date field: each segment is the [APG spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/),
+as in a DateField, and the binding follows React Aria's DatePicker as the behaviour reference (the
+[behaviour rule](/docs/concepts/behaviour-rule)).
+
+<Example id="date-picker-input" />
+
+## Behaviour
+
+- **Typing sets the value only when the entry is complete and valid** (every segment set, inside
+  `min` / `max`, not unavailable). An incomplete or invalid entry makes the value
+  `null`, and its segments stay as typed (`data-invalid` while complete and invalid): the form
+  never submits a date the calendar could not have chosen.
+- **The calendar opens on the typed value** and **fills the segments** when a date is chosen
+  (reason `item-press`). With a time `granularity`, the calendar chooses the date part: the typed
+  time is kept, a time still empty takes `placeholderValue`'s (midnight).
+- **The calendar never clears typed segments**: opening and closing it, or an entry going back
+  to `null`, leaves them as they are. One edit reports one `onValueChange` at most: no loop.
+- **Field and form**: inside a [Field](/docs/api/field) the label names the segments and a press
+  on it focuses the first one; the Trigger is named by the label and itself ("Departure Choose
+  date"). The form is the picker's: one hidden input with the ISO date.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | the picker's state and the segments' |
+| Segments | `div` | `date-picker-segments` | `group` of the segments |
+| Segment | `span` | `date-picker-segment` | `spinbutton`, or a literal hidden from assistive technology |
+| Trigger, Portal, Positioner, Popup | | `date-picker-*` | the [DatePicker's](/docs/api/date-picker#anatomy) |
+| (hidden input) | `input` | `date-picker-input` | the picker's form value |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { DatePicker, DatePickerInput } from "@fragiola/primitives-react/date-picker-input";
+
+<Field.Root name="departure">
+    <Field.Label>Departure</Field.Label>
+    <DatePickerInput.Root value={value} onValueChange={setValue} min={today}>
+        <DatePickerInput.Segments>
+            {(segment) => <DatePickerInput.Segment key={segment.index} segment={segment} />}
+        </DatePickerInput.Segments>
+        <DatePicker.Trigger aria-label="Choose date">📅</DatePicker.Trigger>
+        <DatePicker.Portal>
+            <DatePicker.Positioner>
+                <DatePicker.Popup aria-label="Choose date">
+                    <Calendar.Root>{/* … */}</Calendar.Root>
+                </DatePicker.Popup>
+            </DatePicker.Positioner>
+        </DatePicker.Portal>
+    </DatePickerInput.Root>
+</Field.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <DatePickerInput.Root v-model:value="value" :min="today" name="departure">
+        <DatePickerInput.Segments v-slot="{ segment }">
+            <DatePickerInput.Segment :segment="segment" />
+        </DatePickerInput.Segments>
+        <DatePicker.Trigger aria-label="Choose date">📅</DatePicker.Trigger>
+        <DatePicker.Portal>
+            <DatePicker.Positioner>
+                <DatePicker.Popup aria-label="Choose date">
+                    <Calendar.Root><!-- … --></Calendar.Root>
+                </DatePicker.Popup>
+            </DatePicker.Positioner>
+        </DatePicker.Portal>
+    </DatePickerInput.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    template: `
+        <ng-container datePickerInputRoot [(value)]="value" [min]="today" name="departure">
+            <div dateFieldInput #input="dateFieldInput">
+                @for (segment of input.segments(); track segment.index) {
+                    <span [dateFieldSegment]="segment">{{ segment.text }}</span>
+                }
+            </div>
+            <button datePickerTrigger aria-label="Choose date">📅</button>
+            <!-- the popup and its [calendarRoot], as the picker's -->
+        </ng-container>
+    `,
+})
+```
+
+The Segments part is DateField's `[dateFieldInput]` directive and the Segment `[dateFieldSegment]`, both re-exported from this entry; the picker's directives come with it (`export *` of `/date-picker`).
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. Vue
+binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`,
+`(valueChangeDetails)`, `(openChangeDetails)`. The other parts' props are the
+[DatePicker's](/docs/api/date-picker#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainDate \| PlainDateTime \| null` | | the date, controlled; set only from a complete, valid entry |
+| `defaultValue` | `PlainDate \| PlainDateTime \| null` | `null` | the initial date, uncontrolled |
+| `onValueChange` | `(value, details: { reason, event }) => void` | | every change: `input-change`, `input-clear`, `keyboard` (typed), `item-press` (chosen), `none` (a reset) |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason (`trigger-press`, `item-press`, `escape-key`, `outside-press`, `focus-out`); called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions (not on the first render, nor for an exit a reopening interrupted) |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` (reason `imperative-action`) and `unmount()` (ends an exit now); Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `min` | `PlainDate \| null` | | the calendar's and the segments' |
+| `max` | `PlainDate \| null` | | the calendar's and the segments' |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | the calendar's and the segments' |
+| `locale` | `string` | the document's `lang` | the calendar's and the segments' |
+| `firstDayOfWeek` | `number` | the locale's | passed to the bound calendar |
+| `visibleMonths` | `number` | `1` | passed to the bound calendar |
+| `name` | `string` | | the hidden input's form name (a Field's wins); without one, no input is rendered |
+| `required` | `boolean` | `false` | a native form's validation blocks a submission with no date |
+| `disabled` | `boolean` | `false` | the Trigger cannot open the popup; the hidden input submits nothing |
+| `readOnly` | `boolean` | `false` | the popup still opens; its calendar can be browsed, no date chosen |
+| `granularity` | `"day" \| "hour" \| "minute" \| "second"` | `"day"` | a time granularity adds the time's segments; the calendar chooses the date |
+| `placeholderValue` | `PlainDate \| PlainDateTime` | today at midnight | what an arrow on an empty segment starts from, and a chosen date's time while the time is empty |
+| `hourCycle` | `12 \| 24` | the locale's | a time granularity's clock |
+
+### Segments
+
+No props of its own. Its children: a function of each segment (Vue: the default slot's `{ segment }`; Angular: `@for` over `segments()`).
+
+### Segment
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `segment` | `DateSegment` | required | one of the Segments' segments |
+
+## State and part attributes
+
+The segments as [DateField's](/docs/api/date-field#state-and-part-attributes), named `date-picker-*`;
+the Trigger, the Popup and the hidden input as the [DatePicker's](/docs/api/date-picker#state-and-part-attributes).
+
+## Keyboard
+
+On a segment, [DateField's](/docs/api/date-field#keyboard); in the calendar, the
+[DatePicker's](/docs/api/date-picker#keyboard).
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/date-picker-input` | `ChangeDetails`, `ChangeReason`, `DateFieldInputProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DatePicker`, `DatePickerInput`, `DatePickerInputRootProps`, `DatePickerInputRootSharedProps`, `DateSegment`, `PlainDate`, `PlainDateTime`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-vue/date-picker-input` | `ChangeDetails`, `ChangeReason`, `DateFieldInputSlots`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DatePicker`, `DatePickerInput`, `DatePickerInputRootEmits`, `DatePickerInputRootProps`, `DatePickerInputRootSharedProps`, `DateSegment`, `PlainDate`, `PlainDateTime`, `SegmentGranularity`, `SegmentType` |
+| `@fragiola/primitives-angular/date-picker-input` | `*` (every export of the DatePicker entry), `DateFieldInput`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DatePickerInputInputs`, `DatePickerInputRoot`, `DatePickerInputState`, `DateSegment`, `hourCycleAttribute`, `PickerValue`, `PlainDateTime`, `SegmentGranularity`, `SegmentType` |

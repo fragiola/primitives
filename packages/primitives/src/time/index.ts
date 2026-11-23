@@ -27,5 +27,6 @@ export {
     plainTime,
     type TimeDuration,
     type TimeField,
+    type TimeRange,
     toIsoTime,
 } from "./plain-time.ts";

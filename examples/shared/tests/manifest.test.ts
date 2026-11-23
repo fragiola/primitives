@@ -39,6 +39,13 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     // the date and time fields' Field (TimeField's own recipe is DateField's)
     "date-field": ["_recipes/field.ts"],
     "time-field": ["_recipes/field.ts"],
+    // the range's Field; the typed picker's segments, popup, calendar and Field (Epic #76)
+    "date-range-field": ["_recipes/field.ts"],
+    "date-picker-input": [
+        "_recipes/calendar.ts",
+        "_recipes/date-field.ts",
+        "_recipes/field.ts",
+    ],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -65,6 +72,9 @@ const RECIPE_OF: Record<string, string> = {
     "toast-promise": "toast",
     // TimeField is built on DateField's parts: DateField's recipe styles it
     "time-field": "date-field",
+    // DateRangeField's recipe is in DateField's file; the typed picker's in DatePicker's
+    "date-range-field": "date-field",
+    "date-picker-input": "date-picker",
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
@@ -124,6 +134,8 @@ describe("the manifest", () => {
                 "calendar",
                 "date-field",
                 "time-field",
+                "date-range-field",
+                "date-picker-input",
                 "progress",
                 "meter",
                 "avatar",

@@ -1,0 +1,13 @@
+import { DateFieldInput } from "../date-field/date-field-input.tsx";
+import { DateFieldSegment } from "../date-field/date-field-segment.tsx";
+import { DatePickerInputRoot } from "./date-picker-input-root.tsx";
+
+/**
+ * spec/calendar.md, "Typed input": a DatePicker typed into DateField segments; its other parts
+ * are the DatePicker's
+ */
+export const DatePickerInput = {
+    Root: DatePickerInputRoot,
+    Segments: DateFieldInput,
+    Segment: DateFieldSegment,
+};

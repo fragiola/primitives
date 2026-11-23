@@ -209,8 +209,25 @@ describe("the bundle guard, entry by entry", () => {
 
     // Epic #73: the segment editing and the time values stay out of the calendars and pickers
     it("fails a toolkit mechanism kept for other components", () => {
-        expect(MECHANISM_USERS.segments).toEqual(["date-field", "time-field"]);
-        expect(MECHANISM_USERS.time).toEqual(["date-field", "time-field"]);
+        // Epic #76: the range fields and the pickers' typed input are segmented too
+        const segmented = [
+            "date-field",
+            "time-field",
+            "date-range-field",
+            "time-range-field",
+            "date-picker-input",
+            "date-range-picker-input",
+        ];
+        expect(MECHANISM_USERS.segments).toEqual(segmented);
+        expect(MECHANISM_USERS.time).toEqual(segmented);
+        expect(
+            mechanismLeaks("date-picker-input", ["date", "segments", "time"]),
+        ).toEqual([]);
+        expect(
+            mechanismLeaks("date-range-picker", ["date", "segments"]),
+        ).toEqual([
+            '/date-range-picker: imports the toolkit mechanism "/segments"',
+        ]);
         expect(
             mechanismLeaks("date-field", ["date", "form", "segments", "time"]),
         ).toEqual([]);
@@ -256,6 +273,28 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["date-field"]).toEqual(["field"]);
         expect(ENTRY_DEPENDENCIES["time-field"]).toEqual([
             "date-field",
+            "field",
+        ]);
+        // Epic #76: the range fields on DateField's parts; the typed pickers on their picker,
+        // its calendar and the fields' parts, never the other way
+        expect(ENTRY_DEPENDENCIES["date-range-field"]).toEqual([
+            "date-field",
+            "field",
+        ]);
+        expect(ENTRY_DEPENDENCIES["time-range-field"]).toEqual([
+            "date-field",
+            "date-range-field",
+            "field",
+        ]);
+        expect(ENTRY_DEPENDENCIES["date-picker-input"]).toEqual([
+            "calendar",
+            "date-field",
+            "date-picker",
+            "date-range-field",
+            "field",
+        ]);
+        expect(ENTRY_DEPENDENCIES["date-picker"]).toEqual([
+            "calendar",
             "field",
         ]);
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's

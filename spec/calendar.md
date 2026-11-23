@@ -8,9 +8,12 @@
 - **DatePicker** / **DateRangePicker**: a trigger and a non-modal popup holding a Calendar /
   RangeCalendar.
 
-Out of scope (stage 3, `docs/handoff.md` §5): the segmented date and time fields are
-[date-field.md](date-field.md) (Epic #73); the range fields, a multiple-date calendar, month and year pickers, presets, time zones,
-non-Gregorian calendars, event calendars.
+Stage 3 (`docs/handoff.md` §5): the segmented date and time fields are
+[date-field.md](date-field.md) (Epic #73), the range fields
+[date-range-field.md](date-range-field.md) (Epic #76), and the pickers' typed input is
+[Typed input](#typed-input-datepickerinput-daterangepickerinput) below (Epic #76); a multiple-date
+calendar, month and year pickers, presets, time zones, non-Gregorian calendars, event calendars
+are out of scope.
 
 ## Dates
 
@@ -168,6 +171,75 @@ as the other form controls do (spec/README.md, "Forms"):
 - **Field**: the Trigger is the labelable element and the focus target; the value given to
   `validate` is the date or the range (or `null`); the hidden input is the validated element
   ([field.md](field.md#integration-contract)).
+
+## Typed input (DatePickerInput, DateRangePickerInput)
+
+A picker can take a **typed segmented input** next to its Trigger (Epic #76, Issue #75): the
+user types the date into [DateField](date-field.md) segments, or opens the calendar with the
+Trigger. It is **opt-in, in entries of its own**, `/date-picker-input` and
+`/date-range-picker-input` (D8, the virtual lists' way, Epic #58): a picker that does not use it
+imports neither the segment editing nor the time values, and `/date-picker` and
+`/date-range-picker` are unchanged, byte for byte.
+
+**Anatomy.** `DatePickerInput.Root` (or `DateRangePickerInput.Root`) **replaces** the picker's
+Root: it is the same picker (the open state, the bound calendar, the form, the Field) plus the
+typed segments' state. The picker's own parts (Trigger, Portal, Positioner, Popup) and the bound
+Calendar inside are used unchanged, from `/date-picker` (each input entry also exports its base
+namespace, `DatePicker` / `DateRangePicker`, so an app imports both from one entry). The new parts:
+
+| part | element | `data-primitives-part` (DatePickerInput / DateRangePickerInput) | notes |
+| --- | --- | --- | --- |
+| Root | none | | the picker's state and the segments' |
+| Segments | `div` | `date-picker-segments` / `date-range-picker-segments` | `role="group"`: the segments (DateRangePickerInput: one end's, `range="start"` or `"end"`); children function per segment, or every segment |
+| Segment | `span` | `date-picker-segment` / `date-range-picker-segment` | one segment, DateField's |
+| (hidden input) | `input` | `date-picker-input` / `date-range-picker-input` | the picker's own ([Forms](#forms)) |
+
+The group is **Segments**, not Input: `date-picker-input` has been the picker's hidden input since
+Epic #26 and keeps its name.
+
+**API.** The Root takes every prop of the picker's Root (value, open state, the calendar options,
+the form props; [API](#api)), plus the segments' (date-field.md "API"): `granularity` (`"day"`;
+`"hour"`, `"minute"`, `"second"` add the time's segments, and the value is a `PlainDateTime`, or a
+range of them), `placeholderValue` (default: today at midnight), `hourCycle`. `min`, `max`,
+`isDateUnavailable` and `locale` are shared by the calendar and the segments. Segments takes no
+prop but `range` (DateRangePickerInput, required); it is named by the Field's label (and, in a
+range, its own `aria-label`: "Check-in"), as the range field's Input. Segment is DateField's.
+
+**The binding rule** (both ways, no loop):
+
+- **Typing sets the value only when the entry is complete and valid**: every segment set, inside
+  `min` / `max`, not unavailable, and (a range) the end not before the start. The value is then
+  the typed date (reason `input-change`, or `keyboard` for a step), and the calendar opens on it
+  (its focused date and month start at the value, [Focus](#focus)).
+- **An entry that is incomplete or invalid makes the value `null`** (reported once, with the
+  edit's reason: `input-clear` for an erase, `input-change` for a digit, `keyboard` for a step)
+  and the segments keep it: they show `data-invalid` / `aria-invalid` while complete and
+  invalid. So the form never submits a date the calendar could not have chosen, and a required
+  picker refuses it (`valueMissing`).
+- **The calendar fills the segments**: choosing a date (a range) sets the value (reason
+  `item-press`, as the picker's) and replaces the segments with it. With a time granularity the
+  calendar chooses the date part only: the typed time is kept, and a time segment still a
+  placeholder takes `placeholderValue`'s (midnight by default; React Aria's).
+- **The calendar never clears typed segments**: opening and closing the popup, or a `null` value
+  coming back from the segments themselves, leave them as they are. A value from outside replaces
+  them (a `null` one only when they are complete, as DateField's).
+- **No update loop**: the value the segments reported coming back replaces nothing, and replacing
+  the segments from a value reports nothing: one edit, one `onValueChange` at most.
+
+**Field and form.** Inside a [Field](field.md) the typed Segments are the control (as a
+DateField's Input): the label names the group and a press on it focuses the first segment; the
+focus target and the place a failed validation moves the focus to is the first segment; the
+Trigger stays named by its own content and the label (`aria-labelledby` the label and itself,
+"Arrival Choose date"). The form is the picker's: one hidden text input (an ISO date, or the
+interval `start/end`), `required`, `disabled` (no segment focusable, the Trigger disabled),
+`readOnly` (the segments read-only, the calendar too), a form reset (the value and the segments
+return to `defaultValue`).
+
+**Focus.** Each editable segment is a tab stop, before the Trigger in the order the consumer
+renders them (the recipes: the segments, then the Trigger). Choosing a date closes the popup and
+focuses the Trigger, as the picker's. Leaving the segments (for the Trigger too) is the field's
+blur, as leaving the Trigger is today's. The keys of the segments are DateField's; a range's two
+ends are one sequence (date-range-field.md, "Typing and keys").
 
 ## Keyboard
 
@@ -444,6 +516,76 @@ Calendar with PrevButton **"Previous month"** and NextButton **"Next month"**.
 
 Checks: the common checks (no "Close with actions"); reopened, focus is on November 20 (today).
 
+### `/date-picker-input/basic`
+
+A native `<form>` with a `Field.Root` (`name="arrival"`) and `Field.Label` **"Arrival"** around a
+DatePickerInput (`en-US`, `required`, `min` 2026-11-10): Segments rendering every segment, a
+Trigger with `aria-label` **"Choose date"** and no text (an icon's
+place), the Popup (`aria-label` **"Choose date"**) holding a bound Calendar with PrevButton
+**"Previous month"** and NextButton **"Next month"**; a **"Submit"** button. Output: `value`,
+`reason`, `changes` (how many times `onValueChange` ran), `form`.
+
+Checks:
+
+1. A `group` named "Arrival" with three `spinbutton`s (month, day, year); a button named "Arrival
+   Choose date" with `aria-haspopup="dialog"`.
+2. "Submit" submits nothing (`form: none`) and focuses the month.
+3. Typing `1`, `1`, `2`, `4`, `2`, `0`, `2`, `6`: `value: 2026-11-24`, `reason: input-change`,
+   `changes: 1` (the years 2, 20 and 202 on the way are before `min`: no value, nothing reported).
+4. A press on the Trigger opens the popup; the focus is on November 24, which has
+   `aria-selected="true"`.
+5. ArrowRight ×2, Enter: `value: 2026-11-26`, `reason: item-press`, `changes: 2`; the popup closes,
+   the Trigger has the focus, and the day segment shows 26 (`aria-valuenow="26"`).
+6. On the day, Backspace ×2: `value: none`, `reason: input-clear`, `changes: 3`; the month and the
+   year keep 11 and 2026. Opening the popup focuses November 20 (today) with no selected cell;
+   Escape closes it, and the segments still hold 11, a placeholder, 2026.
+7. Typing `0`, `5` in the day (11/05/2026, before `min`): nothing is reported (`changes: 3`); the
+   group has `data-invalid` and every segment `aria-invalid="true"`.
+8. ArrowUp ×5 on the day (5 → 10): `value: 2026-11-10`, `reason: keyboard`, `changes: 4`, valid.
+9. "Submit": `form: arrival=2026-11-10`.
+10. A press on the label focuses the month.
+11. Axe finds no violation, closed and open.
+12. Contract layer: the Segments `date-picker-segments`, the segments `date-picker-segment`, the
+    Trigger `date-picker-trigger`, the hidden input `date-picker-input`; no `date-field-*` part.
+
+### `/date-picker-input/range`
+
+A `Field.Root` **"Stay"** around a DateRangePickerInput (`en-US`): Segments `range="start"`
+(`aria-label` **"Check-in"**), a literal **"–"** (`aria-hidden`), Segments `range="end"`
+(**"Check-out"**), a Trigger `aria-label` **"Choose dates"**, the Popup (**"Choose dates"**)
+holding a bound RangeCalendar. Output: `value`, `reason`.
+
+Checks:
+
+1. Two `group`s named "Stay Check-in" and "Stay Check-out"; the Trigger is named "Stay Choose
+   dates".
+2. Typing 11/23/2026 moves the focus to Check-out's month; typing 11/27/2026:
+   `value: 2026-11-23..2026-11-27`, `reason: input-change`.
+3. Opening the popup: November 23–27 have `aria-selected="true"`. Clicking November 10, then
+   November 13: `value: 2026-11-10..2026-11-13`, `reason: item-press`; the popup closes; the
+   start's day shows 10, the end's 13.
+4. On Check-out's day, ArrowDown ×4 (13 → 9, before the start): `value: none`,
+   `reason: keyboard`; every segment has `aria-invalid="true"`.
+5. Axe finds no violation.
+6. Contract layer: two `date-range-picker-segments` with `data-range="start"` / `"end"`,
+   `date-range-picker-segment`s, the calendar's `range-calendar-*` parts.
+
+### `/date-picker-input/date-time`
+
+A `Field.Root` **"Meeting"** around a DatePickerInput with `granularity="minute"` (`en-US`), a
+Trigger **"Choose date"**, a bound Calendar. Output: `value`, `reason`.
+
+Checks:
+
+1. Six spinbuttons: month, day, year, hour, minute, day period.
+2. Opening the popup and pressing Enter on November 20 (today): `value: 2026-11-20T00:00`,
+   `reason: item-press` (the time segments, placeholders, take midnight); the hour shows 12 and
+   the day period AM.
+3. Typing `2`, `3`, `0` on the hour, then the PM letter: `value: 2026-11-20T14:30`,
+   `reason: input-change`.
+4. Opening the popup, ArrowRight, Enter (November 21): `value: 2026-11-21T14:30`,
+   `reason: item-press` (the time kept).
+
 ## Differences from Base UI
 
 Base UI has no calendar and no date picker (`docs/catalog.md`), so the behaviour comes from the
@@ -460,3 +602,6 @@ against React Aria Components 1.22. The decided points:
 | The trigger's open state | `data-popup-open` (the POC: `data-open`) | Base UI's name for every trigger (D4 §3 "Naming") |
 | Focus after an outside press | returns to the trigger unless the press focused something (the POC: no focus move) | as Popover (D4 §3), since a picker's popup is one |
 | The part attribute | `calendar-*` / `range-calendar-*`, `date-picker-*` / `date-range-picker-*`, by the root (the POC: `data-calendar-part` and `data-date-picker-part` for both) | spec/README.md, "Part attribute": the value names the component |
+| The typed input (Epic #76) | an opt-in Root of its own (`DatePickerInput.Root`) in a separate entry, DateField segments and the picker's Trigger as the calendar button; React Aria's DatePicker always has its segments | D8: the pickers without it stay byte for byte as they were |
+| A typed entry out of range | no value (`null`) and the segments invalid; React Aria sets the value and marks it invalid | the binding rule (the Epic's): the picker's value is one the calendar could have chosen |
+| A date chosen with a time granularity | the typed time is kept, a placeholder time takes `placeholderValue`'s; React Aria the same when the popup closes on a choice | the calendar chooses the date part only |
