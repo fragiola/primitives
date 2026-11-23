@@ -296,6 +296,9 @@ import { Calendar } from "@fragiola/primitives-react/calendar";
   `Intl.DateTimeFormat#formatToParts`, so a system is only as good as the engine's ICU (Chromium and
   Node 24+ have all 13). A `CalendarSystem` also exposes the math (`fields`, `fromFields`,
   `monthsInYear`, `daysInMonth`, `addMonths`, `monthGrid`, ...) for a primitive of your own.
+- **The system carries what it changes**: the components call it through one hook per concern
+  (its month math, its `units(kind)`, the segments' `segment*` hooks), so an app that passes no
+  `calendar` pays only for those calls ([bundle size](https://github.com/fragiola/primitives/blob/main/docs/size.md)).
 
 ## Time zones
 
@@ -326,3 +329,6 @@ const newYork = timeZone("America/New_York");
   `cycleZoned`, `offsetAt`, `localTimeZone`, the ISO text (`toIsoZoned`, `fromIsoZoned`) and
   `formatTimeZoneName` (the zone's short name at an instant, from `Intl`). Zone names come from
   each engine's ICU: a server's may differ from the browser's ([server rendering](/docs/server-rendering)).
+- **The zone carries what it changes**: a field calls its hooks (`segmentOptions`, `segmentText`,
+  `wallTime`, `segmentsToDateTime`) and a picker its `choose` (a chosen wall time, `reject` read as
+  `compatible`), so a field given no zone pays only for those calls.

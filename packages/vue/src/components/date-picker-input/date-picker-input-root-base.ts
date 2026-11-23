@@ -369,17 +369,13 @@ export function defineDatePickerInputRoot(
                     day: date.day,
                     ...typedTime(group.values.value, seed.value),
                 };
-                // a zoned picker's choice is resolved in its zone (spec/time-zones.md)
-                const zone = format.value.timeZone;
-                const { disambiguation } = format.value;
-                return zone
-                    ? zone.resolve(
-                          wall,
-                          disambiguation === "reject"
-                              ? "compatible"
-                              : disambiguation,
-                      )
-                    : wall;
+                // a zoned picker's choice is resolved in its zone (its hook, spec/time-zones.md)
+                return (
+                    format.value.timeZone?.choose(
+                        wall,
+                        format.value.disambiguation,
+                    ) ?? wall
+                );
             };
             provide(PickerBindingKey, {
                 mode,

@@ -13,8 +13,7 @@ import {
     untracked,
 } from "@angular/core";
 import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
-import { today, watchDocumentLanguage } from "@fragiola/primitives/date";
-import { monthIndex } from "@fragiola/primitives/month-year";
+import { watchDocumentLanguage } from "@fragiola/primitives/date";
 import {
     type ChangeDetails,
     controllable,
@@ -161,18 +160,8 @@ export class MonthCalendarState {
             this.inputs.readOnly() ??
             (this.bound() && (this.binding?.readOnly() ?? false)),
     );
-    // today, read once (as the calendars' today)
-    private readonly todayDate = today();
     /** Today's month or year (in the calendar system, when one is given). */
-    readonly todayIndex = computed(() => {
-        const system = this.options().calendar;
-        if (system) {
-            return system.units(this.kind).fromDate(this.todayDate);
-        }
-        return this.kind === "month"
-            ? monthIndex(this.todayDate)
-            : this.todayDate.year;
-    });
+    readonly todayIndex = computed(() => this.units().today());
     private seed: number | null = null;
     private readonly focusedOwn = signal<number | null>(null);
     private readonly pageOwn = signal<number | null>(null);
@@ -301,17 +290,9 @@ export class MonthCalendarState {
         return true;
     }
 
-    /** The first item of the next or previous page (a system's year can have 13 months). */
-    private nextStart(delta: 1 | -1): number {
-        const units = this.units();
-        const start = this.pageStart();
-        return delta > 0
-            ? start + units.pageSize(start)
-            : units.pageStart(start - 1);
-    }
-
     canPage(delta: 1 | -1): boolean {
-        const start = this.nextStart(delta);
+        // the next or previous page (a system's year can have 13 months)
+        const start = this.units().page(this.pageStart(), delta);
         const end = start + this.units().pageSize(start);
         for (let index = start; index < end; index++) {
             if (!this.isOutOfBounds(index)) {
@@ -327,7 +308,7 @@ export class MonthCalendarState {
         if (!this.canPage(delta)) {
             return;
         }
-        const start = this.nextStart(delta);
+        const start = this.units().page(this.pageStart(), delta);
         const size = this.units().pageSize(start);
         const target =
             start + Math.min(this.focused() - this.pageStart(), size - 1);

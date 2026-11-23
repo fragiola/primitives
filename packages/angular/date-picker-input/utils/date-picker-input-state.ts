@@ -354,16 +354,10 @@ export class DatePickerInputState implements RangeGroups {
                     day: date.day,
                     ...typedTime(untracked(group.values), seed),
                 };
-                // a zoned picker's choice is resolved in its zone (spec/time-zones.md)
-                const zone = format.timeZone;
-                return zone
-                    ? zone.resolve(
-                          wall,
-                          format.disambiguation === "reject"
-                              ? "compatible"
-                              : format.disambiguation,
-                      )
-                    : wall;
+                // a zoned picker's choice is resolved in its zone (its hook, spec/time-zones.md)
+                return (
+                    format.timeZone?.choose(wall, format.disambiguation) ?? wall
+                );
             };
             const next: PickerValue =
                 chosen === null

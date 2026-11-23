@@ -65,12 +65,15 @@ export function typeSegment(
     edit: SegmentEdit | null,
     seed: SegmentValues = {},
 ): SegmentTypeResult | null {
-    if (type === "dayPeriod" || type === "era") {
-        // a letter: the first letters of a day period's text, or of an era's name
+    // a letter: the first letters of a day period's text, or of an era's name
+    const names = (
+        { dayPeriod: format.dayPeriods, era: format.eras } as Partial<
+            Record<EditableSegmentType, readonly string[]>
+        >
+    )[type];
+    if (names) {
         const key = character.toLocaleLowerCase(format.locale);
-        const index = (
-            type === "era" ? (format.eras ?? []) : format.dayPeriods
-        ).findIndex(
+        const index = names.findIndex(
             (text) =>
                 text !== "" &&
                 text.toLocaleLowerCase(format.locale).startsWith(key),

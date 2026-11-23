@@ -6,7 +6,6 @@ import {
 } from "./segment-format.ts";
 import type { SegmentEdit } from "./segment-typing.ts";
 import {
-    calendarYear,
     type SegmentValues,
     segmentRange,
     shownValue,
@@ -47,31 +46,24 @@ function editable(
 }
 
 /**
- * The values' date, completed where they are placeholders: 2000 is a leap year, so a day set with
- * no year keeps February 29 (a calendar system's longest year; an era set with no year its second
- * year, wholly in it).
+ * The values, completed where they are placeholders, as a UTC date `Intl` formats (a calendar
+ * system's is its hook's): 2000 is a leap year, so a day set with no year keeps February 29.
  */
-function sampleDay(
-    format: SegmentFormat,
-    values: SegmentValues,
-): { year: number; month: number; day: number } {
-    const { calendar } = format;
-    if (calendar) {
-        const year =
-            calendarYear(format, values) ??
-            (values.era === undefined
-                ? calendar.referenceYear()
-                : calendar.yearOfEra(values.era, 2));
-        return calendar.fromFields({
-            year,
-            month: values.month ?? 1,
-            day: values.day ?? 1,
-        });
-    }
+function sampleDate(format: SegmentFormat, values: SegmentValues): Date {
     const year = values.year ?? 2000;
     const month = values.month ?? 1;
     const last = utcDate(year, month + 1, 0).getUTCDate();
-    return { year, month, day: Math.min(values.day ?? 1, last) };
+    return (
+        format.calendar?.segmentSample(format, values) ??
+        utcDate(
+            year,
+            month,
+            Math.min(values.day ?? 1, last),
+            values.hour ?? (values.dayPeriod === 1 ? 12 : 0),
+            values.minute ?? 0,
+            values.second ?? 0,
+        )
+    );
 }
 
 /**
@@ -84,102 +76,66 @@ export function dateSegments(
     values: SegmentValues,
     edit: SegmentEdit | null = null,
 ): DateSegment[] {
-    const day = sampleDay(format, values);
-    const time = {
-        hour: values.hour ?? (values.dayPeriod === 1 ? 12 : 0),
-        minute: values.minute ?? 0,
-        second: values.second ?? 0,
-    };
+    const sample = sampleDate(format, values);
     const texts = new Map<string, string>();
-    for (const part of format.formatter.formatToParts(
-        utcDate(
-            day.year,
-            day.month,
-            day.day,
-            time.hour,
-            time.minute,
-            time.second,
-        ),
-    )) {
+    for (const part of format.formatter.formatToParts(sample)) {
         texts.set(part.type, part.value);
     }
-    const { timeZone } = format;
     const local = (text: string) =>
         [...text]
             .map((digit) => format.digits[Number(digit)] ?? digit)
             .join("");
     return format.parts.map((part, index): DateSegment => {
         const { type } = part;
+        const label = format.names[type] ?? null;
         if (!editable(format, type)) {
             return {
                 type,
                 index,
-                // the zone's name at the values' time ("EST", "EDT"), else the literal's text
+                // the zone's name at the values' time ("EST", "EDT": its hook), else the literal
                 text:
-                    type === "timeZoneName" && timeZone
-                        ? timeZone.name(
-                              format.locale,
-                              timeZone.resolve(
-                                  { ...day, ...time, millisecond: 0 },
-                                  format.disambiguation === "reject"
-                                      ? "compatible"
-                                      : format.disambiguation,
-                              ),
-                          )
-                        : part.literal,
+                    format.timeZone?.segmentText(format, type, sample) ??
+                    part.literal,
                 editable: false,
                 placeholder: false,
                 value: null,
                 min: null,
                 max: null,
                 valueText: null,
-                label: format.names[type] ?? null,
+                label,
             };
         }
         const range = segmentRange(format, values, type);
         const value =
             type === "dayPeriod"
-                ? (values.dayPeriod ?? undefined)
+                ? values.dayPeriod
                 : shownValue(format, values, type);
-        const label = format.names[type] ?? null;
-        if (value === undefined) {
-            const typing = edit?.type === type && edit.text !== "";
-            return {
-                type,
-                index,
-                text: typing
-                    ? local(edit.text)
-                    : SEGMENT_PLACEHOLDER.repeat(Math.max(range.digits, 2)),
-                editable: true,
-                placeholder: !typing,
-                value: null,
-                min: range.min,
-                max: range.max,
-                valueText: null,
-                label,
-            };
-        }
+        // a placeholder shows the digits being typed, else one dash per digit
+        const typing = edit?.type === type && edit.text !== "";
         const text =
-            type === "dayPeriod"
-                ? (format.dayPeriods[value] ?? "")
-                : (texts.get(type) ?? local(String(value)));
+            value === undefined
+                ? typing
+                    ? local((edit as SegmentEdit).text)
+                    : SEGMENT_PLACEHOLDER.repeat(Math.max(range.digits, 2))
+                : type === "dayPeriod"
+                  ? (format.dayPeriods[value] ?? "")
+                  : (texts.get(type) ?? local(String(value)));
         return {
             type,
             index,
             text,
             editable: true,
-            placeholder: false,
-            value,
+            placeholder: value === undefined && !typing,
+            value: value ?? null,
             min: range.min,
             max: range.max,
+            // a month's name in the sample's year (a calendar system's can depend on it)
             valueText:
-                type === "month"
-                    ? format.monthNames.format(
-                          format.calendar
-                              ? utcDate(day.year, day.month, day.day)
-                              : utcDate(2000, value, 1),
-                      )
-                    : text,
+                value === undefined
+                    ? null
+                    : type === "month"
+                      ? format.monthNames.format(sample)
+                      : text,
             label,
         };
     });

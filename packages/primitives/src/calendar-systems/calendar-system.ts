@@ -8,6 +8,13 @@ import {
     toEpochDay,
     utcMidnight,
 } from "./epoch-day.ts";
+import {
+    segmentCalendarDate,
+    segmentCalendarFields,
+    segmentCalendarFormat,
+    segmentCalendarRange,
+    segmentCalendarSample,
+} from "./segment-hooks.ts";
 
 /** The calendar systems of spec/calendar-systems.md, by their `Intl` (CLDR) identifier. */
 export type CalendarId =
@@ -158,6 +165,19 @@ export interface CalendarSystem {
     ): string;
     /** The items of a month or year calendar in this system (cached per kind). */
     units(kind: "month" | "year"): CalendarUnits;
+    // The segments' hooks (`/segments` calls them through a format's `calendar`, which is this
+    // system): the era, the system's months and its fields live here, so a field given no
+    // calendar bundles none of them.
+    /** A field's format in this system: the era editable where it has several, their names. */
+    segmentFormat: typeof segmentCalendarFormat;
+    /** The range of the era, month and day segments (`undefined` for the others). */
+    segmentRange: typeof segmentCalendarRange;
+    /** Segment values as the UTC date `Intl` formats, completed where they are placeholders. */
+    segmentSample: typeof segmentCalendarSample;
+    /** A value's date as this system's fields (`segmentValuesOf`). */
+    segmentValuesOf: typeof segmentCalendarFields;
+    /** The ISO date of segment values (`segmentsToDate`); `null` while one is a placeholder. */
+    segmentsToDate: typeof segmentCalendarDate;
 }
 
 /** The longest-months year near the system's year of 2000-01-01, searched over a 19-year cycle. */
@@ -346,6 +366,11 @@ export function createCalendarSystem(engine: CalendarEngine): CalendarSystem {
                 kind === "month" ? monthUnits(system) : yearUnits(system);
             return units[kind];
         },
+        segmentFormat: segmentCalendarFormat,
+        segmentRange: segmentCalendarRange,
+        segmentSample: segmentCalendarSample,
+        segmentValuesOf: segmentCalendarFields,
+        segmentsToDate: segmentCalendarDate,
     };
     return system;
 }

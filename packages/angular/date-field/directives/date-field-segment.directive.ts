@@ -85,11 +85,8 @@ export class DateFieldSegment {
             !this.dateField.readOnly(),
     );
     // a day period and an era take letters
-    private readonly textual = computed(
-        () =>
-            this.segment().type === "dayPeriod" ||
-            this.segment().type === "era",
-    );
+    private readonly textual = () =>
+        this.segment().type === "dayPeriod" || this.segment().type === "era";
     protected readonly numeric = computed(
         () => this.editable() && !this.textual(),
     );

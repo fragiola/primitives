@@ -1,4 +1,3 @@
-import { currentYearMonth, monthIndex } from "@fragiola/primitives/month-year";
 import {
     useCallback,
     useContext,
@@ -76,7 +75,7 @@ export function useMonthCalendar(
     const value = bound ? binding.value : ownValue;
     // a calendar system's months or years (spec/calendar-systems.md), else the ISO calendar's
     const system = options.calendar;
-    const units = unitsOf(kind, system);
+    const units = useMemo(() => unitsOf(kind, system), [kind, system]);
     const toIndex = (item: MonthCalendarValue) =>
         item === null || isItemRange(item) ? null : units.index(item);
     const min = options.min == null ? null : units.index(options.min);
@@ -86,18 +85,7 @@ export function useMonthCalendar(
     const disabled = props.disabled ?? false;
     const readOnly = props.readOnly ?? (bound && binding.readOnly);
     const isDisabledByView = bound ? binding.isDisabled : undefined;
-    const [todayIndex] = useState(() => {
-        if (system) {
-            const now = new Date();
-            return system.units(kind).fromDate({
-                year: now.getFullYear(),
-                month: now.getMonth() + 1,
-                day: now.getDate(),
-            });
-        }
-        const now = currentYearMonth();
-        return kind === "month" ? monthIndex(now) : now.year;
-    });
+    const [todayIndex] = useState(units.today);
     const isOutOfBounds = useCallback(
         (index: number) =>
             disabled ||
@@ -139,18 +127,10 @@ export function useMonthCalendar(
         },
         [isOutOfBounds, units],
     );
-    // the first item of the next or previous page (a system's year can have 13 months)
-    const nextStart = useCallback(
-        (delta: 1 | -1) =>
-            delta > 0
-                ? pageStart + units.pageSize(pageStart)
-                : units.pageStart(pageStart - 1),
-        [pageStart, units],
-    );
-
     const canPage = useCallback(
         (delta: 1 | -1) => {
-            const start = nextStart(delta);
+            // the next or previous page (a system's year can have 13 months)
+            const start = units.page(pageStart, delta);
             const end = start + units.pageSize(start);
             for (let index = start; index < end; index++) {
                 if (!isOutOfBounds(index)) {
@@ -159,14 +139,14 @@ export function useMonthCalendar(
             }
             return false;
         },
-        [nextStart, isOutOfBounds, units],
+        [pageStart, isOutOfBounds, units],
     );
     const page = useCallback(
         (delta: 1 | -1) => {
             if (!canPage(delta)) {
                 return;
             }
-            const start = nextStart(delta);
+            const start = units.page(pageStart, delta);
             const size = units.pageSize(start);
             const target = start + Math.min(focused - pageStart, size - 1);
             // the same place on the new page, else its enabled item nearest to it
@@ -187,7 +167,7 @@ export function useMonthCalendar(
             setPageStart(start);
             setFocused(next);
         },
-        [canPage, nextStart, pageStart, focused, isOutOfBounds, units],
+        [canPage, pageStart, focused, isOutOfBounds, units],
     );
 
     const commit = (next: MonthCalendarValue) => {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { DATE_ALLOWANCE, SIZE_BUDGETS } from "../../scripts/size-budgets.ts";
 import {
+    budgetProblems,
     entrySubpaths,
     exportTarget,
     formatBytes,
@@ -178,5 +180,62 @@ describe("entries", () => {
                 "@fragiola/primitives",
             ),
         ).toBe(false);
+    });
+});
+
+describe("budgetProblems (the date rows' budget guard, Epic #88)", () => {
+    const dialog = "@fragiola/primitives-react/dialog";
+
+    it("is nothing while every budgeted entry is within its budget", () => {
+        expect(
+            budgetProblems(PACKAGES, {
+                [dialog]: { before: 3500, budget: 3600 },
+            }),
+        ).toEqual([]);
+    });
+
+    it("allows zlib's slack over a budget, and fails past it", () => {
+        const at = (budget: number) =>
+            budgetProblems(PACKAGES, { [dialog]: { before: 3400, budget } });
+        expect(at(3558 - GZIP_TOLERANCE.bytes)).toEqual([]);
+        expect(at(3558 - GZIP_TOLERANCE.bytes - 1)).toEqual([
+            `${dialog}: 3,558 B min + gzip is over its budget of 3,541 B (scripts/size-budgets.ts)`,
+        ]);
+    });
+
+    it("fails a budgeted entry that is not measured", () => {
+        expect(
+            budgetProblems(PACKAGES, {
+                "@fragiola/primitives-react/gone": { before: 1, budget: 2 },
+            }),
+        ).toEqual([
+            "@fragiola/primitives-react/gone: has a budget (scripts/size-budgets.ts) but is not measured",
+        ]);
+    });
+
+    it("writes the budgets in the report, each with its size now", () => {
+        const report = formatReport(PACKAGES, "rolldown 1.3.2", {
+            [dialog]: { before: 3400, budget: 3558, reason: "a reason" },
+        });
+        expect(report).toContain("## Date budgets");
+        expect(report).toContain(
+            `| \`${dialog}\` | 3,400 B | 3,558 B | 3,558 B | a reason |`,
+        );
+        expect(formatReport(PACKAGES, "rolldown 1.3.2")).not.toContain(
+            "## Date budgets",
+        );
+    });
+
+    it("budgets every date entry: the allowance, or the best size with its reason", () => {
+        const dates = Object.entries(SIZE_BUDGETS);
+        expect(dates.length).toBe(67);
+        for (const [specifier, { before, budget, reason }] of dates) {
+            expect(budget, specifier).toBeGreaterThan(0);
+            if (budget > before + DATE_ALLOWANCE) {
+                expect(reason, specifier).toBeTruthy();
+            } else {
+                expect(reason, specifier).toBeUndefined();
+            }
+        }
     });
 });

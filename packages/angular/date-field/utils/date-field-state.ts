@@ -211,7 +211,7 @@ export class DateFieldRootState implements DateFieldParts {
         }),
     );
     /** The time zone the values are in (spec/time-zones.md), if any. */
-    private readonly timeZone = computed(() => this.inputs.system?.timeZone());
+    private readonly timeZone = () => this.inputs.system?.timeZone();
     private readonly seed = computed(() =>
         segmentValuesOf(this.format(), this.inputs.placeholderValue()),
     );

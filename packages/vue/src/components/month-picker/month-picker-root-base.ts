@@ -3,6 +3,12 @@ import {
     bridgeForm,
     VISUALLY_HIDDEN_INPUT_STYLE,
 } from "@fragiola/primitives/form";
+import {
+    type PlainYear,
+    type PlainYearMonth,
+    toIsoYear,
+    toIsoYearMonth,
+} from "@fragiola/primitives/month-year";
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import {
     computed,
@@ -35,9 +41,7 @@ import {
     type MonthCalendarItem,
     type MonthCalendarKind,
     type MonthCalendarMode,
-    type MonthCalendarUnits,
     type MonthCalendarValue,
-    unitsOf,
 } from "../month-calendar/month-calendar-value.ts";
 
 /** The props every month and year picker root shares (each adds its own typed value). */
@@ -86,26 +90,34 @@ export const monthPickerRootEmits = {
     valueChange: (_value: MonthCalendarValue, _details: ChangeDetails) => true,
 };
 
-/** `2026-11` or `2026` (a calendar system's: `2026-10-23[u-ca=persian]`). */
-function isoOf(units: MonthCalendarUnits, item: MonthCalendarItem): string {
-    return units.iso(units.index(item));
+/** An item's ISO text: `2026-11` or `2026`; a calendar system's (its hook) `2026-10-23[u-ca=persian]`. */
+type IsoOf = (item: MonthCalendarItem) => string;
+
+function isoOf(
+    kind: MonthCalendarKind,
+    calendar: CalendarSystem | undefined,
+): IsoOf {
+    if (calendar) {
+        const units = calendar.units(kind);
+        return (item) => units.iso(units.index(item));
+    }
+    return kind === "month"
+        ? (item) => toIsoYearMonth(item as PlainYearMonth)
+        : (item) => toIsoYear(item as PlainYear);
 }
 
 /**
  * What the form submits: `2026-11`, `2026`, a range as the ISO 8601 interval (`2026-03/2026-06`,
  * `2020/2024`), or empty with no value.
  */
-function formValue(
-    units: MonthCalendarUnits,
-    value: MonthCalendarValue,
-): string {
+function formValue(iso: IsoOf, value: MonthCalendarValue): string {
     if (value === null) {
         return "";
     }
     if (isItemRange(value)) {
-        return `${isoOf(units, value.start)}/${isoOf(units, value.end)}`;
+        return `${iso(value.start)}/${iso(value.end)}`;
     }
-    return isoOf(units, value);
+    return iso(value);
 }
 
 /**
@@ -202,7 +214,7 @@ export function defineMonthPickerRoot(
                                 field.reset();
                                 value.set(initial, { reason: "none" });
                                 element.value = formValue(
-                                    unitsOf(kind, props.calendar),
+                                    isoOf(kind, props.calendar),
                                     value.value.value ?? null,
                                 );
                             },
@@ -227,7 +239,7 @@ export function defineMonthPickerRoot(
                               tabindex: -1,
                               name: submitted,
                               value: formValue(
-                                  unitsOf(kind, props.calendar),
+                                  isoOf(kind, props.calendar),
                                   current.value,
                               ),
                               required: props.required,

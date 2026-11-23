@@ -23,6 +23,10 @@ export interface CalendarUnits {
     pageStart(index: number): number;
     /** How many items the page starting at `start` holds. */
     pageSize(start: number): number;
+    /** The first item of the next (`1`) or previous (`-1`) page (a year can have 13 months). */
+    page(start: number, delta: 1 | -1): number;
+    /** Today's month or year (the page's local date). */
+    today(): number;
     /** The page starting at `start`, in rows of `columns`. */
     rows(start: number, columns: number): number[][];
     /** The item a key moves to (the ISO calendar's `unitKeyTarget`, a page being a year). */
@@ -35,6 +39,16 @@ export interface CalendarUnits {
     fromDate(date: PlainDate): number;
     /** The ISO dates of a month or year. */
     days(index: number): PlainDate[];
+    /**
+     * A CalendarView's choice of a month or year: its enabled day nearest to the focused date's
+     * place in it (the same day of the month, the same month and day of the year); `undefined`
+     * when every day is disabled.
+     */
+    nearest(
+        index: number,
+        focused: PlainDate,
+        enabled: (date: PlainDate) => boolean,
+    ): PlainDate | undefined;
     /** A month's cell content ("Azar"), a year's ("1405"). */
     text(locale: string, index: number): string;
     /** A cell's name ("Azar 1405", "1405"). */
@@ -55,11 +69,32 @@ function isoText(date: PlainDate, id: string): string {
     return `${date.year < 0 ? "-" : ""}${pad(date.year, 4)}-${pad(date.month, 2)}-${pad(date.day, 2)}[u-ca=${id}]`;
 }
 
+/** Today, in the page's local time. */
+function localToday(): PlainDate {
+    const now = new Date();
+    return {
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+        day: now.getDate(),
+    };
+}
+
 function between(first: PlainDate, next: PlainDate): PlainDate[] {
     const start = toEpochDay(first);
     return Array.from({ length: toEpochDay(next) - start }, (_, offset) =>
         fromEpochDay(start + offset),
     );
+}
+
+/** The enabled day of `days` nearest to `place`. */
+function nearestDay(
+    days: PlainDate[],
+    place: PlainDate,
+    enabled: (date: PlainDate) => boolean,
+): PlainDate | undefined {
+    const at = toEpochDay(place);
+    const distance = (date: PlainDate) => Math.abs(toEpochDay(date) - at);
+    return days.filter(enabled).sort((a, b) => distance(a) - distance(b))[0];
 }
 
 /** A year page's size: 12 years from a multiple of 12, as the ISO calendar's (`/month-year`). */
@@ -127,12 +162,17 @@ export function monthUnits(system: CalendarSystem): CalendarUnits {
         system.monthsInYear(system.fromMonthIndex(start).year);
     const first = (index: number) =>
         system.monthStart(system.fromMonthIndex(index));
+    const fromDate = (date: PlainDate) =>
+        system.monthIndex(system.yearMonthOf(date));
     return {
         index: (item) =>
             system.monthIndex({ year: item.year, month: item.month ?? 1 }),
         item: (index) => system.fromMonthIndex(index),
         pageStart: yearStart,
         pageSize,
+        page: (start, delta) =>
+            delta > 0 ? start + pageSize(start) : yearStart(start - 1),
+        today: () => fromDate(localToday()),
         rows: (start, columns) => rowsOf(start, pageSize(start), columns),
         keyTarget: (key, focused, options) => {
             const page = yearStart(focused);
@@ -151,8 +191,17 @@ export function monthUnits(system: CalendarSystem): CalendarUnits {
                     ),
             );
         },
-        fromDate: (date) => system.monthIndex(system.yearMonthOf(date)),
+        fromDate,
         days: (index) => between(first(index), first(index + 1)),
+        nearest: (index, focused, enabled) =>
+            nearestDay(
+                between(first(index), first(index + 1)),
+                system.fromFields({
+                    ...system.fromMonthIndex(index),
+                    day: system.fields(focused).day,
+                }),
+                enabled,
+            ),
         text: (locale, index) =>
             system.format(locale, first(index), { month: "long" }),
         name: (locale, index) =>
@@ -170,11 +219,14 @@ export function monthUnits(system: CalendarSystem): CalendarUnits {
 export function yearUnits(system: CalendarSystem): CalendarUnits {
     const first = (year: number) => system.monthStart({ year, month: 1 });
     const pageStart = (year: number) => Math.floor(year / YEARS) * YEARS;
+    const fromDate = (date: PlainDate) => system.fields(date).year;
     return {
         index: (item) => item.year,
         item: (index) => ({ year: index }),
         pageStart,
         pageSize: () => YEARS,
+        page: (start, delta) => start + delta * YEARS,
+        today: () => fromDate(localToday()),
         rows: (start, columns) => rowsOf(start, YEARS, columns),
         keyTarget: (key, focused, options) =>
             pagedKeyTarget(
@@ -185,8 +237,14 @@ export function yearUnits(system: CalendarSystem): CalendarUnits {
                 YEARS,
                 (delta) => focused + delta * YEARS,
             ),
-        fromDate: (date) => system.fields(date).year,
+        fromDate,
         days: (year) => between(first(year), first(year + 1)),
+        nearest: (year, focused, enabled) =>
+            nearestDay(
+                between(first(year), first(year + 1)),
+                system.addYears(focused, year - system.fields(focused).year),
+                enabled,
+            ),
         text: (locale, year) =>
             system.format(locale, first(year), { year: "numeric" }),
         name: (locale, year) =>
