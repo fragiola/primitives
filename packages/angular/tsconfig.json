@@ -90,6 +90,8 @@
         "date-range-picker-input",
         "tag-group",
         "tags-input",
+        "segmented-control",
+        "rating",
         "tests",
         "*.config.ts"
     ]
