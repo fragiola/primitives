@@ -40,6 +40,8 @@
         "slider",
         "calendar",
         "range-calendar",
+        "multiple-calendar",
+        "calendar-preset",
         "date-picker",
         "date-range-picker",
         "button",

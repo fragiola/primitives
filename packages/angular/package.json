@@ -93,6 +93,11 @@
             "types": "./dist/types/fragiola-primitives-angular-calendar.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-calendar.mjs"
         },
+        "./calendar-preset": {
+            "@fragiola/source": "./calendar-preset/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-calendar-preset.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-calendar-preset.mjs"
+        },
         "./checkbox": {
             "@fragiola/source": "./checkbox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-checkbox.d.ts",
@@ -212,6 +217,11 @@
             "@fragiola/source": "./meter/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-meter.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-meter.mjs"
+        },
+        "./multiple-calendar": {
+            "@fragiola/source": "./multiple-calendar/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-multiple-calendar.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-multiple-calendar.mjs"
         },
         "./navigation-menu": {
             "@fragiola/source": "./navigation-menu/public-api.ts",

@@ -5,7 +5,11 @@ export type CalendarMode = "single" | "range";
 export type CalendarValue = PlainDate | DateRange | null;
 
 /** The component a calendar's parts belong to: their part attribute's prefix. */
-export type CalendarComponent = "calendar" | "range-calendar";
+export type CalendarComponent =
+    | "calendar"
+    | "range-calendar"
+    // a Root of its own entry over the Calendar's parts (Epic #79): the type only, no code here
+    | "multiple-calendar";
 
 /** The options a calendar takes, and a picker passes to the calendar it binds (spec/calendar.md). */
 export interface CalendarOptions {

@@ -24,6 +24,8 @@ import { ButtonBasic } from "../scenarios/button/button-basic.ts";
 import { CalendarRange } from "../scenarios/calendar/calendar-range.ts";
 import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts";
 import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
+import { CalendarPresetBasic } from "../scenarios/calendar-preset/calendar-preset-basic.ts";
+import { CalendarPresetPicker } from "../scenarios/calendar-preset/calendar-preset-picker.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
@@ -104,6 +106,8 @@ import { MenubarBasic } from "../scenarios/menubar/menubar-basic.ts";
 import { MenubarModal } from "../scenarios/menubar/menubar-modal.ts";
 import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.ts";
 import { MeterBasic } from "../scenarios/meter/meter-basic.ts";
+import { MultipleCalendarBasic } from "../scenarios/multiple-calendar/multiple-calendar-basic.ts";
+import { MultipleCalendarForm } from "../scenarios/multiple-calendar/multiple-calendar-form.ts";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
 import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.ts";
@@ -272,6 +276,10 @@ import { ROUTES } from "./routes.ts";
         SingleCalendar,
         CalendarTwoMonths,
         CalendarRange,
+        CalendarPresetBasic,
+        CalendarPresetPicker,
+        MultipleCalendarBasic,
+        MultipleCalendarForm,
         DatePickerBasic,
         DatePickerRange,
         DatePickerForm,
@@ -469,6 +477,10 @@ import { ROUTES } from "./routes.ts";
             @case ("/calendar/rtl") { <main class="p-6" scenario-single-calendar [locale]="query.locale"></main> }
             @case ("/calendar/two-months") { <main class="p-6" scenario-calendar-two-months [locale]="query.locale"></main> }
             @case ("/calendar/range") { <main class="p-6" scenario-calendar-range [locale]="query.locale"></main> }
+            @case ("/calendar-preset/basic") { <main class="p-6" scenario-calendar-preset-basic></main> }
+            @case ("/calendar-preset/picker") { <main class="p-6" scenario-calendar-preset-picker></main> }
+            @case ("/multiple-calendar/basic") { <main class="p-6" scenario-multiple-calendar-basic></main> }
+            @case ("/multiple-calendar/form") { <main class="p-6" scenario-multiple-calendar-form></main> }
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
