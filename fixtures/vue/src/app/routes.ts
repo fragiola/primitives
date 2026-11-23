@@ -68,6 +68,9 @@ import MenuGroups from "../scenarios/menu/menu-groups.vue";
 import MenuLifecycle from "../scenarios/menu/menu-lifecycle.vue";
 import MenuModal from "../scenarios/menu/menu-modal.vue";
 import MenuSubmenu from "../scenarios/menu/menu-submenu.vue";
+import MenubarBasic from "../scenarios/menubar/menubar-basic.vue";
+import MenubarModal from "../scenarios/menubar/menubar-modal.vue";
+import MenubarVertical from "../scenarios/menubar/menubar-vertical.vue";
 import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
 import NavigationMenuNested from "../scenarios/navigation-menu/navigation-menu-nested.vue";
 import PopoverArrow from "../scenarios/popover/popover-arrow.vue";
@@ -201,6 +204,9 @@ export const routes: Record<string, Component> = {
     "/toggle-group/vertical": ToggleGroupVertical,
     "/toolbar/basic": ToolbarBasic,
     "/toolbar/vertical": ToolbarVertical,
+    "/menubar/basic": MenubarBasic,
+    "/menubar/vertical": MenubarVertical,
+    "/menubar/modal": MenubarModal,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,
