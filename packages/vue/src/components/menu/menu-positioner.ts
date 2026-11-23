@@ -36,7 +36,8 @@ export const MenuPositioner: PartComponent<
             const setPositioner = elementSetter(context.positioner);
             const placed = usePositioner(
                 props,
-                nested
+                // a vertical bar's menus open at its end side, as submenus (spec/menubar.md)
+                nested || context.bar?.orientation() === "vertical"
                     ? { side: "inline-end", align: "start" }
                     : { side: "bottom", align: "start" },
                 // a context menu's point, else the trigger

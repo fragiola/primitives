@@ -10,6 +10,7 @@ import {
     type OverlayTriggerRootProps,
     useOverlayRoot,
 } from "../../composables/use-overlay-root.ts";
+import { MenuBarKey } from "./menu-bar-context.ts";
 import {
     type MenuComponent,
     type MenuContext,
@@ -38,22 +39,37 @@ export function useMenuRoot(
     options: MenuRootOptions = {},
 ): MenuContext {
     const parent = nested ? inject(MenuKey, null) : null;
+    const enclosingBar = inject(MenuBarKey, null);
     const root = useOverlayRoot(props, emit);
     const returnTarget = options.returnTarget;
+    const component = options.component ?? parent?.component ?? "menu";
+    // a root Menu inside a bar is one of its menus (spec/menu.md, "In a Menubar"); its levels
+    // share the bar
+    const bar = parent
+        ? parent.bar
+        : component === "menu"
+          ? enclosingBar
+          : null;
     const context: MenuContext = {
         ...root,
-        component: options.component ?? parent?.component ?? "menu",
+        component,
         anchor: options.anchor ?? shallowRef(null),
         returnTarget: returnTarget ?? (() => root.trigger.value),
         parent,
         loopFocus: () => props.loopFocus,
-        // a submenu follows its root menu
-        modal: () => (parent ? parent.modal() : (props.modal ?? false)),
+        // a submenu follows its root menu, a menu of a bar the bar
+        modal: () =>
+            parent
+                ? parent.modal()
+                : bar
+                  ? bar.modal()
+                  : (props.modal ?? false),
+        bar,
         pendingHighlight: { current: null },
         typeahead: createTypeahead(),
         labels: new Map(),
         placed: ref<{ side: Side; align: Align }>(
-            nested
+            nested || bar?.orientation() === "vertical"
                 ? { side: "inline-end", align: "start" }
                 : { side: "bottom", align: "start" },
         ),
@@ -79,5 +95,7 @@ export function useMenuRoot(
         );
     }
     provide(MenuKey, context);
+    // a Menu opened from inside this one's content is no menu of the bar (spec/menu.md)
+    provide(MenuBarKey, null);
     return context;
 }

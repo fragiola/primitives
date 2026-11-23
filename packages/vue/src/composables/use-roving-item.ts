@@ -6,15 +6,20 @@ import { elementSetter } from "./use-overlay-root.ts";
  * An item of the nearest roving-focus scope (spec/toolbar.md, "Nested composites"), or `null`
  * outside any: it registers its element, takes the roving `tabindex` (`0` on the scope's tab
  * stop, `-1` on every other item and before the items are known, on a server) and tells the
- * scope when it takes focus.
+ * scope when it takes focus. `explicit` names the scope instead of the nearest one (a Menubar's,
+ * which its Triggers read from the bar's contract; `null`: none).
  */
-export function useRovingItem(focusable: () => boolean): {
+export function useRovingItem(
+    focusable: () => boolean,
+    explicit?: RovingScope | null,
+): {
     scope: RovingScope;
     tabIndex: () => number;
     ref: (value: unknown) => void;
     onFocus: () => void;
 } | null {
-    const scope = inject(RovingKey, null);
+    const nearest = inject(RovingKey, null);
+    const scope = explicit === undefined ? nearest : explicit;
     if (scope === null) {
         return null;
     }
