@@ -156,6 +156,17 @@ import TabsManual from "../scenarios/tabs/tabs-manual.vue";
 import TabsNonce from "../scenarios/tabs/tabs-nonce.vue";
 import TabsNoneSelected from "../scenarios/tabs/tabs-none-selected.vue";
 import TabsVertical from "../scenarios/tabs/tabs-vertical.vue";
+import TagGroupBasic from "../scenarios/tag-group/tag-group-basic.vue";
+import TagGroupDisabled from "../scenarios/tag-group/tag-group-disabled.vue";
+import TagGroupEmpty from "../scenarios/tag-group/tag-group-empty.vue";
+import TagGroupField from "../scenarios/tag-group/tag-group-field.vue";
+import TagGroupSelection from "../scenarios/tag-group/tag-group-selection.vue";
+import TagGroupSingle from "../scenarios/tag-group/tag-group-single.vue";
+import TagsInputBasic from "../scenarios/tags-input/tags-input-basic.vue";
+import TagsInputBlur from "../scenarios/tags-input/tags-input-blur.vue";
+import TagsInputEdit from "../scenarios/tags-input/tags-input-edit.vue";
+import TagsInputField from "../scenarios/tags-input/tags-input-field.vue";
+import TagsInputOptions from "../scenarios/tags-input/tags-input-options.vue";
 import TimeFieldBasic from "../scenarios/time-field/time-field-basic.vue";
 import TimeFieldForm from "../scenarios/time-field/time-field-form.vue";
 import TimeFieldMinMax from "../scenarios/time-field/time-field-min-max.vue";
@@ -382,6 +393,17 @@ export const routes: Record<string, Component> = {
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/tag-group/basic": TagGroupBasic,
+    "/tag-group/selection": TagGroupSelection,
+    "/tag-group/single": TagGroupSingle,
+    "/tag-group/disabled": TagGroupDisabled,
+    "/tag-group/empty": TagGroupEmpty,
+    "/tag-group/field": TagGroupField,
+    "/tags-input/basic": TagsInputBasic,
+    "/tags-input/options": TagsInputOptions,
+    "/tags-input/edit": TagsInputEdit,
+    "/tags-input/blur": TagsInputBlur,
+    "/tags-input/field": TagsInputField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
