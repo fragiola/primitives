@@ -153,6 +153,12 @@
             "import": "./dist/form.js",
             "default": "./dist/form.js"
         },
+        "./label": {
+            "@fragiola/source": "./src/components/label/index.ts",
+            "types": "./dist/label.d.ts",
+            "import": "./dist/label.js",
+            "default": "./dist/label.js"
+        },
         "./menu": {
             "@fragiola/source": "./src/components/menu/index.ts",
             "types": "./dist/menu.d.ts",
@@ -165,11 +171,29 @@
             "import": "./dist/menubar.js",
             "default": "./dist/menubar.js"
         },
+        "./meter": {
+            "@fragiola/source": "./src/components/meter/index.ts",
+            "types": "./dist/meter.d.ts",
+            "import": "./dist/meter.js",
+            "default": "./dist/meter.js"
+        },
         "./navigation-menu": {
             "@fragiola/source": "./src/components/navigation-menu/index.ts",
             "types": "./dist/navigation-menu.d.ts",
             "import": "./dist/navigation-menu.js",
             "default": "./dist/navigation-menu.js"
+        },
+        "./number-field": {
+            "@fragiola/source": "./src/components/number-field/index.ts",
+            "types": "./dist/number-field.d.ts",
+            "import": "./dist/number-field.js",
+            "default": "./dist/number-field.js"
+        },
+        "./otp-field": {
+            "@fragiola/source": "./src/components/otp-field/index.ts",
+            "types": "./dist/otp-field.d.ts",
+            "import": "./dist/otp-field.js",
+            "default": "./dist/otp-field.js"
         },
         "./popover": {
             "@fragiola/source": "./src/components/popover/index.ts",
@@ -367,6 +391,11 @@
                 "import": "./dist/form.js",
                 "default": "./dist/form.js"
             },
+            "./label": {
+                "types": "./dist/label.d.ts",
+                "import": "./dist/label.js",
+                "default": "./dist/label.js"
+            },
             "./menu": {
                 "types": "./dist/menu.d.ts",
                 "import": "./dist/menu.js",
@@ -377,10 +406,25 @@
                 "import": "./dist/menubar.js",
                 "default": "./dist/menubar.js"
             },
+            "./meter": {
+                "types": "./dist/meter.d.ts",
+                "import": "./dist/meter.js",
+                "default": "./dist/meter.js"
+            },
             "./navigation-menu": {
                 "types": "./dist/navigation-menu.d.ts",
                 "import": "./dist/navigation-menu.js",
                 "default": "./dist/navigation-menu.js"
+            },
+            "./number-field": {
+                "types": "./dist/number-field.d.ts",
+                "import": "./dist/number-field.js",
+                "default": "./dist/number-field.js"
+            },
+            "./otp-field": {
+                "types": "./dist/otp-field.d.ts",
+                "import": "./dist/otp-field.js",
+                "default": "./dist/otp-field.js"
             },
             "./popover": {
                 "types": "./dist/popover.d.ts",
