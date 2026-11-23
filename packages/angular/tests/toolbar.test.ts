@@ -51,16 +51,6 @@ Output("valueChange")(ToggleGroup.prototype, "valueChange");
 TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
 afterEach(() => TestBed.resetTestingModule());
 
-const PARTS = [
-    ToolbarRoot,
-    ToolbarButton,
-    ToolbarLink,
-    ToolbarInput,
-    ToolbarGroup,
-    ToggleGroup,
-    Toggle,
-];
-
 async function render<T>(component: new () => T): Promise<HTMLElement> {
     TestBed.configureTestingModule({
         providers: [provideZonelessChangeDetection()],
@@ -89,7 +79,14 @@ const keydown = (element: HTMLElement, key: string) =>
 
 @Component({
     selector: "test-disabled-toolbar",
-    imports: PARTS,
+    imports: [
+        ToolbarRoot,
+        ToggleGroup,
+        Toggle,
+        ToolbarButton,
+        ToolbarInput,
+        ToolbarLink,
+    ],
     template: `
         <div toolbarRoot aria-label="Formatting" [disabled]="true">
             <div toggleGroup aria-label="Text style">
@@ -105,7 +102,7 @@ class DisabledToolbar {}
 
 @Component({
     selector: "test-disabled-group",
-    imports: PARTS,
+    imports: [ToolbarRoot, ToolbarGroup, ToolbarButton, Toggle],
     template: `
         <div toolbarRoot aria-label="Formatting">
             <div toolbarGroup aria-label="History" [disabled]="true">
@@ -145,7 +142,7 @@ describe("a disabled Toolbar and Toolbar.Group", () => {
 
 @Component({
     selector: "test-focusable-disabled",
-    imports: PARTS,
+    imports: [ToolbarRoot, ToolbarButton, ToolbarInput],
     template: `
         <div toolbarRoot aria-label="Formatting">
             <button toolbarButton [disabled]="true" [focusableWhenDisabled]="true" (click)="clicks.set(clicks() + 1)">Share</button>
@@ -187,7 +184,7 @@ describe("a focusable disabled Toolbar.Input and Toolbar.Button", () => {
 
 @Component({
     selector: "test-toggle-in-group",
-    imports: PARTS,
+    imports: [ToggleGroup, Toggle],
     template: `
         <div toggleGroup aria-label="Alignment" (valueChange)="calls.push('group:' + $event.join())">
             <button toggle [value]="'left'" [pressed]="false" (pressedChange)="calls.push('left:' + $event)">Left</button>
