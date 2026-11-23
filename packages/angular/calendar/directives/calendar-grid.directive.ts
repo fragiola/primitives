@@ -83,13 +83,6 @@ export class CalendarGrid {
             this.flush();
             return;
         }
-        if (event.key === "Escape") {
-            if (calendar.anchor() !== null) {
-                event.preventDefault();
-                calendar.cancelRange();
-            }
-            return;
-        }
         const target = calendarKeyTarget(event.key, calendar.focusedDate(), {
             rtl:
                 getDirection(
