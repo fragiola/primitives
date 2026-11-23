@@ -59,6 +59,10 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [search-field.md](search-field.md) | SearchField (no APG pattern and no Base UI component: React Aria's search field, Escape and a clear button, decided there) |
 | [clipboard.md](clipboard.md) | Clipboard (no APG pattern and no Base UI component: a copy button, its copied state and a polite announcement, on the toolkit's `/clipboard`) |
 | [editable.md](editable.md) | Editable (no APG pattern and no Base UI component: Zag/Ark's and Reka UI's inline edit, its activation, submit modes and focus return decided there) |
+| [link.md](link.md) | Link (the APG link with a disabled and a current state, on the app's anchor or its router's; React Aria's Link as the behaviour reference) |
+| [breadcrumbs.md](breadcrumbs.md) | Breadcrumbs (the APG breadcrumb; its Link on Link's behaviour, its Ellipsis composed with a Menu by the app) |
+| [steps.md](steps.md) | Steps (no APG pattern and no Base UI component: an ordered list with `aria-current="step"`, linear validation, decided there) |
+| [carousel.md](carousel.md) | Carousel (the APG carousel, basic and tabbed, native scroll snapping, the rotation rules; its DOM side on the toolkit's `/carousel`) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -104,7 +108,10 @@ Indicator's measurement in `/collection` and the rating's value math in `/range`
 inputs (Epic #94, Issue #92: PasswordInput, SearchField and Clipboard,
 [password-input.md](password-input.md), [search-field.md](search-field.md),
 [clipboard.md](clipboard.md), with the copy and its announcement in the toolkit's new
-`/clipboard`; Issue #93: Editable, [editable.md](editable.md)).
+`/clipboard`; Issue #93: Editable, [editable.md](editable.md)), then navigation (Epic #97, Issue
+#95: Link, Breadcrumbs and Steps, [link.md](link.md), [breadcrumbs.md](breadcrumbs.md),
+[steps.md](steps.md); Issue #96: Carousel, [carousel.md](carousel.md), with its pages, scrolling,
+mouse drag, hover and focus watch and rotation delay in the toolkit's new `/carousel`).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -213,12 +220,12 @@ The reasons are shared:
 
 | reason | when |
 | --- | --- |
-| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area); a PasswordInput's VisibilityTrigger showed or hid its text; a Clipboard's Trigger copied (its status became `copied` or `failed`) |
+| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area); a PasswordInput's VisibilityTrigger showed or hid its text; a Clipboard's Trigger copied (its status became `copied` or `failed`); a Steps Trigger moved to its step; a Carousel's AutoplayTrigger stopped or started the rotation |
 | `close-press` | a `Close` part was pressed |
 | `escape-key` | Escape dismissed the overlay; Escape cleared a SearchField, or reverted an Editable's edit |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value |
+| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value; a Carousel Indicator's press changed its page |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
 | `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
@@ -230,14 +237,16 @@ The reasons are shared:
 | `chip-remove-press` | a combobox chip's remove button, a TagGroup's RemoveButton or a TagsInput's TagRemove was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit |
+| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit; a tabbed Carousel Indicator's arrow, Home or End changed its page |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
 | `track-press` | a press on a slider's control moved a thumb |
-| `drag` | a pointer drag moved a slider's thumb |
-| `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md) |
-| `previous-press`, `next-press`, `first-press`, `last-press` | a Pagination's Previous, Next, First or Last changed its page (an Item's press is `item-press`) |
+| `drag` | a pointer drag moved a slider's thumb; a mouse drag of a Carousel's slides changed its page |
+| `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md); a scroll the user made (touch, a trackpad, the wheel, the keys) settled a Carousel on another page |
+| `previous-press`, `next-press`, `first-press`, `last-press` | a Pagination's Previous, Next, First or Last changed its page (an Item's press is `item-press`); a Steps PrevTrigger or NextTrigger, or a Carousel's PrevTrigger or NextTrigger |
+| `autoplay` | a Carousel's rotation moved to its next page |
+| `focus-in` | focus entering a Carousel stopped its rotation (spec/carousel.md) |
 | `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
 | `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed; a form reset; a form submission that hid a PasswordInput's text; a Clipboard's status returning to `idle`) |
 
@@ -499,6 +508,12 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | SegmentedControl's parts | `SegmentedControl.Root`, `.Item` (`value`), `.ItemText`, `.Indicator` (`renderBeforeHydration`, `nonce`) | the same (`render-before-hydration`) | `[segmentedControlRoot]`, `button[segmentedControlItem]` (`[value]`), `[segmentedControlItemText]`, structural `*segmentedControlIndicator` (`*segmentedControlIndicator="true"` for `renderBeforeHydration`, `*segmentedControlIndicator="true; nonce: cspNonce"`), as Tabs' |
 | Rating's value (a number, `0` for none) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Rating.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[ratingRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`) |
 | Rating's parts, its stars and their state | `Rating.Root` (children `({ items, value }) => ...`), `.Item` (`index`; children `(state) => ...`), `.HiddenInput` | the same (the Root's default scoped slot `v-slot="{ items, value }"`, the Item's `v-slot="state"`) | `[ratingRoot]` (`items()`, `value()` through `exportAs`, `#rating="ratingRoot"`), `button[ratingItem]` (`[index]`; `state()` through `exportAs`, `#star="ratingItem"`), `input[ratingHiddenInput]` |
+| Link | `<Link href="/docs" current disabled>` (one component, as Label), a router through `render={<RouterLink to="/docs" />}` | `<Link href="/docs" current>`, a router through `:as="RouterLink" to="/docs"` | `<a link href="/docs" [current]="true">` (selector `a[link]`, class `Link`), on a router's own anchor `<a routerLink="/docs" link>` |
+| Breadcrumbs' parts | `Breadcrumbs.Root`, `.List`, `.Item`, `.Link` (`current`, `disabled`), `.Current`, `.Separator`, `.Ellipsis` (composed with a Menu: `render={<Menu.Trigger />}`) | the same (`:as="Menu.Trigger"` on the Ellipsis) | `nav[breadcrumbsRoot]`, `ol[breadcrumbsList]`, `li[breadcrumbsItem]`, `a[breadcrumbsLink]`, `[breadcrumbsCurrent]`, `li[breadcrumbsSeparator]`, `button[breadcrumbsEllipsis]` (with `menuTrigger` on the same button) |
+| Steps' step (a number, `count` once completed) | `step` + `onStepChange(step, details)` (`defaultStep`) on `Steps.Root`, `isStepValid={(index) => ...}` | `v-model:step` (`default-step`, `@step-change`, `:is-step-valid`) | `[(step)]` on `[stepsRoot]` (`defaultStep`, `[isStepValid]`; `stepChangeDetails` output `{ value, details }`) |
+| Steps' parts | `Steps.Root`, `.List`, `.Item` (`index`), `.Trigger`, `.Indicator`, `.Separator`, `.Content` (`index`), `.PrevTrigger`, `.NextTrigger`, `.CompletedContent` | the same | `[stepsRoot]`, `ol[stepsList]`, `li[stepsItem]` (`[index]`), `button[stepsTrigger]`, `[stepsIndicator]`, `[stepsSeparator]`, `[stepsContent]` (`[index]`), `button[stepsPrevTrigger]`, `button[stepsNextTrigger]`, `[stepsCompletedContent]` |
+| Carousel's page and rotation | `page` + `onPageChange(page, details)` (`defaultPage`), `playing` + `onPlayingChange(playing, details)` (`defaultPlaying`) on `Carousel.Root` | `v-model:page`, `v-model:playing` (`default-page`, `default-playing`, `@page-change`, `@playing-change`) | `[(page)]`, `[(playing)]` on `[carouselRoot]` (`defaultPage`, `defaultPlaying`; `pageChangeDetails` and `playingChangeDetails` outputs, each `{ value, details }`) |
+| Carousel's parts | `Carousel.Root`, `.ItemGroup`, `.Item` (`index`), `.PrevTrigger`, `.NextTrigger`, `.IndicatorGroup`, `.Indicator` (`index`), `.AutoplayTrigger` (children `({ playing }) => ...`) | the same (the AutoplayTrigger's default slot `v-slot="{ state }"`) | `[carouselRoot]`, `[carouselItemGroup]`, `[carouselItem]` (`[index]`), `button[carouselPrevTrigger]`, `button[carouselNextTrigger]`, `[carouselIndicatorGroup]`, `button[carouselIndicator]` (`[index]`), `button[carouselAutoplayTrigger]` (`state()` through `exportAs`, `#rotation="carouselAutoplayTrigger"`) |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
