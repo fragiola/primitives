@@ -52,7 +52,8 @@ One entry, `/pagination` (D8), built on no other component. The range is the too
 - `boundaryCount` (`1`): the pages always shown at each end.
 - `disabled` (`false`): every control is disabled.
 - Children: a function of `{ items, page, count }` (React; Vue: the default scoped slot; Angular:
-  the root directive's `items()`, `page()` and `count()` signals through `exportAs`), where each
+  the root directive's `items()`, `currentPage()` and `pageCount()` signals through `exportAs`,
+  since `page` and `count` are its inputs), where each
   item is `{ type: "page", value }` or `{ type: "ellipsis", position: "start" | "end" }`, in
   order, to render as Items and Ellipses.
 
