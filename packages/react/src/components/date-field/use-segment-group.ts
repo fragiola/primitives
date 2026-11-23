@@ -239,6 +239,8 @@ export function useSegmentGroup(options: SegmentGroupOptions) {
     );
     return {
         segments,
+        /** The segment values this render shows. */
+        rendered: values,
         /** Whether every segment is set (the state as of the last change). */
         complete: () => isSegmentsComplete(format, current.current.values),
         /** The segment values as of the last change. */
