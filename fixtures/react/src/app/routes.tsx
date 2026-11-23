@@ -133,8 +133,16 @@ import { PopoverRtl } from "../scenarios/popover/popover-rtl.tsx";
 import { ProgressBasic } from "../scenarios/progress/progress-basic.tsx";
 import { RadioGroupBasic } from "../scenarios/radio-group/radio-group-basic.tsx";
 import { RadioGroupControlled } from "../scenarios/radio-group/radio-group-controlled.tsx";
+import { RatingBasic } from "../scenarios/rating/rating-basic.tsx";
+import { RatingField } from "../scenarios/rating/rating-field.tsx";
+import { RatingHalf } from "../scenarios/rating/rating-half.tsx";
+import { RatingReadOnly } from "../scenarios/rating/rating-read-only.tsx";
 import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.tsx";
 import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.tsx";
+import { SegmentedControlBasic } from "../scenarios/segmented-control/segmented-control-basic.tsx";
+import { SegmentedControlDisabled } from "../scenarios/segmented-control/segmented-control-disabled.tsx";
+import { SegmentedControlField } from "../scenarios/segmented-control/segmented-control-field.tsx";
+import { SegmentedControlVertical } from "../scenarios/segmented-control/segmented-control-vertical.tsx";
 import { SelectBasic } from "../scenarios/select/select-basic.tsx";
 import { SelectControlled } from "../scenarios/select/select-controlled.tsx";
 import { SelectGroups } from "../scenarios/select/select-groups.tsx";
@@ -406,6 +414,14 @@ export const routes: Record<
     "/tags-input/edit": TagsInputEdit,
     "/tags-input/blur": TagsInputBlur,
     "/tags-input/field": TagsInputField,
+    "/segmented-control/basic": SegmentedControlBasic,
+    "/segmented-control/vertical": SegmentedControlVertical,
+    "/segmented-control/disabled": SegmentedControlDisabled,
+    "/segmented-control/field": SegmentedControlField,
+    "/rating/basic": RatingBasic,
+    "/rating/half": RatingHalf,
+    "/rating/read-only": RatingReadOnly,
+    "/rating/field": RatingField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
