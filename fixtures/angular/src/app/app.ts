@@ -2,6 +2,7 @@ import { DOCUMENT } from "@angular/common";
 import { Component, inject, ViewEncapsulation } from "@angular/core";
 import type { PlainDate } from "@fragiola/primitives-angular/calendar";
 import { DirectionProvider } from "@fragiola/primitives-angular/direction";
+import { ToastProvider } from "@fragiola/primitives-angular/toast";
 import { readQuery } from "../kit/query.ts";
 import { AccordionBasic } from "../scenarios/accordion/accordion-basic.ts";
 import { AccordionHorizontal } from "../scenarios/accordion/accordion-horizontal.ts";
@@ -70,6 +71,10 @@ import { FieldSettings } from "../scenarios/field/field-settings.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
+import { HoverCardBasic } from "../scenarios/hover-card/hover-card-basic.ts";
+import { HoverCardDetached } from "../scenarios/hover-card/hover-card-detached.ts";
+import { HoverCardInDialog } from "../scenarios/hover-card/hover-card-in-dialog.ts";
+import { HoverCardLifecycle } from "../scenarios/hover-card/hover-card-lifecycle.ts";
 import { LabelControls } from "../scenarios/label/label-controls.ts";
 import { ListboxField } from "../scenarios/listbox/listbox-field.ts";
 import { ListboxGroups } from "../scenarios/listbox/listbox-groups.ts";
@@ -126,6 +131,11 @@ import { SettingsTabs } from "../scenarios/tabs/settings-tabs.ts";
 import { TabsAnimated } from "../scenarios/tabs/tabs-animated.ts";
 import { TabsAnimatedDefault } from "../scenarios/tabs/tabs-animated-default.ts";
 import { TabsNoneSelected } from "../scenarios/tabs/tabs-none-selected.ts";
+import { ToastBasic } from "../scenarios/toast/toast-basic.ts";
+import { ToastLimit } from "../scenarios/toast/toast-limit.ts";
+import { ToastPromise } from "../scenarios/toast/toast-promise.ts";
+import { notifications } from "../scenarios/toast/toast-queue.ts";
+import { ToastSwipe } from "../scenarios/toast/toast-swipe.ts";
 import { ToggleBasic } from "../scenarios/toggle/toggle-basic.ts";
 import { ToggleControlled } from "../scenarios/toggle/toggle-controlled.ts";
 import { ToggleGroupBasic } from "../scenarios/toggle-group/toggle-group-basic.ts";
@@ -300,6 +310,15 @@ import { ROUTES } from "./routes.ts";
         ComboboxVirtualAsync,
         AutocompleteVirtualBasic,
         AutocompleteVirtualAsync,
+        ToastProvider,
+        ToastBasic,
+        ToastLimit,
+        ToastPromise,
+        ToastSwipe,
+        HoverCardBasic,
+        HoverCardDetached,
+        HoverCardInDialog,
+        HoverCardLifecycle,
     ],
     template: `
         @switch (path) {
@@ -455,6 +474,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/combobox-virtual/async") { <main class="p-6" scenario-combobox-virtual-async></main> }
             @case ("/autocomplete-virtual/basic") { <main class="p-6" scenario-autocomplete-virtual-basic></main> }
             @case ("/autocomplete-virtual/async") { <main class="p-6" scenario-autocomplete-virtual-async></main> }
+            @case ("/toast/basic") { <main class="p-6" scenario-toast-basic toastProvider [toastManager]="notifications"></main> }
+            @case ("/toast/limit") { <main class="p-6" scenario-toast-limit toastProvider [limit]="2" [timeout]="0"></main> }
+            @case ("/toast/promise") { <main class="p-6" scenario-toast-promise toastProvider [timeout]="2000"></main> }
+            @case ("/toast/swipe") { <main class="p-6" scenario-toast-swipe toastProvider [timeout]="0"></main> }
+            @case ("/hover-card/basic") { <main class="p-6" scenario-hover-card-basic></main> }
+            @case ("/hover-card/detached") { <main class="p-6" scenario-hover-card-detached></main> }
+            @case ("/hover-card/in-dialog") { <main class="p-6" scenario-hover-card-in-dialog></main> }
+            @case ("/hover-card/lifecycle") { <main class="p-6" scenario-hover-card-lifecycle [cancel]="query.cancel"></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>
@@ -474,6 +501,8 @@ export class App {
     protected readonly query = readQuery(this.location.search);
     protected readonly path = this.location.pathname;
     protected readonly routes = ROUTES;
+    /** The `/toast/basic` queue, created in a plain module. */
+    protected readonly notifications = notifications;
 
     /** The unavailable dates of `/calendar/unavailable`: weekends. */
     protected readonly isWeekend = (date: PlainDate) => {
