@@ -27,7 +27,7 @@ test("autocomplete / groups: grouped suggestions", async ({ page }) => {
     await openScenario(page, "/autocomplete/groups");
     await page.getByRole("combobox", { name: "Produce" }).click();
     await page.keyboard.type("c");
-    await expect(page.getByRole("group")).toHaveCount(2);
+    await expect(page.getByRole("listbox").getByRole("group")).toHaveCount(2);
     await expectScreen(page, "autocomplete-groups");
 });
 
