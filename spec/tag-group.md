@@ -64,6 +64,8 @@ DOM (`docs/decisions.md`). Every Tag holds exactly one TagCell, around all of it
   handler) or keeps it. Reasons: `keyboard` (Delete, Backspace), `chip-remove-press` (its
   RemoveButton). Without `onRemove`, no tag is removable: the keys do nothing and a RemoveButton
   press reports nothing.
+  Vue: a `remove` listener (`@remove`) makes the tags removable. Angular, which cannot tell
+  whether an output is bound: the `removable` input (`false`) together with the `(remove)` output.
 - `loopFocus` (`true`): the arrows wrap from the last tag to the first and back.
 
 A removal does not change the selection: an app that removes a selected tag updates `value` too
