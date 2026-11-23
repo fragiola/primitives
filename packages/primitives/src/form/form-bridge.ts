@@ -23,7 +23,8 @@ function firstInvalidControl(form: HTMLFormElement): Element | null {
  * Bridges a primitive's hidden input and its form (spec/README.md, "Forms"): a form reset, and a
  * failed validation (the browser would focus the hidden input; focus goes to the primitive, when
  * its input is the form's first invalid control, and the browser's bubble is not shown on an
- * invisible element). Returns the cleanup.
+ * invisible element, nor does the browser then move the focus on to a later invalid control).
+ * Returns the cleanup.
  */
 export function bridgeForm(
     input: HTMLInputElement,
@@ -31,6 +32,20 @@ export function bridgeForm(
 ): () => void {
     const form = input.form;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    // the validation this bridge took the focus in: the later controls' `invalid` events
+    let holding: ReturnType<typeof setTimeout> | undefined;
+    const cancelLater = (event: Event) => {
+        if (event.target !== input) {
+            event.preventDefault();
+        }
+    };
+    const release = () => {
+        if (holding !== undefined) {
+            clearTimeout(holding);
+            holding = undefined;
+            form?.removeEventListener("invalid", cancelLater, true);
+        }
+    };
     const onReset = () => {
         // the reset event fires before the browser resets the controls
         timer = setTimeout(() => {
@@ -46,6 +61,14 @@ export function bridgeForm(
             // the first one's primitive takes focus (Epic #26, several required pickers)
             if (form === null || firstInvalidControl(form) === input) {
                 target.focus();
+                // then the browser would focus the first control whose `invalid` was not
+                // canceled, a later native one, and show its bubble: the rest of this validation's
+                // events are canceled (Epic #49). They come in the same task, one per control,
+                // with microtasks between them, so the hold ends with the task
+                if (form !== null && holding === undefined) {
+                    form.addEventListener("invalid", cancelLater, true);
+                    holding = setTimeout(release);
+                }
             }
         }
     };
@@ -55,6 +78,7 @@ export function bridgeForm(
         if (timer !== undefined) {
             clearTimeout(timer);
         }
+        release();
         form?.removeEventListener("reset", onReset);
         input.removeEventListener("invalid", onInvalid);
     };
