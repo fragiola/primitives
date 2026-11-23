@@ -20,12 +20,17 @@ import {
 } from "./examples-lib.ts";
 
 /** What an example file may import, besides its relative files and the recipes. */
+// The toolkit's entries too: a calendar system or a time zone is imported from it and injected
+// into a component (`calendar={persian}`), which then installs the toolkit (manifest.ts).
+const TOOLKIT_ENTRY = /^@fragiola\/primitives\/[a-z-]+$/;
+
 export const ALLOWED_IMPORTS: Record<Framework, readonly RegExp[]> = {
-    react: [/^react$/, /^@fragiola\/primitives-react\/[a-z-]+$/],
-    vue: [/^vue$/, /^@fragiola\/primitives-vue\/[a-z-]+$/],
+    react: [/^react$/, /^@fragiola\/primitives-react\/[a-z-]+$/, TOOLKIT_ENTRY],
+    vue: [/^vue$/, /^@fragiola\/primitives-vue\/[a-z-]+$/, TOOLKIT_ENTRY],
     angular: [
         /^@angular\/(core|common)$/,
         /^@fragiola\/primitives-angular\/[a-z-]+$/,
+        TOOLKIT_ENTRY,
     ],
 };
 

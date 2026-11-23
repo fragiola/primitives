@@ -129,6 +129,7 @@ Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)`).
 | `max` | `PlainYear \| null` | | years after it are disabled |
 | `isUnavailable` | `(year: PlainYear) => boolean` | | unavailable years can be focused, not chosen |
 | `locale` | `string` | the document's `lang` | a BCP 47 tag: the names |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems): the items are its years, and so are the values (a form submits the first day's ISO date, `2026-10-23[u-ca=persian]`) |
 | `columns` | `number` | `3` | items per row |
 | `disabled` | `boolean` | `false` | nothing can be focused or chosen |
 | `readOnly` | `boolean` | `false` | years can be focused, not chosen |

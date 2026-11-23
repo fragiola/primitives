@@ -26,6 +26,8 @@ import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.ts"
 import { SingleCalendar } from "../scenarios/calendar/single-calendar.ts";
 import { CalendarPresetBasic } from "../scenarios/calendar-preset/calendar-preset-basic.ts";
 import { CalendarPresetPicker } from "../scenarios/calendar-preset/calendar-preset-picker.ts";
+import { CalendarSystemsBasic } from "../scenarios/calendar-systems/calendar-systems-basic.ts";
+import { CalendarSystemsPickers } from "../scenarios/calendar-systems/calendar-systems-pickers.ts";
 import { CalendarViewPicker } from "../scenarios/calendar-view/calendar-view-picker.ts";
 import { CalendarViewTyped } from "../scenarios/calendar-view/calendar-view-typed.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
@@ -158,6 +160,8 @@ import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.ts";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.ts";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.ts";
 import { TimeRangeFieldBasic } from "../scenarios/time-range-field/time-range-field-basic.ts";
+import { TimeZonesField } from "../scenarios/time-zones/time-zones-field.ts";
+import { TimeZonesPicker } from "../scenarios/time-zones/time-zones-picker.ts";
 import { ToastBasic } from "../scenarios/toast/toast-basic.ts";
 import { ToastLimit } from "../scenarios/toast/toast-limit.ts";
 import { ToastPromise } from "../scenarios/toast/toast-promise.ts";
@@ -379,6 +383,10 @@ import { ROUTES } from "./routes.ts";
         PaginationBasic,
         PaginationLinks,
         AspectRatioBasic,
+        CalendarSystemsBasic,
+        CalendarSystemsPickers,
+        TimeZonesField,
+        TimeZonesPicker,
     ],
     template: `
         @switch (path) {
@@ -572,6 +580,10 @@ import { ROUTES } from "./routes.ts";
             @case ("/pagination/basic") { <main class="p-6" scenario-pagination-basic></main> }
             @case ("/pagination/links") { <main class="p-6" scenario-pagination-links></main> }
             @case ("/aspect-ratio/basic") { <main class="p-6" scenario-aspect-ratio-basic></main> }
+            @case ("/calendar-systems/basic") { <main class="p-6" scenario-calendar-systems-basic [locale]="query.locale"></main> }
+            @case ("/calendar-systems/pickers") { <main class="p-6" scenario-calendar-systems-pickers [locale]="query.locale"></main> }
+            @case ("/time-zones/field") { <main class="p-6" scenario-time-zones-field></main> }
+            @case ("/time-zones/picker") { <main class="p-6" scenario-time-zones-picker></main> }
             @default {
                 <main class="p-6">
                     <h1 class="text-lg font-semibold">Angular fixture</h1>

@@ -165,6 +165,7 @@ names below are React's; Vue binds them the same way (`v-model:value`, `v-model:
 | `max` | `PlainDate \| null` | | passed to the bound calendar |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | passed to the bound calendar |
 | `locale` | `string` | the document's `lang` | passed to the bound calendar |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems), passed to the bound calendar; the range stays ISO |
 | `firstDayOfWeek` | `number` | the locale's | passed to the bound calendar |
 | `visibleMonths` | `number` | `1` | passed to the bound calendar |
 | `name` | `string` | | the hidden input's form name (a Field's wins); without one, no input is rendered |

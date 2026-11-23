@@ -1,4 +1,4 @@
-import { addMonths, formatMonthYear } from "@fragiola/primitives/date";
+import { formatMonthYear } from "@fragiola/primitives/date";
 import { defineComponent } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
@@ -32,7 +32,9 @@ export const CalendarHeading: PartComponent<
             return () => {
                 const month = formatMonthYear(
                     context.locale(),
-                    addMonths(context.visibleStart.value, props.offset),
+                    context
+                        .math()
+                        .addMonths(context.visibleStart.value, props.offset),
                 );
                 const state = { month };
                 return renderPart(

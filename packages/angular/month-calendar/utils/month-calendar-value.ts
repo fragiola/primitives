@@ -1,8 +1,22 @@
+import type {
+    CalendarSystem,
+    CalendarUnits,
+} from "@fragiola/primitives/calendar-systems";
 import {
+    formatMonthName,
+    formatYear,
+    formatYearMonth,
+    formatYearSpan,
     fromMonthIndex,
     monthIndex,
     type PlainYear,
     type PlainYearMonth,
+    toIsoYear,
+    toIsoYearMonth,
+    UNIT_PAGE_SIZE,
+    unitKeyTarget,
+    unitPageStart,
+    unitRows,
 } from "@fragiola/primitives/month-year";
 
 /** What a month or year calendar's items are: months, or years (spec/month-calendar.md). */
@@ -37,24 +51,66 @@ export interface MonthCalendarOptions {
     locale?: string;
     /** Items per row (default 3). */
     columns?: number;
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems` (spec/calendar-systems.md):
+     * the items are its months (a page is its year) or years, and so are the values.
+     */
+    calendar?: CalendarSystem;
 }
 
-/** An item as a number: a month's `monthIndex`, a year's year. */
-export function itemIndex(
-    kind: MonthCalendarKind,
-    item: MonthCalendarItem,
-): number {
-    return kind === "month"
-        ? monthIndex(item as PlainYearMonth)
-        : (item as PlainYear).year;
-}
+/** What a month or year calendar's items are: a calendar system's units, or the ISO calendar's. */
+export type MonthCalendarUnits = Pick<
+    CalendarUnits,
+    | "index"
+    | "item"
+    | "pageStart"
+    | "pageSize"
+    | "rows"
+    | "keyTarget"
+    | "text"
+    | "name"
+    | "heading"
+    | "iso"
+>;
 
-/** The item of a number. */
-export function itemOf(
+const size = () => UNIT_PAGE_SIZE;
+
+/** The ISO calendar's months and years (`/month-year`), when no system is given. */
+export const ISO_UNITS: Record<MonthCalendarKind, MonthCalendarUnits> = {
+    month: {
+        index: (item) => monthIndex(item as PlainYearMonth),
+        item: fromMonthIndex,
+        pageStart: unitPageStart,
+        pageSize: size,
+        rows: unitRows,
+        keyTarget: unitKeyTarget,
+        text: (locale, index) =>
+            formatMonthName(locale, fromMonthIndex(index), "long"),
+        name: (locale, index) => formatYearMonth(locale, fromMonthIndex(index)),
+        heading: (locale, start) => formatYear(locale, start / UNIT_PAGE_SIZE),
+        iso: (index) => toIsoYearMonth(fromMonthIndex(index)),
+    },
+    year: {
+        index: (item) => item.year,
+        item: (year) => ({ year }),
+        pageStart: unitPageStart,
+        pageSize: size,
+        rows: unitRows,
+        keyTarget: unitKeyTarget,
+        text: formatYear,
+        name: formatYear,
+        heading: (locale, start) =>
+            formatYearSpan(locale, start, start + UNIT_PAGE_SIZE - 1),
+        iso: (year) => toIsoYear({ year }),
+    },
+};
+
+/** The units of a kind: the calendar system's, else the ISO calendar's. */
+export function unitsOf(
     kind: MonthCalendarKind,
-    index: number,
-): MonthCalendarItem {
-    return kind === "month" ? fromMonthIndex(index) : { year: index };
+    calendar: CalendarSystem | undefined,
+): MonthCalendarUnits {
+    return calendar ? calendar.units(kind) : ISO_UNITS[kind];
 }
 
 export function isItemRange(

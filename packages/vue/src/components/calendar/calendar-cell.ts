@@ -1,6 +1,5 @@
 import {
     formatDayNumber,
-    formatFullDate,
     type PlainDate,
     toIsoDate,
 } from "@fragiola/primitives/date";
@@ -84,7 +83,11 @@ export const CalendarCell: PartComponent<CalendarCellProps, CalendarCellState> =
                     const cell = state();
                     const locale = context.locale();
                     const consumer = mergeProps(
-                        { "aria-label": formatFullDate(locale, props.date) },
+                        {
+                            "aria-label": context
+                                .math()
+                                .fullDate(locale, props.date),
+                        },
                         attrs,
                     );
                     return renderPart(

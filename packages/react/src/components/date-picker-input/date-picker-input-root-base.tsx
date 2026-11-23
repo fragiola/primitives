@@ -12,6 +12,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import {
     type ReactNode,
     useCallback,
@@ -37,6 +38,7 @@ import {
     type DateFieldState,
 } from "../date-field/date-field-context.ts";
 import type { DateFieldValue } from "../date-field/date-field-root.tsx";
+import type { DateFieldSystemProps } from "../date-field/date-field-root-base.tsx";
 import {
     composeSegments,
     type FieldValue,
@@ -68,7 +70,8 @@ import {
 
 /** The props both typed picker roots share: the picker's, and the segments' (spec/calendar.md). */
 export interface DatePickerInputRootSharedProps
-    extends DatePickerRootSharedProps {
+    extends DatePickerRootSharedProps,
+        DateFieldSystemProps {
     /** `day` (the default), or `hour`, `minute`, `second`: the time is typed, the calendar chooses the date. */
     granularity?: SegmentGranularity;
     /** What a placeholder segment's first step gives, and a placeholder time a chosen date takes; default: today at midnight. */
@@ -86,12 +89,13 @@ const NOOP = () => {};
 function pickerIso(
     granularity: SegmentGranularity,
     value: PickerValue | undefined,
+    timeZone: TimeZone | undefined,
 ): string {
     return value == null
         ? ""
         : "start" in value
-          ? rangeIso("date", granularity, value)
-          : isoOf("date", granularity, value);
+          ? rangeIso("date", granularity, value, timeZone)
+          : isoOf("date", granularity, value, timeZone);
 }
 
 /** The value of each end's segments (a single date is the start's). */
@@ -142,6 +146,10 @@ export function DatePickerInputRootBase({
     granularity = "day",
     placeholderValue,
     hourCycle,
+    calendar,
+    timeZone,
+    hideTimeZone,
+    disambiguation,
     name,
     required = false,
     disabled: disabledProp = false,
@@ -163,8 +171,26 @@ export function DatePickerInputRootBase({
     );
     const locale = useDocumentLocale(localeProp);
     const format = useMemo(
-        () => segmentFormat({ locale, kind: "date", granularity, hourCycle }),
-        [locale, granularity, hourCycle],
+        () =>
+            segmentFormat({
+                locale,
+                kind: "date",
+                granularity,
+                hourCycle,
+                calendar,
+                timeZone,
+                hideTimeZone,
+                disambiguation,
+            }),
+        [
+            locale,
+            granularity,
+            hourCycle,
+            calendar,
+            timeZone,
+            hideTimeZone,
+            disambiguation,
+        ],
     );
     // today, read once when the picker renders (as the calendars' today)
     const [todayDate] = useState(() => today());
@@ -176,7 +202,8 @@ export function DatePickerInputRootBase({
     const min = minProp ?? undefined;
     const max = maxProp ?? undefined;
     const hidden = useRef<HTMLInputElement>(null);
-    const iso = (next: PickerValue | undefined) => pickerIso(granularity, next);
+    const iso = (next: PickerValue | undefined) =>
+        pickerIso(granularity, next, timeZone);
     // the value as of the last change, and the last one the segments reported
     const current = useRef(value);
     const reported = useRef<string | null>(null);
@@ -297,15 +324,27 @@ export function DatePickerInputRootBase({
     const choose = useCallback(
         (chosen: CalendarValue) => {
             const state = latest.current;
-            const withTime = (date: PlainDate, group: SegmentGroup) =>
-                state.granularity === "day"
-                    ? date
-                    : {
-                          year: date.year,
-                          month: date.month,
-                          day: date.day,
-                          ...typedTime(group.values(), state.seed),
-                      };
+            const withTime = (date: PlainDate, group: SegmentGroup) => {
+                if (state.granularity === "day") {
+                    return date;
+                }
+                const wall = {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day,
+                    ...typedTime(group.values(), state.seed),
+                };
+                // a zoned picker's choice is resolved in its zone (spec/time-zones.md)
+                const zone = state.format.timeZone;
+                return zone
+                    ? zone.resolve(
+                          wall,
+                          state.format.disambiguation === "reject"
+                              ? "compatible"
+                              : state.format.disambiguation,
+                      )
+                    : wall;
+            };
             const next: PickerValue =
                 chosen === null
                     ? null
@@ -347,7 +386,11 @@ export function DatePickerInputRootBase({
                 replaceStart(next.start);
                 replaceEnd(next.end);
                 state.setValue(initialValue, { reason: "none" });
-                element.value = pickerIso(state.granularity, initialValue);
+                element.value = pickerIso(
+                    state.granularity,
+                    initialValue,
+                    state.format.timeZone,
+                );
             },
             invalid: startFirst,
         });
@@ -374,6 +417,7 @@ export function DatePickerInputRootBase({
             locale,
             firstDayOfWeek,
             visibleMonths,
+            calendar,
         }),
         [
             minProp,
@@ -382,6 +426,7 @@ export function DatePickerInputRootBase({
             locale,
             firstDayOfWeek,
             visibleMonths,
+            calendar,
         ],
     );
     const { open } = root;

@@ -4,6 +4,7 @@ import type {
     DateFieldInputs,
     DateFieldRootState,
     DateFieldState,
+    DateFieldSystemInputs,
 } from "../utils/date-field-state.ts";
 
 /** `hourCycle="24"` and `[hourCycle]="24"` give `24`; nothing gives `undefined`. */
@@ -67,9 +68,11 @@ export abstract class DateFieldRootBase {
             | "max"
             | "isDateUnavailable"
         >,
+        system?: DateFieldSystemInputs,
     ): DateFieldInputs {
         return {
             ...own,
+            system,
             hourCycle: this.hourCycle,
             locale: this.locale,
             required: this.required,

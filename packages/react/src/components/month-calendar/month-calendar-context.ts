@@ -3,6 +3,7 @@ import type {
     MonthCalendarItem,
     MonthCalendarKind,
     MonthCalendarMode,
+    MonthCalendarUnits,
 } from "./month-calendar-value.ts";
 
 /** The component a month or year calendar's parts belong to: their part attribute's prefix. */
@@ -38,6 +39,8 @@ export interface MonthCalendarContextValue {
     readOnly: boolean;
     headingId: string;
     gridId: string;
+    /** The items' math and names: a calendar system's, or the ISO calendar's. */
+    units: MonthCalendarUnits;
     itemOf: (index: number) => MonthCalendarItem;
     cellState: (index: number) => MonthCalendarCellState;
     /** Moves the focused item (and the page); `false` when it is disabled. */

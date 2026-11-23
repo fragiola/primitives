@@ -37,6 +37,14 @@ one.
   first day of the week (`firstDayOfWeek` overrides it).
 - **Grid**: six weeks always, so it never changes height. The month Heading of offset 0 is
   announced (`aria-live`).
+- **Calendar systems**: `calendar={persian}` (one export per system from
+  [`@fragiola/primitives/calendar-systems`](/docs/api/toolkit#calendar-systems)) shows the
+  system's months: a month starts on its day 1, the heading and cells are its names, Page Up and
+  Page Down move by its months and years. The value stays an ISO `PlainDate`, so a DateField with
+  the same system, or none, reads it as it is. Without `calendar`, a locale whose calendar is not
+  Gregorian (`fa-IR`) keeps the ISO grid with `Intl`'s names.
+
+<Example id="calendar-system" />
 
 ## Anatomy
 
@@ -177,6 +185,7 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | `max` | `PlainDate \| null` | | dates after it are disabled |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | unavailable dates can be focused, not chosen |
 | `locale` | `string` | the document's `lang` | a BCP 47 tag: the names and the first day of the week |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems) (`persian` from `@fragiola/primitives/calendar-systems`): the grid's months, names and Page Up / Down are its own; values stay ISO |
 | `firstDayOfWeek` | `number` | the locale's | `0`–`6`, Sunday is `0` |
 | `visibleMonths` | `number` | `1` | how many months are shown, each a Grid with its `offset` |
 | `disabled` | `boolean` | `false` | nothing can be focused or chosen |

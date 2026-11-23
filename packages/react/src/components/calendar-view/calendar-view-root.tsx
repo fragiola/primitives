@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { daysInMonth, type PlainDate } from "@fragiola/primitives/date";
 import {
     fromMonthIndex,
@@ -54,6 +55,65 @@ const days = (year: number, month: number): PlainDate[] =>
 
 const enabled = (calendar: CalendarContextValue, date: PlainDate) =>
     !calendar.cellState(date, date).disabled;
+
+const dayNumber = (date: PlainDate) =>
+    Date.UTC(date.year, date.month - 1, date.day) / 86_400_000;
+
+/**
+ * A view's binding in a calendar system (spec/calendar-systems.md): its months or years are the
+ * system's; a choice goes to the enabled day of the unit nearest to the focused date's place in it
+ * (the same day of the month, the same month and day of the year).
+ */
+function systemBinding(
+    calendar: CalendarContextValue,
+    system: CalendarSystem,
+    kind: "month" | "year",
+    change: (next: CalendarViewName, reason: "item-press") => void,
+): Pick<
+    MonthCalendarBinding,
+    "options" | "focus" | "isDisabled" | "isSelected" | "choose"
+> {
+    const units = system.units(kind);
+    const { focusedDate } = calendar;
+    return {
+        options: { locale: calendar.locale, calendar: system },
+        focus: units.fromDate(focusedDate),
+        isDisabled: (index) =>
+            !units.days(index).some((date) => enabled(calendar, date)),
+        isSelected: (index) =>
+            units
+                .days(index)
+                .some((date) => calendar.cellState(date, date).selected),
+        choose: (item) => {
+            if (item === null || "start" in item) {
+                return;
+            }
+            const index = units.index(item);
+            const fields = system.fields(focusedDate);
+            const place =
+                kind === "month"
+                    ? system.fromFields({
+                          ...system.fromMonthIndex(index),
+                          day: fields.day,
+                      })
+                    : system.addYears(focusedDate, item.year - fields.year);
+            const target = units
+                .days(index)
+                .filter((date) => enabled(calendar, date))
+                .sort(
+                    (a, b) =>
+                        Math.abs(dayNumber(a) - dayNumber(place)) -
+                        Math.abs(dayNumber(b) - dayNumber(place)),
+                )[0];
+            if (target !== undefined && calendar.moveFocus(target)) {
+                if (kind === "month") {
+                    calendar.requestFocus();
+                }
+                change(kind === "month" ? "day" : "month", "item-press");
+            }
+        },
+    };
+}
 
 /** The enabled day of the month nearest to `day`, or `null` when every day is disabled. */
 function nearestDay(
@@ -211,6 +271,8 @@ export function CalendarViewRoot({
                     change("month", "item-press");
                 }
             },
+            ...(calendar.calendar &&
+                systemBinding(calendar, calendar.calendar, kind, change)),
         };
     }, [kind, open, picker, calendar, focusedDate, change]);
 

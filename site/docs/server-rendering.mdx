@@ -21,6 +21,11 @@ ends as the browser alone renders it, with the server's ids kept.
   browser: they agree unless the server's date differs from the reader's (another time zone, near
   midnight), which the hydration repairs. Pass a `value` or `defaultValue` when the first month
   matters.
+- **Time zone names.** A zoned date field writes its zone's name ("EST") from `Intl`, whose
+  names come from each engine's ICU: Node and the browser disagree for some zones and locales
+  (Europe/London in `en-US`: "GMT" on Node, "GMT+0" in Chromium), and the hydration then finds
+  another text. Pass `hideTimeZone` to a zoned field rendered on a server in such a zone. A
+  calendar system's names agree between Node and Chromium in the locales the suite checks.
 - **Layout.** Nothing is measured on a server. The overlays render closed, and the parts that
   follow a measurement render without it until they are mounted.
 - **Portals.** An overlay's portal content is never rendered on a server, even open or with the

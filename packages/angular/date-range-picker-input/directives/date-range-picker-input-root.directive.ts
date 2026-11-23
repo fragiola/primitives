@@ -1,4 +1,5 @@
 import {
+    booleanAttribute,
     computed,
     Directive,
     forwardRef,
@@ -8,6 +9,7 @@ import {
 } from "@angular/core";
 import { today } from "@fragiola/primitives/date";
 import type { SegmentGranularity } from "@fragiola/primitives/segments";
+import type { Disambiguation, TimeZone } from "@fragiola/primitives/time-zone";
 import { PICKER_BINDING } from "@fragiola/primitives-angular/calendar";
 import type { DateFieldValue } from "@fragiola/primitives-angular/date-field";
 import {
@@ -70,6 +72,15 @@ export class DateRangePickerInputRoot extends DatePickerRootBase {
     readonly hourCycle = input<12 | 24 | undefined, unknown>(undefined, {
         transform: hourCycleAttribute,
     });
+    /**
+     * A time zone from `@fragiola/primitives/time-zone` (`timeZone("America/New_York")`): the
+     * values are `ZonedDateTime`s in it, and a date and time shows the zone's name.
+     */
+    readonly timeZone = input<TimeZone | undefined>(undefined);
+    /** Hides the zone's name segment. */
+    readonly hideTimeZone = input(false, { transform: booleanAttribute });
+    /** How a wall time the zone skips or repeats resolves (Temporal's; default `compatible`). */
+    readonly disambiguation = input<Disambiguation | undefined>(undefined);
     private readonly todayDate = today();
     /** The picker's and the segments' state. */
     readonly typed = new DatePickerInputState(
@@ -96,6 +107,12 @@ export class DateRangePickerInputRoot extends DatePickerRootBase {
                 () => this.placeholderValue() ?? this.todayDate,
             ),
             hourCycle: this.hourCycle,
+            system: {
+                calendar: this.calendar,
+                timeZone: this.timeZone,
+                hideTimeZone: this.hideTimeZone,
+                disambiguation: this.disambiguation,
+            },
         },
         (event) => this.openChangeDetails.emit(event),
         (value: PickerValue, details) =>

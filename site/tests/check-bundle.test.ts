@@ -207,6 +207,20 @@ describe("the bundle guard, entry by entry", () => {
         ).toEqual(['/dialog: imports the component entry "/tabs"']);
     });
 
+    // Epic #82: the calendar systems and the time zones are injected, so no entry imports them
+    it("keeps /calendar-systems and /time-zone out of every component entry", () => {
+        expect(MECHANISM_USERS["calendar-systems"]).toEqual([]);
+        expect(MECHANISM_USERS["time-zone"]).toEqual([]);
+        expect(
+            mechanismLeaks("calendar", ["date", "calendar-systems"]),
+        ).toEqual([
+            '/calendar: imports the toolkit mechanism "/calendar-systems"',
+        ]);
+        expect(
+            mechanismLeaks("date-field", ["segments", "time", "time-zone"]),
+        ).toEqual(['/date-field: imports the toolkit mechanism "/time-zone"']);
+    });
+
     // Epic #79: the month and year values stay out of the day calendars and pickers
     it("keeps /month-year to the month and year entries and the views", () => {
         expect(MECHANISM_USERS["month-year"]).toContain("calendar-view");

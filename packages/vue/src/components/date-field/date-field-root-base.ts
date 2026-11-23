@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { PlainDate } from "@fragiola/primitives/date";
 import {
     bridgeForm,
@@ -11,6 +12,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { Disambiguation, TimeZone } from "@fragiola/primitives/time-zone";
 import {
     computed,
     Fragment,
@@ -69,6 +71,41 @@ export const dateFieldSharedProps = {
     name: { type: String, default: undefined },
 };
 
+/**
+ * The calendar system and time zone a date field takes (spec/calendar-systems.md,
+ * spec/time-zones.md): DateField, the range fields and the typed pickers.
+ */
+export interface DateFieldSystemProps {
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems`: the segments show and edit
+     * its fields (an era where it has several); values stay ISO. Default: the ISO calendar.
+     */
+    calendar?: CalendarSystem;
+    /**
+     * A time zone from `@fragiola/primitives/time-zone` (`timeZone("America/New_York")`): the
+     * values are `ZonedDateTime`s in it, and a date and time shows the zone's name.
+     */
+    timeZone?: TimeZone;
+    /** Hides the zone's name segment. */
+    hideTimeZone?: boolean;
+    /** How a wall time the zone skips or repeats resolves (Temporal's; default `compatible`). */
+    disambiguation?: Disambiguation;
+}
+
+/** The runtime props of `DateFieldSystemProps`. */
+export const dateFieldSystemProps = {
+    calendar: {
+        type: Object as PropType<CalendarSystem>,
+        default: undefined,
+    },
+    timeZone: { type: Object as PropType<TimeZone>, default: undefined },
+    hideTimeZone: { type: Boolean, default: undefined },
+    disambiguation: {
+        type: String as PropType<Disambiguation>,
+        default: undefined,
+    },
+};
+
 /** What the root's state reads from its component's props (each read when needed). */
 export interface DateFieldRootOptions<Value extends FieldValue> {
     component: DateFieldComponent;
@@ -81,7 +118,7 @@ export interface DateFieldRootOptions<Value extends FieldValue> {
         readOnly: boolean;
         disabled: boolean;
         name: string | undefined;
-    };
+    } & DateFieldSystemProps;
     granularity: () => SegmentGranularity;
     value: () => Value | null | undefined;
     defaultValue: () => Value | null;
@@ -115,13 +152,17 @@ export function useDateFieldRoot<Value extends FieldValue>(
             kind,
             granularity: options.granularity(),
             hourCycle: props.hourCycle,
+            calendar: props.calendar,
+            timeZone: props.timeZone,
+            hideTimeZone: props.hideTimeZone,
+            disambiguation: props.disambiguation,
         }),
     );
     const seed = computed(() =>
         segmentValuesOf(format.value, options.placeholderValue()),
     );
     const iso = computed(() =>
-        isoOf(kind, options.granularity(), own.value.value),
+        isoOf(kind, options.granularity(), own.value.value, props.timeZone),
     );
     // the last value the segments reported: it coming back changes nothing (the typing goes on)
     let reported: string | null = null;
@@ -159,8 +200,8 @@ export function useDateFieldRoot<Value extends FieldValue>(
         readOnly: () => props.readOnly,
         onEdit: (composed, edit, event) => {
             const granularity = options.granularity();
-            const after = isoOf(kind, granularity, composed);
-            if (after === isoOf(kind, granularity, current)) {
+            const after = isoOf(kind, granularity, composed, props.timeZone);
+            if (after === isoOf(kind, granularity, current, props.timeZone)) {
                 return;
             }
             reported = after;
@@ -299,11 +340,14 @@ export function useDateFieldRoot<Value extends FieldValue>(
                     hidden.value = element as HTMLInputElement | null;
                 },
                 type:
-                    kind === "time"
-                        ? "time"
-                        : granularity === "day"
-                          ? "date"
-                          : "datetime-local",
+                    // a zoned value's text (`…-05:00[America/New_York]`) is no native date's
+                    props.timeZone
+                        ? "text"
+                        : kind === "time"
+                          ? "time"
+                          : granularity === "day"
+                            ? "date"
+                            : "datetime-local",
                 "aria-hidden": "true",
                 tabindex: -1,
                 name: field.name() ?? props.name,

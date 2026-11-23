@@ -1,4 +1,3 @@
-import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
 import {
@@ -22,7 +21,7 @@ export interface CalendarGridProps extends PartProps<Record<string, never>> {
 export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
     const context = useRequiredContext(CalendarContext, "Calendar.Grid");
     const direction = useContext(DirectionContext);
-    const month = addMonths(context.visibleStart, offset);
+    const month = context.math.addMonths(context.visibleStart, offset);
     const [element, setElement] = useState<HTMLElement | null>(null);
     // read when the key comes, so the interception never waits for a render
     const range = useRef({ started: false, cancel: context.cancelRange });
@@ -55,7 +54,7 @@ export function CalendarGrid({ offset = 0, ...props }: CalendarGridProps) {
             context.select(context.focusedDate);
             return;
         }
-        const target = calendarKeyTarget(event.key, context.focusedDate, {
+        const target = context.math.keyTarget(event.key, context.focusedDate, {
             rtl: getDirection(event.currentTarget, direction) === "rtl",
             firstDayOfWeek: context.firstDay,
             shiftKey: event.shiftKey,

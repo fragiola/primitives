@@ -267,7 +267,7 @@ its focus and its changes; give it no `name` of its own. Outside a field it beha
 | [DateRangePicker](/docs/api/date-range-picker) | the range, or `null` | its hidden input (`required`) | its Trigger |
 | [NumberField](/docs/api/number-field) | the number, or `null` | its hidden `number` input (`required`, `min`, `max`) | its Input |
 | [OTPField](/docs/api/otp-field) | the code, a string | its hidden input (`required`, and a `pattern` that refuses an incomplete code) | its first empty slot |
-| [DateField](/docs/api/date-field) | the date (or date and time), or `null` | its hidden `date` or `datetime-local` input (`required`, `min`, `max`) | its first segment |
+| [DateField](/docs/api/date-field) | the date (or date and time), or `null` | its hidden `date` or `datetime-local` input (`required`, `min`, `max`); with a `timeZone`, a `text` input holding the zoned ISO text (`required` only) | its first segment |
 | [TimeField](/docs/api/time-field) | the time, or `null` | its hidden `time` input (`required`, `min`, `max`) | its first segment |
 | [DateRangeField](/docs/api/date-range-field), [TimeRangeField](/docs/api/time-range-field) | the range, or `null` | its two hidden inputs, `startName` and `endName` (`required`, crossed `min` / `max`: an end before the start is `rangeOverflow`) | the first segment of the first invalid end |
 | [DatePickerInput](/docs/api/date-picker-input), [DateRangePickerInput](/docs/api/date-range-picker-input) | the date or range, or `null` (only a complete, valid entry) | the picker's hidden input (`required`) | its first segment |

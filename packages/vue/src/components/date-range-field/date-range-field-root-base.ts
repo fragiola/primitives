@@ -11,6 +11,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import {
     computed,
     Fragment,
@@ -32,6 +33,7 @@ import type {
     DateFieldContext,
     DateFieldState,
 } from "../date-field/date-field-context.ts";
+import type { DateFieldSystemProps } from "../date-field/date-field-root-base.ts";
 import {
     boundIso,
     compareValues,
@@ -101,7 +103,7 @@ export interface DateRangeFieldRootOptions<Value extends FieldValue> {
         disabled: boolean;
         startName: string | undefined;
         endName: string | undefined;
-    };
+    } & DateFieldSystemProps;
     granularity: () => SegmentGranularity;
     value: () => FieldRange<Value> | null | undefined;
     defaultValue: () => FieldRange<Value> | null;
@@ -119,10 +121,11 @@ export function rangeIso(
     kind: SegmentKind,
     granularity: SegmentGranularity,
     range: FieldRange | null | undefined,
+    timeZone?: TimeZone,
 ): string {
     return range == null
         ? ""
-        : `${isoOf(kind, granularity, range.start)}/${isoOf(kind, granularity, range.end)}`;
+        : `${isoOf(kind, granularity, range.start, timeZone)}/${isoOf(kind, granularity, range.end, timeZone)}`;
 }
 
 /**
@@ -196,13 +199,17 @@ export function useDateRangeFieldRoot<Value extends FieldValue>(
             kind,
             granularity: options.granularity(),
             hourCycle: props.hourCycle,
+            calendar: props.calendar,
+            timeZone: props.timeZone,
+            hideTimeZone: props.hideTimeZone,
+            disambiguation: props.disambiguation,
         }),
     );
     const seed = computed(() =>
         segmentValuesOf(format.value, options.placeholderValue()),
     );
     const iso = computed(() =>
-        rangeIso(kind, options.granularity(), own.value.value),
+        rangeIso(kind, options.granularity(), own.value.value, props.timeZone),
     );
     // the last value the segments reported, and the value as of the last change (date-field's)
     let reported: string | null = null;
@@ -243,8 +250,10 @@ export function useDateRangeFieldRoot<Value extends FieldValue>(
         (composed: FieldValue | null, edit: SegmentEditKind, event: Event) => {
             const granularity = options.granularity();
             const next = composeRange(groups, end, composed, compose);
-            const after = rangeIso(kind, granularity, next);
-            if (after === rangeIso(kind, granularity, current)) {
+            const after = rangeIso(kind, granularity, next, props.timeZone);
+            if (
+                after === rangeIso(kind, granularity, current, props.timeZone)
+            ) {
                 return;
             }
             reported = after;
@@ -335,8 +344,18 @@ export function useDateRangeFieldRoot<Value extends FieldValue>(
                     // Vue sets `value` as a property only: write the rendered value back
                     const granularity = options.granularity();
                     const shown = own.value.value;
-                    start.value = isoOf(kind, granularity, shown?.start);
-                    end.value = isoOf(kind, granularity, shown?.end);
+                    start.value = isoOf(
+                        kind,
+                        granularity,
+                        shown?.start,
+                        props.timeZone,
+                    );
+                    end.value = isoOf(
+                        kind,
+                        granularity,
+                        shown?.end,
+                        props.timeZone,
+                    );
                 },
                 invalid: groups.start.firstSegment,
             });
@@ -411,16 +430,23 @@ export function useDateRangeFieldRoot<Value extends FieldValue>(
             ref: (element: unknown) => {
                 target.value = element as HTMLInputElement | null;
             },
-            type:
-                kind === "time"
-                    ? "time"
-                    : granularity === "day"
-                      ? "date"
-                      : "datetime-local",
+            // a zoned value's text (`…-05:00[America/New_York]`) is no native date's
+            type: props.timeZone
+                ? "text"
+                : kind === "time"
+                  ? "time"
+                  : granularity === "day"
+                    ? "date"
+                    : "datetime-local",
             "aria-hidden": "true",
             tabindex: -1,
             name,
-            value: isoOf(kind, granularity, own.value.value?.[end]),
+            value: isoOf(
+                kind,
+                granularity,
+                own.value.value?.[end],
+                props.timeZone,
+            ),
             min: boundIso(kind, granularity, lower),
             max: boundIso(kind, granularity, upper),
             step: "any",

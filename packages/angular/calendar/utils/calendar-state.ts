@@ -12,20 +12,16 @@ import {
     signal,
     untracked,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import {
-    addMonths,
     clampDate,
     compareDates,
     type DateRange,
-    endOfMonth,
     firstDayOfWeek,
     isBetween,
     isSameDate,
-    isSameMonth,
     isWithinBounds,
-    monthsBetween,
     type PlainDate,
-    startOfMonth,
     today,
     toIsoDate,
     watchDocumentLanguage,
@@ -40,6 +36,7 @@ import {
     type CalendarMode,
     type CalendarOptions,
     type CalendarValue,
+    ISO_MATH,
     isRange,
 } from "./calendar-value.ts";
 import { PICKER_BINDING } from "./picker-binding.ts";
@@ -68,6 +65,8 @@ export interface CalendarInputs {
     locale: Signal<string | undefined>;
     firstDayOfWeek: Signal<number | undefined>;
     visibleMonths: Signal<number | undefined>;
+    /** A calendar system (spec/calendar-systems.md); `undefined`: the ISO calendar. */
+    calendar: Signal<CalendarSystem | undefined>;
     disabled: Signal<boolean>;
     /** `undefined` when unset: a bound picker's then applies. */
     readOnly: Signal<boolean | undefined>;
@@ -122,6 +121,7 @@ export class CalendarState {
             locale: this.inputs.locale(),
             firstDayOfWeek: this.inputs.firstDayOfWeek(),
             visibleMonths: this.inputs.visibleMonths(),
+            calendar: this.inputs.calendar(),
         };
         if (!this.bound() || this.picker === null) {
             return own;
@@ -141,7 +141,7 @@ export class CalendarState {
     private readonly browser = inject(PLATFORM_ID) === "browser";
     /** Bumped by a change of the document's `lang` in the browser (Epic #49: followed after mount). */
     private readonly language = signal(0);
-    readonly locale = computed(() => {
+    private readonly baseLocale = computed(() => {
         const own = this.options().locale;
         if (own !== undefined) {
             return own;
@@ -149,8 +149,19 @@ export class CalendarState {
         this.language();
         return documentLocale(this.document, this.browser);
     });
+    /** The calendar system, when one is given (a CalendarView's month and year views use it). */
+    readonly system = computed(() => this.options().calendar);
+    /** The month math: the calendar system's, or the ISO calendar's. */
+    readonly math = computed(() => this.system() ?? ISO_MATH);
+    /** The locale `Intl` writes the names in (with a calendar system's `-u-ca-`). */
+    readonly locale = computed(() => {
+        const system = this.system();
+        const locale = this.baseLocale();
+        return system ? system.locale(locale) : locale;
+    });
     readonly firstDay = computed(
-        () => this.options().firstDayOfWeek ?? firstDayOfWeek(this.locale()),
+        () =>
+            this.options().firstDayOfWeek ?? firstDayOfWeek(this.baseLocale()),
     );
     readonly visibleMonths = computed(() =>
         Math.max(1, this.options().visibleMonths ?? 1),
@@ -172,7 +183,8 @@ export class CalendarState {
     );
     /** The first visible month (day 1). */
     readonly visibleStart = computed(
-        () => this.visibleOwn() ?? startOfMonth(this.initialFocus()),
+        () =>
+            this.visibleOwn() ?? this.math().startOfMonth(this.initialFocus()),
     );
     /** RangeCalendar: the start of a range being chosen, and the date it previews to. */
     readonly anchor = signal<PlainDate | null>(null);
@@ -264,17 +276,18 @@ export class CalendarState {
         if (this.isOutOfBounds(date)) {
             return false;
         }
+        const math = this.math();
         const visibleMonths = this.visibleMonths();
         const start = this.visibleStart();
-        const offset = monthsBetween(start, date);
+        const offset = math.monthsBetween(start, date);
         // the keyboard previews the range from now on, not the last hovered date
         this.hovered.set(null);
         this.focusedOwn.set(date);
         if (offset < 0) {
-            this.visibleOwn.set(startOfMonth(date));
+            this.visibleOwn.set(math.startOfMonth(date));
         } else if (offset >= visibleMonths) {
             this.visibleOwn.set(
-                addMonths(startOfMonth(date), -(visibleMonths - 1)),
+                math.addMonths(math.startOfMonth(date), -(visibleMonths - 1)),
             );
         } else {
             this.visibleOwn.set(start);
@@ -283,9 +296,13 @@ export class CalendarState {
     }
 
     canPage(delta: 1 | -1): boolean {
+        const math = this.math();
         const visibleMonths = this.visibleMonths();
-        const start = addMonths(this.visibleStart(), delta * visibleMonths);
-        const end = endOfMonth(addMonths(start, visibleMonths - 1));
+        const start = math.addMonths(
+            this.visibleStart(),
+            delta * visibleMonths,
+        );
+        const end = math.endOfMonth(math.addMonths(start, visibleMonths - 1));
         const min = this.min();
         const max = this.max();
         return (
@@ -300,11 +317,12 @@ export class CalendarState {
         if (!this.canPage(delta)) {
             return;
         }
+        const math = this.math();
         const step = delta * this.visibleMonths();
-        this.visibleOwn.set(addMonths(this.visibleStart(), step));
+        this.visibleOwn.set(math.addMonths(this.visibleStart(), step));
         this.focusedOwn.set(
             clampDate(
-                addMonths(this.focusedDate(), step),
+                math.addMonths(this.focusedDate(), step),
                 this.min(),
                 this.max(),
             ),
@@ -353,7 +371,7 @@ export class CalendarState {
         const value = this.value();
         const rangeValue = this.rangeValue();
         const anchor = this.anchor();
-        const outsideMonth = !isSameMonth(date, month);
+        const outsideMonth = !this.math().isSameMonth(date, month);
         const inRange =
             rangeValue !== null &&
             isBetween(date, rangeValue.start, rangeValue.end);

@@ -1,4 +1,3 @@
-import { unitRows } from "@fragiola/primitives/month-year";
 import { defineComponent, h, type VNode } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
@@ -13,7 +12,7 @@ import {
 } from "../../utils/render-part.ts";
 import { MonthCalendarKey } from "./month-calendar-context.ts";
 import { MonthCalendarRow } from "./month-calendar-row.ts";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 /** The default slot renders each row of `columns` items (default: a Row each). */
 export interface MonthCalendarGridBodySlots {
@@ -36,10 +35,10 @@ export const MonthCalendarGridBody: PublicComponent<
                 "MonthCalendar.GridBody",
             );
             return () => {
-                const rows = unitRows(
-                    context.pageStart.value,
-                    context.columns(),
-                ).map((row) => row.map(context.itemOf));
+                const units = context.units();
+                const rows = units
+                    .rows(context.pageStart.value, context.columns())
+                    .map((row) => row.map(context.itemOf));
                 return renderPart(
                     "tbody",
                     { attrs, slots },
@@ -54,8 +53,7 @@ export const MonthCalendarGridBody: PublicComponent<
                                 ? slots.default({ row })
                                 : [
                                       h(MonthCalendarRow, {
-                                          key: itemIndex(
-                                              context.kind,
+                                          key: units.index(
                                               row[0] as MonthCalendarItem,
                                           ),
                                           row,

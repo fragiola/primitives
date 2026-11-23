@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -27,6 +28,11 @@ export interface MonthCalendarRootSharedProps
     columns?: number;
     /** A BCP 47 tag (default: the document's `lang`, then the browser's). */
     locale?: string;
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems` (spec/calendar-systems.md):
+     * the items are its months (a page is its year) or years, and so are the values.
+     */
+    calendar?: CalendarSystem;
     disabled?: boolean;
     readOnly?: boolean;
 }
@@ -40,6 +46,7 @@ const OPTION_KEYS: ReadonlySet<string> = new Set([
     "isUnavailable",
     "locale",
     "columns",
+    "calendar",
     "disabled",
     "readOnly",
 ]);

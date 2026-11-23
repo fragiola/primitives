@@ -1,6 +1,5 @@
 import {
     formatDayNumber,
-    formatFullDate,
     type PlainDate,
     toIsoDate,
 } from "@fragiola/primitives/date";
@@ -49,7 +48,7 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
     return renderElement(
         "td",
         {
-            "aria-label": formatFullDate(context.locale, date),
+            "aria-label": context.math.fullDate(context.locale, date),
             ...props,
             children: children ?? formatDayNumber(context.locale, date),
         },

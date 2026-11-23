@@ -11,6 +11,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
@@ -22,6 +23,7 @@ import type {
     DateFieldContextValue,
     DateFieldState,
 } from "../date-field/date-field-context.ts";
+import type { DateFieldSystemProps } from "../date-field/date-field-root-base.tsx";
 import {
     boundIso,
     compareValues,
@@ -65,7 +67,8 @@ export interface DateRangeFieldRootSharedProps
 }
 
 export interface DateRangeFieldRootBaseProps<Value extends FieldValue>
-    extends DateRangeFieldRootSharedProps {
+    extends DateRangeFieldRootSharedProps,
+        DateFieldSystemProps {
     component: DateFieldComponent;
     kind: SegmentKind;
     granularity: SegmentGranularity;
@@ -87,10 +90,11 @@ export function rangeIso(
     kind: SegmentKind,
     granularity: SegmentGranularity,
     range: FieldRange | null | undefined,
+    timeZone?: TimeZone,
 ): string {
     return range == null
         ? ""
-        : `${isoOf(kind, granularity, range.start)}/${isoOf(kind, granularity, range.end)}`;
+        : `${isoOf(kind, granularity, range.start, timeZone)}/${isoOf(kind, granularity, range.end, timeZone)}`;
 }
 
 /**
@@ -157,6 +161,10 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
     max,
     isDateUnavailable,
     hourCycle,
+    calendar,
+    timeZone,
+    hideTimeZone,
+    disambiguation,
     locale: localeProp,
     required = false,
     readOnly = false,
@@ -178,8 +186,27 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
     );
     const locale = useDocumentLocale(localeProp);
     const format = useMemo(
-        () => segmentFormat({ locale, kind, granularity, hourCycle }),
-        [locale, kind, granularity, hourCycle],
+        () =>
+            segmentFormat({
+                locale,
+                kind,
+                granularity,
+                hourCycle,
+                calendar,
+                timeZone,
+                hideTimeZone,
+                disambiguation,
+            }),
+        [
+            locale,
+            kind,
+            granularity,
+            hourCycle,
+            calendar,
+            timeZone,
+            hideTimeZone,
+            disambiguation,
+        ],
     );
     const seed = useMemo(
         () => segmentValuesOf(format, placeholderValue),
@@ -228,10 +255,20 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
                     group.values(),
                 ),
             );
-            const after = rangeIso(state.kind, state.granularity, next);
+            const after = rangeIso(
+                state.kind,
+                state.granularity,
+                next,
+                state.format.timeZone,
+            );
             if (
                 after ===
-                rangeIso(state.kind, state.granularity, current.current)
+                rangeIso(
+                    state.kind,
+                    state.granularity,
+                    current.current,
+                    state.format.timeZone,
+                )
             ) {
                 return;
             }
@@ -264,7 +301,7 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
             onEdit: onEdit("end"),
         }),
     };
-    const iso = rangeIso(kind, granularity, value);
+    const iso = rangeIso(kind, granularity, value, timeZone);
     // a value from outside replaces both ends; a `null` one only when they are complete
     current.current = value;
     const [synced, setSynced] = useState(iso);
@@ -321,8 +358,14 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
                     state.kind,
                     state.granularity,
                     initial?.start,
+                    state.format.timeZone,
                 );
-                end.value = isoOf(state.kind, state.granularity, initial?.end);
+                end.value = isoOf(
+                    state.kind,
+                    state.granularity,
+                    initial?.end,
+                    state.format.timeZone,
+                );
             },
             invalid: startFirst,
         });
@@ -374,12 +417,13 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
             end: groupContext(groups.end),
         },
     };
-    const type =
-        kind === "time"
-            ? "time"
-            : granularity === "day"
-              ? "date"
-              : "datetime-local";
+    const type = timeZone
+        ? "text"
+        : kind === "time"
+          ? "time"
+          : granularity === "day"
+            ? "date"
+            : "datetime-local";
     const hiddenInput = (
         end: RangeEnd,
         ref: typeof hiddenStart,
@@ -393,7 +437,7 @@ export function DateRangeFieldRootBase<Value extends FieldValue>({
             aria-hidden="true"
             tabIndex={-1}
             name={name}
-            value={isoOf(kind, granularity, value?.[end])}
+            value={isoOf(kind, granularity, value?.[end], timeZone)}
             min={boundIso(kind, granularity, lower)}
             max={boundIso(kind, granularity, upper)}
             step="any"

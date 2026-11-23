@@ -5,6 +5,7 @@ import {
     input,
     numberAttribute,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { dataValues } from "@fragiola/primitives-angular/internal";
 import type {
     MonthCalendarInputs,
@@ -32,6 +33,14 @@ export abstract class MonthCalendarRootBase {
     /** Items per row (default 3). */
     readonly columns = input<number | undefined, unknown>(undefined, {
         transform: optionalNumber,
+    });
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems` (spec/calendar-systems.md):
+     * the items are its months (a page is its year) or years, and so are the values
+     * (`[calendar]`; the root's `calendar` is its state).
+     */
+    readonly calendarSystem = input<CalendarSystem | undefined>(undefined, {
+        alias: "calendar",
     });
     readonly disabled = input(false, { transform: booleanAttribute });
     /** Default: a bound picker's `readOnly`, else `false`; an explicit `false` wins over the picker's. */
@@ -64,6 +73,7 @@ export abstract class MonthCalendarRootBase {
             ...own,
             locale: this.locale,
             columns: this.columns,
+            calendar: this.calendarSystem,
             disabled: this.disabled,
             readOnly: this.readOnly,
         };

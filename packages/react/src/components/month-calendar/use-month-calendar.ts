@@ -1,9 +1,4 @@
-import {
-    currentYearMonth,
-    monthIndex,
-    UNIT_PAGE_SIZE,
-    unitPageStart,
-} from "@fragiola/primitives/month-year";
+import { currentYearMonth, monthIndex } from "@fragiola/primitives/month-year";
 import {
     useCallback,
     useContext,
@@ -23,12 +18,11 @@ import type {
 } from "./month-calendar-context.ts";
 import {
     isItemRange,
-    itemIndex,
-    itemOf,
     type MonthCalendarKind,
     type MonthCalendarMode,
     type MonthCalendarOptions,
     type MonthCalendarValue,
+    unitsOf,
 } from "./month-calendar-value.ts";
 import { useDocumentLocale } from "./use-document-locale.ts";
 
@@ -49,6 +43,7 @@ function definedOptions(props: MonthCalendarOptions): MonthCalendarOptions {
             isUnavailable: props.isUnavailable,
             locale: props.locale,
             columns: props.columns,
+            calendar: props.calendar,
         }).filter(([, value]) => value !== undefined),
     );
 }
@@ -56,7 +51,7 @@ function definedOptions(props: MonthCalendarOptions): MonthCalendarOptions {
 /**
  * The state of a month or year calendar, single or range (spec/month-calendar.md): the focused
  * item and its page, the value (its own, or its picker's or view's when it sits in one with no
- * value of its own), and the range being chosen. Items are numbers (`itemIndex`).
+ * value of its own), and the range being chosen. Items are numbers (`units.index`).
  */
 export function useMonthCalendar(
     component: MonthCalendarComponent,
@@ -79,16 +74,27 @@ export function useMonthCalendar(
         ChangeDetails
     >(props.value, props.defaultValue ?? null, props.onValueChange);
     const value = bound ? binding.value : ownValue;
+    // a calendar system's months or years (spec/calendar-systems.md), else the ISO calendar's
+    const system = options.calendar;
+    const units = unitsOf(kind, system);
     const toIndex = (item: MonthCalendarValue) =>
-        item === null || isItemRange(item) ? null : itemIndex(kind, item);
-    const min = options.min == null ? null : itemIndex(kind, options.min);
-    const max = options.max == null ? null : itemIndex(kind, options.max);
+        item === null || isItemRange(item) ? null : units.index(item);
+    const min = options.min == null ? null : units.index(options.min);
+    const max = options.max == null ? null : units.index(options.max);
     const locale = useDocumentLocale(options.locale);
     const columns = Math.max(1, Math.floor(options.columns ?? 3));
     const disabled = props.disabled ?? false;
     const readOnly = props.readOnly ?? (bound && binding.readOnly);
     const isDisabledByView = bound ? binding.isDisabled : undefined;
     const [todayIndex] = useState(() => {
+        if (system) {
+            const now = new Date();
+            return system.units(kind).fromDate({
+                year: now.getFullYear(),
+                month: now.getMonth() + 1,
+                day: now.getDate(),
+            });
+        }
         const now = currentYearMonth();
         return kind === "month" ? monthIndex(now) : now.year;
     });
@@ -108,20 +114,18 @@ export function useMonthCalendar(
               : index;
     const seed = () =>
         clamp(
-            (isItemRange(value)
-                ? itemIndex(kind, value.start)
-                : toIndex(value)) ??
+            (isItemRange(value) ? units.index(value.start) : toIndex(value)) ??
                 (bound ? binding.focus : undefined) ??
                 todayIndex,
         );
     const [focused, setFocused] = useState(seed);
-    const [pageStart, setPageStart] = useState(() => unitPageStart(focused));
+    const [pageStart, setPageStart] = useState(() => units.pageStart(focused));
     const [anchor, setAnchor] = useState<number | null>(null);
     const [hovered, setHovered] = useState<number | null>(null);
     const cells = useMemo(() => new Map<number, HTMLElement>(), []);
     const baseId = useId();
     const isUnavailable = (index: number) =>
-        options.isUnavailable?.(itemOf(kind, index)) ?? false;
+        options.isUnavailable?.(units.item(index)) ?? false;
 
     const moveFocus = useCallback(
         (index: number) => {
@@ -130,39 +134,49 @@ export function useMonthCalendar(
             }
             setHovered(null);
             setFocused(index);
-            setPageStart(unitPageStart(index));
+            setPageStart(units.pageStart(index));
             return true;
         },
-        [isOutOfBounds],
+        [isOutOfBounds, units],
+    );
+    // the first item of the next or previous page (a system's year can have 13 months)
+    const nextStart = useCallback(
+        (delta: 1 | -1) =>
+            delta > 0
+                ? pageStart + units.pageSize(pageStart)
+                : units.pageStart(pageStart - 1),
+        [pageStart, units],
     );
 
     const canPage = useCallback(
         (delta: 1 | -1) => {
-            const start = pageStart + delta * UNIT_PAGE_SIZE;
-            for (let index = start; index < start + UNIT_PAGE_SIZE; index++) {
+            const start = nextStart(delta);
+            const end = start + units.pageSize(start);
+            for (let index = start; index < end; index++) {
                 if (!isOutOfBounds(index)) {
                     return true;
                 }
             }
             return false;
         },
-        [pageStart, isOutOfBounds],
+        [nextStart, isOutOfBounds, units],
     );
     const page = useCallback(
         (delta: 1 | -1) => {
             if (!canPage(delta)) {
                 return;
             }
-            const start = pageStart + delta * UNIT_PAGE_SIZE;
-            const target = focused + delta * UNIT_PAGE_SIZE;
+            const start = nextStart(delta);
+            const size = units.pageSize(start);
+            const target = start + Math.min(focused - pageStart, size - 1);
             // the same place on the new page, else its enabled item nearest to it
             let next = target;
-            for (let distance = 0; distance < UNIT_PAGE_SIZE; distance++) {
+            for (let distance = 0; distance < size; distance++) {
                 const candidates = [target - distance, target + distance];
                 const found = candidates.find(
                     (index) =>
                         index >= start &&
-                        index < start + UNIT_PAGE_SIZE &&
+                        index < start + size &&
                         !isOutOfBounds(index),
                 );
                 if (found !== undefined) {
@@ -173,7 +187,7 @@ export function useMonthCalendar(
             setPageStart(start);
             setFocused(next);
         },
-        [canPage, pageStart, focused, isOutOfBounds],
+        [canPage, nextStart, pageStart, focused, isOutOfBounds, units],
     );
 
     const commit = (next: MonthCalendarValue) => {
@@ -189,7 +203,7 @@ export function useMonthCalendar(
         }
         setFocused(index);
         if (mode === "single") {
-            commit(itemOf(kind, index));
+            commit(units.item(index));
             return;
         }
         if (anchor === null) {
@@ -200,7 +214,7 @@ export function useMonthCalendar(
             anchor <= index ? [anchor, index] : [index, anchor];
         setAnchor(null);
         setHovered(null);
-        commit({ start: itemOf(kind, start), end: itemOf(kind, end) });
+        commit({ start: units.item(start), end: units.item(end) });
     };
 
     // a picker's calendar stays mounted while its popup's exit animation runs: closing cancels a
@@ -218,15 +232,15 @@ export function useMonthCalendar(
         if (opened) {
             const start = seed();
             setFocused(start);
-            setPageStart(unitPageStart(start));
+            setPageStart(units.pageStart(start));
             setReopened((count) => count + 1);
         }
     });
 
     const range = isItemRange(value)
         ? {
-              start: itemIndex(kind, value.start),
-              end: itemIndex(kind, value.end),
+              start: units.index(value.start),
+              end: units.index(value.end),
           }
         : null;
     const single = toIndex(value);
@@ -268,7 +282,8 @@ export function useMonthCalendar(
         readOnly,
         headingId: `${baseId}-heading`,
         gridId: `${baseId}-grid`,
-        itemOf: (index) => itemOf(kind, index),
+        units,
+        itemOf: units.item,
         cellState,
         moveFocus,
         page,

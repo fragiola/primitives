@@ -17,20 +17,28 @@ import {
     toIsoDateTime,
     toIsoTime,
 } from "@fragiola/primitives/time";
+import type { TimeZone, ZonedDateTime } from "@fragiola/primitives/time-zone";
 
 /** What a date or time field holds: a date, a date and time, or a time. */
 export type FieldValue = PlainDate | PlainDateTime | PlainTime;
 
-/** A value's ISO text at the field's granularity (spec/date-field.md, "Forms"); `""` for none. */
+/**
+ * A value's ISO text at the field's granularity (spec/date-field.md, "Forms"); a zoned value's with
+ * its offset and zone (spec/time-zones.md); `""` for none.
+ */
 export function isoOf(
     kind: SegmentKind,
     granularity: SegmentGranularity,
     value: FieldValue | null | undefined,
+    timeZone?: TimeZone,
 ): string {
     if (value == null) {
         return "";
     }
     const precision = granularity === "second" ? "second" : "minute";
+    if (timeZone && "offset" in value) {
+        return timeZone.toIso(value as ZonedDateTime, precision);
+    }
     if (kind === "time") {
         return toIsoTime(value as PlainTime, precision);
     }
@@ -88,8 +96,8 @@ export function composeSegments(
         : kind === "time"
           ? segmentsToTime(values)
           : granularity === "day"
-            ? segmentsToDate(values)
-            : segmentsToDateTime(values);
+            ? segmentsToDate(values, format)
+            : segmentsToDateTime(values, format);
 }
 
 /** A bound's ISO text for a hidden input's `min` / `max` (`null` with none). */

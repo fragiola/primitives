@@ -1,6 +1,5 @@
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
-import { unitKeyTarget } from "@fragiola/primitives/month-year";
 import {
     type KeyboardEvent,
     useContext,
@@ -54,7 +53,7 @@ export function MonthCalendarGrid(props: MonthCalendarGridProps) {
             context.select(context.focused);
             return;
         }
-        const target = unitKeyTarget(event.key, context.focused, {
+        const target = context.units.keyTarget(event.key, context.focused, {
             rtl: getDirection(event.currentTarget, direction) === "rtl",
             columns: context.columns,
         });

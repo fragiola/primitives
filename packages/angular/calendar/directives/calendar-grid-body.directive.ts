@@ -1,5 +1,5 @@
 import { computed, Directive, inject } from "@angular/core";
-import { monthGrid, type PlainDate } from "@fragiola/primitives/date";
+import type { PlainDate } from "@fragiola/primitives/date";
 import { CALENDAR } from "../utils/calendar-state.ts";
 import { CalendarGrid } from "./calendar-grid.directive.ts";
 
@@ -15,8 +15,9 @@ import { CalendarGrid } from "./calendar-grid.directive.ts";
 export class CalendarGridBody {
     protected readonly calendar = inject(CALENDAR);
     private readonly grid = inject(CalendarGrid);
-    readonly weeks = computed<PlainDate[][]>(() => {
-        const month = this.grid.month();
-        return monthGrid(month.year, month.month, this.calendar.firstDay());
-    });
+    readonly weeks = computed<PlainDate[][]>(() =>
+        this.calendar
+            .math()
+            .monthGrid(this.grid.month(), this.calendar.firstDay()),
+    );
 }

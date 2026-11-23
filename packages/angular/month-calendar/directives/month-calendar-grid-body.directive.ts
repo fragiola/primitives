@@ -1,5 +1,4 @@
 import { computed, Directive, inject } from "@angular/core";
-import { unitRows } from "@fragiola/primitives/month-year";
 import { MONTH_CALENDAR } from "../utils/month-calendar-state.ts";
 import type { MonthCalendarItem } from "../utils/month-calendar-value.ts";
 
@@ -15,8 +14,9 @@ import type { MonthCalendarItem } from "../utils/month-calendar-value.ts";
 export class MonthCalendarGridBody {
     protected readonly calendar = inject(MONTH_CALENDAR);
     readonly rows = computed<MonthCalendarItem[][]>(() =>
-        unitRows(this.calendar.pageStart(), this.calendar.columns()).map(
-            (row) => row.map((index) => this.calendar.itemOf(index)),
-        ),
+        this.calendar
+            .units()
+            .rows(this.calendar.pageStart(), this.calendar.columns())
+            .map((row) => row.map((index) => this.calendar.itemOf(index))),
     );
 }

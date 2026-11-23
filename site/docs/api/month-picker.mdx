@@ -118,6 +118,7 @@ binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`, `(val
 | `max` | `PlainYearMonth \| null` | | passed to the bound calendar |
 | `isUnavailable` | `(month: PlainYearMonth) => boolean` | | passed to the bound calendar |
 | `locale` | `string` | the document's `lang` | passed to the bound calendar |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems), passed to the bound calendar: the values are its months, submitted as the first day's ISO date with the system (`2026-10-23[u-ca=persian]`) |
 | `columns` | `number` | `3` | passed to the bound calendar |
 | `name` | `string` | | the hidden input's form name (a Field's wins) |
 | `required` | `boolean` | `false` | a native form's validation blocks a submission with no value |

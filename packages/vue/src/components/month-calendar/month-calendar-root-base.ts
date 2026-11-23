@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { defineComponent, nextTick, type PropType, provide, watch } from "vue";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
@@ -25,6 +26,11 @@ export interface MonthCalendarRootSharedProps {
     columns?: number;
     /** A BCP 47 tag (default: the document's `lang`, then the browser's). */
     locale?: string;
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems` (spec/calendar-systems.md):
+     * the items are its months (a page is its year) or years, and so are the values.
+     */
+    calendar?: CalendarSystem;
     disabled?: boolean;
     readOnly?: boolean;
 }
@@ -45,6 +51,10 @@ export const monthCalendarOptionProps = {
     },
     locale: { type: String, default: undefined },
     columns: { type: Number, default: undefined },
+    calendar: {
+        type: Object as PropType<CalendarSystem>,
+        default: undefined,
+    },
 };
 
 export const monthCalendarRootProps = {

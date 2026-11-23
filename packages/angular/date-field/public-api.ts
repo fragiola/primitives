@@ -30,7 +30,10 @@ export {
     type DateFieldInputs,
     DateFieldRootState,
     type DateFieldSegmentState,
+    type DateFieldSystemInputs,
+    hiddenType,
     stateData,
+    systemFormat,
 } from "./utils/date-field-state.ts";
 export { documentLocale } from "./utils/document-locale.ts";
 export {

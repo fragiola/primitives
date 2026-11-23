@@ -157,6 +157,8 @@ export const DateFieldSegment: PartComponent<
                     );
                 }
                 const labelId = context.labelId();
+                const textual =
+                    segment.type === "dayPeriod" || segment.type === "era";
                 return renderPart(
                     "span",
                     { attrs, slots },
@@ -180,16 +182,13 @@ export const DateFieldSegment: PartComponent<
                         "aria-readonly": readOnly ? "true" : undefined,
                         "aria-disabled": disabled ? "true" : undefined,
                         contenteditable: writable.value ? "true" : undefined,
-                        inputmode:
-                            segment.type === "dayPeriod" ? "text" : "numeric",
+                        // a day period and an era take letters
+                        inputmode: textual ? "text" : "numeric",
                         spellcheck: "false",
                         autocorrect: "off",
                         autocapitalize: "off",
                         enterkeyhint: "next",
-                        style:
-                            segment.type === "dayPeriod"
-                                ? undefined
-                                : NUMERIC_STYLE,
+                        style: textual ? undefined : NUMERIC_STYLE,
                         "data-primitives-part": `${context.component}-segment`,
                         "data-type": segment.type,
                         "data-placeholder": segment.placeholder

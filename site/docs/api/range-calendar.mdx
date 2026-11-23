@@ -140,6 +140,7 @@ page.
 | `max` | `PlainDate \| null` | | dates after it are disabled |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | unavailable dates can be focused, not chosen |
 | `locale` | `string` | the document's `lang` | a BCP 47 tag |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems): the grid's months and names; values stay ISO |
 | `firstDayOfWeek` | `number` | the locale's | `0`–`6`, Sunday is `0` |
 | `visibleMonths` | `number` | `1` | how many months are shown |
 | `disabled` | `boolean` | `false` | nothing can be focused or chosen |

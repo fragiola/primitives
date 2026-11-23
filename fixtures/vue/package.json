@@ -11,6 +11,7 @@
         "typecheck": "vue-tsc -p tsconfig.json --noEmit"
     },
     "dependencies": {
+        "@fragiola/primitives": "workspace:*",
         "@fragiola/primitives-vue": "workspace:*",
         "examples-shared": "workspace:*",
         "vue": "3.5.45"

@@ -1,3 +1,7 @@
+import type { CalendarSystem } from "../calendar-systems/calendar-system.ts";
+import type { TimeZone } from "../time-zone/time-zone.ts";
+import type { Disambiguation } from "../time-zone/zoned-date-time.ts";
+
 /** What a segment of a date or time field shows (spec/date-field.md, "Segments"). */
 export type SegmentType =
     | "era"
@@ -8,10 +12,15 @@ export type SegmentType =
     | "minute"
     | "second"
     | "dayPeriod"
+    | "timeZoneName"
     | "literal";
 
-/** The segments the user edits; the others (`literal`, `era`) are only shown. */
+/**
+ * The segments the user edits; the others (`literal`, `timeZoneName`) are only shown, and an
+ * `era` only in a calendar system of several eras (spec/calendar-systems.md, "In the fields").
+ */
 export type EditableSegmentType =
+    | "era"
     | "year"
     | "month"
     | "day"
@@ -37,6 +46,19 @@ export interface SegmentFormatOptions {
     readonly granularity?: SegmentGranularity | undefined;
     /** `12` or `24` (the locale picks `h11` or `h12` for 12), or an exact cycle; default: the locale's. */
     readonly hourCycle?: 12 | 24 | HourCycle | undefined;
+    /**
+     * A calendar system (spec/calendar-systems.md): the segments show and edit its fields; values
+     * stay ISO. Default: none (the ISO calendar, as the locale writes it).
+     */
+    readonly calendar?: CalendarSystem | undefined;
+    /**
+     * A time zone (spec/time-zones.md): the values are `ZonedDateTime`s in it, and a date and
+     * time shows a `timeZoneName` segment unless `hideTimeZone`.
+     */
+    readonly timeZone?: TimeZone | undefined;
+    readonly hideTimeZone?: boolean | undefined;
+    /** How a wall time the zone skips or repeats resolves (default `compatible`). */
+    readonly disambiguation?: Disambiguation | undefined;
 }
 
 /** One piece of the format, in the locale's order: a segment, or the literal text between. */
@@ -70,6 +92,13 @@ export interface SegmentFormat {
     readonly formatter: Intl.DateTimeFormat;
     /** Formats a UTC date's month name (`month: "long"`), the month's `aria-valuetext`. */
     readonly monthNames: Intl.DateTimeFormat;
+    /** The calendar system, when the field has one. */
+    readonly calendar?: CalendarSystem | undefined;
+    /** The eras' names (`era: "short"`), oldest first, when the era is editable. */
+    readonly eras?: readonly string[] | undefined;
+    /** The time zone, when the field holds zoned values. */
+    readonly timeZone?: TimeZone | undefined;
+    readonly disambiguation?: Disambiguation | undefined;
 }
 
 const EDITABLE = /* @__PURE__ */ new Set<string>([
@@ -101,6 +130,7 @@ function formatOptions(
     kind: SegmentKind,
     granularity: SegmentGranularity,
     hourCycle: SegmentFormatOptions["hourCycle"],
+    zoneName: boolean,
 ): Intl.DateTimeFormatOptions {
     const options: Intl.DateTimeFormatOptions = { timeZone: "UTC" };
     if (kind === "date") {
@@ -124,6 +154,10 @@ function formatOptions(
         } else if (hourCycle !== undefined) {
             options.hourCycle = hourCycle;
         }
+        if (zoneName && kind === "date") {
+            // where the locale writes it; its text is the field's zone's (`dateSegments`)
+            options.timeZoneName = "short";
+        }
     }
     return options;
 }
@@ -138,7 +172,7 @@ function normalizeLiteral(text: string): string {
 }
 
 function partType(type: string): SegmentType {
-    return EDITABLE.has(type) || type === "era"
+    return EDITABLE.has(type) || type === "era" || type === "timeZoneName"
         ? (type as SegmentType)
         : "literal";
 }
@@ -169,6 +203,7 @@ function segmentNames(locale: string): Partial<Record<SegmentType, string>> {
             "minute",
             "second",
             "dayPeriod",
+            "timeZoneName",
         ] as const) {
             const name = names.of(type);
             if (name !== undefined) {
@@ -188,7 +223,9 @@ function segmentNames(locale: string): Partial<Record<SegmentType, string>> {
  * literals, hour cycle and digits.
  */
 export function segmentFormat(options: SegmentFormatOptions): SegmentFormat {
-    const { locale, kind } = options;
+    const { locale, kind, calendar, timeZone } = options;
+    // a calendar system's names and digits: the locale with its `-u-ca-`
+    const intlLocale = calendar ? calendar.locale(locale) : locale;
     const granularity: SegmentGranularity =
         options.granularity === undefined ||
         (kind === "time" && options.granularity === "day")
@@ -197,8 +234,13 @@ export function segmentFormat(options: SegmentFormatOptions): SegmentFormat {
                 : "day"
             : options.granularity;
     const formatter = new Intl.DateTimeFormat(
-        locale,
-        formatOptions(kind, granularity, options.hourCycle),
+        intlLocale,
+        formatOptions(
+            kind,
+            granularity,
+            options.hourCycle,
+            timeZone !== undefined && !options.hideTimeZone,
+        ),
     );
     const resolved = formatter.resolvedOptions();
     // a sample whose fields are all two digits, and in the afternoon
@@ -225,9 +267,14 @@ export function segmentFormat(options: SegmentFormatOptions): SegmentFormat {
                       : "",
         });
     }
+    // an era is edited only where there are several to choose from (a Japanese date's)
+    const eraCount = calendar?.eraCount() ?? 1;
     const types = parts
         .map((part) => part.type)
-        .filter((type): type is EditableSegmentType => EDITABLE.has(type));
+        .filter(
+            (type): type is EditableSegmentType =>
+                EDITABLE.has(type) || (type === "era" && eraCount > 1),
+        );
     const hasHour = types.includes("hour");
     const period = (hour: number) =>
         formatter
@@ -246,9 +293,18 @@ export function segmentFormat(options: SegmentFormatOptions): SegmentFormat {
             : ["", ""],
         names: segmentNames(locale),
         formatter,
-        monthNames: new Intl.DateTimeFormat(locale, {
+        monthNames: new Intl.DateTimeFormat(intlLocale, {
             month: "long",
             timeZone: "UTC",
         }),
+        calendar,
+        eras:
+            calendar && types.includes("era")
+                ? Array.from({ length: eraCount }, (_, era) =>
+                      calendar.eraName(locale, era),
+                  )
+                : undefined,
+        timeZone,
+        disambiguation: options.disambiguation,
     };
 }

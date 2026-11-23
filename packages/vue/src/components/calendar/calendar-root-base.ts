@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import { type PlainDate, toIsoDate } from "@fragiola/primitives/date";
 import { defineComponent, nextTick, type PropType, provide, watch } from "vue";
 import type { ChangeDetails } from "../../utils/change-details.ts";
@@ -33,6 +34,10 @@ export const calendarOptionProps = {
     locale: { type: String, default: undefined },
     firstDayOfWeek: { type: Number, default: undefined },
     visibleMonths: { type: Number, default: undefined },
+    calendar: {
+        type: Object as PropType<CalendarSystem>,
+        default: undefined,
+    },
 };
 
 export const calendarRootProps = {

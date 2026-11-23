@@ -30,13 +30,16 @@ import {
     type DateFieldComponent,
     type DateFieldData,
     type DateFieldState,
+    type DateFieldSystemInputs,
     documentLocale,
     editReason,
     type FieldValue,
+    hiddenType,
     isoOf,
     type SegmentEditKind,
     SegmentGroup,
     stateData,
+    systemFormat,
 } from "@fragiola/primitives-angular/date-field";
 import {
     type FieldControlBinding,
@@ -77,6 +80,8 @@ export interface DateRangeFieldInputs {
     disabled: Signal<boolean>;
     startName: Signal<string | undefined>;
     endName: Signal<string | undefined>;
+    /** A DateRangeField's calendar system and time zone (a TimeRangeField has none). */
+    system?: DateFieldSystemInputs;
 }
 
 /**
@@ -111,14 +116,22 @@ export class DateRangeFieldRootState implements RangeGroups {
             kind: this.kind,
             granularity: this.inputs.granularity(),
             hourCycle: this.inputs.hourCycle(),
+            ...systemFormat(this.inputs.system),
         }),
     );
+    /** The time zone the values are in (spec/time-zones.md), if any. */
+    private readonly timeZone = computed(() => this.inputs.system?.timeZone());
     private readonly seed = computed(() =>
         segmentValuesOf(this.format(), this.inputs.placeholderValue()),
     );
     /** The value's ISO text, `start/end`. */
     readonly iso = computed(() =>
-        rangeIso(this.kind, this.inputs.granularity(), this.value()),
+        rangeIso(
+            this.kind,
+            this.inputs.granularity(),
+            this.value(),
+            this.timeZone(),
+        ),
     );
     readonly field: FieldControlBinding;
     readonly disabled: Signal<boolean>;
@@ -256,12 +269,8 @@ export class DateRangeFieldRootState implements RangeGroups {
             const value = this.value();
             const min = this.inputs.min();
             const max = this.inputs.max();
-            const type =
-                kind === "time"
-                    ? "time"
-                    : granularity === "day"
-                      ? "date"
-                      : "datetime-local";
+            const timeZone = this.timeZone();
+            const type = hiddenType(kind, granularity, timeZone);
             const write = (
                 input: HTMLInputElement,
                 name: string | undefined,
@@ -282,7 +291,7 @@ export class DateRangeFieldRootState implements RangeGroups {
                     "max",
                     boundIso(kind, granularity, upper),
                 );
-                input.value = isoOf(kind, granularity, own);
+                input.value = isoOf(kind, granularity, own, timeZone);
                 input.required = this.required();
                 input.disabled = this.disabled();
             };
@@ -326,12 +335,19 @@ export class DateRangeFieldRootState implements RangeGroups {
                         this.reset();
                         const value = untracked(this.value);
                         const granularity = untracked(this.inputs.granularity);
+                        const timeZone = untracked(this.timeZone);
                         hiddenStart.value = isoOf(
                             kind,
                             granularity,
                             value?.start,
+                            timeZone,
                         );
-                        hiddenEnd.value = isoOf(kind, granularity, value?.end);
+                        hiddenEnd.value = isoOf(
+                            kind,
+                            granularity,
+                            value?.end,
+                            timeZone,
+                        );
                     },
                     invalid: () => this.start.firstSegment(),
                 }),
@@ -392,6 +408,7 @@ export class DateRangeFieldRootState implements RangeGroups {
             this.kind,
             untracked(this.inputs.granularity),
             next,
+            untracked(this.timeZone),
         );
         if (after === untracked(this.iso)) {
             return;

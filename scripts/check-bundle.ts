@@ -185,10 +185,15 @@ const MONTH_YEAR = [
  * the pickers never import them, so their entries stay as they were.
  */
 export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
+    // the calendar systems and the time zones (Epic #82): injected by the app (`calendar={persian}`,
+    // `timeZone={timeZone(...)}`), so no component entry imports them and an app that passes none
+    // bundles none of their code
+    "calendar-systems": [],
     // the month and year values, grid and names (Epic #79): the day calendars never import them
     "month-year": MONTH_YEAR,
     segments: SEGMENTED,
     time: SEGMENTED,
+    "time-zone": [],
 };
 
 /**

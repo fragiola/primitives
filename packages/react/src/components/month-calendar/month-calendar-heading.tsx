@@ -1,8 +1,3 @@
-import {
-    formatYear,
-    formatYearSpan,
-    UNIT_PAGE_SIZE,
-} from "@fragiola/primitives/month-year";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { MonthCalendarContext } from "./month-calendar-context.ts";
@@ -24,14 +19,7 @@ export function MonthCalendarHeading({
         MonthCalendarContext,
         "MonthCalendar.Heading",
     );
-    const label =
-        context.kind === "month"
-            ? formatYear(context.locale, context.pageStart / UNIT_PAGE_SIZE)
-            : formatYearSpan(
-                  context.locale,
-                  context.pageStart,
-                  context.pageStart + UNIT_PAGE_SIZE - 1,
-              );
+    const label = context.units.heading(context.locale, context.pageStart);
     return renderElement(
         "h2",
         { ...props, children: children ?? label },

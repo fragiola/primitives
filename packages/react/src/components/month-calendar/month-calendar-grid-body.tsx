@@ -1,10 +1,9 @@
-import { unitRows } from "@fragiola/primitives/month-year";
 import type { ReactNode } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { MonthCalendarContext } from "./month-calendar-context.ts";
 import { MonthCalendarRow } from "./month-calendar-row.tsx";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 export interface MonthCalendarGridBodyProps
     extends Omit<PartProps<Record<string, never>>, "children"> {
@@ -21,14 +20,14 @@ export function MonthCalendarGridBody({
         MonthCalendarContext,
         "MonthCalendar.GridBody",
     );
-    const rows = unitRows(context.pageStart, context.columns).map((row) =>
-        row.map(context.itemOf),
-    );
+    const rows = context.units
+        .rows(context.pageStart, context.columns)
+        .map((row) => row.map(context.itemOf));
     const render =
         children ??
         ((row: MonthCalendarItem[]) => (
             <MonthCalendarRow
-                key={itemIndex(context.kind, row[0] as MonthCalendarItem)}
+                key={context.units.index(row[0] as MonthCalendarItem)}
                 row={row}
             />
         ));

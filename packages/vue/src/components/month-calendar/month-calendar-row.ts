@@ -12,7 +12,7 @@ import {
 } from "../../utils/render-part.ts";
 import { MonthCalendarCell } from "./month-calendar-cell.ts";
 import { MonthCalendarKey } from "./month-calendar-context.ts";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 export interface MonthCalendarRowProps {
     row: MonthCalendarItem[];
@@ -57,7 +57,7 @@ export const MonthCalendarRow: PublicComponent<
                                 ? slots.default({ item })
                                 : [
                                       h(MonthCalendarCell, {
-                                          key: itemIndex(context.kind, item),
+                                          key: context.units().index(item),
                                           value: item,
                                       }),
                                   ],

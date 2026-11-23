@@ -8,7 +8,6 @@ import {
     numberAttribute,
     untracked,
 } from "@angular/core";
-import { addMonths, calendarKeyTarget } from "@fragiola/primitives/date";
 import { getDirection } from "@fragiola/primitives/direction";
 import { interceptEscape } from "@fragiola/primitives/layers";
 import {
@@ -45,7 +44,9 @@ export class CalendarGrid {
     readonly offset = input(0, { transform: numberAttribute });
     /** The month this grid shows (day 1). */
     readonly month = computed(() =>
-        addMonths(this.calendar.visibleStart(), this.offset()),
+        this.calendar
+            .math()
+            .addMonths(this.calendar.visibleStart(), this.offset()),
     );
     private readonly flush = injectFlush();
 
@@ -83,15 +84,17 @@ export class CalendarGrid {
             this.flush();
             return;
         }
-        const target = calendarKeyTarget(event.key, calendar.focusedDate(), {
-            rtl:
-                getDirection(
-                    event.currentTarget as HTMLElement,
-                    this.direction(),
-                ) === "rtl",
-            firstDayOfWeek: calendar.firstDay(),
-            shiftKey: event.shiftKey,
-        });
+        const target = calendar
+            .math()
+            .keyTarget(event.key, calendar.focusedDate(), {
+                rtl:
+                    getDirection(
+                        event.currentTarget as HTMLElement,
+                        this.direction(),
+                    ) === "rtl",
+                firstDayOfWeek: calendar.firstDay(),
+                shiftKey: event.shiftKey,
+            });
         if (target === null) {
             return;
         }

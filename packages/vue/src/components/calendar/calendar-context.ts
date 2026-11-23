@@ -1,6 +1,7 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { DateRange, PlainDate } from "@fragiola/primitives/date";
 import type { InjectionKey, Ref } from "vue";
-import type { CalendarMode } from "./calendar-value.ts";
+import type { CalendarMath, CalendarMode } from "./calendar-value.ts";
 
 /** The component a calendar's parts belong to: their part attribute's prefix. */
 export type CalendarComponent =
@@ -25,7 +26,12 @@ export interface CalendarCellState {
 export interface CalendarContext {
     component: CalendarComponent;
     mode: CalendarMode;
+    /** The locale `Intl` writes the names in (with a calendar system's `-u-ca-`). */
     locale: () => string;
+    /** The month math: the calendar system's, or the ISO calendar's. */
+    math: () => CalendarMath;
+    /** The calendar system, when one is given (a CalendarView's month and year views use it). */
+    calendar: () => CalendarSystem | undefined;
     firstDay: () => number;
     visibleMonths: () => number;
     /** The first visible month (day 1). */

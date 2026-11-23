@@ -22,6 +22,7 @@ import {
     ENTRY_FILES,
     FRAMEWORKS,
     PRIMITIVES_PACKAGES,
+    TOOLKIT_PACKAGE,
 } from "../src/framework.ts";
 
 // A framework's manifest (contract §5.3): every example with its files, entry first, its own
@@ -55,6 +56,10 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
         "_recipes/field.ts",
     ],
     "year-range-picker": ["_recipes/calendar.ts", "_recipes/date-picker.ts"],
+    // calendar systems and time zones (Epic #82): the Persian calendar's DateField and its Field,
+    // the zoned DateField's Field
+    "calendar-system": ["_recipes/date-field.ts", "_recipes/field.ts"],
+    "date-field-time-zone": ["_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -90,6 +95,9 @@ const RECIPE_OF: Record<string, string> = {
     "calendar-preset": "calendar",
     "month-picker": "month-calendar",
     "year-range-picker": "month-calendar",
+    // a Calendar in a calendar system; a DateField in a time zone
+    "calendar-system": "calendar",
+    "date-field-time-zone": "date-field",
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
@@ -100,6 +108,12 @@ const WITHOUT_SHARED: ReadonlySet<string> = new Set([
     "aspect-ratio",
     "avatar",
     "meter",
+]);
+
+/** The examples that import a toolkit entry themselves, so they install the toolkit too. */
+const TOOLKIT_EXAMPLES: ReadonlySet<string> = new Set([
+    "calendar-system",
+    "date-field-time-zone",
 ]);
 
 describe("the manifest", () => {
@@ -155,6 +169,8 @@ describe("the manifest", () => {
                 "calendar-preset",
                 "month-picker",
                 "year-range-picker",
+                "calendar-system",
+                "date-field-time-zone",
                 "progress",
                 "meter",
                 "avatar",
@@ -179,6 +195,10 @@ describe("the manifest", () => {
                 ]);
                 expect(example.packages).toEqual([
                     PRIMITIVES_PACKAGES[framework],
+                    // a calendar system or a time zone it injects: the toolkit too
+                    ...(TOOLKIT_EXAMPLES.has(example.id)
+                        ? [TOOLKIT_PACKAGE]
+                        : []),
                 ]);
                 expect(example.registry).toEqual([]);
                 expect(example.layout).toBe("fill");

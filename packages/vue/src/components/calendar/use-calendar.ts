@@ -1,17 +1,12 @@
 import {
-    addMonths,
     clampDate,
     compareDates,
     type DateRange,
-    endOfMonth,
     firstDayOfWeek,
     isBetween,
     isSameDate,
-    isSameMonth,
     isWithinBounds,
-    monthsBetween,
     type PlainDate,
-    startOfMonth,
     today,
     watchDocumentLanguage,
 } from "@fragiola/primitives/date";
@@ -36,6 +31,7 @@ import {
     type CalendarMode,
     type CalendarOptions,
     type CalendarValue,
+    ISO_MATH,
     isRange,
 } from "./calendar-value.ts";
 import {
@@ -132,6 +128,9 @@ export function useCalendar(
     onBeforeUnmount(() => stopLanguage());
     const locale = () =>
         option("locale") ?? mountedLocale.value ?? FIRST_RENDER_LOCALE;
+    // a calendar system's month math and names (spec/calendar-systems.md), else the ISO calendar's
+    const system = () => option("calendar");
+    const math = () => system() ?? ISO_MATH;
     const firstDay = () => option("firstDayOfWeek") ?? firstDayOfWeek(locale());
     const visibleMonths = () => Math.max(1, option("visibleMonths") ?? 1);
     const todayDate = today();
@@ -142,7 +141,7 @@ export function useCalendar(
         max(),
     );
     const focusedDate = shallowRef(initialFocus);
-    const visibleStart = shallowRef(startOfMonth(initialFocus));
+    const visibleStart = shallowRef(math().startOfMonth(initialFocus));
     const anchor = shallowRef<PlainDate | null>(null);
     const hovered = shallowRef<PlainDate | null>(null);
     // a calendar in a picker focuses its focused date when it opens (spec/calendar.md, "Focus")
@@ -180,7 +179,7 @@ export function useCalendar(
                     max(),
                 );
                 focusedDate.value = start;
-                visibleStart.value = startOfMonth(start);
+                visibleStart.value = math().startOfMonth(start);
             }
         },
         { flush: "sync" },
@@ -191,7 +190,13 @@ export function useCalendar(
     const context: CalendarContext = {
         component,
         mode,
-        locale,
+        // with a system, `Intl` writes its names (`-u-ca-`)
+        locale: () => {
+            const calendar = system();
+            return calendar ? calendar.locale(locale()) : locale();
+        },
+        math,
+        calendar: system,
         firstDay,
         visibleMonths,
         visibleStart,
@@ -201,7 +206,7 @@ export function useCalendar(
         headingId: (offset) => `${baseId}-heading-${offset}`,
         gridId: (offset) => `${baseId}-grid-${offset}`,
         cellState(date, month): CalendarCellState {
-            const outsideMonth = !isSameMonth(date, month);
+            const outsideMonth = !math().isSameMonth(date, month);
             const range = rangeValue();
             const inRange =
                 range !== null && isBetween(date, range.start, range.end);
@@ -233,23 +238,25 @@ export function useCalendar(
             // the keyboard previews the range from now on, not the last hovered date
             hovered.value = null;
             focusedDate.value = date;
-            const offset = monthsBetween(visibleStart.value, date);
+            const offset = math().monthsBetween(visibleStart.value, date);
             if (offset < 0) {
-                visibleStart.value = startOfMonth(date);
+                visibleStart.value = math().startOfMonth(date);
             } else if (offset >= visibleMonths()) {
-                visibleStart.value = addMonths(
-                    startOfMonth(date),
+                visibleStart.value = math().addMonths(
+                    math().startOfMonth(date),
                     -(visibleMonths() - 1),
                 );
             }
             return true;
         },
         canPage(delta) {
-            const start = addMonths(
+            const start = math().addMonths(
                 visibleStart.value,
                 delta * visibleMonths(),
             );
-            const end = endOfMonth(addMonths(start, visibleMonths() - 1));
+            const end = math().endOfMonth(
+                math().addMonths(start, visibleMonths() - 1),
+            );
             const upper = max();
             const lower = min();
             return (
@@ -261,12 +268,12 @@ export function useCalendar(
             if (!context.canPage(delta)) {
                 return;
             }
-            visibleStart.value = addMonths(
+            visibleStart.value = math().addMonths(
                 visibleStart.value,
                 delta * visibleMonths(),
             );
             focusedDate.value = clampDate(
-                addMonths(focusedDate.value, delta * visibleMonths()),
+                math().addMonths(focusedDate.value, delta * visibleMonths()),
                 min(),
                 max(),
             );

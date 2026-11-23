@@ -42,6 +42,12 @@
             "import": "./dist/async-list.js",
             "default": "./dist/async-list.js"
         },
+        "./calendar-systems": {
+            "@fragiola/source": "./src/calendar-systems/index.ts",
+            "types": "./dist/calendar-systems.d.ts",
+            "import": "./dist/calendar-systems.js",
+            "default": "./dist/calendar-systems.js"
+        },
         "./collection": {
             "@fragiola/source": "./src/collection/index.ts",
             "types": "./dist/collection.d.ts",
@@ -186,6 +192,12 @@
             "import": "./dist/time.js",
             "default": "./dist/time.js"
         },
+        "./time-zone": {
+            "@fragiola/source": "./src/time-zone/index.ts",
+            "types": "./dist/time-zone.d.ts",
+            "import": "./dist/time-zone.js",
+            "default": "./dist/time-zone.js"
+        },
         "./toast": {
             "@fragiola/source": "./src/toast/index.ts",
             "types": "./dist/toast.d.ts",
@@ -217,6 +229,11 @@
                 "types": "./dist/async-list.d.ts",
                 "import": "./dist/async-list.js",
                 "default": "./dist/async-list.js"
+            },
+            "./calendar-systems": {
+                "types": "./dist/calendar-systems.d.ts",
+                "import": "./dist/calendar-systems.js",
+                "default": "./dist/calendar-systems.js"
             },
             "./collection": {
                 "types": "./dist/collection.d.ts",
@@ -337,6 +354,11 @@
                 "types": "./dist/time.d.ts",
                 "import": "./dist/time.js",
                 "default": "./dist/time.js"
+            },
+            "./time-zone": {
+                "types": "./dist/time-zone.d.ts",
+                "import": "./dist/time-zone.js",
+                "default": "./dist/time-zone.js"
             },
             "./toast": {
                 "types": "./dist/toast.d.ts",

@@ -11,6 +11,7 @@
         "e2e": "playwright test"
     },
     "dependencies": {
+        "@fragiola/primitives": "workspace:*",
         "@fragiola/primitives-react": "workspace:*",
         "examples-shared": "workspace:*",
         "react": "19.3.1",

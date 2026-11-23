@@ -1,9 +1,3 @@
-import {
-    formatMonthName,
-    formatYear,
-    formatYearMonth,
-    type PlainYearMonth,
-} from "@fragiola/primitives/month-year";
 import { type MouseEvent, useLayoutEffect } from "react";
 import { useElement } from "../../hooks/use-element.ts";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
@@ -13,7 +7,7 @@ import {
     type MonthCalendarCellState,
     MonthCalendarContext,
 } from "./month-calendar-context.ts";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 export interface MonthCalendarCellProps
     extends PartProps<MonthCalendarCellState> {
@@ -32,7 +26,8 @@ export function MonthCalendarCell({
         "MonthCalendar.Cell",
     );
     const [element, ref] = useElement<HTMLElement>();
-    const index = itemIndex(context.kind, value);
+    const { units } = context;
+    const index = units.index(value);
     const state = context.cellState(index);
     const { cells, focusPending } = context;
     useLayoutEffect(() => {
@@ -52,23 +47,12 @@ export function MonthCalendarCell({
         };
     }, [element, index, state.focused, cells, focusPending]);
 
-    const month = context.kind === "month";
     return renderElement(
         "td",
         {
-            "aria-label": month
-                ? formatYearMonth(context.locale, value as PlainYearMonth)
-                : formatYear(context.locale, value.year),
+            "aria-label": units.name(context.locale, index),
             ...props,
-            children:
-                children ??
-                (month
-                    ? formatMonthName(
-                          context.locale,
-                          value as PlainYearMonth,
-                          "long",
-                      )
-                    : formatYear(context.locale, value.year)),
+            children: children ?? units.text(context.locale, index),
         },
         state,
         {

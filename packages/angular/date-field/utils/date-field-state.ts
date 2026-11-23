@@ -14,6 +14,7 @@ import {
     untracked,
     type WritableSignal,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import {
     type PlainDate,
     watchDocumentLanguage,
@@ -28,6 +29,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { Disambiguation, TimeZone } from "@fragiola/primitives/time-zone";
 import {
     type FieldControlBinding,
     fieldControl,
@@ -100,6 +102,49 @@ export interface DateFieldSegmentState extends DateFieldState {
     placeholder: boolean;
 }
 
+/**
+ * The calendar system and time zone a date field takes (spec/calendar-systems.md,
+ * spec/time-zones.md): DateField, DateRangeField and the typed pickers; TimeField and
+ * TimeRangeField have none.
+ */
+export interface DateFieldSystemInputs {
+    /** A calendar system: the segments show and edit its fields; values stay ISO. */
+    calendar: Signal<CalendarSystem | undefined>;
+    /** A time zone: the values are `ZonedDateTime`s in it. */
+    timeZone: Signal<TimeZone | undefined>;
+    /** Hides the zone's name segment. */
+    hideTimeZone: Signal<boolean>;
+    /** How a wall time the zone skips or repeats resolves (default `compatible`). */
+    disambiguation: Signal<Disambiguation | undefined>;
+}
+
+/** The segment format options of a field's calendar system and time zone (none without them). */
+export function systemFormat(system: DateFieldSystemInputs | undefined) {
+    return system === undefined
+        ? {}
+        : {
+              calendar: system.calendar(),
+              timeZone: system.timeZone(),
+              hideTimeZone: system.hideTimeZone(),
+              disambiguation: system.disambiguation(),
+          };
+}
+
+/** The hidden input's type: a zoned value's text (`…-05:00[America/New_York]`) is no native date's. */
+export function hiddenType(
+    kind: SegmentKind,
+    granularity: SegmentGranularity,
+    timeZone: TimeZone | undefined,
+): string {
+    return timeZone
+        ? "text"
+        : kind === "time"
+          ? "time"
+          : granularity === "day"
+            ? "date"
+            : "datetime-local";
+}
+
 /** The inputs a DateField or TimeField root hands its state (spec/date-field.md, "API"). */
 export interface DateFieldInputs {
     value: Signal<FieldValue | null | undefined>;
@@ -117,6 +162,8 @@ export interface DateFieldInputs {
     readOnly: Signal<boolean>;
     disabled: Signal<boolean>;
     name: Signal<string | undefined>;
+    /** A DateField's calendar system and time zone (a TimeField has none). */
+    system?: DateFieldSystemInputs;
 }
 
 /**
@@ -160,14 +207,22 @@ export class DateFieldRootState implements DateFieldParts {
             kind: this.kind,
             granularity: this.inputs.granularity(),
             hourCycle: this.inputs.hourCycle(),
+            ...systemFormat(this.inputs.system),
         }),
     );
+    /** The time zone the values are in (spec/time-zones.md), if any. */
+    private readonly timeZone = computed(() => this.inputs.system?.timeZone());
     private readonly seed = computed(() =>
         segmentValuesOf(this.format(), this.inputs.placeholderValue()),
     );
     /** The value's ISO text (the hidden input's value). */
     readonly iso = computed(() =>
-        isoOf(this.kind, this.inputs.granularity(), this.value()),
+        isoOf(
+            this.kind,
+            this.inputs.granularity(),
+            this.value(),
+            this.timeZone(),
+        ),
     );
     readonly field: FieldControlBinding;
     readonly disabled: Signal<boolean>;
@@ -254,7 +309,12 @@ export class DateFieldRootState implements DateFieldParts {
                 labelledBy: this.labelledBy,
                 onEdit: (composed, edit, event) => {
                     const granularity = untracked(this.inputs.granularity);
-                    const after = isoOf(kind, granularity, composed);
+                    const after = isoOf(
+                        kind,
+                        granularity,
+                        composed,
+                        untracked(this.timeZone),
+                    );
                     if (after === untracked(this.iso)) {
                         return;
                     }
@@ -300,12 +360,7 @@ export class DateFieldRootState implements DateFieldParts {
         effect(() => {
             const granularity = this.inputs.granularity();
             // the type first: a value is read in the type it is set in
-            hidden.type =
-                kind === "time"
-                    ? "time"
-                    : granularity === "day"
-                      ? "date"
-                      : "datetime-local";
+            hidden.type = hiddenType(kind, granularity, this.timeZone());
             setInputAttribute(hidden, "name", formName());
             setInputAttribute(
                 hidden,

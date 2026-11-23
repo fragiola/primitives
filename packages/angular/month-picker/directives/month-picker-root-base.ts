@@ -6,6 +6,7 @@ import {
     numberAttribute,
     output,
 } from "@angular/core";
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { DatePickerState } from "@fragiola/primitives-angular/date-picker";
 import type {
     OpenChangeEvent,
@@ -40,6 +41,12 @@ export abstract class MonthPickerRootBase implements OverlayActions {
     readonly columns = input<number | undefined, unknown>(undefined, {
         transform: optionalNumber,
     });
+    /**
+     * A calendar system (spec/calendar-systems.md), passed to the bound calendar: the values are
+     * its months or years, and the form submits their first day's ISO date with the system
+     * (`2026-10-23[u-ca=persian]`).
+     */
+    readonly calendar = input<CalendarSystem | undefined>(undefined);
     /** The form name of its hidden input (a Field's `name` wins). */
     readonly name = input<string | undefined>(undefined);
     /** A native form's validation blocks a submission with no value. */
@@ -79,5 +86,6 @@ export abstract class MonthPickerRootBase implements OverlayActions {
             | undefined,
         locale: this.locale(),
         columns: this.columns(),
+        calendar: this.calendar(),
     }));
 }

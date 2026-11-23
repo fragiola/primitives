@@ -76,6 +76,7 @@ export function DateFieldSegment({
         placeholder: segment.placeholder,
     };
     const content = children ?? segment.text;
+    const textual = segment.type === "dayPeriod" || segment.type === "era";
     if (!editable) {
         return renderElement("span", { ...props, children: content }, state, {
             "aria-hidden": segment.type === "literal" ? "true" : undefined,
@@ -105,12 +106,13 @@ export function DateFieldSegment({
             "aria-disabled": disabled ? "true" : undefined,
             contentEditable: writable ? true : undefined,
             suppressContentEditableWarning: true,
-            inputMode: segment.type === "dayPeriod" ? "text" : "numeric",
+            // a day period and an era take letters
+            inputMode: textual ? "text" : "numeric",
             spellCheck: "false",
             autoCorrect: "off",
             autoCapitalize: "off",
             enterKeyHint: "next",
-            style: segment.type === "dayPeriod" ? undefined : NUMERIC_STYLE,
+            style: textual ? undefined : NUMERIC_STYLE,
             "data-primitives-part": `${context.component}-segment`,
             "data-type": segment.type,
             "data-placeholder": segment.placeholder ? "" : undefined,

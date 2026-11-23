@@ -3,6 +3,7 @@ import type {
     SegmentGranularity,
     SegmentKind,
 } from "@fragiola/primitives/segments";
+import type { TimeZone } from "@fragiola/primitives/time-zone";
 import {
     compareValues,
     type FieldValue,
@@ -24,10 +25,11 @@ export function rangeIso(
     kind: SegmentKind,
     granularity: SegmentGranularity,
     range: FieldRange | null | undefined,
+    timeZone?: TimeZone,
 ): string {
     return range == null
         ? ""
-        : `${isoOf(kind, granularity, range.start)}/${isoOf(kind, granularity, range.end)}`;
+        : `${isoOf(kind, granularity, range.start, timeZone)}/${isoOf(kind, granularity, range.end, timeZone)}`;
 }
 
 /**

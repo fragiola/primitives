@@ -53,5 +53,11 @@ describe("the example rules", () => {
         expect(allowed("vue", "@fragiola/primitives-react/dialog")).toBe(false);
         expect(allowed("angular", "@angular/core")).toBe(true);
         expect(allowed("angular", "@angular/forms")).toBe(false);
+        // a toolkit entry, for a calendar system or a time zone it injects; never the root
+        expect(allowed("vue", "@fragiola/primitives/calendar-systems")).toBe(
+            true,
+        );
+        expect(allowed("angular", "@fragiola/primitives/time-zone")).toBe(true);
+        expect(allowed("react", "@fragiola/primitives")).toBe(false);
     });
 });
