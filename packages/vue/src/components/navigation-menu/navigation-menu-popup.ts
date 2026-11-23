@@ -1,6 +1,9 @@
 import { getTabbables, nextTabbableAfter } from "@fragiola/primitives/focus";
 import { openOverlaySession } from "@fragiola/primitives/overlay";
-import { isInHoverBridge } from "@fragiola/primitives/pointer";
+import {
+    isInHoverBridge,
+    watchPointerExit,
+} from "@fragiola/primitives/pointer";
 import type { Align, Side } from "@fragiola/primitives/positioning";
 import { defineComponent, watch } from "vue";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
@@ -74,12 +77,16 @@ export const NavigationMenuPopup: PartComponent<
                     });
                     context.layered.value = true;
                     // a hover-opened Content: the pointer leaving the Trigger and the popup (and
-                    // the levels opened from it) closes it after the close delay
+                    // the levels opened from it), or the document at once (the window or the
+                    // iframe), closes it after the close delay
+                    const hoverOpened = () =>
+                        context.openedBy.by === "hover" &&
+                        context.activeTrigger.value !== null;
                     const onMove = (event: PointerEvent) => {
                         const trigger = context.activeTrigger.value;
                         if (
                             event.pointerType === "touch" ||
-                            context.openedBy.by !== "hover" ||
+                            !hoverOpened() ||
                             trigger === null
                         ) {
                             return;
@@ -104,8 +111,14 @@ export const NavigationMenuPopup: PartComponent<
                         }
                     };
                     doc.addEventListener("pointermove", onMove);
+                    const stopExit = watchPointerExit(doc, () => {
+                        if (hoverOpened()) {
+                            context.hover.leave(context.closeDelay());
+                        }
+                    });
                     onCleanup(() => {
                         doc.removeEventListener("pointermove", onMove);
+                        stopExit();
                         context.layered.value = false;
                         // a close delay still pending would close a later opening
                         context.hover.cancel();

@@ -141,18 +141,16 @@ export const FieldRoot: PartComponent<FieldRootProps, FieldState> =
                             form.clearErrors(props.name);
                         }
                         const onChange = validatesOnChange(mode(), submitted);
-                        const apply = (next: FieldValidation) => {
+                        const apply = (next: FieldValidation | null) => {
                             shown.value = shownAfterChange(
                                 shown.value,
                                 next,
                                 onChange,
                             );
                         };
-                        // pending: the field keeps what it showed until the run settles
-                        const next = run(input, value, onChange, apply);
-                        if (next !== null) {
-                            apply(next);
-                        }
+                        // a pending run (`null`) still hides a shown error at once when the field
+                        // does not validate on change (spec/field.md, "Async validation")
+                        apply(run(input, value, onChange, apply));
                     },
                     focused: () => {
                         focused.value = true;
