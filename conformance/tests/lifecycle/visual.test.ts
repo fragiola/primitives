@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { LIFECYCLE_OVERLAYS } from "../../src/lifecycle.ts";
+import { LIFECYCLE_OVERLAYS, lifecyclePopup } from "../../src/lifecycle.ts";
 import { openScenario } from "../../src/scenario.ts";
 import { expectScreen, visualOnlyInCi } from "../../src/visual.ts";
 
@@ -12,13 +12,13 @@ for (const [name, overlay] of Object.entries(LIFECYCLE_OVERLAYS)) {
     }) => {
         await openScenario(page, overlay.path, { today: overlay.today });
         await expectScreen(page, `lifecycle-${name}-closed`);
-        if (name === "tooltip") {
+        if (name === "tooltip" || name === "hover-card") {
             // the screenshot parks the pointer away: a focused trigger keeps it open
             await page.keyboard.press("Tab");
         } else {
             await overlay.open(page);
         }
-        await expect(page.getByRole(overlay.role)).toBeVisible();
+        await expect(lifecyclePopup(page, overlay)).toBeVisible();
         await expectScreen(page, `lifecycle-${name}-open`);
     });
 }

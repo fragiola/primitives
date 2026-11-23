@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 /**
  * The overlays of the lifecycle scenarios (spec/README.md, "The lifecycle scenarios"): the part
@@ -11,8 +11,11 @@ export interface LifecycleOverlay {
     kept: string;
     /** The popup: the same node across openings, `data-ending-style` during its exit. */
     popup: string;
-    /** The popup's role in the accessibility tree while open. */
-    role: "dialog" | "alertdialog" | "menu" | "listbox" | "tooltip";
+    /**
+     * The popup's role in the accessibility tree while open; none for a popup with no role (a
+     * HoverCard's card, spec/hover-card.md), found by its part attribute while visible.
+     */
+    role?: "dialog" | "alertdialog" | "menu" | "listbox" | "tooltip";
     open: (page: Page) => Promise<void>;
     /** The trigger focus returns to. */
     trigger: (page: Page) => ReturnType<Page["getByRole"]>;
@@ -24,6 +27,13 @@ export interface LifecycleOverlay {
      */
     outsidePress?: true | "never";
     today?: boolean;
+}
+
+/** The open popup: by its role, else by its part attribute while it is visible. */
+export function lifecyclePopup(page: Page, overlay: LifecycleOverlay): Locator {
+    return overlay.role === undefined
+        ? page.locator(`[data-primitives-part="${overlay.popup}"]:visible`)
+        : page.getByRole(overlay.role);
 }
 
 const button = (name: string) => (page: Page) =>
@@ -93,6 +103,17 @@ export const LIFECYCLE_OVERLAYS: Record<string, LifecycleOverlay> = {
             await button("Save")(page).hover();
         },
         trigger: button("Save"),
+    },
+    "hover-card": {
+        path: "/hover-card/lifecycle",
+        kept: "hover-card-positioner",
+        popup: "hover-card-popup",
+        open: async (page) => {
+            await page.mouse.move(0, 0);
+            await page.getByRole("link", { name: "@ada" }).hover();
+        },
+        trigger: (page) => page.getByRole("link", { name: "@ada" }),
+        outsidePress: true,
     },
     menu: {
         path: "/menu/lifecycle",
