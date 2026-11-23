@@ -1,10 +1,10 @@
 ---
 title: Steps
-description: A process in a fixed number of steps: an ordered list with aria-current="step", the step's content, Previous, Next and linear validation.
+description: A process in a fixed number of steps, an ordered list with aria-current="step", the step's content, Previous, Next and linear validation.
 ---
 
-A process in a fixed number of steps: a checkout, an onboarding, a setup wizard. The APG has no
-stepper pattern and Base UI has no Steps, so the semantics are the APG-closest ones: an ordered
+A process in a fixed number of steps: a checkout, an onboarding, a setup wizard. The
+[APG](https://www.w3.org/WAI/ARIA/apg/patterns/) has no stepper pattern and Base UI has no Steps, so the semantics are the APG-closest ones: an ordered
 list of the steps with the current one `aria-current="step"` (the value WAI-ARIA defines for the
 current step of a process), each step's trigger a native button in the tab order, the current
 step's content shown, and Previous and Next. In a **linear** process a step is reached only once
