@@ -31,6 +31,8 @@ import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
+import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.tsx";
+import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.tsx";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
@@ -74,6 +76,10 @@ import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.tsx";
 import { DrawerNested } from "../scenarios/drawer/drawer-nested.tsx";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.tsx";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.tsx";
+import { EditableBasic } from "../scenarios/editable/editable-basic.tsx";
+import { EditableField } from "../scenarios/editable/editable-field.tsx";
+import { EditableModes } from "../scenarios/editable/editable-modes.tsx";
+import { EditableStates } from "../scenarios/editable/editable-states.tsx";
 import { FieldAsync } from "../scenarios/field/field-async.tsx";
 import { FieldAsyncBlur } from "../scenarios/field/field-async-blur.tsx";
 import { FieldBasic } from "../scenarios/field/field-basic.tsx";
@@ -122,6 +128,9 @@ import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.tsx";
 import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.tsx";
 import { PaginationBasic } from "../scenarios/pagination/pagination-basic.tsx";
 import { PaginationLinks } from "../scenarios/pagination/pagination-links.tsx";
+import { PasswordInputBasic } from "../scenarios/password-input/password-input-basic.tsx";
+import { PasswordInputField } from "../scenarios/password-input/password-input-field.tsx";
+import { PasswordInputStates } from "../scenarios/password-input/password-input-states.tsx";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.tsx";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.tsx";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.tsx";
@@ -139,6 +148,9 @@ import { RatingHalf } from "../scenarios/rating/rating-half.tsx";
 import { RatingReadOnly } from "../scenarios/rating/rating-read-only.tsx";
 import { ScrollAreaBasic } from "../scenarios/scroll-area/scroll-area-basic.tsx";
 import { ScrollAreaLinks } from "../scenarios/scroll-area/scroll-area-links.tsx";
+import { SearchFieldBasic } from "../scenarios/search-field/search-field-basic.tsx";
+import { SearchFieldField } from "../scenarios/search-field/search-field-field.tsx";
+import { SearchFieldStates } from "../scenarios/search-field/search-field-states.tsx";
 import { SegmentedControlBasic } from "../scenarios/segmented-control/segmented-control-basic.tsx";
 import { SegmentedControlDisabled } from "../scenarios/segmented-control/segmented-control-disabled.tsx";
 import { SegmentedControlField } from "../scenarios/segmented-control/segmented-control-field.tsx";
@@ -424,6 +436,18 @@ export const routes: Record<
     "/rating/half": RatingHalf,
     "/rating/read-only": RatingReadOnly,
     "/rating/field": RatingField,
+    "/password-input/basic": PasswordInputBasic,
+    "/password-input/states": PasswordInputStates,
+    "/password-input/field": PasswordInputField,
+    "/search-field/basic": SearchFieldBasic,
+    "/search-field/states": SearchFieldStates,
+    "/search-field/field": SearchFieldField,
+    "/clipboard/basic": ClipboardBasic,
+    "/clipboard/failure": ClipboardFailure,
+    "/editable/basic": EditableBasic,
+    "/editable/modes": EditableModes,
+    "/editable/states": EditableStates,
+    "/editable/field": EditableField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
