@@ -3,6 +3,7 @@
 // from it tree-shakes to the same output as importing from the subpath. There is no `app.use()`
 // plugin: an app imports the components it uses.
 
+export * from "./async-list/index.ts";
 export * from "./components/accordion/index.ts";
 export * from "./components/alert-dialog/index.ts";
 export * from "./components/autocomplete/index.ts";
@@ -47,6 +48,5 @@ export * from "./components/toggle/index.ts";
 export * from "./components/toggle-group/index.ts";
 export * from "./components/toolbar/index.ts";
 export * from "./components/tooltip/index.ts";
-export * from "./async-list/index.ts";
 export * from "./direction/index.ts";
 export * from "./render/index.ts";
