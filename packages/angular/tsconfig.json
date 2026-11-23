@@ -68,6 +68,9 @@
         "async-list",
         "toast",
         "hover-card",
+        "scroll-area",
+        "pagination",
+        "aspect-ratio",
         "tests",
         "*.config.ts"
     ]
