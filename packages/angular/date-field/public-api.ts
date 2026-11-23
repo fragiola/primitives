@@ -30,6 +30,23 @@ export {
     type DateFieldInputs,
     DateFieldRootState,
     type DateFieldSegmentState,
-    type DateFieldState,
+    stateData,
 } from "./utils/date-field-state.ts";
-export type { FieldValue } from "./utils/field-value.ts";
+export { documentLocale } from "./utils/document-locale.ts";
+export {
+    boundIso,
+    compareValues,
+    composeSegments,
+    type FieldValue,
+    isOutOfRange,
+    isoOf,
+} from "./utils/field-value.ts";
+export {
+    type DateFieldData,
+    type DateFieldParts,
+    type DateFieldState,
+    editReason,
+    type SegmentEditKind,
+    SegmentGroup,
+    type SegmentGroupOwner,
+} from "./utils/segment-group.ts";

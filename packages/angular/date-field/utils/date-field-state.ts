@@ -12,6 +12,7 @@ import {
     type Signal,
     signal,
     untracked,
+    type WritableSignal,
 } from "@angular/core";
 import {
     type PlainDate,
@@ -20,28 +21,19 @@ import {
 import { bridgeForm } from "@fragiola/primitives/form";
 import {
     type DateSegment,
-    dateSegments,
     focusOnLabelPress,
-    isSegmentsComplete,
-    type SegmentEdit,
     type SegmentGranularity,
     type SegmentKind,
-    type SegmentValues,
     segmentFormat,
-    segmentKeyDown,
-    segmentsToDate,
-    segmentsToDateTime,
-    segmentsToTime,
-    segmentTarget,
     segmentValuesOf,
-    typeSegment,
 } from "@fragiola/primitives/segments";
-import type { PlainDateTime, PlainTime } from "@fragiola/primitives/time";
-import { toIsoTime } from "@fragiola/primitives/time";
-import { fieldControl } from "@fragiola/primitives-angular/field";
+import type { PlainDateTime } from "@fragiola/primitives/time";
+import {
+    type FieldControlBinding,
+    fieldControl,
+} from "@fragiola/primitives-angular/field";
 import {
     type ChangeDetails,
-    type ChangeReason,
     controllable,
     createHiddenInput,
     dataValues,
@@ -49,19 +41,58 @@ import {
     setInputAttribute,
 } from "@fragiola/primitives-angular/internal";
 import { documentLocale } from "./document-locale.ts";
-import { compareValues, type FieldValue, isoOf } from "./field-value.ts";
+import {
+    boundIso,
+    type FieldValue,
+    isOutOfRange,
+    isoOf,
+} from "./field-value.ts";
+import {
+    type DateFieldData,
+    type DateFieldParts,
+    type DateFieldState,
+    editReason,
+    SegmentGroup,
+} from "./segment-group.ts";
 
-/** Which root the shared parts sit in: their part attribute names it (spec/date-field.md). */
-export type DateFieldComponent = "date-field" | "time-field";
+export type { DateFieldData, DateFieldParts, DateFieldState };
 
-/** The state every part renders with (spec/date-field.md, "State attributes and ARIA"). */
-export interface DateFieldState {
-    disabled: boolean;
-    readOnly: boolean;
-    required: boolean;
-    /** Out of range or unavailable, or the Field shows an error. */
-    invalid: boolean;
+/** The state attributes of every part: the field's own (`state`) and its Field's. */
+export function stateData(
+    state: Signal<DateFieldState>,
+    field: FieldControlBinding,
+): Signal<DateFieldData> {
+    return computed(() => {
+        const current = state();
+        const own = dataValues({
+            disabled: current.disabled,
+            readonly: current.readOnly,
+            required: current.required,
+            invalid: current.invalid,
+        });
+        const fieldData = field.data();
+        return {
+            ...own,
+            valid: fieldData.valid,
+            dirty: fieldData.dirty,
+            touched: fieldData.touched,
+            filled: fieldData.filled,
+            focused: fieldData.focused,
+        };
+    });
 }
+
+/**
+ * Which root the shared parts sit in: their part attribute names it (spec/date-field.md; the
+ * range fields' and the pickers' typed input, spec/date-range-field.md and spec/calendar.md).
+ */
+export type DateFieldComponent =
+    | "date-field"
+    | "time-field"
+    | "date-range-field"
+    | "time-range-field"
+    | "date-picker"
+    | "date-range-picker";
 
 /** A Segment's state: the field's, with its own type and placeholder state. */
 export interface DateFieldSegmentState extends DateFieldState {
@@ -88,18 +119,19 @@ export interface DateFieldInputs {
     name: Signal<string | undefined>;
 }
 
-/** The enclosing date or time field's state, for its parts (provided by both roots). */
-export const DATE_FIELD = new InjectionToken<DateFieldRootState>("DATE_FIELD");
-
-const FIRST_SEGMENT = '[role="spinbutton"][tabindex]';
+/**
+ * The enclosing group of segments, for the Input and Segment directives: a DateField's or
+ * TimeField's root state, or one end of a range field or a typed picker.
+ */
+export const DATE_FIELD = new InjectionToken<DateFieldParts>("DATE_FIELD");
 
 /**
- * The state of a DateField or TimeField (spec/date-field.md): the segment values the user set, the
- * digits being typed, the value (complete segments only), its validity and its hidden form input,
+ * The state of a DateField or TimeField (spec/date-field.md): one group of segments
+ * (`SegmentGroup`), the value (complete segments only), its validity and its hidden form input,
  * rendered right after the root. The segment editing itself is the toolkit's `/segments`. Created
  * in a root directive's injection context.
  */
-export class DateFieldRootState {
+export class DateFieldRootState implements DateFieldParts {
     private readonly flush = injectFlush();
     private readonly document = inject(DOCUMENT);
     // `"browser"` or `"server"` (`isPlatformBrowser` lives in @angular/common, not a peer)
@@ -130,16 +162,6 @@ export class DateFieldRootState {
             hourCycle: this.inputs.hourCycle(),
         }),
     );
-    /** The segment values the user set; `null` until the first edit (they follow the value). */
-    private readonly ownValues = signal<SegmentValues | null>(null);
-    readonly values = computed(
-        () => this.ownValues() ?? segmentValuesOf(this.format(), this.value()),
-    );
-    /** The digits being typed into a segment. */
-    readonly edit = signal<SegmentEdit | null>(null);
-    readonly segments = computed(() =>
-        dateSegments(this.format(), this.values(), this.edit()),
-    );
     private readonly seed = computed(() =>
         segmentValuesOf(this.format(), this.inputs.placeholderValue()),
     );
@@ -147,9 +169,7 @@ export class DateFieldRootState {
     readonly iso = computed(() =>
         isoOf(this.kind, this.inputs.granularity(), this.value()),
     );
-    /** The Input's element, once rendered. */
-    readonly inputElement = signal<HTMLElement | null>(null);
-    readonly field: ReturnType<typeof fieldControl>;
+    readonly field: FieldControlBinding;
     readonly disabled: Signal<boolean>;
     readonly readOnly: Signal<boolean>;
     readonly required: Signal<boolean>;
@@ -157,17 +177,12 @@ export class DateFieldRootState {
     readonly invalid: Signal<boolean>;
     readonly state: Signal<DateFieldState>;
     /** The state attributes and the field's, for every part. */
-    readonly data: Signal<{
-        disabled: string | null;
-        readonly: string | null;
-        required: string | null;
-        invalid: string | null;
-        valid: string | null;
-        dirty: string | null;
-        touched: string | null;
-        filled: string | null;
-        focused: string | null;
-    }>;
+    readonly data: Signal<DateFieldData>;
+    readonly labelledBy: Signal<string | null>;
+    /** The segments: the one group of a single field. */
+    private readonly group: SegmentGroup;
+    readonly segments: Signal<DateSegment[]>;
+    readonly inputElement: WritableSignal<HTMLElement | null>;
     /** The ISO text the segments reported last: it coming back changes nothing (the typing goes on). */
     private reported: string | null = null;
 
@@ -196,6 +211,7 @@ export class DateFieldRootState {
             focusTarget: () => this.firstSegment(),
         });
         const field = this.field;
+        this.labelledBy = field.labelledBy;
         this.disabled = computed(
             () => this.inputs.disabled() || field.disabled(),
         );
@@ -203,16 +219,15 @@ export class DateFieldRootState {
         this.required = computed(() => this.inputs.required());
         this.invalid = computed(() => {
             const value = this.value();
-            const min = this.inputs.min();
-            const max = this.inputs.max();
             const own =
                 value !== null &&
-                ((min != null && compareValues(kind, value, min) < 0) ||
-                    (max != null && compareValues(kind, value, max) > 0) ||
-                    (kind === "date" &&
-                        this.inputs.isDateUnavailable()?.(
-                            value as PlainDate,
-                        ) === true));
+                isOutOfRange(
+                    kind,
+                    value,
+                    this.inputs.min(),
+                    this.inputs.max(),
+                    this.inputs.isDateUnavailable(),
+                );
             return own || field.ariaInvalid() === "true";
         });
         this.state = computed(() => ({
@@ -221,24 +236,41 @@ export class DateFieldRootState {
             required: this.required(),
             invalid: this.invalid(),
         }));
-        this.data = computed(() => {
-            const state = this.state();
-            const own = dataValues({
-                disabled: state.disabled,
-                readonly: state.readOnly,
-                required: state.required,
-                invalid: state.invalid,
-            });
-            const fieldData = field.data();
-            return {
-                ...own,
-                valid: fieldData.valid,
-                dirty: fieldData.dirty,
-                touched: fieldData.touched,
-                filled: fieldData.filled,
-                focused: fieldData.focused,
-            };
-        });
+        this.data = stateData(this.state, field);
+        this.group = new SegmentGroup(
+            {
+                component,
+                kind,
+                format: this.format,
+                granularity: this.inputs.granularity,
+                seed: this.seed,
+                state: this.state,
+                data: this.data,
+                disabled: this.disabled,
+                readOnly: this.readOnly,
+                required: this.required,
+                invalid: this.invalid,
+                field,
+                labelledBy: this.labelledBy,
+                onEdit: (composed, edit, event) => {
+                    const granularity = untracked(this.inputs.granularity);
+                    const after = isoOf(kind, granularity, composed);
+                    if (after === untracked(this.iso)) {
+                        return;
+                    }
+                    this.reported = after;
+                    this.own.set(composed, {
+                        reason: editReason(edit, composed),
+                        event,
+                    });
+                },
+                onBlur: () => field.blurred(),
+                flush: () => this.flush(),
+            },
+            this.value,
+        );
+        this.segments = this.group.segments;
+        this.inputElement = this.group.inputElement;
 
         // a value given from outside (or reported back) replaces the segments; a `null` one only
         // when they are complete, so a partly typed field keeps what it holds
@@ -256,12 +288,8 @@ export class DateFieldRootState {
                 }
                 this.reported = null;
                 const value = this.value();
-                if (
-                    value !== null ||
-                    isSegmentsComplete(this.format(), this.values())
-                ) {
-                    this.ownValues.set(segmentValuesOf(this.format(), value));
-                    this.edit.set(null);
+                if (value !== null || this.group.complete()) {
+                    this.group.replace(value);
                 }
             });
         });
@@ -279,8 +307,16 @@ export class DateFieldRootState {
                       ? "date"
                       : "datetime-local";
             setInputAttribute(hidden, "name", formName());
-            setInputAttribute(hidden, "min", this.bound(this.inputs.min()));
-            setInputAttribute(hidden, "max", this.bound(this.inputs.max()));
+            setInputAttribute(
+                hidden,
+                "min",
+                boundIso(kind, granularity, this.inputs.min()),
+            );
+            setInputAttribute(
+                hidden,
+                "max",
+                boundIso(kind, granularity, this.inputs.max()),
+            );
             hidden.value = this.iso();
             hidden.required = this.required();
             hidden.disabled = this.disabled();
@@ -335,181 +371,36 @@ export class DateFieldRootState {
 
     /** The first focusable segment. */
     firstSegment(): HTMLElement | null {
-        return (
-            untracked(this.inputElement)?.querySelector<HTMLElement>(
-                FIRST_SEGMENT,
-            ) ?? null
-        );
+        return this.group.firstSegment();
     }
 
-    /**
-     * A key on a segment (spec/date-field.md, "Keyboard"): whether the field took it (its default
-     * is then prevented). A key that moves the focus renders first (AGENTS.md, "Porting", 8).
-     */
     segmentKey(
         segment: DateSegment,
         event: KeyboardEvent,
         element: HTMLElement,
     ): boolean {
-        if (
-            segment.type === "literal" ||
-            segment.type === "era" ||
-            untracked(this.disabled) ||
-            event.altKey ||
-            event.ctrlKey ||
-            event.metaKey
-        ) {
-            return false;
-        }
-        const result = segmentKeyDown(
-            untracked(this.format),
-            untracked(this.values),
-            segment.type,
-            event.key,
-            untracked(this.edit),
-            { seed: untracked(this.seed), readOnly: !this.editable() },
-        );
-        if (result === null) {
-            return false;
-        }
-        if (result.kind !== "move") {
-            this.apply(
-                result.values,
-                result.edit,
-                (composed) =>
-                    result.kind === "step"
-                        ? "keyboard"
-                        : composed === null
-                          ? "input-clear"
-                          : "input-change",
-                event,
-            );
-        }
-        if (result.move !== null) {
-            segmentTarget(element, result.move)?.focus();
-        }
-        return true;
+        return this.group.segmentKey(segment, event, element);
     }
 
-    /** Text typed into a segment (`beforeinput`'s data, spec/date-field.md "Typing"). */
     segmentText(
         segment: DateSegment,
         text: string,
         event: Event,
         element: HTMLElement,
     ): void {
-        if (
-            segment.type === "literal" ||
-            segment.type === "era" ||
-            !this.editable()
-        ) {
-            return;
-        }
-        const format = untracked(this.format);
-        const seed = untracked(this.seed);
-        const before = untracked(this.values);
-        const typingBefore = untracked(this.edit);
-        let next = before;
-        let typing = typingBefore;
-        let advance = false;
-        for (const character of text) {
-            const result = typeSegment(
-                format,
-                next,
-                segment.type,
-                character,
-                typing,
-                seed,
-            );
-            if (result === null) {
-                continue;
-            }
-            next = result.values;
-            typing = result.edit;
-            advance = result.advance;
-        }
-        if (next === before && typing === typingBefore) {
-            return;
-        }
-        this.apply(next, typing, () => "input-change", event);
-        if (advance) {
-            segmentTarget(element, "next")?.focus();
-        }
+        this.group.segmentText(segment, text, event, element);
     }
 
-    /** A segment lost the focus: its typed digits are dropped; leaving the Input is the blur. */
     segmentBlur(segment: DateSegment, event: FocusEvent): void {
-        const typing = untracked(this.edit);
-        if (typing !== null && typing.type === segment.type) {
-            this.edit.set(null);
-        }
-        const group = (event.currentTarget as HTMLElement | null)?.closest(
-            '[role="group"]',
-        );
-        const to = event.relatedTarget as Node | null;
-        if (group == null || to === null || !group.contains(to)) {
-            this.field.blurred();
-        }
-    }
-
-    private editable(): boolean {
-        return !untracked(this.disabled) && !untracked(this.readOnly);
-    }
-
-    /** Applies new segment values: the value follows once they are complete. */
-    private apply(
-        next: SegmentValues,
-        nextEdit: SegmentEdit | null,
-        reason: (value: FieldValue | null) => ChangeReason,
-        event: Event,
-    ): void {
-        const granularity = untracked(this.inputs.granularity);
-        const composed: FieldValue | null = !isSegmentsComplete(
-            untracked(this.format),
-            next,
-        )
-            ? null
-            : this.kind === "time"
-              ? segmentsToTime(next)
-              : granularity === "day"
-                ? segmentsToDate(next)
-                : segmentsToDateTime(next);
-        this.ownValues.set(next);
-        this.edit.set(nextEdit);
-        const before = untracked(this.iso);
-        const after = isoOf(this.kind, granularity, composed);
-        if (after !== before) {
-            this.reported = after;
-            this.own.set(composed, { reason: reason(composed), event });
-        }
-        // a controlled value comes back through its binding, and the segments show the key,
-        // before the next key (AGENTS.md, "Porting", 8)
-        this.flush();
+        this.group.segmentBlur(segment, event);
     }
 
     private reset(): void {
         this.field.reset();
         this.reported = null;
         const defaultValue = untracked(this.inputs.defaultValue);
-        this.ownValues.set(
-            segmentValuesOf(untracked(this.format), defaultValue),
-        );
-        this.edit.set(null);
+        this.group.replace(defaultValue);
         this.own.set(defaultValue, { reason: "none" });
         this.flush();
-    }
-
-    /** A bound's ISO text at the field's granularity. */
-    private bound(edge: FieldValue | null | undefined): string | null {
-        if (edge == null) {
-            return null;
-        }
-        const granularity = this.inputs.granularity();
-        return this.kind === "time"
-            ? toIsoTime(
-                  edge as PlainTime,
-                  granularity === "second" ? "second" : "minute",
-              )
-            : isoOf(this.kind, granularity, edge);
     }
 }
