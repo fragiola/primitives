@@ -44,6 +44,11 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [number-field.md](number-field.md) | NumberField (a spinbutton with localized text, auto repeat and scrub) |
 | [meter.md](meter.md) | Meter |
 | [otp-field.md](otp-field.md) | OTPField (a one-time code, one input per slot) |
+| [toast.md](toast.md) | Toast (on the toolkit's toast queue) |
+| [hover-card.md](hover-card.md) | HoverCard |
+| [scroll-area.md](scroll-area.md) | ScrollArea (native scrolling, custom scrollbars, on the toolkit's `/scroll-area`) |
+| [pagination.md](pagination.md) | Pagination (no APG pattern and no Base UI component: the APG-closest behaviour, decided there; the range is the toolkit's `/pagination`) |
+| [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
 The render utilities (React `useRender` and `mergeProps`, and the Vue and Angular equivalents)
@@ -69,7 +74,9 @@ NumberField and Meter, on the toolkit's new `/number` mechanism for localized nu
 auto repeat and scrub; Issue #51: OTPField, whose input model [otp-field.md](otp-field.md) decides);
 then the collections (Epic #55, Issue #53: the toolkit's collections mechanism, `/selection`, and
 Listbox on it; Issue #54: Autocomplete, sharing Combobox's behaviour through each framework's
-shared code).
+shared code); then the virtual lists (Epic #58), Toast and HoverCard (Epic #61); then ScrollArea,
+Pagination and AspectRatio (Epic #64, Issue #62: ScrollArea, on the toolkit's `/scroll-area`;
+Issue #63: Pagination, on the toolkit's `/pagination`, and AspectRatio), which complete stage 2.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -146,6 +153,11 @@ The vocabulary is shared by every component:
 | `data-placeholder` | a Select showing its placeholder |
 | `data-instant` | a tooltip that opened with no delay |
 | `data-dragging` | a slider while a pointer drags a thumb |
+| `data-current` | a Pagination Item of the current page (with `aria-current="page"`) |
+| `data-scrolling` | a ScrollArea's parts while the user scrolls it (a Scrollbar and a Thumb: their own axis) |
+| `data-hovering` | a ScrollArea's Scrollbars while a mouse or pen is over its Root |
+| `data-has-overflow-x`, `data-has-overflow-y` | a ScrollArea whose content is wider (taller) than its viewport |
+| `data-overflow-x-start`, `data-overflow-x-end`, `data-overflow-y-start`, `data-overflow-y-end` | a ScrollArea scrolled away from that edge (the x edges logical) |
 | `data-index` | a slider thumb's value index; an OTPField slot's index (a value) |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation) |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTPField slot that holds a character |
@@ -172,7 +184,7 @@ The reasons are shared:
 | `escape-key` | Escape dismissed the overlay |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's selection |
+| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's selection; a Pagination Item's press changed its page |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
 | `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did) |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
@@ -190,6 +202,7 @@ The reasons are shared:
 | `track-press` | a press on a slider's control moved a thumb |
 | `drag` | a pointer drag moved a slider's thumb |
 | `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md) |
+| `previous-press`, `next-press`, `first-press`, `last-press` | a Pagination's Previous, Next, First or Last changed its page (an Item's press is `item-press`) |
 | `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
 | `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed) |
 
@@ -437,6 +450,10 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Listbox's parts | `Listbox.Root`, `.Item`, `.ItemIndicator`, `.Group`, `.GroupLabel`, `.Separator` | the same | `[listboxRoot]`, `[listboxItem]`, structural `*listboxItemIndicator`, `[listboxGroup]`, `[listboxGroupLabel]`, `[listboxSeparator]` |
 | Autocomplete's value (the text) | `value` + `onValueChange(value, details)` (`defaultValue`) on `Autocomplete.Root` | `v-model:value` (`default-value`, `@value-change`) | `[(value)]` on `[autocompleteRoot]` (`valueChangeDetails`); the Root's `value()` signal instead of a Value directive |
 | Autocomplete's parts | `Autocomplete.Root`, `.InputGroup`, `.Input`, `.Trigger`, `.Clear`, `.Value`, `.Status`, `.Portal`, `.Positioner`, `.Popup`, `.Empty`, `.List`, `.Group`, `.GroupLabel`, `.Separator`, `.Item` | the same | `[autocompleteRoot]`, `[autocompleteInputGroup]`, `input[autocompleteInput]`, `[autocompleteTrigger]`, structural `*autocompleteClear`, `[autocompleteStatus]`, `*autocompletePortal`, `[autocompletePositioner]`, `[autocompletePopup]`, `[autocompleteEmpty]`, `[autocompleteList]` (`entries()`), `[autocompleteGroup]`, `[autocompleteGroupLabel]`, `[autocompleteSeparator]`, `[autocompleteItem]`; `injectAutocomplete()` |
+| ScrollArea's parts | `ScrollArea.Root`, `.Viewport`, `.Content`, `.Scrollbar` (`orientation`, `keepMounted`), `.Thumb`, `.Corner` | the same (`orientation`, `keep-mounted`) | `[scrollAreaRoot]`, `[scrollAreaViewport]`, `[scrollAreaContent]`, structural `*scrollAreaScrollbar` (`*scrollAreaScrollbar="'horizontal'"`, `*scrollAreaScrollbar="{ orientation: 'horizontal', keepMounted: true }"`: rendered only while its axis overflows), `[scrollAreaThumb]`, structural `*scrollAreaCorner` |
+| Pagination's page | `page` + `onPageChange(page, details)` (`defaultPage`) on `Pagination.Root` | `v-model:page` (`default-page`, `@page-change="(page, details) => ..."`) | `[(page)]` on `nav[paginationRoot]` (`defaultPage`; `pageChangeDetails` output `{ value, details }`) |
+| Pagination's parts and range | `Pagination.Root` (children `({ items, page, count }) => ...`), `.Item`, `.Ellipsis`, `.Previous`, `.Next`, `.First`, `.Last` | the same (the Root's default scoped slot `v-slot="{ items, page, count }"`) | `nav[paginationRoot]` (`items()`, `page()`, `count()` through `exportAs`), `[paginationItem]` (`[value]`), `[paginationEllipsis]`, `[paginationPrevious]`, `[paginationNext]`, `[paginationFirst]`, `[paginationLast]` |
+| AspectRatio | `<AspectRatio ratio={16 / 9}>` (one component, as Label) | `<AspectRatio :ratio="16 / 9">` | `<div aspectRatio [ratio]="16 / 9">` (selector `[aspectRatio]`, class `AspectRatio`) |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
