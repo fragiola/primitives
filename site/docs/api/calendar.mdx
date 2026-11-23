@@ -7,7 +7,9 @@ A month grid for choosing one date. It is an ARIA `grid` with one tab stop, the 
 WAI-ARIA APG [date picker dialog example](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/)
 (the [grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/)). A start and an end date is a
 [RangeCalendar](/docs/api/range-calendar); a calendar in a popup is a
-[DatePicker](/docs/api/date-picker).
+[DatePicker](/docs/api/date-picker). Several dates are a [MultipleCalendar](/docs/api/multiple-calendar);
+[presets](/docs/api/calendar-preset) and day, month and year [views](/docs/api/calendar-view) are opt-in
+parts of any calendar.
 
 A date is a plain `{ year, month, day }` (`PlainDate`, `month` 1–12) with no time and no time
 zone, and no date library: the math is the toolkit's

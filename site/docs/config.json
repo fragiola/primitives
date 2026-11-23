@@ -270,6 +270,50 @@
                     "path": "api/date-range-picker-input"
                 },
                 {
+                    "label": "MultipleCalendar",
+                    "path": "api/multiple-calendar"
+                },
+                {
+                    "label": "CalendarPreset",
+                    "path": "api/calendar-preset"
+                },
+                {
+                    "label": "CalendarView",
+                    "path": "api/calendar-view"
+                },
+                {
+                    "label": "MonthCalendar",
+                    "path": "api/month-calendar"
+                },
+                {
+                    "label": "MonthRangeCalendar",
+                    "path": "api/month-range-calendar"
+                },
+                {
+                    "label": "YearCalendar",
+                    "path": "api/year-calendar"
+                },
+                {
+                    "label": "YearRangeCalendar",
+                    "path": "api/year-range-calendar"
+                },
+                {
+                    "label": "MonthPicker",
+                    "path": "api/month-picker"
+                },
+                {
+                    "label": "MonthRangePicker",
+                    "path": "api/month-range-picker"
+                },
+                {
+                    "label": "YearPicker",
+                    "path": "api/year-picker"
+                },
+                {
+                    "label": "YearRangePicker",
+                    "path": "api/year-range-picker"
+                },
+                {
                     "label": "Progress",
                     "path": "api/progress"
                 },

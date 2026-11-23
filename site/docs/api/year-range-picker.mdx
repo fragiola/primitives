@@ -1,0 +1,169 @@
+---
+title: YearRangePicker
+description: "A trigger and a non-modal popup holding a bound YearRangeCalendar: a range of years, submitted as 2020/2024."
+---
+
+A trigger and a non-modal popup holding a [YearRangeCalendar](/docs/api/year-range-calendar): the
+[DatePicker](/docs/api/date-picker)'s trigger, popup, form and Field, with a range of years as its value. Its
+parts are the DatePicker's, named `year-range-picker-*`; the YearRangeCalendar inside the Popup has no value of its own and
+**binds** to the picker. The popup is a non-modal APG
+[dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) disclosed by a button, as the
+DatePicker's. It renders no text: the trigger's content and the popup's name are yours.
+
+<Example id="year-range-picker" />
+
+## Behaviour
+
+- **Open, choose, close**: as the [DatePicker's](/docs/api/date-picker#behaviour): the calendar
+  focuses its focused year as the popup opens (the value, else the year holding today);
+  choosing the range's end sets the value, closes the popup (reason `item-press`) and focuses the
+  Trigger; Escape, an outside press and Tab out close it; focus is not trapped.
+- **Forms**: with a `name`, the Root renders a hidden input after its children, which submits
+  the ISO interval `years=2020/2024`, or an empty value. `required`, `disabled`, `readOnly`, a form reset and a
+  [Field](/docs/api/field) work as the DatePicker's.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the value and the open state |
+| Trigger | `button` | `year-range-picker-trigger` | toggles the popup, and anchors it |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `year-range-picker-positioner` | places the popup next to the trigger |
+| Popup | `div` | `year-range-picker-popup` | the non-modal dialog, holding a `YearRangeCalendar.Root` |
+| (hidden input) | `input` | `year-range-picker-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { YearRangePicker, type YearRange } from "@fragiola/primitives-react/year-range-picker";
+import { YearRangeCalendar } from "@fragiola/primitives-react/year-range-calendar";
+
+<YearRangePicker.Root value={value} onValueChange={setValue} name="year">
+    <YearRangePicker.Trigger>{/* the formatted value */}</YearRangePicker.Trigger>
+    <YearRangePicker.Portal>
+        <YearRangePicker.Positioner>
+            <YearRangePicker.Popup aria-label="Choose years">
+                <YearRangeCalendar.Root>{/* its header and grid */}</YearRangeCalendar.Root>
+            </YearRangePicker.Popup>
+        </YearRangePicker.Positioner>
+    </YearRangePicker.Portal>
+</YearRangePicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <YearRangePicker.Root v-model:value="value" name="year">
+        <YearRangePicker.Trigger><!-- the formatted value --></YearRangePicker.Trigger>
+        <YearRangePicker.Portal>
+            <YearRangePicker.Positioner>
+                <YearRangePicker.Popup aria-label="Choose years">
+                    <YearRangeCalendar.Root><!-- its header and grid --></YearRangeCalendar.Root>
+                </YearRangePicker.Popup>
+            </YearRangePicker.Positioner>
+        </YearRangePicker.Portal>
+    </YearRangePicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [YearRangePickerRoot, DatePickerTrigger, DatePickerPortal, DatePickerPositioner, DatePickerPopup, YearRangeCalendarRoot /* , its parts */],
+    template: `
+        <ng-container yearRangePickerRoot [(value)]="value" name="year">
+            <button datePickerTrigger><!-- the formatted value --></button>
+            <div *datePickerPortal datePickerPositioner>
+                <div datePickerPopup aria-label="Choose years">
+                    <div yearRangeCalendarRoot><!-- its header and grid --></div>
+                </div>
+            </div>
+        </ng-container>
+    `,
+})
+```
+
+The DatePicker's part directives serve it, re-exported from this entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. Vue
+binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`, `(valueChangeDetails)`,
+`(openChangeDetails)`. The other parts' props are the [DatePicker's](/docs/api/date-picker#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `YearRange \| null` | | the chosen range, controlled |
+| `defaultValue` | `YearRange \| null` | `null` | the initial range, uncontrolled |
+| `onValueChange` | `(value: YearRange \| null, details: { reason }) => void` | | every choice (reason `item-press`), a form reset (`none`) |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason; called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `min` | `PlainYear \| null` | | passed to the bound calendar |
+| `max` | `PlainYear \| null` | | passed to the bound calendar |
+| `isUnavailable` | `(year: PlainYear) => boolean` | | passed to the bound calendar |
+| `locale` | `string` | the document's `lang` | passed to the bound calendar |
+| `columns` | `number` | `3` | passed to the bound calendar |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+| `required` | `boolean` | `false` | a native form's validation blocks a submission with no value |
+| `disabled` | `boolean` | `false` | the Trigger cannot open the popup; nothing is submitted |
+| `readOnly` | `boolean` | `false` | the popup still opens; its calendar chooses nothing |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*datePickerPortal="{ keepMounted: true }"`, or `*datePickerPortal="element"` for a container alone |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the trigger |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along its edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+## State and part attributes
+
+The [DatePicker's](/docs/api/date-picker#state-and-part-attributes), named `year-range-picker-*`; the hidden
+input's value is the ISO text (the ISO interval `years=2020/2024`).
+
+## Keyboard
+
+The [DatePicker's](/docs/api/date-picker#keyboard), with the [YearRangeCalendar's](/docs/api/year-range-calendar#keyboard) keys in the popup.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/year-range-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PlainYear`, `PositionerProps`, `RenderProp`, `Side`, `YearRange`, `YearRangePicker`, `YearRangePickerRootProps` |
+| `@fragiola/primitives-vue/year-range-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PlainYear`, `PositionerProps`, `RenderSlotProps`, `Side`, `YearRange`, `YearRangePicker`, `YearRangePickerRootEmits`, `YearRangePickerRootProps` |
+| `@fragiola/primitives-angular/year-range-picker` | `ChangeDetails`, `ChangeReason`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerTrigger`, `DatePickerTriggerState`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `PlainYear`, `PlainYearMonth`, `ValueChangeEvent`, `YearMonthRange`, `YearRange`, `YearRangePickerRoot` |

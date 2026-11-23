@@ -1,0 +1,206 @@
+---
+title: MultipleCalendar
+description: A month grid for choosing several dates, a press or Enter toggling each, with the Calendar's parts and keyboard, a limit, and one form entry per date.
+---
+
+A month grid for choosing **several dates**: an availability, a set of days off. It is the
+[Calendar](/docs/api/calendar)'s grid and keyboard (the WAI-ARIA APG
+[grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/), with multiple selection), with a
+Root of its own: a press on a date, or Enter and Space on the focused one, adds it or removes it.
+
+It is **its own component, in an entry of its own**, not a `multiple` prop on `Calendar.Root`:
+the calendars' state is shared by the Calendar, RangeCalendar and picker entries, so a mode added
+there would make all of them bigger. Its parts are the Calendar's, named `multiple-calendar-*`.
+
+<Example id="multiple-calendar" />
+
+## Behaviour
+
+- **Toggle**: a press on a date, or Enter / Space on the focused one, adds it when it is not
+  chosen and removes it when it is (reason `item-press`). A disabled, unavailable or outside-month
+  date, or a read-only calendar, changes nothing.
+- **Value**: a `PlainDate[]`, sorted from the earliest, with no date twice.
+- **Limit**: `maxSelected` refuses a date that would make the value longer; the chosen dates can
+  still be removed.
+- **Focus**: the grid is one tab stop. The focused date starts at the earliest chosen date, else
+  today, kept inside `min` and `max`; after a toggle the focus stays on the cell. Every other key,
+  the pages and the locale are the [Calendar](/docs/api/calendar#behaviour)'s.
+- **Forms**: with a `name`, the Root renders one `<input type="hidden">` per chosen date, so the
+  form submits `days=2026-11-20&days=2026-11-24` (read it with `FormData.getAll`); `disabled`
+  submits nothing; a form reset returns an uncontrolled calendar to its `defaultValue`. There is
+  no `required`, no [Field](/docs/api/field) integration and no picker.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `multiple-calendar-root` | holds the dates |
+| Heading, PrevButton, NextButton, Grid, GridHeader, HeaderCell, GridBody, Row, Cell | as the [Calendar's](/docs/api/calendar#anatomy) | `multiple-calendar-<part>` | |
+| (hidden inputs) | `input type="hidden"` | `multiple-calendar-input` | one per chosen date, after the Root's children, while it has a `name` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { MultipleCalendar, type PlainDate } from "@fragiola/primitives-react/multiple-calendar";
+
+const [days, setDays] = useState<PlainDate[]>([]);
+
+<MultipleCalendar.Root value={days} onValueChange={setDays} maxSelected={5} name="days">
+    <MultipleCalendar.PrevButton aria-label="Previous month">‹</MultipleCalendar.PrevButton>
+    <MultipleCalendar.Heading />
+    <MultipleCalendar.NextButton aria-label="Next month">›</MultipleCalendar.NextButton>
+    <MultipleCalendar.Grid>
+        <MultipleCalendar.GridHeader />
+        <MultipleCalendar.GridBody />
+    </MultipleCalendar.Grid>
+</MultipleCalendar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<script setup lang="ts">
+import { MultipleCalendar, type PlainDate } from "@fragiola/primitives-vue/multiple-calendar";
+import { ref } from "vue";
+
+const days = ref<PlainDate[]>([]);
+</script>
+
+<template>
+    <MultipleCalendar.Root v-model:value="days" :max-selected="5" name="days">
+        <MultipleCalendar.PrevButton aria-label="Previous month">‹</MultipleCalendar.PrevButton>
+        <MultipleCalendar.Heading />
+        <MultipleCalendar.NextButton aria-label="Next month">›</MultipleCalendar.NextButton>
+        <MultipleCalendar.Grid>
+            <MultipleCalendar.GridHeader />
+            <MultipleCalendar.GridBody />
+        </MultipleCalendar.Grid>
+    </MultipleCalendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [MultipleCalendarRoot, CalendarHeading, CalendarPrevButton, CalendarNextButton, CalendarGrid, CalendarGridHeader, CalendarHeaderCell, CalendarGridBody, CalendarRow, CalendarCell],
+    template: `
+        <div multipleCalendarRoot [(value)]="days" [maxSelected]="5" name="days">
+            <button calendarPrevButton aria-label="Previous month">‹</button>
+            <h2 calendarHeading #heading="calendarHeading">{{ heading.month() }}</h2>
+            <button calendarNextButton aria-label="Next month">›</button>
+            <table calendarGrid>
+                <!-- the Calendar's header and body, as on the Calendar page -->
+            </table>
+        </div>
+    `,
+})
+export class Availability {
+    protected readonly days = signal<PlainDate[]>([]);
+}
+```
+
+The parts are the Calendar's directives, re-exported from this entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:value`, `:max-selected`), and
+Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)`, `[maxSelected]`). The other
+parts' props are the [Calendar's](/docs/api/calendar#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainDate[]` | | the chosen dates, sorted, controlled |
+| `defaultValue` | `PlainDate[]` | `[]` | the initial dates, uncontrolled |
+| `onValueChange` | `(value: PlainDate[], details: { reason }) => void` | | every toggle (reason `item-press`), a form reset (`none`) |
+| `maxSelected` | `number` | no limit | a date that would make the value longer is not added |
+| `name` | `string` | | the hidden inputs' form name: one per chosen date |
+| `min` | `PlainDate \| null` | | dates before it are disabled |
+| `max` | `PlainDate \| null` | | dates after it are disabled |
+| `isDateUnavailable` | `(date: PlainDate) => boolean` | | unavailable dates can be focused, not chosen |
+| `locale` | `string` | the document's `lang` | a BCP 47 tag |
+| `firstDayOfWeek` | `number` | the locale's | `0`–`6`, Sunday is `0` |
+| `visibleMonths` | `number` | `1` | how many months are shown |
+| `disabled` | `boolean` | `false` | nothing can be focused or chosen; nothing is submitted |
+| `readOnly` | `boolean` | `false` | dates can be focused, not toggled |
+
+### Heading
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it names |
+
+### PrevButton
+
+No props of its own.
+
+### NextButton
+
+No props of its own.
+
+### Grid
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `offset` | `number` | `0` | which visible month it shows |
+
+### GridHeader
+
+No props of its own: React's children are a function of each weekday, Vue's default slot gets
+`{ weekday }`, Angular's `weekdays()` lists them.
+
+### HeaderCell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `weekday` | `Weekday` | | `{ index, short, long }`: its text is `short`, its `abbr` is `long` |
+
+### GridBody
+
+No props of its own: React's children are a function of each week, Vue's default slot gets
+`{ week }`, Angular's `weeks()` lists them.
+
+### Row
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `week` (react, vue) | `PlainDate[]` | | its seven dates; Angular loops over the week itself |
+
+### Cell
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `date` | `PlainDate` | | its date; its name is the full date from `Intl` unless it has an `aria-label` |
+
+## State and part attributes
+
+The [Calendar's](/docs/api/calendar#state-and-part-attributes), named `multiple-calendar-*`, plus:
+
+| part | attributes |
+| --- | --- |
+| Grid | `aria-multiselectable="true"` |
+| Cell | `aria-selected="true"` and `data-selected` on every chosen date |
+| hidden inputs | `type="hidden"`, `name`, `value` (ISO), `disabled` |
+
+## Keyboard
+
+The [Calendar's](/docs/api/calendar#keyboard); Enter and Space toggle the focused date.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/multiple-calendar` | `Calendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodyProps`, `CalendarGridHeaderProps`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `ChangeDetails`, `ChangeReason`, `DateRange`, `MultipleCalendar`, `MultipleCalendarRootProps`, `PlainDate`, `RenderProp`, `Weekday` |
+| `@fragiola/primitives-vue/multiple-calendar` | `Calendar`, `CalendarCellProps`, `CalendarCellState`, `CalendarGridBodySlots`, `CalendarGridHeaderSlots`, `CalendarGridProps`, `CalendarHeaderCellProps`, `CalendarHeaderCellState`, `CalendarHeadingProps`, `CalendarHeadingState`, `CalendarNextButtonProps`, `CalendarOptions`, `CalendarPageButtonState`, `CalendarPrevButtonProps`, `CalendarRootSharedProps`, `CalendarRootState`, `CalendarRowProps`, `CalendarRowSlots`, `ChangeDetails`, `ChangeReason`, `DateRange`, `MultipleCalendar`, `MultipleCalendarRootEmits`, `MultipleCalendarRootProps`, `PlainDate`, `RenderSlotProps`, `Weekday` |
+| `@fragiola/primitives-angular/multiple-calendar` | `CalendarCell`, `CalendarCellState`, `CalendarGrid`, `CalendarGridBody`, `CalendarGridHeader`, `CalendarHeaderCell`, `CalendarHeading`, `CalendarNextButton`, `CalendarNextButtonState`, `CalendarOptions`, `CalendarPrevButton`, `CalendarPrevButtonState`, `CalendarRow`, `ChangeDetails`, `ChangeReason`, `DateRange`, `MultipleCalendarDates`, `MultipleCalendarRoot`, `MultipleCalendarState`, `PlainDate`, `ValueChangeEvent`, `Weekday`, `injectCalendar` |

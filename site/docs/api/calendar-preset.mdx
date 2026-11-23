@@ -1,0 +1,114 @@
+---
+title: CalendarPreset
+description: A button that sets a calendar's value to a known date or range, inline or in any picker, marked while it is the current value.
+---
+
+A **preset** is a button that sets a calendar's value to a known date or range: "Today", "Last 7
+days", "Next week". `CalendarPreset` is one part, placed anywhere inside a
+[Calendar](/docs/api/calendar) or a [RangeCalendar](/docs/api/range-calendar), inline or bound in
+a picker's popup ([DatePicker](/docs/api/date-picker), [DateRangePicker](/docs/api/date-range-picker)
+and their typed inputs). It is **opt-in, in an entry of its own**: a calendar without presets
+imports none of its code. The labels are yours. It is an APG
+[button](https://www.w3.org/WAI/ARIA/apg/patterns/button/); the APG and Base UI have no presets
+(Zag's `PresetTrigger` and Bits UI's presets are the behaviour references).
+
+<Example id="calendar-preset" />
+
+## Behaviour
+
+- **A press sets the value** (reason `item-press`, as a cell's choice) and shows it: the focused
+  date moves to it (a range's end), and the visible months follow as they do for the keyboard, so
+  a range that fits shows whole. A range started in the grid is dropped first.
+- **In a picker** the press is a choice: the picker's value is set, its popup closes and the
+  Trigger takes the focus. In a typed picker ([DatePickerInput](/docs/api/date-picker-input)) the
+  segments are replaced, one press reporting one change. Inline, the focus stays on the preset.
+- **Value**: a `PlainDate`, a `DateRange`, or a function of today returning one
+  (`(today) => ({ start: addDays(today, -6), end: today })`), read when it renders and when it is
+  pressed. In a RangeCalendar a date is the one-day range; in a Calendar a range is no value.
+- **Disabled** while the calendar is disabled or read-only, or a date of the value (a range's start
+  or end) is before `min`, after `max` or unavailable: it could not be chosen in the grid either.
+- **Selected**: `data-selected` while the calendar's value equals the preset's. A preset is no
+  toggle: pressing it again does not unset the value, so it has no `aria-pressed`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| CalendarPreset | `button` | `calendar-preset` / `range-calendar-preset` (by the calendar it sits in) | sets the value; its content is yours |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { CalendarPreset } from "@fragiola/primitives-react/calendar-preset";
+import { RangeCalendar } from "@fragiola/primitives-react/range-calendar";
+
+const lastWeek = (today: PlainDate) => ({ start: addDays(today, -6), end: today });
+
+<RangeCalendar.Root value={range} onValueChange={setRange}>
+    {/* the header and the grid */}
+    <CalendarPreset value={lastWeek}>Last 7 days</CalendarPreset>
+</RangeCalendar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <RangeCalendar.Root v-model:value="range">
+        <!-- the header and the grid -->
+        <CalendarPreset :value="lastWeek">Last 7 days</CalendarPreset>
+    </RangeCalendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [RangeCalendarRoot, CalendarPreset],
+    template: `
+        <div rangeCalendarRoot [(value)]="range">
+            <!-- the header and the grid -->
+            <button [calendarPreset]="lastWeek">Last 7 days</button>
+        </div>
+    `,
+})
+```
+
+The directive's own input is the value: `[calendarPreset]="lastWeek"`.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives.
+
+### CalendarPreset
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainDate \| DateRange \| ((today: PlainDate) => PlainDate \| DateRange)` | required | the value it sets (Angular: `[calendarPreset]`) |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| CalendarPreset | `type="button"`; `disabled` and `data-disabled` when it cannot be chosen; `data-selected` while it is the calendar's value |
+
+## Keyboard
+
+Enter and Space press it, as any button.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/calendar-preset` | `Calendar`, `CalendarPreset`, `CalendarPresetProps`, `CalendarPresetState`, `CalendarPresetValue`, `DateRange`, `PlainDate`, `RenderProp` |
+| `@fragiola/primitives-vue/calendar-preset` | `Calendar`, `CalendarPreset`, `CalendarPresetProps`, `CalendarPresetState`, `CalendarPresetValue`, `DateRange`, `PlainDate`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/calendar-preset` | `CalendarPreset`, `CalendarPresetState`, `CalendarPresetValue`, `DateRange`, `PlainDate` |

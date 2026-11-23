@@ -1,0 +1,152 @@
+---
+title: CalendarView
+description: A calendar's day, month and year views, inline or in a picker's popup, a trigger going up and a choice coming down, the focus in each new grid.
+---
+
+A calendar can **switch its grid between days, months and years**, to move far quickly: a
+Trigger in the header goes up from the days to the months of the year, then to a page of years;
+choosing a year shows its months, choosing a month shows its days. `CalendarView` sits inside a
+[Calendar](/docs/api/calendar), [RangeCalendar](/docs/api/range-calendar) or
+[MultipleCalendar](/docs/api/multiple-calendar) Root, inline or bound in a
+[DatePicker](/docs/api/date-picker)'s popup (and the typed pickers'). The month view is a
+[MonthCalendar](/docs/api/month-calendar) and the year view a [YearCalendar](/docs/api/year-calendar),
+each without a value: it binds to the view.
+
+The views are **opt-in, in an entry of their own**: a calendar or a picker without them is
+unchanged. The APG has no view switch: the grids are the APG
+[grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/), and Zag/Ark's `view` and
+`ViewTrigger` are the behaviour reference.
+
+## Behaviour
+
+- **The Trigger goes up**: day → month → year (reason `trigger-press`); in the year view it is
+  disabled.
+- **A choice goes down**: a year shows its months, with the calendar's focused date moved to that
+  year (the same month and day, kept inside `min` and `max`); a month shows its days, on the same
+  day. A view's choice **only navigates**: the value is a date, chosen in the day grid, so a typed
+  picker's segments are unchanged.
+- **Focus on every switch**: the new view's focused cell takes the focus (the pressed Trigger or
+  cell may not exist in the new view). Shown on its own (a first render), a view takes no focus
+  inline, and in a picker its focused cell takes it as the popup opens, as the day grid's does.
+- **The bound grids**: the month (year) view shows the calendar's focused date's year (page),
+  disables a month (year) whose every day is disabled, and selects one holding the value.
+- **In a picker**: Escape closes the popup from any view; reopening shows the `defaultView`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | the view, inside a calendar's Root |
+| Trigger | `button` | `calendar-view-trigger` / `range-calendar-view-trigger` (by the calendar it sits in) | goes one view up; its content is yours (typically the view's Heading) |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Calendar, CalendarView, MonthCalendar } from "@fragiola/primitives-react/calendar-view";
+import { YearCalendar } from "@fragiola/primitives-react/year-calendar";
+
+<Calendar.Root>
+    <CalendarView.Root>
+        {({ view }) =>
+            view === "day" ? (
+                <>
+                    <CalendarView.Trigger>
+                        <Calendar.Heading render={<span />} />
+                    </CalendarView.Trigger>
+                    <Calendar.Grid>{/* … */}</Calendar.Grid>
+                </>
+            ) : view === "month" ? (
+                <MonthCalendar.Root>{/* a Trigger holding its Heading, its Grid */}</MonthCalendar.Root>
+            ) : (
+                <YearCalendar.Root>{/* … */}</YearCalendar.Root>
+            )
+        }
+    </CalendarView.Root>
+</Calendar.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Calendar.Root>
+        <CalendarView.Root v-slot="{ view }">
+            <template v-if="view === 'day'">
+                <CalendarView.Trigger><Calendar.Heading as="span" /></CalendarView.Trigger>
+                <Calendar.Grid><!-- … --></Calendar.Grid>
+            </template>
+            <MonthCalendar.Root v-else-if="view === 'month'"><!-- … --></MonthCalendar.Root>
+            <YearCalendar.Root v-else><!-- … --></YearCalendar.Root>
+        </CalendarView.Root>
+    </Calendar.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CalendarRoot, CalendarViewRoot, CalendarViewTrigger, MonthCalendarRoot, YearCalendarRoot /* , the parts */],
+    template: `
+        <div calendarRoot>
+            <ng-container calendarViewRoot #views="calendarView">
+                @switch (views.view()) {
+                    @case ("day") {
+                        <button calendarViewTrigger><span calendarHeading #h="calendarHeading">{{ h.month() }}</span></button>
+                        <!-- the day grid -->
+                    }
+                    @case ("month") { <div monthCalendarRoot><!-- … --></div> }
+                    @default { <div yearCalendarRoot><!-- … --></div> }
+                }
+            </ng-container>
+        </div>
+    `,
+})
+```
+
+</Framework>
+
+## Props
+
+Vue binds `v-model:view`, Angular `[(view)]` and `(viewChangeDetails)`.
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `view` | `"day" \| "month" \| "year"` | | the view shown, controlled |
+| `defaultView` | `"day" \| "month" \| "year"` | `"day"` | the view shown first, and again when a picker reopens, uncontrolled |
+| `onViewChange` | `(view, details: { reason }) => void` | | every switch: `trigger-press` (the Trigger), `item-press` (a choice), `none` (a picker reopened) |
+
+Its children see the view: React's may be a function of `{ view }`, Vue's default slot gets
+`{ view }`, Angular's `view()` (`exportAs: "calendarView"`) gives it.
+
+### Trigger
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `type="button"`, `data-view` (`day`, `month`, `year`); `disabled` and `data-disabled` in the year view |
+
+## Keyboard
+
+The Trigger is a button (Enter, Space). In each view, the keys of its grid:
+[Calendar](/docs/api/calendar#keyboard), [MonthCalendar](/docs/api/month-calendar#keyboard),
+[YearCalendar](/docs/api/year-calendar#keyboard); Enter on a month or year goes down a view.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/calendar-view` | `Calendar`, `CalendarView`, `CalendarViewName`, `CalendarViewRootProps`, `CalendarViewState`, `CalendarViewTriggerProps`, `CalendarViewTriggerState`, `ChangeDetails`, `ChangeReason`, `MonthCalendar`, `RenderProp` |
+| `@fragiola/primitives-vue/calendar-view` | `Calendar`, `CalendarView`, `CalendarViewName`, `CalendarViewRootEmits`, `CalendarViewRootProps`, `CalendarViewRootSlots`, `CalendarViewState`, `CalendarViewTriggerProps`, `CalendarViewTriggerState`, `ChangeDetails`, `ChangeReason`, `MonthCalendar`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/calendar-view` | `CALENDAR_VIEW`, `CalendarViewContext`, `CalendarViewName`, `CalendarViewRoot`, `CalendarViewTrigger`, `CalendarViewTriggerState`, `ChangeDetails`, `ChangeReason`, `ValueChangeEvent` |

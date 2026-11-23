@@ -7,7 +7,9 @@ The [Calendar](/docs/api/calendar)'s grid for a range: the first choice is the s
 the end, and `onValueChange` fires once, with `{ start, end }`. It is the same ARIA `grid` with the
 keyboard of the WAI-ARIA APG [date picker dialog example](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/),
 marked `aria-multiselectable`. A range in a popup is a
-[DateRangePicker](/docs/api/date-range-picker).
+[DateRangePicker](/docs/api/date-range-picker). [Presets](/docs/api/calendar-preset) ("Last 7 days") set a range in
+one press; a range of months or years is a [MonthRangeCalendar](/docs/api/month-range-calendar) or a
+[YearRangeCalendar](/docs/api/year-range-calendar).
 
 Its parts are the Calendar's: `/range-calendar` exports its own Root with them, named
 `range-calendar-*` inside it. Dates are plain `{ year, month, day }` values with no time zone; the

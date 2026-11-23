@@ -1,0 +1,167 @@
+---
+title: YearPicker
+description: "A trigger and a non-modal popup holding a bound YearCalendar: one year, submitted as 2026."
+---
+
+A trigger and a non-modal popup holding a [YearCalendar](/docs/api/year-calendar): the
+[DatePicker](/docs/api/date-picker)'s trigger, popup, form and Field, with a year as its value. Its
+parts are the DatePicker's, named `year-picker-*`; the YearCalendar inside the Popup has no value of its own and
+**binds** to the picker. The popup is a non-modal APG
+[dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) disclosed by a button, as the
+DatePicker's. It renders no text: the trigger's content and the popup's name are yours.
+
+## Behaviour
+
+- **Open, choose, close**: as the [DatePicker's](/docs/api/date-picker#behaviour): the calendar
+  focuses its focused year as the popup opens (the value, else the year holding today);
+  choosing a year sets the value, closes the popup (reason `item-press`) and focuses the
+  Trigger; Escape, an outside press and Tab out close it; focus is not trapped.
+- **Forms**: with a `name`, the Root renders a hidden input after its children, which submits
+  `year=2026`, or an empty value. `required`, `disabled`, `readOnly`, a form reset and a
+  [Field](/docs/api/field) work as the DatePicker's.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the value and the open state |
+| Trigger | `button` | `year-picker-trigger` | toggles the popup, and anchors it |
+| Portal | none | | moves the Positioner to the end of `body` |
+| Positioner | `div` | `year-picker-positioner` | places the popup next to the trigger |
+| Popup | `div` | `year-picker-popup` | the non-modal dialog, holding a `YearCalendar.Root` |
+| (hidden input) | `input` | `year-picker-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { YearPicker, type PlainYear } from "@fragiola/primitives-react/year-picker";
+import { YearCalendar } from "@fragiola/primitives-react/year-calendar";
+
+<YearPicker.Root value={value} onValueChange={setValue} name="year">
+    <YearPicker.Trigger>{/* the formatted value */}</YearPicker.Trigger>
+    <YearPicker.Portal>
+        <YearPicker.Positioner>
+            <YearPicker.Popup aria-label="Choose year">
+                <YearCalendar.Root>{/* its header and grid */}</YearCalendar.Root>
+            </YearPicker.Popup>
+        </YearPicker.Positioner>
+    </YearPicker.Portal>
+</YearPicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <YearPicker.Root v-model:value="value" name="year">
+        <YearPicker.Trigger><!-- the formatted value --></YearPicker.Trigger>
+        <YearPicker.Portal>
+            <YearPicker.Positioner>
+                <YearPicker.Popup aria-label="Choose year">
+                    <YearCalendar.Root><!-- its header and grid --></YearCalendar.Root>
+                </YearPicker.Popup>
+            </YearPicker.Positioner>
+        </YearPicker.Portal>
+    </YearPicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [YearPickerRoot, DatePickerTrigger, DatePickerPortal, DatePickerPositioner, DatePickerPopup, YearCalendarRoot /* , its parts */],
+    template: `
+        <ng-container yearPickerRoot [(value)]="value" name="year">
+            <button datePickerTrigger><!-- the formatted value --></button>
+            <div *datePickerPortal datePickerPositioner>
+                <div datePickerPopup aria-label="Choose year">
+                    <div yearCalendarRoot><!-- its header and grid --></div>
+                </div>
+            </div>
+        </ng-container>
+    `,
+})
+```
+
+The DatePicker's part directives serve it, re-exported from this entry.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. Vue
+binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`, `(valueChangeDetails)`,
+`(openChangeDetails)`. The other parts' props are the [DatePicker's](/docs/api/date-picker#props).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `PlainYear \| null` | | the chosen year, controlled |
+| `defaultValue` | `PlainYear \| null` | `null` | the initial year, uncontrolled |
+| `onValueChange` | `(value: PlainYear \| null, details: { reason }) => void` | | every choice (reason `item-press`), a form reset (`none`) |
+| `open` | `boolean` | | the open state, controlled |
+| `defaultOpen` | `boolean` | `false` | the initial open state, uncontrolled |
+| `onOpenChange` | `(open: boolean, details: OpenChangeDetails) => void` | | every change, with its reason; called before the change, `details.cancel()` stops it |
+| `onOpenChangeComplete` | `(open: boolean) => void` | | once an opening or a closing has finished its transitions |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | receives `close()` and `unmount()`; Vue exposes them on the Root's template ref, Angular as the root directive's methods |
+| `min` | `PlainYear \| null` | | passed to the bound calendar |
+| `max` | `PlainYear \| null` | | passed to the bound calendar |
+| `isUnavailable` | `(year: PlainYear) => boolean` | | passed to the bound calendar |
+| `locale` | `string` | the document's `lang` | passed to the bound calendar |
+| `columns` | `number` | `3` | passed to the bound calendar |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+| `required` | `boolean` | `false` | a native form's validation blocks a submission with no value |
+| `disabled` | `boolean` | `false` | the Trigger cannot open the popup; nothing is submitted |
+| `readOnly` | `boolean` | `false` | the popup still opens; its calendar chooses nothing |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | `document.body` | where the Positioner goes |
+| `keepMounted` (react, vue) | `boolean` | `false` | keep the content rendered while closed (before the first opening and after an exit), `hidden` and `data-closed`; reopening shows the same elements |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*datePickerPortal="{ keepMounted: true }"`, or `*datePickerPortal="element"` for a container alone |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `"top" \| "bottom" \| "inline-start" \| "inline-end" \| "left" \| "right"` | `"bottom"` | the side of the trigger |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | the alignment along that side |
+| `sideOffset` | `number` | `0` | the distance from the trigger, in px |
+| `alignOffset` | `number` | `0` | the shift along its edge, in px |
+| `collisionPadding` | `number` | `8` | the space kept from the viewport's edges, in px |
+| `anchor` | `Element` | the trigger | the element to place the popup next to |
+
+### Popup
+
+No props of its own.
+
+## State and part attributes
+
+The [DatePicker's](/docs/api/date-picker#state-and-part-attributes), named `year-picker-*`; the hidden
+input's value is the ISO text (`year=2026`).
+
+## Keyboard
+
+The [DatePicker's](/docs/api/date-picker#keyboard), with the [YearCalendar's](/docs/api/year-calendar#keyboard) keys in the popup.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/year-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PlainYear`, `PositionerProps`, `RenderProp`, `Side`, `YearPicker`, `YearPickerRootProps` |
+| `@fragiola/primitives-vue/year-picker` | `Align`, `ChangeDetails`, `ChangeReason`, `DatePicker`, `DatePickerPopupProps`, `DatePickerPopupState`, `DatePickerPortalProps`, `DatePickerPositionerState`, `DatePickerTriggerProps`, `DatePickerTriggerState`, `MonthPickerRootSharedProps`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PlainYear`, `PositionerProps`, `RenderSlotProps`, `Side`, `YearPicker`, `YearPickerRootEmits`, `YearPickerRootProps` |
+| `@fragiola/primitives-angular/year-picker` | `ChangeDetails`, `ChangeReason`, `DatePickerPopup`, `DatePickerPopupState`, `DatePickerPortal`, `DatePickerPositioner`, `DatePickerPositionerState`, `DatePickerTrigger`, `DatePickerTriggerState`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `PlainYear`, `PlainYearMonth`, `ValueChangeEvent`, `YearMonthRange`, `YearPickerRoot`, `YearRange` |

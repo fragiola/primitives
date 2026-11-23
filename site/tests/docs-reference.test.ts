@@ -395,6 +395,17 @@ const SHARED_PARTS: Record<string, string | readonly string[]> = {
     "alert-dialog": "dialog",
     "context-menu": "menu",
     drawer: "dialog",
+    // spec/calendar.md "Multiple dates", spec/month-calendar.md (Epic #79): a MultipleCalendar's
+    // parts are the Calendar's; the range and year calendars' MonthCalendar's; the month and year
+    // pickers' the DatePicker's (and MonthPicker's, whose Root base they share)
+    "multiple-calendar": "calendar",
+    "month-range-calendar": "month-calendar",
+    "year-calendar": "month-calendar",
+    "year-range-calendar": "month-calendar",
+    "month-picker": "date-picker",
+    "month-range-picker": ["month-picker", "date-picker"],
+    "year-picker": ["month-picker", "date-picker"],
+    "year-range-picker": ["month-picker", "date-picker"],
 };
 
 /** The components a component's parts come from (SHARED_PARTS), in the order they are tried. */
