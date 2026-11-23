@@ -35,4 +35,7 @@ export * from "@fragiola/primitives-angular/separator";
 export * from "@fragiola/primitives-angular/slider";
 export * from "@fragiola/primitives-angular/switch";
 export * from "@fragiola/primitives-angular/tabs";
+export * from "@fragiola/primitives-angular/toggle";
+export * from "@fragiola/primitives-angular/toggle-group";
+export * from "@fragiola/primitives-angular/toolbar";
 export * from "@fragiola/primitives-angular/tooltip";

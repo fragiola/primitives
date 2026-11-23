@@ -7,7 +7,7 @@ export interface ButtonOptions {
     focusableWhenDisabled: boolean;
     nativeButton: boolean;
     type: ButtonType | undefined;
-    /** The consumer's own `tabindex`, or `null`. */
+    /** The consumer's own `tabindex` (or a composite's roving one), or `null`. */
     tabIndex: string | null;
 }
 
@@ -51,12 +51,28 @@ export function nativeKeyAction(
     return key === " " ? "click-on-keyup" : null;
 }
 
+/** The keys a roving composite acts on (spec/toolbar.md, "Keyboard"). */
+const COMPOSITE_KEYS: readonly string[] = [
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "Home",
+    "End",
+];
+
 /** The events a disabled button keeps from the consumer's handlers (spec/button.md, "Pointer"). */
 const GUARDED = ["click", "mousedown", "pointerdown", "keydown", "keyup"];
 
 export interface ButtonBehaviourOptions {
     disabled: () => boolean;
     nativeButton: () => boolean;
+    /**
+     * An item of a roving composite (a toolbar's button, a Toggle in a group): while disabled and
+     * focusable, the composite's keys still reach the composite (spec/toolbar.md, "Disabled
+     * items"), handed to it here since the consumer's handlers are stopped. `null` outside one.
+     */
+    composite?: () => ((event: KeyboardEvent) => void) | null;
 }
 
 /**
@@ -77,11 +93,21 @@ export function buttonBehaviour(
         if (event instanceof KeyboardEvent && event.key === "Tab") {
             return;
         }
+        const composite =
+            event instanceof KeyboardEvent &&
+            event.type === "keydown" &&
+            COMPOSITE_KEYS.includes(event.key)
+                ? (options.composite?.() ?? null)
+                : null;
+        event.stopImmediatePropagation();
+        if (composite !== null) {
+            composite(event as KeyboardEvent);
+            return;
+        }
         // a focusable disabled submit button does not submit, on a press or on Enter
         if (event.type !== "mousedown" && event.type !== "keyup") {
             event.preventDefault();
         }
-        event.stopImmediatePropagation();
     };
     // at the target, capturing listeners run before the consumer's own `(click)`
     for (const type of GUARDED) {
