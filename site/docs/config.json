@@ -134,6 +134,10 @@
                     "path": "api/form"
                 },
                 {
+                    "label": "Label",
+                    "path": "api/label"
+                },
+                {
                     "label": "Button",
                     "path": "api/button"
                 },
@@ -174,6 +178,14 @@
                     "path": "api/slider"
                 },
                 {
+                    "label": "NumberField",
+                    "path": "api/number-field"
+                },
+                {
+                    "label": "OTPField",
+                    "path": "api/otp-field"
+                },
+                {
                     "label": "Select",
                     "path": "api/select"
                 },
@@ -200,6 +212,10 @@
                 {
                     "label": "Progress",
                     "path": "api/progress"
+                },
+                {
+                    "label": "Meter",
+                    "path": "api/meter"
                 },
                 {
                     "label": "Avatar",

@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 34 components in React, Vue and Angular ([`spec/`](spec)), stages 0 and 1 complete, stage 2
+Today, 38 components in React, Vue and Angular ([`spec/`](spec)), stages 0 and 1 complete, stage 2
 under way:
 
 | group | components |
@@ -20,9 +20,10 @@ under way:
 | overlays | **Dialog**, **AlertDialog**, **Drawer**, **Popover**, **Tooltip**, **Menu** (checkbox and radio items, submenus), **ContextMenu** |
 | navigation and disclosure | **Tabs**, **NavigationMenu**, **Collapsible**, **Accordion** |
 | forms | **Field**, **Fieldset**, **Form**, **Button**, **Checkbox** and **CheckboxGroup**, **RadioGroup** and **Radio**, **Switch**, **Slider**, **Select**, **Combobox** |
+| inputs | **Label**, **NumberField** (localized text, held buttons, scrub), **OTPField** |
 | dates | **Calendar**, **RangeCalendar**, **DatePicker**, **DateRangePicker** |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
-| display | **Progress**, **Avatar**, **Separator** |
+| display | **Progress**, **Meter**, **Avatar**, **Separator** |
 
 Plus the [direction provider](spec/direction.md) and the render utilities. Stage 0 ported the
 cross-framework POC's components to production; stage 1 brought the production scope and

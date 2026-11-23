@@ -1,0 +1,150 @@
+---
+title: Meter
+description: A scalar measurement within a known range, as the APG meter, with its value formatted by Intl.NumberFormat, in each framework.
+---
+
+Shows a measurement within a known range (the APG [meter](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)
+pattern): a disk's usage, a battery's charge, a password's strength. It is not interactive and it
+is never indeterminate: how far a task has gone is a [Progress](/docs/api/progress).
+
+<Example id="meter" />
+
+## Behaviour
+
+- **Value**: a number, clamped to `[min, max]` (`0` and `100` by default).
+- **Format**: without `format`, the value is written as a percentage of the range (`"60%"`);
+  with `format` (`Intl.NumberFormatOptions`, in `locale`), as it says (`"384 GB"`). The Value and
+  the Root's `aria-valuetext` use it; `getAriaValueText` wins over it for the Root. Without
+  `locale`, the runtime's default: a page rendered on a server passes `locale`.
+- **Label**: names the Root (`aria-labelledby`) while it is rendered; or give the Root an
+  `aria-label`.
+- **Indicator**: grows from the inline start (right to left in RTL), with
+  `--meter-indicator-size` for a recipe that draws it otherwise (a ring).
+- **No text**: the Root renders nothing of its own (Base UI's visually hidden `x` for NVDA is not
+  rendered).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `meter-root` | the `meter`; holds the value |
+| Label | `span` | `meter-label` | names the Root |
+| Value | `span` | `meter-value` | shows the formatted value |
+| Track | `div` | `meter-track` | the rail |
+| Indicator | `div` | `meter-indicator` | the filled part, inside the Track |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Meter } from "@fragiola/primitives-react/meter";
+
+<Meter.Root value={384} max={512} format={{ style: "unit", unit: "gigabyte" }} locale="en-US">
+    <Meter.Label>Storage</Meter.Label>
+    <Meter.Value />
+    <Meter.Track>
+        <Meter.Indicator />
+    </Meter.Track>
+</Meter.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Meter.Root :value="battery" locale="en-US">
+        <Meter.Label>Battery</Meter.Label>
+        <Meter.Value v-slot="{ formattedValue }">{{ formattedValue }} left</Meter.Value>
+        <Meter.Track><Meter.Indicator /></Meter.Track>
+    </Meter.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [MeterRoot, MeterLabel, MeterValue, MeterTrack, MeterIndicator],
+    template: `
+        <div meterRoot [value]="battery()" locale="en-US">
+            <span meterLabel>Battery</span>
+            <span meterValue></span>
+            <div meterTrack><div meterIndicator></div></div>
+        </div>
+    `,
+})
+export class Battery {
+    protected readonly battery = signal(60);
+}
+```
+
+`<span meterValue #shown="meterValue">` reads `shown.formattedValue()` and `shown.value()` for
+content of your own.
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds them as props (`:value`, `:get-aria-value-text`), and Angular as inputs
+(`[value]`, `[getAriaValueText]`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `number` | required | the value, clamped to `[min, max]` |
+| `min` | `number` | `0` | the lower bound |
+| `max` | `number` | `100` | the upper bound |
+| `format` | `Intl.NumberFormatOptions` | a percentage of the range | how the Value and `aria-valuetext` write the value |
+| `locale` | `string` | the runtime's | the locale of the format (a BCP 47 tag) |
+| `getAriaValueText` | `(formattedValue: string, value: number) => string` | | the Root's `aria-valuetext` instead of the formatted value |
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the id the Root's `aria-labelledby` points at |
+
+### Value
+
+No props of its own. Its children replace the formatted value: a function
+`(formattedValue, value) => ReactNode` in React, the default scoped slot
+`{ formattedValue, value }` in Vue, the directive's `formattedValue()` and `value()` signals in
+Angular.
+
+### Track
+
+No props of its own.
+
+### Indicator
+
+No props of its own.
+
+## State and part attributes
+
+No state attribute: a meter has a value and nothing else.
+
+| part | attributes |
+| --- | --- |
+| Root | `role="meter"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow` (the clamped value), `aria-valuetext` (the formatted value, or `getAriaValueText`'s), `aria-labelledby` (the Label, while one is rendered) |
+| Label | `id` |
+| Indicator | structural inline style: `inset-inline-start: 0`, `inline-size: <percent>%` and `--meter-indicator-size: <percent>%` |
+
+## Keyboard
+
+None: a meter is not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/meter` | `Meter`, `MeterIndicatorProps`, `MeterLabelProps`, `MeterRootProps`, `MeterState`, `MeterTrackProps`, `MeterValueProps`, `RenderProp` |
+| `@fragiola/primitives-vue/meter` | `Meter`, `MeterLabelProps`, `MeterRootProps`, `MeterState`, `MeterValueSlotProps`, `MeterValueSlots`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/meter` | `MeterIndicator`, `MeterLabel`, `MeterRoot`, `MeterState`, `MeterTrack`, `MeterValue` |

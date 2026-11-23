@@ -1,0 +1,151 @@
+---
+title: OTPField
+description: A one-time code, one native input per slot in a named group with one tab stop, with paste, autofill, forms and Field support, in each framework.
+---
+
+A one-time code entered one character per slot: a sign-in code, a verification code. Typing
+moves forward, Backspace moves back, a paste or the browser's one-time-code autofill fills the
+slots, and the code works in a native `<form>` and in a [Field](/docs/api/field). The APG has no
+pattern for it; Base UI's OTP Field decides where the APG says nothing (the
+[behaviour rule](/docs/concepts/behaviour-rule)).
+
+<Example id="otp-field" />
+
+## Behaviour
+
+- **One native input per slot**, in a `group` with one tab stop: Tab enters and leaves the code
+  once. Each slot is named by you, saying its position (`aria-label="Digit 2 of 6"`): no text of
+  the library's own. A slot with no name takes a Field's label.
+- **Value**: a string with no gap, at most `length` long; `onValueChange` reports
+  `input-change`, `input-clear`, `input-paste`, `keyboard` or `none` (a reset);
+  `onValueComplete` reports the complete code; `onValueInvalid` the text whose characters
+  `validationType` refused.
+- **Typing**: a character fills the slot and moves on; a refused one changes nothing; a paste
+  spreads from the focused slot. A slot after the first empty one cannot take the focus.
+- **Keys**: ArrowLeft and ArrowRight (mirrored in RTL), Home and End, Backspace (moves back),
+  Delete, Control or Meta + Backspace (clears).
+- **Autofill**: the first slot has `autocomplete="one-time-code"` and `maxlength` the length.
+- **Forms**: a hidden input submits the code; `required` refuses an empty code and its `pattern`
+  an incomplete one; a reset returns to `defaultValue`.
+- `mask` hides the characters (`type="password"`).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `otp-field-root` | `group`; holds the value; renders the hidden input after it |
+| Input | `input` | `otp-field-input` | one slot |
+| (hidden input) | `input type="text"` | `otp-field-hidden-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Label } from "@fragiola/primitives-react/label";
+import { OTPField } from "@fragiola/primitives-react/otp-field";
+
+<Label id="code-label" htmlFor="code">Verification code</Label>
+<OTPField.Root id="code" name="code" length={6} aria-labelledby="code-label" onValueComplete={verify}>
+    {[1, 2, 3, 4, 5, 6].map((slot) => (
+        <OTPField.Input key={slot} aria-label={`Digit ${slot} of 6`} />
+    ))}
+</OTPField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <OTPField.Root v-model:value="code" :length="6" aria-label="Verification code" @value-complete="verify">
+        <OTPField.Input v-for="slot in 6" :key="slot" :aria-label="`Digit ${slot} of 6`" />
+    </OTPField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [OTPFieldRoot, OTPFieldInput],
+    template: `
+        <div otpFieldRoot [(value)]="code" [length]="6" aria-label="Verification code" (valueComplete)="verify($event.value)">
+            @for (slot of slots; track slot) {
+                <input otpFieldInput [attr.aria-label]="'Digit ' + slot + ' of 6'" />
+            }
+        </div>
+    `,
+})
+export class Verification {
+    protected readonly slots = [1, 2, 3, 4, 5, 6];
+    protected readonly code = signal("");
+    protected verify(code: string): void {}
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Vue binds the value as `v-model:value` with `@value-change`, `@value-complete` and
+`@value-invalid`; Angular as `[(value)]` with `(valueChangeDetails)`, `(valueComplete)` and
+`(valueInvalid)` (each `{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `length` | `number` | required | the number of slots |
+| `value` | `string` | | the code, controlled |
+| `defaultValue` | `string` | `""` | the initial code, uncontrolled |
+| `onValueChange` | `(value: string, details: { reason, event }) => void` | | every change |
+| `onValueComplete` | `(value: string, details: { reason, event }) => void` | | the code became `length` long (or a complete code was pasted again) |
+| `onValueInvalid` | `(text: string, details: { reason, event }) => void` | | typed or pasted text held refused characters |
+| `validationType` | `"numeric" \| "alpha" \| "alphanumeric" \| "none" \| RegExp` | `"numeric"` | the characters a slot accepts (a `RegExp` one character must match) |
+| `mask` | `boolean` | `false` | the slots hide their characters |
+| `autoComplete` | `string` | `"one-time-code"` | the first slot's and the hidden input's `autocomplete` |
+| `inputMode` | `string` | `numeric` for digits, else `text` | the slots' virtual keyboard |
+| `required` | `boolean` | `false` | the hidden input is required |
+| `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
+| `disabled` | `boolean` | `false` | ignores every interaction, submits nothing |
+| `name` | `string` | | the hidden input's name (a Field's wins) |
+| `id` | `string` | generated | the first slot's `id`; slot `n` gets `<id>-<n>` |
+
+### Input
+
+No props of its own: its name is yours (`aria-label`).
+
+## State and part attributes
+
+Every part carries `data-disabled`, `data-readonly`, `data-required`, `data-complete` and, inside
+a Field, the Field's state.
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`; inside a Field, `aria-labelledby` and `aria-describedby` |
+| Input | `id`, `type` (`text`, or `password` with `mask`), `inputmode`, `autocomplete`, `maxlength` (the first slot), `enterkeyhint`, the roving `tabindex`, `data-filled`, `data-index`, `aria-invalid` inside an invalid Field |
+
+## Keyboard
+
+| key | does |
+| --- | --- |
+| ArrowLeft, ArrowRight | the previous or the next slot (mirrored in RTL); with Control or Meta, the first or the first empty one |
+| Home, ArrowUp | the first slot |
+| End, ArrowDown | the first empty slot |
+| Backspace | removes a character and moves back; Control or Meta: clears the code |
+| Delete | removes the slot's character |
+| Tab | leaves the code |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/otp-field` | `ChangeDetails`, `ChangeReason`, `OTPField`, `OTPFieldInputProps`, `OTPFieldInputState`, `OTPFieldRootProps`, `OTPFieldState`, `OtpValidationType`, `RenderProp` |
+| `@fragiola/primitives-vue/otp-field` | `ChangeDetails`, `ChangeReason`, `OTPField`, `OTPFieldInputState`, `OTPFieldRootEmits`, `OTPFieldRootProps`, `OTPFieldState`, `OtpValidationType`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/otp-field` | `ChangeDetails`, `ChangeReason`, `OTPFieldInput`, `OTPFieldInputState`, `OTPFieldRoot`, `OTPFieldState`, `OtpValidationType`, `ValueChangeEvent` |

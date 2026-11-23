@@ -228,6 +228,10 @@ describe("the bundle guard, entry by entry", () => {
         // Epic #49 (#48): a Menubar on Menu's entry (the parent-bar contract is Menu's); never
         // the other way (spec/menu.md, "In a Menubar")
         expect(ENTRY_DEPENDENCIES.menubar).toEqual(["menu"]);
+        // Epic #52: NumberField and OTPField are Field controls; Label and Meter are built on
+        // nothing (a Meter shares Progress's toolkit math, not its code)
+        expect(ENTRY_DEPENDENCIES["number-field"]).toEqual(["field"]);
+        expect(ENTRY_DEPENDENCIES["otp-field"]).toEqual(["field"]);
         // Epic #32: Collapsible and Accordion share the panel's mechanics through each framework's
         // hooks and the toolkit, not through each other's code
         for (const name of [
@@ -237,6 +241,8 @@ describe("the bundle guard, entry by entry", () => {
             "button",
             "progress",
             "separator",
+            "label",
+            "meter",
         ] as const) {
             expect(ENTRY_DEPENDENCIES[name]).toBeUndefined();
         }

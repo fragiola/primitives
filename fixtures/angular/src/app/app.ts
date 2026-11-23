@@ -62,6 +62,7 @@ import { FieldSettings } from "../scenarios/field/field-settings.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
+import { LabelControls } from "../scenarios/label/label-controls.ts";
 import { MenuBasic } from "../scenarios/menu/menu-basic.ts";
 import { MenuCheckboxRadio } from "../scenarios/menu/menu-checkbox-radio.ts";
 import { MenuControlled } from "../scenarios/menu/menu-controlled.ts";
@@ -73,8 +74,15 @@ import { MenuSubmenu } from "../scenarios/menu/menu-submenu.ts";
 import { MenubarBasic } from "../scenarios/menubar/menubar-basic.ts";
 import { MenubarModal } from "../scenarios/menubar/menubar-modal.ts";
 import { MenubarVertical } from "../scenarios/menubar/menubar-vertical.ts";
+import { MeterBasic } from "../scenarios/meter/meter-basic.ts";
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
+import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.ts";
+import { NumberFieldField } from "../scenarios/number-field/number-field-field.ts";
+import { NumberFieldFormat } from "../scenarios/number-field/number-field-format.ts";
+import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.ts";
+import { OtpFieldBasic } from "../scenarios/otp-field/otp-field-basic.ts";
+import { OtpFieldField } from "../scenarios/otp-field/otp-field-field.ts";
 import { PopoverArrow } from "../scenarios/popover/popover-arrow.ts";
 import { PopoverBasic } from "../scenarios/popover/popover-basic.ts";
 import { PopoverControlled } from "../scenarios/popover/popover-controlled.ts";
@@ -224,6 +232,14 @@ import { ROUTES } from "./routes.ts";
         AvatarBasic,
         ButtonBasic,
         FieldSettings,
+        LabelControls,
+        MeterBasic,
+        NumberFieldBasic,
+        NumberFieldField,
+        NumberFieldFormat,
+        NumberFieldScrub,
+        OtpFieldBasic,
+        OtpFieldField,
         ProgressBasic,
         RadioGroupBasic,
         RadioGroupControlled,
@@ -351,6 +367,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
             @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
+            @case ("/label/controls") { <main class="p-6" scenario-label-controls></main> }
+            @case ("/meter/basic") { <main class="p-6" scenario-meter-basic></main> }
+            @case ("/number-field/basic") { <main class="p-6" scenario-number-field-basic></main> }
+            @case ("/number-field/field") { <main class="p-6" scenario-number-field-field></main> }
+            @case ("/number-field/format") { <main class="p-6" scenario-number-field-format [locale]="query.locale"></main> }
+            @case ("/number-field/scrub") { <main class="p-6" scenario-number-field-scrub></main> }
+            @case ("/otp-field/basic") { <main class="p-6" scenario-otp-field-basic></main> }
+            @case ("/otp-field/field") { <main class="p-6" scenario-otp-field-field></main> }
             @case ("/progress/basic") { <main class="p-6" scenario-progress-basic></main> }
             @case ("/avatar/basic") { <main class="p-6" scenario-avatar-basic></main> }
             @case ("/separator/basic") { <main class="p-6" scenario-separator-basic></main> }

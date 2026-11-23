@@ -214,6 +214,8 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | CheckboxGroup | none (a `group`) | the CheckboxGroup | the array of checked values | its Checkboxes (focus within the group; `touched` once focus leaves it) | none: `validate` decides, as for the Slider. Its Checkboxes take the field's `name` (each still submits its own `value`; a parent checkbox submits nothing) and `disabled`, and do not register as the field's control themselves |
 | DatePicker | DatePicker.Trigger (`button`) | DatePicker.Trigger; its `aria-labelledby` lists the label's `id` **then its own** (see below) | the date, or `null` | DatePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
 | DateRangePicker | DateRangePicker.Trigger (`button`) | DateRangePicker.Trigger, as DatePicker's | the range `{ start, end }`, or `null` | DateRangePicker.Trigger | its visually hidden input ([calendar.md](calendar.md#forms)) |
+| NumberField | NumberField.Input (`input`) | NumberField.Input | the value, a number or `null` | NumberField.Input | its hidden `number` input ([number-field.md](number-field.md#forms)) |
+| OTPField | its first slot (`input`) | the Root (`group`) gets `aria-labelledby` and `aria-describedby`; every slot `aria-invalid`, and `aria-labelledby` when it has no name of its own | the value, a string | its slots (focus within the group; `touched` once focus leaves it) | its visually hidden input ([otp-field.md](otp-field.md#forms)) |
 
 **A picker's Trigger is named by its own content too.** Its text is the consumer's (the chosen
 date), so `aria-labelledby` lists the label, then the Trigger itself: the name reads "Arrival

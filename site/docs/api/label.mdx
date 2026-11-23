@@ -1,0 +1,100 @@
+---
+title: Label
+description: A standalone label that names a control outside a Field, focuses or activates it on press, and selects no text on a double press, in each framework.
+---
+
+A native `<label>` for a control outside a [Field](/docs/api/field): a text input, a Checkbox, a
+Switch, a Select's trigger, a [NumberField](/docs/api/number-field)'s input, a Slider's thumb. It
+names its control by `for` (React `htmlFor`) or by wrapping it, a press on it reaches the control,
+and a double press selects none of its text. Inside a Field, `Field.Label` does this and wires the
+ids and the description: use one or the other.
+
+<Example id="number-field" />
+
+## Behaviour
+
+- **Naming**: as HTML's `label`: `for` names a labelable control (an `input`, a `button`), or the
+  Label wraps it. A control `for` cannot name (a Slider's thumb, a group) takes the Label's `id`
+  in its own `aria-labelledby`.
+- **Press**: activates the control as a native label does: a text input takes the focus, a
+  Checkbox or a Switch toggles, a button is clicked. When `for` names an element that is not
+  labelable (a Slider's thumb), the press focuses it, or its first focusable descendant.
+- **Double press**: selects none of the Label's text (its `mousedown` default is prevented when
+  `detail > 1`), unless it lands on a control inside the Label.
+- **No text**: the Label renders its children only.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Label | `label` | `label-root` | names its control |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Label } from "@fragiola/primitives-react/label";
+
+<Label htmlFor="email">Email</Label>
+<input id="email" type="email" />;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Label for="email">Email</Label>
+    <input id="email" type="email" />
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [Label],
+    template: `
+        <label label for="email">Email</label>
+        <input id="email" type="email" />
+    `,
+})
+export class Email {}
+```
+
+The directive sits on your own `<label>` (`label[label]`): `for` and `id` are its native
+attributes.
+
+</Framework>
+
+## Props
+
+It also takes what the [primitive contract](/docs/concepts/primitive-contract) gives: `render`
+(Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which it
+forwards (Vue and Angular: `for` and `id`, native attributes).
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `htmlFor` (react) | `string` | | the `id` of the control it names; without it, the labelable control it wraps |
+
+## State and part attributes
+
+None but its part attribute, `data-primitives-part="label-root"`.
+
+## Keyboard
+
+None: a label is not focusable.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/label` | `Label`, `LabelProps`, `LabelState`, `RenderProp` |
+| `@fragiola/primitives-vue/label` | `Label`, `LabelProps`, `LabelState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/label` | `Label` |

@@ -63,7 +63,8 @@ export const GUARD = {
  * entry, which holds the group's context (Epic #49), never the other way; a Toolbar on neither:
  * the nested composites meet through each framework's own roving-focus code (spec/toolbar.md,
  * "Nested composites"). A Menubar is built on Menu's entry, which holds the contract of a parent
- * bar its Roots and Triggers read (spec/menu.md, "In a Menubar"), never the other way. Any other
+ * bar its Roots and Triggers read (spec/menu.md, "In a Menubar"), never the other way. NumberField
+ * and OTPField are Field controls (Epic #52); Label and Meter are built on nothing. Any other
  * component's code in an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
@@ -80,6 +81,8 @@ export const ENTRY_DEPENDENCIES: Readonly<
     fieldset: ["field"],
     form: ["field"],
     menubar: ["menu"],
+    "number-field": ["field"],
+    "otp-field": ["field"],
     radio: ["radio-group", "field"],
     "radio-group": ["field"],
     "range-calendar": ["calendar"],

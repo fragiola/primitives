@@ -26,7 +26,8 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/swipe` | `watchSwipe(element, options)` → cleanup (pointer and touch swipes, scroll containment), `swipeRelease`, `swipeMovement`, `swipeProgress`, `resolveSnapPoints` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `createDelayGroup` |
 | `@fragiola/primitives/range` | range math (`snapToStep`, `valueToPercent`, thumbs) and `sliderKeyTarget` |
-| `@fragiola/primitives/form` | `bridgeForm`, `validateField`, the field's state and change rules, `onSubmitAttempt` |
+| `@fragiola/primitives/number` | a number field's localized text (`formatNumber`, `parseNumber`, `isNumberText`: grouping, decimal separators, non-Latin digits, currency and percent), `stepNumber`, `clampNumber`, the press-and-hold `watchAutoRepeat` and the `watchScrub` of a scrub area |
+| `@fragiola/primitives/form` | `bridgeForm`, `validateField`, the field's state and change rules, `onSubmitAttempt`, a Label's press (`preventLabelSelection`, `labelFocusTarget`), an OTP field's value (`normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpPattern`) |
 | `@fragiola/primitives/date` | `PlainDate` (`{ year, month, day }`, no time zone) and its math, `monthGrid`, `calendarKeyTarget`, the locale data from `Intl` |
 | `@fragiola/primitives/id` | `createId` |
 | `@fragiola/primitives/direction` | `getDirection(element)` |
