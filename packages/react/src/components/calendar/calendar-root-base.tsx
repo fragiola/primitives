@@ -28,6 +28,7 @@ const OPTION_KEYS: ReadonlySet<string> = new Set([
     "locale",
     "firstDayOfWeek",
     "visibleMonths",
+    "calendar",
     "disabled",
     "readOnly",
 ]);

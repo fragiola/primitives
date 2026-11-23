@@ -40,6 +40,7 @@ const OPTION_KEYS: ReadonlySet<string> = new Set([
     "isUnavailable",
     "locale",
     "columns",
+    "calendar",
     "disabled",
     "readOnly",
 ]);

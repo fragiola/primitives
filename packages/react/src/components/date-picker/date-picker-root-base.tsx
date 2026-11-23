@@ -79,6 +79,7 @@ export function DatePickerRootBase({
     locale,
     firstDayOfWeek,
     visibleMonths,
+    calendar,
     name,
     required = false,
     disabled: disabledProp = false,
@@ -163,8 +164,17 @@ export function DatePickerRootBase({
             locale,
             firstDayOfWeek,
             visibleMonths,
+            calendar,
         }),
-        [min, max, isDateUnavailable, locale, firstDayOfWeek, visibleMonths],
+        [
+            min,
+            max,
+            isDateUnavailable,
+            locale,
+            firstDayOfWeek,
+            visibleMonths,
+            calendar,
+        ],
     );
     const { open } = root;
     const binding = useMemo(

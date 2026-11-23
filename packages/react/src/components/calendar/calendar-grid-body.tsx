@@ -1,8 +1,4 @@
-import {
-    monthGrid,
-    type PlainDate,
-    toIsoDate,
-} from "@fragiola/primitives/date";
+import { type PlainDate, toIsoDate } from "@fragiola/primitives/date";
 import type { ReactNode } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
@@ -22,7 +18,7 @@ export function CalendarGridBody({
 }: CalendarGridBodyProps) {
     const context = useRequiredContext(CalendarContext, "Calendar.GridBody");
     const month = useRequiredContext(CalendarGridContext, "Calendar.GridBody");
-    const weeks = monthGrid(month.year, month.month, context.firstDay);
+    const weeks = context.math.monthGrid(month, context.firstDay);
     const render =
         children ??
         ((week: PlainDate[]) => (

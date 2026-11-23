@@ -1,3 +1,4 @@
+import type { CalendarSystem } from "@fragiola/primitives/calendar-systems";
 import type { PlainDate } from "@fragiola/primitives/date";
 import {
     bridgeForm,
@@ -11,6 +12,7 @@ import {
     segmentValuesOf,
 } from "@fragiola/primitives/segments";
 import type { PlainDateTime } from "@fragiola/primitives/time";
+import type { Disambiguation, TimeZone } from "@fragiola/primitives/time-zone";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
@@ -46,8 +48,30 @@ export interface DateFieldRootSharedProps extends PartProps<DateFieldState> {
     name?: string;
 }
 
+/**
+ * The calendar system and time zone a date field takes (spec/calendar-systems.md,
+ * spec/time-zones.md): DateField, the range fields and the typed pickers.
+ */
+export interface DateFieldSystemProps {
+    /**
+     * A calendar system from `@fragiola/primitives/calendar-systems`: the segments show and edit
+     * its fields (an era where it has several); values stay ISO. Default: the ISO calendar.
+     */
+    calendar?: CalendarSystem;
+    /**
+     * A time zone from `@fragiola/primitives/time-zone` (`timeZone("America/New_York")`): the
+     * values are `ZonedDateTime`s in it, and a date and time shows the zone's name.
+     */
+    timeZone?: TimeZone;
+    /** Hides the zone's name segment. */
+    hideTimeZone?: boolean;
+    /** How a wall time the zone skips or repeats resolves (Temporal's; default `compatible`). */
+    disambiguation?: Disambiguation;
+}
+
 export interface DateFieldRootBaseProps<Value extends FieldValue>
-    extends DateFieldRootSharedProps {
+    extends DateFieldRootSharedProps,
+        DateFieldSystemProps {
     component: DateFieldComponent;
     kind: SegmentKind;
     granularity: SegmentGranularity;
@@ -81,6 +105,10 @@ export function DateFieldRootBase<Value extends FieldValue>({
     max,
     isDateUnavailable,
     hourCycle,
+    calendar,
+    timeZone,
+    hideTimeZone,
+    disambiguation,
     locale: localeProp,
     required = false,
     readOnly = false,
@@ -96,8 +124,27 @@ export function DateFieldRootBase<Value extends FieldValue>({
     );
     const locale = useDocumentLocale(localeProp);
     const format = useMemo(
-        () => segmentFormat({ locale, kind, granularity, hourCycle }),
-        [locale, kind, granularity, hourCycle],
+        () =>
+            segmentFormat({
+                locale,
+                kind,
+                granularity,
+                hourCycle,
+                calendar,
+                timeZone,
+                hideTimeZone,
+                disambiguation,
+            }),
+        [
+            locale,
+            kind,
+            granularity,
+            hourCycle,
+            calendar,
+            timeZone,
+            hideTimeZone,
+            disambiguation,
+        ],
     );
     const seed = useMemo(
         () => segmentValuesOf(format, placeholderValue),
@@ -111,6 +158,7 @@ export function DateFieldRootBase<Value extends FieldValue>({
     const latest = useRef({
         kind,
         granularity,
+        timeZone,
         defaultValue,
         setOwnValue,
         reset: () => {},
@@ -134,9 +182,20 @@ export function DateFieldRootBase<Value extends FieldValue>({
         readOnly,
         onEdit: (composed, edit, event) => {
             const state = latest.current;
-            const after = isoOf(state.kind, state.granularity, composed);
+            const after = isoOf(
+                state.kind,
+                state.granularity,
+                composed,
+                state.timeZone,
+            );
             if (
-                after === isoOf(state.kind, state.granularity, current.current)
+                after ===
+                isoOf(
+                    state.kind,
+                    state.granularity,
+                    current.current,
+                    state.timeZone,
+                )
             ) {
                 return;
             }
@@ -149,7 +208,7 @@ export function DateFieldRootBase<Value extends FieldValue>({
         },
         onBlur: () => field.onBlur(),
     });
-    const iso = isoOf(kind, granularity, value);
+    const iso = isoOf(kind, granularity, value, timeZone);
     // a value given from outside (or reported back) replaces the segments; a `null` one only
     // when they are complete, so a partly typed field keeps what it holds
     const [synced, setSynced] = useState(iso);
@@ -171,6 +230,7 @@ export function DateFieldRootBase<Value extends FieldValue>({
     latest.current = {
         kind,
         granularity,
+        timeZone,
         defaultValue,
         setOwnValue,
         reset: field.reset,
@@ -195,6 +255,7 @@ export function DateFieldRootBase<Value extends FieldValue>({
                     state.kind,
                     state.granularity,
                     state.defaultValue,
+                    state.timeZone,
                 );
             },
             invalid: firstSegment,
@@ -245,11 +306,14 @@ export function DateFieldRootBase<Value extends FieldValue>({
             <input
                 ref={hidden}
                 type={
-                    kind === "time"
-                        ? "time"
-                        : granularity === "day"
-                          ? "date"
-                          : "datetime-local"
+                    // a zoned value's text (`…-05:00[America/New_York]`) is no native date's
+                    timeZone
+                        ? "text"
+                        : kind === "time"
+                          ? "time"
+                          : granularity === "day"
+                            ? "date"
+                            : "datetime-local"
                 }
                 aria-hidden="true"
                 tabIndex={-1}

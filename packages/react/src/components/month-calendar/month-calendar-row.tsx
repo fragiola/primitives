@@ -3,7 +3,7 @@ import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { MonthCalendarCell } from "./month-calendar-cell.tsx";
 import { MonthCalendarContext } from "./month-calendar-context.ts";
-import { itemIndex, type MonthCalendarItem } from "./month-calendar-value.ts";
+import type { MonthCalendarItem } from "./month-calendar-value.ts";
 
 export interface MonthCalendarRowProps
     extends Omit<PartProps<Record<string, never>>, "children"> {
@@ -25,10 +25,7 @@ export function MonthCalendarRow({
     const render =
         children ??
         ((item: MonthCalendarItem) => (
-            <MonthCalendarCell
-                key={itemIndex(context.kind, item)}
-                value={item}
-            />
+            <MonthCalendarCell key={context.units.index(item)} value={item} />
         ));
     return renderElement(
         "tr",

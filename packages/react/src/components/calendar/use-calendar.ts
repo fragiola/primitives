@@ -1,17 +1,12 @@
 import {
-    addMonths,
     clampDate,
     compareDates,
     type DateRange,
-    endOfMonth,
     firstDayOfWeek,
     isBetween,
     isSameDate,
-    isSameMonth,
     isWithinBounds,
-    monthsBetween,
     type PlainDate,
-    startOfMonth,
     today,
     toIsoDate,
     watchDocumentLanguage,
@@ -37,6 +32,7 @@ import {
     type CalendarMode,
     type CalendarOptions,
     type CalendarValue,
+    ISO_MATH,
     isRange,
 } from "./calendar-value.ts";
 import { PickerBindingContext } from "./picker-binding-context.ts";
@@ -80,6 +76,7 @@ function definedOptions(props: CalendarOptions): CalendarOptions {
             locale: props.locale,
             firstDayOfWeek: props.firstDayOfWeek,
             visibleMonths: props.visibleMonths,
+            calendar: props.calendar,
         }).filter(([, value]) => value !== undefined),
     );
 }
@@ -119,6 +116,9 @@ export function useCalendar(
     );
     const locale = options.locale ?? defaultLocale;
     const firstDay = options.firstDayOfWeek ?? firstDayOfWeek(locale);
+    // a calendar system's month math and names (spec/calendar-systems.md), else the ISO calendar's
+    const system = options.calendar;
+    const math = system ?? ISO_MATH;
     const visibleMonths = Math.max(1, options.visibleMonths ?? 1);
     const disabled = props.disabled ?? false;
     const readOnly = props.readOnly ?? (bound && picker.readOnly);
@@ -131,7 +131,7 @@ export function useCalendar(
         ),
     );
     const [visibleStart, setVisibleStart] = useState(() =>
-        startOfMonth(focusedDate),
+        math.startOfMonth(focusedDate),
     );
     const [anchor, setAnchor] = useState<PlainDate | null>(null);
     const [hovered, setHovered] = useState<PlainDate | null>(null);
@@ -153,42 +153,53 @@ export function useCalendar(
             setHovered(null);
             setFocusedDate(date);
             setVisibleStart((start) => {
-                const offset = monthsBetween(start, date);
+                const offset = math.monthsBetween(start, date);
                 if (offset < 0) {
-                    return startOfMonth(date);
+                    return math.startOfMonth(date);
                 }
                 if (offset >= visibleMonths) {
-                    return addMonths(startOfMonth(date), -(visibleMonths - 1));
+                    return math.addMonths(
+                        math.startOfMonth(date),
+                        -(visibleMonths - 1),
+                    );
                 }
                 return start;
             });
             return true;
         },
-        [isOutOfBounds, visibleMonths],
+        [isOutOfBounds, visibleMonths, math],
     );
 
     const canPage = useCallback(
         (delta: 1 | -1) => {
-            const start = addMonths(visibleStart, delta * visibleMonths);
-            const end = endOfMonth(addMonths(start, visibleMonths - 1));
+            const start = math.addMonths(visibleStart, delta * visibleMonths);
+            const end = math.endOfMonth(
+                math.addMonths(start, visibleMonths - 1),
+            );
             return (
                 (max === null || compareDates(start, max) <= 0) &&
                 (min === null || compareDates(end, min) >= 0)
             );
         },
-        [visibleStart, visibleMonths, min, max],
+        [visibleStart, visibleMonths, min, max, math],
     );
     const page = useCallback(
         (delta: 1 | -1) => {
             if (!canPage(delta)) {
                 return;
             }
-            setVisibleStart((start) => addMonths(start, delta * visibleMonths));
+            setVisibleStart((start) =>
+                math.addMonths(start, delta * visibleMonths),
+            );
             setFocusedDate((date) =>
-                clampDate(addMonths(date, delta * visibleMonths), min, max),
+                clampDate(
+                    math.addMonths(date, delta * visibleMonths),
+                    min,
+                    max,
+                ),
             );
         },
-        [canPage, visibleMonths, min, max],
+        [canPage, visibleMonths, min, max, math],
     );
 
     const commit = useCallback(
@@ -247,16 +258,16 @@ export function useCalendar(
                 max,
             );
             setFocusedDate(start);
-            setVisibleStart(startOfMonth(start));
+            setVisibleStart(math.startOfMonth(start));
             setReopened((count) => count + 1);
         }
-    }, [opened, value, todayDate, min, max]);
+    }, [opened, value, todayDate, min, max, math]);
 
     const rangeValue: DateRange | null = isRange(value) ? value : null;
     const previewTo = hovered ?? focusedDate;
     const cellState = useCallback(
         (date: PlainDate, month: PlainDate): CalendarCellState => {
-            const outsideMonth = !isSameMonth(date, month);
+            const outsideMonth = !math.isSameMonth(date, month);
             const inRange =
                 rangeValue !== null &&
                 isBetween(date, rangeValue.start, rangeValue.end);
@@ -290,6 +301,7 @@ export function useCalendar(
             focusedDate,
             anchor,
             previewTo,
+            math,
         ],
     );
 
@@ -301,7 +313,10 @@ export function useCalendar(
         {
             component,
             mode,
-            locale,
+            // with a system, `Intl` writes its names (`-u-ca-`)
+            locale: system ? system.locale(locale) : locale,
+            math,
+            calendar: system,
             firstDay,
             visibleMonths,
             visibleStart,

@@ -1,6 +1,7 @@
 import {
     type DateSegment,
     dateSegments,
+    type EditableSegmentType,
     isSegmentsComplete,
     type SegmentEdit,
     type SegmentFormat,
@@ -115,8 +116,7 @@ export function useSegmentGroup(options: SegmentGroupOptions) {
             ) => {
                 const state = latest.current;
                 if (
-                    segment.type === "literal" ||
-                    segment.type === "era" ||
+                    !segment.editable ||
                     state.disabled ||
                     event.altKey ||
                     event.ctrlKey ||
@@ -128,7 +128,7 @@ export function useSegmentGroup(options: SegmentGroupOptions) {
                 const result = segmentKeyDown(
                     state.format,
                     before,
-                    segment.type,
+                    segment.type as EditableSegmentType,
                     event.key,
                     typing,
                     { seed: state.seed, readOnly: !editable() },
@@ -156,11 +156,7 @@ export function useSegmentGroup(options: SegmentGroupOptions) {
                 event: Event,
                 target: HTMLElement,
             ) => {
-                if (
-                    segment.type === "literal" ||
-                    segment.type === "era" ||
-                    !editable()
-                ) {
+                if (!segment.editable || !editable()) {
                     return;
                 }
                 const state = latest.current;
@@ -170,7 +166,7 @@ export function useSegmentGroup(options: SegmentGroupOptions) {
                     const result = typeSegment(
                         state.format,
                         next,
-                        segment.type,
+                        segment.type as EditableSegmentType,
                         character,
                         typing,
                         state.seed,

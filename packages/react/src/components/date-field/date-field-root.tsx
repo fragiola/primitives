@@ -6,12 +6,15 @@ import type { ChangeDetails } from "../../utils/change-details.ts";
 import {
     DateFieldRootBase,
     type DateFieldRootSharedProps,
+    type DateFieldSystemProps,
 } from "./date-field-root-base.tsx";
 
 /** A DateField's value: a date, or a date and time with a time granularity. */
 export type DateFieldValue = PlainDate | PlainDateTime;
 
-export interface DateFieldRootProps extends DateFieldRootSharedProps {
+export interface DateFieldRootProps
+    extends DateFieldRootSharedProps,
+        DateFieldSystemProps {
     /** A `PlainDate` (`day`) or a `PlainDateTime`; `null` while a segment is a placeholder. */
     value?: DateFieldValue | null;
     defaultValue?: DateFieldValue | null;

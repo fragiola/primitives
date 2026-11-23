@@ -134,6 +134,12 @@ export interface CalendarSystem {
     monthStart(month: CalendarYearMonth): PlainDate;
     /** The month of an ISO date. */
     yearMonthOf(date: PlainDate): CalendarYearMonth;
+    /**
+     * A day cell's name: the weekday, day, month and year in this system. Its fields are explicit
+     * (not `dateStyle: "full"`): Chromium's ICU has no Hebrew-calendar `he` date styles and writes
+     * `57870310 12:00 AM` for them (spec/calendar-systems.md, "Recorded limits").
+     */
+    fullDate(locale: string, date: PlainDate): string;
     /** An ISO date written by `Intl` in this system (`timeZone: "UTC"`: no host zone moves it). */
     format(
         locale: string,
@@ -322,6 +328,13 @@ export function createCalendarSystem(engine: CalendarEngine): CalendarSystem {
         fromMonthIndex,
         monthStart: (month) => fromFields({ ...month, day: 1 }),
         yearMonthOf,
+        fullDate: (locale, date) =>
+            formatter(locale, {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            }).format(utcMidnight(date)),
         format: (locale, date, options) =>
             formatter(locale, options).format(utcMidnight(date)),
         formatRange: (locale, start, end, options) =>

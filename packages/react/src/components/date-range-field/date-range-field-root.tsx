@@ -8,6 +8,7 @@ import type { PlainDateTime } from "@fragiola/primitives/time";
 import { useState } from "react";
 import type { ChangeDetails } from "../../utils/change-details.ts";
 import type { DateFieldValue } from "../date-field/date-field-root.tsx";
+import type { DateFieldSystemProps } from "../date-field/date-field-root-base.tsx";
 import {
     DateRangeFieldRootBase,
     type DateRangeFieldRootSharedProps,
@@ -19,7 +20,9 @@ export type DateRangeFieldValue =
     | DateRange
     | { readonly start: PlainDateTime; readonly end: PlainDateTime };
 
-export interface DateRangeFieldRootProps extends DateRangeFieldRootSharedProps {
+export interface DateRangeFieldRootProps
+    extends DateRangeFieldRootSharedProps,
+        DateFieldSystemProps {
     /** `{ start, end }`; `null` while a segment of either end is a placeholder. */
     value?: DateRangeFieldValue | null;
     defaultValue?: DateRangeFieldValue | null;

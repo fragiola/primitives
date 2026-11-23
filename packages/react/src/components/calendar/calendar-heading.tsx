@@ -1,4 +1,4 @@
-import { addMonths, formatMonthYear } from "@fragiola/primitives/date";
+import { formatMonthYear } from "@fragiola/primitives/date";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { CalendarContext } from "./calendar-context.ts";
@@ -22,7 +22,7 @@ export function CalendarHeading({
     const context = useRequiredContext(CalendarContext, "Calendar.Heading");
     const month = formatMonthYear(
         context.locale,
-        addMonths(context.visibleStart, offset),
+        context.math.addMonths(context.visibleStart, offset),
     );
     return renderElement(
         "h2",
