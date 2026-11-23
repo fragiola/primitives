@@ -32,6 +32,21 @@ reference where the APG says nothing (the [behaviour rule](/docs/concepts/behavi
   invalid (`data-invalid`, `aria-invalid`).
 - **Forms**: a hidden native `date` (or `datetime-local`) input submits the ISO value, with
   `min` and `max`; `required` refuses an empty field; a reset returns to `defaultValue`.
+- **Calendar systems**: with `calendar={persian}` (from
+  [`@fragiola/primitives/calendar-systems`](/docs/api/toolkit#calendar-systems)) the segments show
+  and edit the system's year, month (up to 13 in a Hebrew leap year) and day; where the system has
+  several eras (Japanese, ROC) the era is a segment too, stepped with the arrows or typed by its
+  first letters. The value and the form stay ISO.
+- **Time zones**: with `timeZone={timeZone("America/New_York")}` (from
+  [`@fragiola/primitives/time-zone`](/docs/api/toolkit#time-zones)) the value is a `ZonedDateTime`
+  in that zone; a time granularity shows the zone's name ("EST", "EDT" as the value crosses the
+  change), a segment that is read, not edited (`hideTimeZone` leaves it out). The segments keep
+  the wall time typed, resolved with `disambiguation` where a DST change skips or repeats it
+  (2:30 AM on a spring-forward night is 3:30 AM by default). The hidden input is then
+  `type="text"` and submits `2026-11-01T01:30-05:00[America/New_York]`: `required` still works,
+  `min` and `max` mark the field invalid but have no native message.
+
+<Example id="date-field-time-zone" />
 - **Right to left**: the segments keep the order the locale's text has (a numeric segment is one
   left-to-right run); lay them out inline, not as flex items.
 
@@ -131,6 +146,10 @@ with `(valueChangeDetails)` (`{ value, details }`).
 | `max` | `PlainDate \| PlainDateTime` | | values after it are invalid |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | an unavailable date is invalid |
 | `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems): the segments show and edit its year, month (up to 13) and day, and an era where it has several; values stay ISO |
+| `timeZone` | `TimeZone` | | a [time zone](/docs/api/toolkit#time-zones) (`timeZone("America/New_York")` from `@fragiola/primitives/time-zone`): the values are `ZonedDateTime`s in it, a time granularity shows its name, and the form submits `2026-11-01T01:30-05:00[America/New_York]` |
+| `hideTimeZone` | `boolean` | `false` | leaves the zone's name segment out |
+| `disambiguation` | `"compatible" \| "earlier" \| "later" \| "reject"` | `"compatible"` | how a wall time the zone skips or repeats (a DST change) resolves, Temporal's; `reject` makes no value |
 | `required` | `boolean` | `false` | the hidden input is required |
 | `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
 | `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |
@@ -159,6 +178,7 @@ a Field, the Field's state.
 | Input | `role="group"`; inside a Field, `aria-labelledby` and `aria-describedby` |
 | Segment (editable) | `role="spinbutton"`, `tabindex="0"`, `aria-label`, `aria-valuenow`, `aria-valuetext`, `aria-valuemin`, `aria-valuemax`, `contenteditable`, `inputmode`, `data-type`, `data-placeholder` |
 | Segment (literal) | `aria-hidden="true"`, `data-type="literal"` |
+| Segment (time zone name) | `data-type="timeZoneName"`; no role, not hidden: read as part of the field |
 
 ## Keyboard
 
@@ -178,4 +198,4 @@ a Field, the Field's state.
 | --- | --- |
 | `@fragiola/primitives-react/date-field` | `ChangeDetails`, `ChangeReason`, `DateField`, `DateFieldInputProps`, `DateFieldRootProps`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RenderProp`, `SegmentGranularity`, `SegmentType` |
 | `@fragiola/primitives-vue/date-field` | `ChangeDetails`, `ChangeReason`, `DateField`, `DateFieldInputSlots`, `DateFieldRootEmits`, `DateFieldRootProps`, `DateFieldRootSharedProps`, `DateFieldSegmentProps`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `PlainDate`, `PlainDateTime`, `PlainTime`, `RenderSlotProps`, `SegmentGranularity`, `SegmentType` |
-| `@fragiola/primitives-angular/date-field` | `boundIso`, `ChangeDetails`, `ChangeReason`, `compareValues`, `composeSegments`, `DATE_FIELD`, `DateFieldComponent`, `DateFieldData`, `DateFieldInput`, `DateFieldInputs`, `DateFieldParts`, `DateFieldRoot`, `DateFieldRootBase`, `DateFieldRootState`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldValue`, `DateSegment`, `documentLocale`, `editReason`, `FieldValue`, `isoOf`, `isOutOfRange`, `PlainDate`, `PlainDateTime`, `PlainTime`, `SegmentEditKind`, `SegmentGranularity`, `SegmentGroup`, `SegmentGroupOwner`, `SegmentType`, `stateData`, `ValueChangeEvent` |
+| `@fragiola/primitives-angular/date-field` | `boundIso`, `ChangeDetails`, `ChangeReason`, `compareValues`, `composeSegments`, `DATE_FIELD`, `DateFieldComponent`, `DateFieldData`, `DateFieldInput`, `DateFieldInputs`, `DateFieldParts`, `DateFieldRoot`, `DateFieldRootBase`, `DateFieldRootState`, `DateFieldSegment`, `DateFieldSegmentState`, `DateFieldState`, `DateFieldSystemInputs`, `DateFieldValue`, `DateSegment`, `documentLocale`, `editReason`, `FieldValue`, `hiddenType`, `isoOf`, `isOutOfRange`, `PlainDate`, `PlainDateTime`, `PlainTime`, `SegmentEditKind`, `SegmentGranularity`, `SegmentGroup`, `SegmentGroupOwner`, `SegmentType`, `stateData`, `systemFormat`, `ValueChangeEvent` |

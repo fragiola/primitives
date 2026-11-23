@@ -26,6 +26,11 @@ is the same anatomy over two times.
   bounds cross: the start's `max` is the end, the end's `min` the start, so a reversed range is
   the browser's own `rangeOverflow` / `rangeUnderflow` (a native form refuses it, a Field shows
   its error); `required` refuses an empty range; a reset returns both ends to `defaultValue`.
+- **Calendar systems and time zones**: `calendar`, `timeZone`, `hideTimeZone` and
+  `disambiguation` are a [DateField](/docs/api/date-field)'s, for both ends. A zoned range's
+  inputs are `type="text"` and submit the zoned ISO texts
+  (`2026-11-01T01:30-04:00[America/New_York]`), with no native crossed bounds: a reversed range is
+  still `data-invalid`.
 - **No text**: name each Input (`aria-label`); inside a Field, a segment is named by the label,
   its end and itself ("Stay Check-in month").
 
@@ -119,6 +124,10 @@ Vue binds the value as `v-model:value` with `@value-change`; Angular as `[(value
 | `max` | `PlainDate \| PlainDateTime` | | ends after it are invalid |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | a range whose start or end is unavailable is invalid |
 | `locale` | `string` | the document's `lang` | the segments' order, digits and names |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems): the segments show and edit its year, month (up to 13) and day, and an era where it has several; values stay ISO |
+| `timeZone` | `TimeZone` | | a [time zone](/docs/api/toolkit#time-zones) (`timeZone("America/New_York")` from `@fragiola/primitives/time-zone`): the values are `ZonedDateTime`s in it, a time granularity shows its name, and the form submits `2026-11-01T01:30-05:00[America/New_York]` |
+| `hideTimeZone` | `boolean` | `false` | leaves the zone's name segment out |
+| `disambiguation` | `"compatible" \| "earlier" \| "later" \| "reject"` | `"compatible"` | how a wall time the zone skips or repeats (a DST change) resolves, Temporal's; `reject` makes no value |
 | `required` | `boolean` | `false` | both hidden inputs are required |
 | `readOnly` | `boolean` | `false` | focusable and submitted, but nothing changes it |
 | `disabled` | `boolean` | `false` | no segment is focusable, nothing is submitted |

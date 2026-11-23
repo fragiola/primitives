@@ -23,6 +23,12 @@ An opt-in feature is an entry of its own, never a prop: the virtual lists
 [async list](/docs/api/async-list) (`/async-list`). A Listbox, Select, Combobox or Autocomplete
 that does not import them ships the same code, with no virtualizer.
 
+A calendar system and a time zone are injected, never looked up: a date component takes
+`calendar={persian}` (one export per system from `@fragiola/primitives/calendar-systems`), a date
+field `timeZone={timeZone("America/New_York")}` (from `@fragiola/primitives/time-zone`). No
+component imports either entry, so an app ships only the systems it passes, and no zone code
+when it passes none.
+
 ## No registry
 
 There is no Vue `app.use()` plugin and no Angular NgModule of every directive: nothing references

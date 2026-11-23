@@ -17,14 +17,22 @@ date pickers, a number field and a one-time code field, and a progress bar, a me
   [presets](/docs/api/calendar-preset) and [views](/docs/api/calendar-view), and three entries that are no
   component: the [direction provider](/docs/api/direction), the [render utilities](/docs/api/render) and the
   [async list](/docs/api/async-list).
-- **Dates are stage 3's third step.** A plain `{ year, month, day }`, a plain time, a month
-  `{ year, month }` and a year `{ year }` in the Gregorian calendar, with no time zone: typed in a
+- **Dates are stage 3.** A plain `{ year, month, day }`, a plain time, a month
+  `{ year, month }` and a year `{ year }`: typed in a
   DateField, a TimeField, their range fields or a picker's typed input, chosen in a calendar, a
   [MultipleCalendar](/docs/api/multiple-calendar), a [MonthCalendar](/docs/api/month-calendar) or a
   [YearCalendar](/docs/api/year-calendar) (and their pickers), with [presets](/docs/api/calendar-preset)
-  and a calendar's [views](/docs/api/calendar-view). No calendar systems or time zones yet: they
-  come with the last step of stage 3. A MultipleCalendar has no `required`, no Field and no
+  and a calendar's [views](/docs/api/calendar-view), in any of 13
+  [calendar systems](/docs/api/toolkit#calendar-systems) and, for the date fields and typed pickers,
+  in a [time zone](/docs/api/toolkit#time-zones). A MultipleCalendar has no `required`, no Field and no
   picker; a view's month or year only navigates.
+- **Calendar systems and time zones are computed on `Intl`**, with no data table: a system or a
+  zone is only as good as the engine's ICU (an engine without one falls back, or throws for an
+  unknown zone), and zone names differ between engines (a server render of a zoned field can pass
+  `hideTimeZone`). A component never maps a locale's `-u-ca-` keyword to a system: pass
+  `calendar`. A Japanese year is typed in full; a Hebrew month keeps its number when a typed year
+  moves between a leap and a common year. TimeField and TimeRangeField take no zone, and a zoned
+  field's out-of-range value has no native validation message.
 - **DateField and TimeField leave out** a paste and an IME composition into a segment, the
   expansion of a two-digit year (`26` is the year 26), a native message for an unavailable date
   (a Field's `validate` gives yours), and a range across midnight (a TimeField's `min` later than

@@ -30,6 +30,11 @@ as in a DateField, and the binding follows React Aria's DatePicker as the behavi
 - **Field and form**: inside a [Field](/docs/api/field) the label names the segments and a press
   on it focuses the first one; the Trigger is named by the label and itself ("Departure Choose
   date"). The form is the picker's: one hidden input with the ISO date.
+- **Calendar systems and time zones**: `calendar` goes to the bound calendar and the segments
+  (the value stays ISO); `timeZone`, `hideTimeZone` and `disambiguation` are a
+  [DateField](/docs/api/date-field)'s. A chosen date takes the typed time and resolves it in the
+  zone (`reject` resolves `compatible` there: a press must choose something); the form submits the
+  zoned ISO text.
 
 ## Anatomy
 
@@ -135,6 +140,10 @@ binds `v-model:value` and `v-model:open`; Angular `[(value)]`, `[(open)]`,
 | `max` | `PlainDate \| null` | | the calendar's and the segments' |
 | `isDateUnavailable` | `(date: PlainDate) => boolean` | | the calendar's and the segments' |
 | `locale` | `string` | the document's `lang` | the calendar's and the segments' |
+| `calendar` | `CalendarSystem` | the ISO calendar | a [calendar system](/docs/api/toolkit#calendar-systems): the bound calendar and the segments show and edit its year, month (up to 13) and day, and an era where it has several; values stay ISO |
+| `timeZone` | `TimeZone` | | a [time zone](/docs/api/toolkit#time-zones) (`timeZone("America/New_York")` from `@fragiola/primitives/time-zone`): the values are `ZonedDateTime`s in it, a time granularity shows its name, and the form submits `2026-11-01T01:30-05:00[America/New_York]` |
+| `hideTimeZone` | `boolean` | `false` | leaves the zone's name segment out |
+| `disambiguation` | `"compatible" \| "earlier" \| "later" \| "reject"` | `"compatible"` | how a wall time the zone skips or repeats (a DST change) resolves, Temporal's; `reject` makes no value |
 | `firstDayOfWeek` | `number` | the locale's | passed to the bound calendar |
 | `visibleMonths` | `number` | `1` | passed to the bound calendar |
 | `name` | `string` | | the hidden input's form name (a Field's wins); without one, no input is rendered |

@@ -36,7 +36,10 @@ TimeField add `/segments` (the segment editing) and `/time` (the plain times and
 DateRangePickerInput, in entries of their own), and no other component imports those two: a
 DatePicker without the typed input stays on `/date`. The month and year calendars, their
 pickers and a calendar's views (CalendarView) add `/month-year` (the month and year values, their
-12-item page and its keys, their names), which no day calendar imports. Progress uses
+12-item page and its keys, their names), which no day calendar imports. No component imports
+`/calendar-systems` or `/time-zone`: a date component takes a calendar system as its `calendar`, a
+date field or typed picker a zone as its `timeZone`, so an app that passes none bundles none of
+their code ([calendar systems](#calendar-systems), [time zones](#time-zones)). Progress uses
 `/range` alone, Avatar `/image` alone; Button and Separator use none. Toolbar and ToggleGroup use
 the roving focus of `/collection` and `/direction` (a Toggle alone imports neither: its
 composite's root handles the keys). NumberField adds `/number` to `/form` (its parsing and
@@ -56,6 +59,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives/async-list` | `createAsyncList`, `AsyncList`, `AsyncListOptions`, `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListState`, `AsyncListStatus` |
+| `@fragiola/primitives/calendar-systems` | `buddhist`, `coptic`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamicCivil`, `islamicTbla`, `islamicUmalqura`, `japanese`, `persian`, `roc`, `CalendarSystem`, `CalendarId`, `CalendarDateFields`, `CalendarFieldsInput`, `CalendarYearMonth`, `CalendarUnit`, `CalendarUnits` |
 | `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
@@ -80,6 +84,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/selection` | `createListModel`, `ListModel`, `ListNode`, `applySelection`, `inModelOrder`, `sameSelection`, `SelectionBehavior`, `SelectionChange`, `SelectionMode`, `SelectionOptions`, `SelectionState`, `listKeyTarget`, `listPressSelection`, `ListKeyEvent`, `ListKeyOptions`, `ListKeyResult`, `pageTarget` |
 | `@fragiola/primitives/swipe` | `watchSwipe`, `SwipeOptions`, `SwipeDirection`, `SwipeMovement`, `SwipeEnd`, `SWIPE_LOCK_DISTANCE`, `swipeRelease`, `SwipeOutcome`, `swipeMovement`, `swipeProgress`, `swipeDisplacement`, `resolveSnapPoints`, `SnapPoint`, `ResolvedSnapPoint` |
 | `@fragiola/primitives/time` | `addDateTime`, `addTime`, `compareDateTimes`, `compareTimes`, `currentDateTime`, `currentTime`, `cycleTime`, `DateTimeDuration`, `fromIsoDateTime`, `fromIsoTime`, `IsoTimePrecision`, `isSameDateTime`, `isSameTime`, `PlainDateTime`, `plainDateTime`, `PlainTime`, `plainTime`, `TimeDuration`, `TimeField`, `TimeRange`, `toIsoDateTime`, `toIsoTime`, `toPlainDate`, `toPlainTime` |
+| `@fragiola/primitives/time-zone` | `timeZone`, `TimeZone`, `ZonedDateTime`, `Disambiguation`, `offsetAt`, `fromInstant`, `toInstant`, `toZoned`, `toTimeZone`, `compareZoned`, `addZoned`, `cycleZoned`, `localTimeZone`, `toIsoZoned`, `toIsoOffset`, `fromIsoZoned`, `formatTimeZoneName` |
 | `@fragiola/primitives/toast` | `createToastManager`, `ToastManager`, `ToastManagerOptions`, `ToastObject`, `ToastOptions`, `ToastPriority`, `ToastPromiseOptions`, `ToastUpdate`, `watchToastViewport`, `ToastViewportWatch`, `ToastViewportWatchOptions`, `measureToastHeight` |
 | `@fragiola/primitives/virtual` | `createVirtualizer`, `Virtualizer`, `VirtualizerOptions`, `VirtualAlign`, `scrollContainer`, `virtualLayout`, `VirtualLayoutOptions`, `VirtualRange`, `VirtualRow`, `rowStarts`, `rowAt`, `activeSticky`, `pageIndex` |
 
@@ -261,3 +266,63 @@ alone: a list that does not opt in imports neither. The root entry,
   to those. `segmentTarget(segment, move)` finds the segment a move reaches, ArrowLeft and
   ArrowRight measured on screen; `focusOnLabelPress` focuses the first segment from a Field's
   label.
+
+## Calendar systems
+
+`@fragiola/primitives/calendar-systems` exports **one object per system**, each importable alone:
+`gregory`, `buddhist`, `japanese`, `roc`, `persian`, `indian`, `islamicCivil`, `islamicTbla`,
+`islamicUmalqura`, `hebrew` (13 months in a leap year), `coptic`, `ethiopic` and `ethioaa` (13
+months). Every date component takes one as its `calendar` and **injects** it: no component imports
+the entry, so the systems you do not pass are not in your bundle, and a component never maps a
+locale's `-u-ca-` keyword to a system (it would bundle every system).
+
+```tsx
+import { persian } from "@fragiola/primitives/calendar-systems";
+import { Calendar } from "@fragiola/primitives-react/calendar";
+
+<Calendar.Root calendar={persian} locale="fa-IR" />;
+```
+
+- **Values stay ISO.** A day calendar, picker or field still holds a `PlainDate` (or
+  `PlainDateTime`) and submits `2026-11-20`; `min`, `max` and `isDateUnavailable` take ISO dates.
+  The system is how the dates are shown, typed and moved through: the grid's months, the heading
+  and cell names, Page Up and Page Down, the segments' year, month (up to 13) and day, and an
+  editable era where the system has several (Japanese, ROC, Gregorian).
+- **Month and year calendars and pickers** hold the system's months and years
+  (`{ year: 1405, month: 8 }` is Aban 1405); a page is one of its years, 12 or 13 months. A form
+  submits the ISO date of the first day with the system's annotation (RFC 9557):
+  `2026-10-23[u-ca=persian]`.
+- **Computed on `Intl`, no data table**: the systems read their months from
+  `Intl.DateTimeFormat#formatToParts`, so a system is only as good as the engine's ICU (Chromium and
+  Node 24+ have all 13). A `CalendarSystem` also exposes the math (`fields`, `fromFields`,
+  `monthsInYear`, `daysInMonth`, `addMonths`, `monthGrid`, ...) for a primitive of your own.
+
+## Time zones
+
+`@fragiola/primitives/time-zone` holds zoned dates and times with Temporal's DST rules, on `Intl`.
+A **`ZonedDateTime`** is a `PlainDateTime` (the wall-clock time) with its IANA `timeZone` and its
+`offset` from UTC in milliseconds. DateField, DateRangeField, DatePickerInput and
+DateRangePickerInput take a zone as their `timeZone`, from `timeZone(id)`, and inject it like a
+calendar system:
+
+```tsx
+import { timeZone } from "@fragiola/primitives/time-zone";
+import { DateField } from "@fragiola/primitives-react/date-field";
+
+const newYork = timeZone("America/New_York");
+<DateField.Root granularity="minute" timeZone={newYork} />;
+```
+
+- **Values are `ZonedDateTime`s in the field's zone**; a value from another zone is shown at the
+  same instant. A time granularity shows the zone's name ("EST", then "EDT" across the change) as a
+  segment that is read but not edited; `hideTimeZone` leaves it out.
+- **The segments keep the wall time typed**; the value resolves it with `disambiguation`
+  (`compatible` by default: 2:30 AM on a spring-forward night is 3:30 AM, 1:30 AM on a fall-back
+  night the first one; `earlier`, `later`, or `reject` for no value).
+- **Forms** submit the zoned ISO text, `2026-11-01T01:30-05:00[America/New_York]`, from a
+  `type="text"` hidden input: `required` still works, out of range has no native message.
+- **The functions**: `toZoned` (a wall time in a zone, with a `disambiguation`), `toTimeZone`
+  (the same instant in another zone), `fromInstant`, `toInstant`, `compareZoned`, `addZoned`,
+  `cycleZoned`, `offsetAt`, `localTimeZone`, the ISO text (`toIsoZoned`, `fromIsoZoned`) and
+  `formatTimeZoneName` (the zone's short name at an instant, from `Intl`). Zone names come from
+  each engine's ICU: a server's may differ from the browser's ([server rendering](/docs/server-rendering)).
