@@ -3,6 +3,7 @@
 // toolbar), as standalone attribute directives on the consumer's own elements. It holds no Toggle
 // or ToggleGroup code: they join its focus through the package's roving scope (`/internal`).
 
+export type { RovingOrientation } from "@fragiola/primitives/collection";
 export { ToolbarButton } from "./directives/toolbar-button.directive.ts";
 export { ToolbarGroup } from "./directives/toolbar-group.directive.ts";
 export { ToolbarInput } from "./directives/toolbar-input.directive.ts";

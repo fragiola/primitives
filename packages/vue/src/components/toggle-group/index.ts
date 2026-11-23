@@ -2,6 +2,7 @@
 // (spec/toggle-group.md, Base UI's ToggleGroup). Its toggles come from `/toggle`, which holds the
 // group's context.
 
+export type { RovingOrientation } from "@fragiola/primitives/collection";
 export type {
     ChangeDetails,
     ChangeReason,

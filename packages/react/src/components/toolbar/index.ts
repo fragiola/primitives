@@ -3,6 +3,7 @@
 // toolbar). It holds no Toggle or ToggleGroup code: they join its focus through the package's
 // roving scope.
 
+export type { RovingOrientation } from "@fragiola/primitives/collection";
 export type { RenderProp } from "../../utils/render-element.tsx";
 export { Toolbar } from "./parts.ts";
 export type { ToolbarButtonProps } from "./toolbar-button.tsx";
