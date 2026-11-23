@@ -69,7 +69,8 @@ export const GUARD = {
  * and OTPField are Field controls (Epic #52); Label and Meter are built on nothing. Listbox and
  * Autocomplete are Field controls (Epic #55); Autocomplete shares Combobox's behaviour through each
  * framework's shared code and the toolkit, never Combobox's entry. TagGroup and TagsInput are Field
- * controls (Epic #91); they share nothing with Combobox's chips but the toolkit. Any other component's code in
+ * controls (Epic #91); they share nothing with Combobox's chips but the toolkit. SegmentedControl
+ * and Rating are Field controls (Epic #91); they share nothing with RadioGroup but the toolkit. Any other component's code in
  * an entry is a leak; a utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
@@ -131,6 +132,8 @@ export const ENTRY_DEPENDENCIES: Readonly<
     radio: ["radio-group", "field"],
     "radio-group": ["field"],
     "range-calendar": ["calendar"],
+    rating: ["field"],
+    "segmented-control": ["field"],
     select: ["field"],
     "select-virtual": ["select", "field"],
     slider: ["field"],

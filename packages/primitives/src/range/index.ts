@@ -1,4 +1,4 @@
-// The entry of @fragiola/primitives/range: range math (snapping, fractions, thumbs), the slider key map and a progress's value.
+// The entry of @fragiola/primitives/range: range math (snapping, fractions, thumbs), the slider key map, a progress's value and a rating's steps.
 
 export {
     type ProgressOptions,
@@ -17,4 +17,11 @@ export {
     valueAtFraction,
     valueToPercent,
 } from "./range-math.ts";
+export {
+    type RatingItemState,
+    type RatingKeyOptions,
+    ratingItemState,
+    ratingKeyTarget,
+    ratingValueAt,
+} from "./rating.ts";
 export { type SliderKeyOptions, sliderKeyTarget } from "./slider-keys.ts";

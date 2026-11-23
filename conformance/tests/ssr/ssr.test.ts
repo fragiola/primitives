@@ -132,6 +132,43 @@ test.describe("before hydration", () => {
         });
     }
 
+    // Epic #91 (#90), spec/segmented-control.md "Server rendering": the Indicator's script places
+    // it over the checked Item before hydration, as the Tabs Indicator's
+    for (const scenario of [
+        "/segmented-control/basic",
+        "/segmented-control/basic?dir=rtl",
+    ]) {
+        test(`ssr ${scenario}: the Indicator covers the checked Item`, async ({
+            page,
+        }, info) => {
+            await page.goto(`${ssrBase(info.project.name)}${scenario}`);
+            expect(
+                await page.evaluate(() =>
+                    document.documentElement.hasAttribute("data-fixture-ready"),
+                ),
+            ).toBe(false);
+            const indicator = page.locator(
+                '[data-primitives-part="segmented-control-indicator"]',
+            );
+            await expect(indicator.locator("script")).toHaveCount(0);
+            const width = await indicator.evaluate((element) =>
+                getComputedStyle(element).getPropertyValue(
+                    "--segment-indicator-inline-size",
+                ),
+            );
+            const item = await page
+                .getByRole("radio", { checked: true })
+                .boundingBox();
+            const box = await indicator.boundingBox();
+            expect(item).not.toBeNull();
+            expect(box).not.toBeNull();
+            expect(Number.parseFloat(width)).toBeCloseTo(item?.width ?? 0, 0);
+            // the recipe draws it over the checked Item's whole box
+            expect(box?.x).toBeCloseTo(item?.x ?? Number.NaN, 0);
+            expect(box?.width).toBeCloseTo(item?.width ?? Number.NaN, 0);
+        });
+    }
+
     // Epic #49 (#46), spec/tabs.md `/tabs/nonce`: under a Content Security Policy that allows
     // inline scripts by nonce, the script with the Indicator's `nonce` runs; one without is blocked
     test("ssr /tabs/nonce: the Indicator's script runs under a nonce policy", async ({

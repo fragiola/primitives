@@ -293,10 +293,20 @@
             "types": "./dist/types/fragiola-primitives-angular-range-calendar.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-range-calendar.mjs"
         },
+        "./rating": {
+            "@fragiola/source": "./rating/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-rating.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-rating.mjs"
+        },
         "./scroll-area": {
             "@fragiola/source": "./scroll-area/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-scroll-area.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-scroll-area.mjs"
+        },
+        "./segmented-control": {
+            "@fragiola/source": "./segmented-control/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-segmented-control.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-segmented-control.mjs"
         },
         "./select": {
             "@fragiola/source": "./select/public-api.ts",
