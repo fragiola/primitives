@@ -228,6 +228,9 @@ importers:
       '@angular/platform-browser':
         specifier: 22.2.6
         version: 22.2.6(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-angular':
         specifier: workspace:*
         version: link:../../packages/angular
@@ -271,6 +274,9 @@ importers:
 
   examples/react:
     dependencies:
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -338,6 +344,9 @@ importers:
 
   examples/vue:
     dependencies:
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-vue':
         specifier: workspace:*
         version: link:../../packages/vue
@@ -390,6 +399,9 @@ importers:
       '@angular/platform-browser':
         specifier: 22.2.6
         version: 22.2.6(@angular/common@22.2.6(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-angular':
         specifier: workspace:*
         version: link:../../packages/angular
@@ -427,6 +439,9 @@ importers:
 
   fixtures/react:
     dependencies:
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -464,6 +479,9 @@ importers:
 
   fixtures/vue:
     dependencies:
+      '@fragiola/primitives':
+        specifier: workspace:*
+        version: link:../../packages/primitives
       '@fragiola/primitives-vue':
         specifier: workspace:*
         version: link:../../packages/vue

@@ -23,6 +23,8 @@ import { CalendarTwoMonths } from "../scenarios/calendar/calendar-two-months.tsx
 import { CalendarUnavailable } from "../scenarios/calendar/calendar-unavailable.tsx";
 import { CalendarPresetBasic } from "../scenarios/calendar-preset/calendar-preset-basic.tsx";
 import { CalendarPresetPicker } from "../scenarios/calendar-preset/calendar-preset-picker.tsx";
+import { CalendarSystemsBasic } from "../scenarios/calendar-systems/calendar-systems-basic.tsx";
+import { CalendarSystemsPickers } from "../scenarios/calendar-systems/calendar-systems-pickers.tsx";
 import { CalendarViewPicker } from "../scenarios/calendar-view/calendar-view-picker.tsx";
 import { CalendarViewTyped } from "../scenarios/calendar-view/calendar-view-typed.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
@@ -158,6 +160,8 @@ import { TimeFieldBasic } from "../scenarios/time-field/time-field-basic.tsx";
 import { TimeFieldForm } from "../scenarios/time-field/time-field-form.tsx";
 import { TimeFieldMinMax } from "../scenarios/time-field/time-field-min-max.tsx";
 import { TimeRangeFieldBasic } from "../scenarios/time-range-field/time-range-field-basic.tsx";
+import { TimeZonesField } from "../scenarios/time-zones/time-zones-field.tsx";
+import { TimeZonesPicker } from "../scenarios/time-zones/time-zones-picker.tsx";
 import { ToastBasic } from "../scenarios/toast/toast-basic.tsx";
 import { ToastLimit } from "../scenarios/toast/toast-limit.tsx";
 import { ToastPromise } from "../scenarios/toast/toast-promise.tsx";
@@ -380,4 +384,8 @@ export const routes: Record<
     "/pagination/basic": PaginationBasic,
     "/pagination/links": PaginationLinks,
     "/aspect-ratio/basic": AspectRatioBasic,
+    "/calendar-systems/basic": CalendarSystemsBasic,
+    "/calendar-systems/pickers": CalendarSystemsPickers,
+    "/time-zones/field": TimeZonesField,
+    "/time-zones/picker": TimeZonesPicker,
 };
