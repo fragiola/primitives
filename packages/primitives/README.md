@@ -24,6 +24,7 @@ them, so both tree-shake to the same output.
 | `@fragiola/primitives/presence` | `nextFrame`, `waitForAnimations` |
 | `@fragiola/primitives/pointer` | `startDrag`, `isInSafeArea`, `isInHoverBridge`, `trackHoverBridge` |
 | `@fragiola/primitives/swipe` | `watchSwipe(element, options)` → cleanup (pointer and touch swipes, scroll containment), `swipeRelease`, `swipeMovement`, `swipeProgress`, `resolveSnapPoints` |
+| `@fragiola/primitives/toast` | the toast queue: `createToastManager` (add, update, close, promise toasts, a limit and its queue, priorities, timeouts and pauses; a plain module can import it), `watchToastViewport` (the F6 landmark, the pauses, the live regions), `measureToastHeight` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `createDelayGroup` |
 | `@fragiola/primitives/range` | range math (`snapToStep`, `valueToPercent`, thumbs) and `sliderKeyTarget` |
 | `@fragiola/primitives/number` | a number field's localized text (`formatNumber`, `parseNumber`, `isNumberText`: grouping, decimal separators, non-Latin digits, currency and percent), `stepNumber`, `clampNumber`, the press-and-hold `watchAutoRepeat` and the `watchScrub` of a scrub area |

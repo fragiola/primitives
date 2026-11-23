@@ -261,8 +261,8 @@ every field on submission, focuses the first invalid one, and shows server error
 
 ## Overlays
 
-Every overlay (Dialog, AlertDialog, Drawer, Popover, Tooltip, Menu and its submenus, ContextMenu,
-Select, Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35,
+Every overlay (Dialog, AlertDialog, Drawer, Popover, Tooltip, HoverCard, Menu and its submenus,
+ContextMenu, Select, Combobox, DatePicker, DateRangePicker) shares the mechanisms of this section (Epic #35,
 Issues #33 and #34). Each spec says what it adds. NavigationMenu's popup is a layer of the nested
 overlay tree too, with a value change and no lifecycle controls (spec/navigation-menu.md).
 
