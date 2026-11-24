@@ -626,7 +626,13 @@ function main(): void {
         process.exit(1);
     }
     console.log(
-        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on (and imports ${Object.keys(MECHANISM_USERS).join(" and ")} only in ${[...new Set(Object.values(MECHANISM_USERS).flat())].join(" and ")}), and the ${UTILITIES.length} utility entries no component's code`,
+        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on (and imports ${Object.keys(MECHANISM_USERS).join(" and ")} only in ${[...new Set(Object.values(MECHANISM_USERS).flat())].join(" and ")})${Object.entries(
+            MECHANISMS_KEPT_OUT,
+        )
+            .map(([entry, kept]) => `, /${entry} none of ${kept.join(", ")}`)
+            .join(
+                "",
+            )}, and the ${UTILITIES.length} utility entries no component's code`,
     );
 }
 

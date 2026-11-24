@@ -21,7 +21,9 @@ export interface ColorPickerBinding {
 // pure: an entry that never injects it bundles none of it (every other entry's size stays as it
 // was, docs/size.md)
 export const COLOR_PICKER_BINDING =
-    /* @__PURE__ */ new InjectionToken<ColorPickerBinding>("ColorPickerBinding");
+    /* @__PURE__ */ new InjectionToken<ColorPickerBinding>(
+        "ColorPickerBinding",
+    );
 
 /** The enclosing ColorPicker's binding, or `null` outside one. */
 export function injectColorPickerBinding(): ColorPickerBinding | null {
