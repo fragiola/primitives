@@ -123,6 +123,12 @@
             "import": "./dist/carousel.js",
             "default": "./dist/carousel.js"
         },
+        "./cascade-select": {
+            "@fragiola/source": "./src/components/cascade-select/index.ts",
+            "types": "./dist/cascade-select.d.ts",
+            "import": "./dist/cascade-select.js",
+            "default": "./dist/cascade-select.js"
+        },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
             "types": "./dist/checkbox.d.ts",
@@ -671,6 +677,11 @@
                 "types": "./dist/carousel.d.ts",
                 "import": "./dist/carousel.js",
                 "default": "./dist/carousel.js"
+            },
+            "./cascade-select": {
+                "types": "./dist/cascade-select.d.ts",
+                "import": "./dist/cascade-select.js",
+                "default": "./dist/cascade-select.js"
             },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",

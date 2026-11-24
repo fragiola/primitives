@@ -15,6 +15,7 @@ export * from "./components/calendar/index.ts";
 export * from "./components/calendar-preset/index.ts";
 export * from "./components/calendar-view/index.ts";
 export * from "./components/carousel/index.ts";
+export * from "./components/cascade-select/index.ts";
 export * from "./components/checkbox/index.ts";
 export * from "./components/checkbox-group/index.ts";
 export * from "./components/clipboard/index.ts";
