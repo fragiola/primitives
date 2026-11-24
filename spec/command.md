@@ -120,7 +120,7 @@ into every Command app; a global shortcut belongs to the app (Epic #104, out of 
 | part | attributes |
 | --- | --- |
 | Input | `role="combobox"`, `aria-expanded="true"` (the list is always displayed), `aria-controls` (the List's id), `aria-autocomplete="list"`, `aria-activedescendant` (the highlighted item's id, only while one is highlighted), `autocomplete="off"`, `spellcheck="false"`, `type="text"` |
-| List | `role="listbox"`, an `id`, `data-empty` while no item is shown (once mounted), `aria-busy="true"` and `data-loading` while `loading` |
+| List | `role="listbox"`, an `id`, `tabindex="-1"` (a scrolling list is no Tab stop of its own: Chromium makes a scroll container with no focusable child one, and the Input keeps the focus), `data-empty` while no item is shown (once mounted), `aria-busy="true"` and `data-loading` while `loading` |
 | Group | `role="group"`, `aria-labelledby` (its GroupLabel), `hidden` while it shows no item |
 | GroupLabel | an `id` |
 | Separator | `role="presentation"`, `data-orientation="horizontal"`, `hidden` while there is text (unless `forceMount`) |
@@ -271,8 +271,8 @@ prevented). An Item's `onSelect` writes `ran:` and closes the Dialog. Output: `r
 
 Checks:
 
-1. Ctrl+K opens the Dialog with the focus in the Input; Escape closes it and the focus returns
-   to the body's last focus.
+1. With the focus on "Open command menu", Ctrl+K opens the Dialog with the focus in the Input;
+   Escape closes it and the focus returns to "Open command menu".
 2. Meta+K opens it; type `bill`, Enter: `ran: Billing`, the Dialog closes and the focus returns
    to where it was.
 3. A click on "Open command menu" opens it; Ctrl+K closes it.
