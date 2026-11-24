@@ -110,7 +110,7 @@ and `className` functions; the Item parts' also hold `{ file, rejected, reasons 
 | ClearTrigger | `hidden` while the value and the rejected list are empty |
 | HiddenInput | `type="file"`, `tabindex="-1"`, `aria-hidden="true"`, the structural visually hidden style; `multiple` when `maxFiles` is over 1; its `files` the value |
 | Item and its parts | `data-rejected` for a rejected file |
-| ItemPreviewImage | `src` a `blob:` URL; the URL is revoked when its file leaves both lists and when the Root unmounts |
+| ItemPreviewImage | `src` a `blob:` URL, made once it is mounted (none on the server); the URL is revoked when the image unmounts: its file removed, its Item or the Root unmounted |
 | announcer | Clipboard's: `aria-live="polite"`, `aria-atomic="true"`, empty at rest, a new text node per pick |
 
 ItemSizeText writes **decimal units** (`Intl.NumberFormat` `style: "unit"`, `byte`, `kilobyte`,
@@ -129,8 +129,8 @@ the app's children replace it.
 
 ## Focus
 
-A deleted Item's button moves the focus to the next Item's ItemDeleteTrigger, else the previous
-one's, else the Trigger, else the Dropzone (the focus is never lost to the page). The ClearTrigger
+A deleted Item's button moves the focus to the next Item's ItemDeleteTrigger in its ItemGroup,
+else the previous one's, else the Trigger, else the Dropzone (the focus is never lost to the page). The ClearTrigger
 (then hidden) moves it to the Trigger, else the Dropzone. A form's failed validation focuses the
 Trigger, else the Dropzone, as the hidden inputs of the other controls do (`bridgeForm`).
 
@@ -250,5 +250,5 @@ Base UI has no FileUpload. The decisions where the APG is silent:
 | `too-many` | the files over the limit are rejected, the first ones kept | the user keeps what fits; Zag rejects the whole pick |
 | The rejected list | replaced by each pick | it explains the last pick; Zag's too |
 | Sizes | decimal units from `Intl.NumberFormat` | `Intl`'s byte units are SI; no text of the library's own |
-| Previews | object URLs revoked on removal and unmount | an object URL holds its file in memory until revoked |
+| Previews | an object URL per mounted image, revoked when it unmounts (removal, unmount) | an object URL holds its file in memory until revoked |
 | Deleting | the focus moves to the next delete button | a removed focused button would lose the focus to the page (Zag leaves it) |
