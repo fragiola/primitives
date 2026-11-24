@@ -1,0 +1,303 @@
+---
+title: Command
+description: A command palette, a text input that filters an always displayed list of actions, with a built-in scorer, groups, nested pages and the APG combobox semantics.
+---
+
+A command palette: a text input that filters a list of actions, always shown; Enter or a press
+runs the highlighted action (cmdk's shape). It is the APG
+[combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with a listbox popup, the
+list always displayed: DOM focus stays in the Input and the highlighted item is announced through
+`aria-activedescendant`. Base UI has no Command; where the APG says nothing, the APG-closest
+option is taken (cmdk, React Aria and Bits UI read for the behaviour, never copied).
+
+## Behaviour
+
+- **Items are actions**, not values: an Item's `onSelect` runs it. Nothing is selected and the
+  Command has no form value (no Field, no hidden input).
+- **Built-in filtering**: each Item is scored against the typed text by the toolkit's
+  `commandScore` (case- and accent-insensitive; the whole text, a prefix, a word prefix, every
+  word of the search starting a word in order, then a substring), its `keywords` too, at `0.95`
+  of the same match on its value. A non-matching Item gets `hidden`, a Group with no shown Item
+  gets `hidden`, and the **best-scoring enabled Item is highlighted**. `filter` replaces the
+  scorer; `null` turns filtering off (results filtered by the app or a server).
+- **No sorting**: the Items keep their order (and the Groups theirs); the score decides which
+  match and which is highlighted. Sorting would reorder the app's own elements in every framework.
+- **Hidden, not unmounted**: an Item that does not match stays rendered with the `hidden`
+  attribute, so its state and its listeners stay; keep your CSS from overriding `[hidden]` (a
+  `display` rule on the same element beats the browser's).
+- **Pages**: `pages` is a stack of page keys, the last the current page; the app renders the
+  current page's Items and pushes a page from an Item's `onSelect`. A page change empties the text
+  (`page-change`) and highlights the first enabled Item. **Backspace on an empty Input** removes
+  the last page (`backspace-key`); on the root page it does nothing.
+- **Disabled Items** are highlighted by the arrows (as Combobox's and Autocomplete's) but never
+  run, and never highlighted by the filter.
+- **Empty and Loading** are polite live regions outside the List (a `listbox` owns only options
+  and groups): Empty renders its children only while no Item is shown and nothing loads; Loading
+  only while `loading`.
+- **Async results** come from each framework's [async list](/docs/api/async-list): `filter={null}`,
+  the text sent as the list's filter text, and the list's `loading` on the Root.
+- **Long lists**: [CommandVirtual](/docs/api/command-virtual) (`/command-virtual`) renders only the
+  shown Items in view, with the same keys and highlight. It is opt-in: this entry ships no
+  virtualizer.
+- **Server rendering**: the Items render with their `hidden` state on the server (the text is
+  known); the highlight and `data-empty` are set once mounted.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `command-root` | holds the state: the text, the highlight, the pages |
+| Input | `input` | `command-input` | the `combobox`; keeps DOM focus |
+| List | `div` | `command-list` | the `listbox`, always displayed |
+| Group | `div` | `command-group` | a `group` of Items; `hidden` while it shows none |
+| GroupLabel | `div` | `command-group-label` | names its Group |
+| Separator | `div` | `command-separator` | between Groups; `hidden` while there is text, unless `forceMount` |
+| Item | `div` | `command-item` | an `option`: an action; `hidden` while it does not match |
+| Empty | `div` | `command-empty` | a polite live region; its children rendered only while no Item is shown |
+| Loading | `div` | `command-loading` | a polite live region; its children rendered only while `loading` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { Command } from "@fragiola/primitives-react/command";
+
+<Command.Root>
+    <Command.Input aria-label="Command" />
+    <Command.Empty>No results.</Command.Empty>
+    <Command.List>
+        <Command.Group>
+            <Command.GroupLabel>Suggestions</Command.GroupLabel>
+            <Command.Item value="Calendar" onSelect={openCalendar}>Calendar</Command.Item>
+            <Command.Item value="Calculator" disabled>Calculator</Command.Item>
+        </Command.Group>
+        <Command.Separator />
+        <Command.Group>
+            <Command.GroupLabel>Settings</Command.GroupLabel>
+            <Command.Item value="Profile" keywords={["account"]} onSelect={openProfile}>Profile</Command.Item>
+        </Command.Group>
+    </Command.List>
+</Command.Root>;
+```
+
+Nested pages, pushed by an Item and popped by Backspace on an empty Input:
+
+```tsx
+const [pages, setPages] = useState<string[]>([]);
+const page = pages.at(-1);
+
+<Command.Root pages={pages} onPagesChange={setPages}>
+    <Command.Input aria-label="Command" />
+    <Command.List>
+        {page === undefined && (
+            <Command.Item value="Search projects…" onSelect={() => setPages([...pages, "projects"])}>
+                Search projects…
+            </Command.Item>
+        )}
+        {page === "projects" &&
+            PROJECTS.map((project) => (
+                <Command.Item key={project} value={project} onSelect={openProject}>{project}</Command.Item>
+            ))}
+    </Command.List>
+</Command.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Command.Root v-model:pages="pages">
+        <Command.Input aria-label="Command" />
+        <Command.Empty>No results.</Command.Empty>
+        <Command.List>
+            <Command.Group>
+                <Command.GroupLabel>Settings</Command.GroupLabel>
+                <Command.Item value="Profile" :keywords="['account']" @select="openProfile">Profile</Command.Item>
+                <Command.Item value="Search projects…" @select="pages = [...pages, 'projects']">Search projects…</Command.Item>
+            </Command.Group>
+        </Command.List>
+    </Command.Root>
+</template>
+```
+
+`Command` comes from `@fragiola/primitives-vue/command`; the text binds with
+`v-model:input-value`, the pages with `v-model:pages`, and an Item's action is `@select`
+(`(value, event)`).
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [CommandRoot, CommandInput, CommandList, CommandGroup, CommandGroupLabel, CommandItem, CommandEmpty],
+    template: `
+        <div commandRoot [(pages)]="pages">
+            <input commandInput aria-label="Command" />
+            <div commandEmpty>No results.</div>
+            <div commandList>
+                <div commandGroup>
+                    <div commandGroupLabel>Settings</div>
+                    <div commandItem [value]="'Profile'" [keywords]="['account']" (itemSelect)="open($event.value)">Profile</div>
+                </div>
+            </div>
+        </div>
+    `,
+})
+export class Palette {
+    protected readonly pages = signal<string[]>([]);
+}
+```
+
+An Item's action is `(itemSelect)`, which emits `{ value, event }`; the text binds with
+`[(inputValue)]`, the pages with `[(pages)]` (`(inputValueChangeDetails)` and
+`(pagesChangeDetails)` add the reason). `injectCommand()` gives a child component the Root.
+
+</Framework>
+
+### The Command dialog
+
+A command menu opened by Cmd/Ctrl+K is a **composition**, not a part: a Command inside the
+library's [Dialog](/docs/api/dialog), which gives the modal layer, the focus trap, Escape and the
+focus return. The Input is the Popup's first tabbable element, so it takes the focus on open. The
+app owns the global shortcut:
+
+```tsx
+const [open, setOpen] = useState(false);
+
+useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault();
+            setOpen((value) => !value);
+        }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+}, []);
+
+<Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Trigger>Open command menu</Dialog.Trigger>
+    <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup aria-label="Command menu">
+            <Command.Root>
+                <Command.Input aria-label="Command" />
+                <Command.List>
+                    <Command.Item value="Billing" onSelect={() => { openBilling(); setOpen(false); }}>
+                        Billing
+                    </Command.Item>
+                </Command.List>
+            </Command.Root>
+        </Dialog.Popup>
+    </Dialog.Portal>
+</Dialog.Root>;
+```
+
+A `CommandDialog` part would only re-export Dialog's parts and bundle Dialog into every Command
+app; a global shortcut belongs to the app. Vue and Angular compose it the same way with their
+Dialog and a `keydown` listener on the document.
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:input-value`,
+`v-model:pages`, `@select`), and Angular as inputs and outputs (`[(inputValue)]`, `[(pages)]`,
+`(itemSelect)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `inputValue` | `string` | | the text, controlled |
+| `defaultInputValue` | `string` | `""` | the initial text, uncontrolled |
+| `onInputValueChange` | `(value: string, details: { reason }) => void` | | every change of the text (`input-change`, `page-change`) |
+| `filter` | `(value, search, keywords) => number \| null` | `commandScore` | an Item's score for the trimmed text, `0` hides it; `null`: no filtering |
+| `pages` | `string[]` | | the stack of page keys, controlled; the last is the current page |
+| `defaultPages` | `string[]` | `[]` | the initial pages, uncontrolled |
+| `onPagesChange` | `(pages: string[], details: { reason }) => void` | | Backspace on an empty Input removed the last page (`backspace-key`) |
+| `loading` | `boolean` | `false` | results are loading: the List's `aria-busy`, the Loading part's children; Empty's are not rendered |
+| `loopFocus` | `boolean` | `true` | the arrows wrap from one end to the other |
+
+### Input
+
+No props of its own.
+
+### List
+
+No props of its own.
+
+### Group
+
+No props of its own.
+
+### GroupLabel
+
+No props of its own.
+
+### Separator
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `forceMount` | `boolean` | `false` | shown while there is text too |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `string` | | required: the text the filter scores, and the Item's identity (unique in the Command) |
+| `keywords` | `string[]` | | more texts the filter scores (aliases) |
+| `disabled` | `boolean` | `false` | highlighted by the arrows, never run |
+| `forceMount` | `boolean` | `false` | always shown, whatever the text (an "Ask…" action) |
+| `onSelect` (react, vue) | `(value: string, event: Event) => void` | | runs the action, on Enter or a press (Vue `@select`) |
+| `onItemSelect` (angular) | `{ value, event }` | | the same, as `(itemSelect)` |
+
+### Empty
+
+No props of its own.
+
+### Loading
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Input | `role="combobox"`, `aria-expanded="true"`, `aria-controls` (the List), `aria-autocomplete="list"`, `aria-activedescendant` (while an Item is highlighted), `autocomplete="off"`, `spellcheck="false"`, `type="text"` |
+| List | `role="listbox"`, `tabindex="-1"`, `data-empty` while no Item is shown (once mounted), `aria-busy="true"` and `data-loading` while `loading` |
+| Group | `role="group"`, `aria-labelledby` (its GroupLabel), `hidden` while it shows no Item |
+| Separator | `role="presentation"`, `data-orientation="horizontal"`, `hidden` while there is text (unless `forceMount`) |
+| Item | `role="option"`, `aria-selected="true"` and `data-highlighted` while highlighted (else `aria-selected="false"`), `aria-disabled="true"` and `data-disabled` when disabled, `hidden` while it does not match |
+| Empty, Loading | `role="status"`, `aria-live="polite"`, `aria-atomic="true"` |
+
+`aria-selected` follows the highlight (the APG's "list autocomplete with automatic selection"):
+an action list has no other selection.
+
+## Keyboard
+
+DOM focus stays on the Input.
+
+| key | action |
+| --- | --- |
+| typing | changes the text, filters, and highlights the best-scoring enabled Item |
+| ArrowDown / ArrowUp | the next / previous shown Item; wraps with `loopFocus` |
+| Home / End | the first / last shown Item (Shift+Home / Shift+End stay native) |
+| Enter | runs the highlighted enabled Item |
+| Backspace | on an empty Input with a page: back to the previous page |
+| Escape | nothing of the Command's own: inside a Dialog, it closes the dialog |
+
+Moving the pointer over an Item highlights it; a click runs it, and a press never takes the focus
+from the Input.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/command` | `ChangeDetails`, `ChangeReason`, `Command`, `CommandEntry`, `CommandFilter`, `CommandItemProps`, `CommandItemState`, `CommandListState`, `CommandRootProps`, `CommandRootState`, `CommandSeparatorProps`, `RenderProp` |
+| `@fragiola/primitives-vue/command` | `ChangeDetails`, `ChangeReason`, `Command`, `CommandEntry`, `CommandFilter`, `CommandItemEmits`, `CommandItemProps`, `CommandItemState`, `CommandListState`, `CommandRootEmits`, `CommandRootProps`, `CommandRootState`, `CommandSeparatorProps`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/command` | `ChangeDetails`, `ChangeReason`, `CommandEmpty`, `CommandEntry`, `CommandFilter`, `CommandGroup`, `CommandGroupLabel`, `CommandInput`, `CommandItem`, `CommandItemInfo`, `CommandItemState`, `CommandList`, `CommandListState`, `CommandLoading`, `CommandRoot`, `CommandRootState`, `CommandSelectEvent`, `CommandSeparator`, `ValueChangeEvent`, `injectCommand` |

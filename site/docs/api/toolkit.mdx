@@ -56,7 +56,11 @@ key map and its Indicator's measurement), `/direction` and `/form`; Rating `/ran
 the value under the pointer and a star's state), `/direction` and `/form`. The virtual
 lists ([ListboxVirtual](/docs/api/listbox-virtual) and the others) add `/virtual` to their
 component's mechanisms, and the [async list](/docs/api/async-list) utility uses `/async-list`
-alone: a list that does not opt in imports neither. The root entry,
+alone: a list that does not opt in imports neither. [Command](/docs/api/command) uses `/command`
+(its scorer and keys; no other component imports it) and `/collection`;
+[CascadeSelect](/docs/api/cascade-select) uses `/cascade` (its levels and keys; no other
+component imports it) with Select's mechanisms (`/collection`, `/overlay`, `/positioning`,
+`/form`, `/direction`) and `/pointer` (Menu's safe area). The root entry,
 `@fragiola/primitives`, only re-exports them.
 
 ## Exports
@@ -64,8 +68,10 @@ alone: a list that does not opt in imports neither. The root entry,
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives/async-list` | `createAsyncList`, `AsyncList`, `AsyncListOptions`, `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListState`, `AsyncListStatus` |
+| `@fragiola/primitives/cascade` | `cascadeKeyAction`, `CascadeKeyAction`, `cascadeLevels`, `cascadePathItems`, `hasCascadeChildren`, `CascadeItem` |
 | `@fragiola/primitives/calendar-systems` | `buddhist`, `coptic`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamicCivil`, `islamicTbla`, `islamicUmalqura`, `japanese`, `persian`, `roc`, `CalendarSystem`, `CalendarId`, `CalendarDateFields`, `CalendarFieldsInput`, `CalendarYearMonth`, `CalendarUnit`, `CalendarUnits` |
 | `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `placeSegmentIndicator`, `segmentIndicatorBox`, `SegmentIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `tagGroupKeyTarget`, `removalFocusIndex`, `tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`, `TagGroupKeyAction`, `TagGroupKeyOptions`, `TagKeyEvent`, `TagsInputInputKeyAction`, `TagsInputTagKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/command` | `commandScore`, `commandItemScore`, `commandMatches`, `bestMatch`, `commandKeyTarget`, `CommandEntry`, `CommandFilter`, `CommandMatches` |
 | `@fragiola/primitives/color` | `Color`, `ColorSpace`, `ColorChannel`, `RgbColor`, `HslColor`, `HsbColor`, `ColorChannelRange`, `colorChannelRange`, `colorChannels`, `hasColorChannel`, `colorSpaceFor`, `getColorChannel`, `setColorChannel`, `clampColorChannel`, `isSameColor`, `ColorAreaChannels`, `colorAreaChannels`, `parseColor`, `formatColor`, `ColorFormat`, `colorChannelFormat`, `formatColorChannel`, `convertColor`, `colorChannelGradient`, `ColorGradientDirection`, `colorAreaBackground`, `ColorAreaBackground`, `colorWheelGradient`, `colorAreaKeyTarget`, `ColorAreaKeyOptions`, `colorWheelKeyTarget`, `wrapHue`, `hueAtPoint`, `isOnColorWheel`, `colorWheelThumbOffset`, `openEyeDropper`, `supportsEyeDropper` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
@@ -297,6 +303,20 @@ alone: a list that does not opt in imports neither. The root entry,
   hasMore }`. The loader gets `{ signal, filterText, cursor }` and returns `{ items, cursor? }`; a
   new load aborts the one in flight and a stale page is never used. Each framework wraps it in
   its own state ([async list](/docs/api/async-list)).
+- **Command** (Epic #104): the command palette's scorer and keys. `commandScore(value, search,
+  keywords)` compares case- and accent-insensitively and returns `1` for no text or the whole
+  text, `0.9` for a prefix, `0.8` for a word prefix (words split at spaces and `-_/.:`), `0.7`
+  when every word of the search starts a word of the text in order, `0.6` for a substring, else
+  `0`; a keyword's score counts at `0.95`. `commandItemScore` scores one Item with a filter,
+  `commandMatches(entries, search, filter)` gives a list's matching entries and their scores (the
+  virtual list's), `bestMatch(scores, disabled)` the best-scoring enabled index, the first among
+  equals, and `commandKeyTarget` maps the Input's keys (the arrows, Home, End) to the next
+  highlight.
+- **Cascade** (Epic #104): a cascade select's tree, pure functions. `cascadeLevels(items, path)`
+  gives the items of each open level along a path, `cascadePathItems(items, path)` the items of a
+  path (its labels), `hasCascadeChildren(item)` whether an item is a parent, and
+  `cascadeKeyAction(event, rtl)` maps a key to its action (the inline-end and inline-start keys
+  swapped in RTL).
 - **Id, date**: document-unique ids, and plain dates with their math and locale data from `Intl`
   (imported only by the calendar and picker entries).
 - **Time** (Epic #73): `PlainTime` (`{ hour, minute, second, millisecond }`) and `PlainDateTime`

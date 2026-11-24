@@ -282,6 +282,10 @@
                     "path": "api/select-virtual"
                 },
                 {
+                    "label": "CascadeSelect",
+                    "path": "api/cascade-select"
+                },
+                {
                     "label": "Combobox",
                     "path": "api/combobox"
                 },
@@ -296,6 +300,14 @@
                 {
                     "label": "AutocompleteVirtual",
                     "path": "api/autocomplete-virtual"
+                },
+                {
+                    "label": "Command",
+                    "path": "api/command"
+                },
+                {
+                    "label": "CommandVirtual",
+                    "path": "api/command-virtual"
                 },
                 {
                     "label": "Listbox",
