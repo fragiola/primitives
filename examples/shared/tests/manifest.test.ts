@@ -76,6 +76,9 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
         "_recipes/color-swatch-picker.ts",
         "_recipes/color-swatch.ts",
     ],
+    // the command menu's Dialog (Epic #104); the place picker's Field
+    command: ["_recipes/dialog.ts"],
+    "cascade-select": ["_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -162,6 +165,7 @@ describe("the manifest", () => {
                 "hover-card",
                 "toast",
                 "toast-promise",
+                "command",
                 "tabs",
                 "navigation-menu",
                 "pagination",
@@ -198,6 +202,7 @@ describe("the manifest", () => {
                 "editable",
                 "color-editor",
                 "color-picker",
+                "cascade-select",
                 "date-picker",
                 "calendar",
                 "date-field",
