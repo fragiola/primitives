@@ -63,6 +63,11 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [breadcrumbs.md](breadcrumbs.md) | Breadcrumbs (the APG breadcrumb; its Link on Link's behaviour, its Ellipsis composed with a Menu by the app) |
 | [steps.md](steps.md) | Steps (no APG pattern and no Base UI component: an ordered list with `aria-current="step"`, linear validation, decided there) |
 | [carousel.md](carousel.md) | Carousel (the APG carousel, basic and tabbed, native scroll snapping, the rotation rules; its DOM side on the toolkit's `/carousel`) |
+| [color.md](color.md) | The color model (the toolkit's `/color`: an immutable color in rgb, hsl and hsb with alpha, parsing, formatting, conversion and its precision, the channels' ranges and `Intl` text, the gradients) |
+| [color-slider.md](color-slider.md) | ColorSlider (the APG slider on one channel of a color, its track a gradient; React Aria's ColorSlider as the behaviour reference) |
+| [color-area.md](color-area.md) | ColorArea (no APG pattern and no Base UI component: two APG sliders, one native range input per axis, decided there) |
+| [color-wheel.md](color-wheel.md) | ColorWheel (the APG slider on a ring: the hue, wrapping) |
+| [color-field.md](color-field.md) | ColorField (a hex textbox, or the APG spinbutton for one channel; commits on Enter and blur) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -111,7 +116,10 @@ inputs (Epic #94, Issue #92: PasswordInput, SearchField and Clipboard,
 `/clipboard`; Issue #93: Editable, [editable.md](editable.md)), then navigation (Epic #97, Issue
 #95: Link, Breadcrumbs and Steps, [link.md](link.md), [breadcrumbs.md](breadcrumbs.md),
 [steps.md](steps.md); Issue #96: Carousel, [carousel.md](carousel.md), with its pages, scrolling,
-mouse drag, hover and focus watch and rotation delay in the toolkit's new `/carousel`).
+mouse drag, hover and focus watch and rotation delay in the toolkit's new `/carousel`), then the color controls (Epic #99, Issue #98: ColorSlider, ColorArea,
+ColorWheel and ColorField, [color-slider.md](color-slider.md), [color-area.md](color-area.md),
+[color-wheel.md](color-wheel.md), [color-field.md](color-field.md), on the color model of the
+toolkit's new `/color`, [color.md](color.md)).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -229,20 +237,20 @@ The reasons are shared:
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
 | `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
-| `input-clear` | a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
-| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md); the focus leaving an Editable's edit committed or reverted it (spec/editable.md) |
+| `input-clear` | a ColorField's empty text was committed (`null`); a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
+| `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); a ColorField's blur committed its text; leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md); the focus leaving an Editable's edit committed or reverted it (spec/editable.md) |
 | `input-paste` | a paste filled an OTPField's slots (spec/otp-field.md), or added a TagsInput's tags (spec/tags-input.md) |
 | `clear-press` | a combobox's or an autocomplete's Clear, a TagsInput's ClearTrigger or a SearchField's ClearButton was pressed |
 | `submit-press`, `cancel-press` | an Editable's SubmitTrigger committed its edit, or its CancelTrigger reverted it |
 | `chip-remove-press` | a combobox chip's remove button, a TagGroup's RemoveButton or a TagsInput's TagRemove was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit; a tabbed Carousel Indicator's arrow, Home or End changed its page |
+| `keyboard` | a key changed a slider's value (a ColorSlider's, a ColorArea's, a ColorWheel's too), committed or stepped a ColorField's, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit; a tabbed Carousel Indicator's arrow, Home or End changed its page |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
-| `track-press` | a press on a slider's control moved a thumb |
-| `drag` | a pointer drag moved a slider's thumb; a mouse drag of a Carousel's slides changed its page |
+| `track-press` | a press on a slider's control moved a thumb (a ColorSlider's track, a ColorArea, a ColorWheel's ring) |
+| `drag` | a pointer drag moved a slider's thumb (a ColorSlider's, a ColorArea's, a ColorWheel's); a mouse drag of a Carousel's slides changed its page |
 | `swipe` | a swipe dismissed a drawer, or settled it on another snap point (spec/drawer.md); a scroll the user made (touch, a trackpad, the wheel, the keys) settled a Carousel on another page |
 | `previous-press`, `next-press`, `first-press`, `last-press` | a Pagination's Previous, Next, First or Last changed its page (an Item's press is `item-press`); a Steps PrevTrigger or NextTrigger, or a Carousel's PrevTrigger or NextTrigger |
 | `autoplay` | a Carousel's rotation moved to its next page |
@@ -514,6 +522,11 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | Steps' parts | `Steps.Root`, `.List`, `.Item` (`index`), `.Trigger`, `.Indicator`, `.Separator`, `.Content` (`index`), `.PrevTrigger`, `.NextTrigger`, `.CompletedContent` | the same | `[stepsRoot]`, `ol[stepsList]`, `li[stepsItem]` (`[index]`), `button[stepsTrigger]`, `[stepsIndicator]`, `[stepsSeparator]`, `[stepsContent]` (`[index]`), `button[stepsPrevTrigger]`, `button[stepsNextTrigger]`, `[stepsCompletedContent]` |
 | Carousel's page and rotation | `page` + `onPageChange(page, details)` (`defaultPage`), `playing` + `onPlayingChange(playing, details)` (`defaultPlaying`) on `Carousel.Root` | `v-model:page`, `v-model:playing` (`default-page`, `default-playing`, `@page-change`, `@playing-change`) | `[(page)]`, `[(playing)]` on `[carouselRoot]` (`defaultPage`, `defaultPlaying`; `pageChangeDetails` and `playingChangeDetails` outputs, each `{ value, details }`) |
 | Carousel's parts | `Carousel.Root`, `.ItemGroup`, `.Item` (`index`), `.PrevTrigger`, `.NextTrigger`, `.IndicatorGroup`, `.Indicator` (`index`), `.AutoplayTrigger` (children `({ playing }) => ...`) | the same (the AutoplayTrigger's default slot `v-slot="{ state }"`) | `[carouselRoot]`, `[carouselItemGroup]`, `[carouselItem]` (`[index]`), `button[carouselPrevTrigger]`, `button[carouselNextTrigger]`, `[carouselIndicatorGroup]`, `button[carouselIndicator]` (`[index]`), `button[carouselAutoplayTrigger]` (`state()` through `exportAs`, `#rotation="carouselAutoplayTrigger"`) |
+| A color value (`Color \| string` in, a `Color` out) | `value` + `onValueChange(color, details)` (`defaultValue`), `onValueCommit(color, details)` on `ColorSlider.Root`, `ColorArea.Root`, `ColorWheel.Root`; `ColorField.Root`'s `value` may be `null` | `v-model:value` (`default-value`, `@value-change`, `@value-commit`) | `[(value)]` on `[colorSliderRoot]`, `[colorAreaRoot]`, `[colorWheelRoot]`, `[colorFieldRoot]` (`defaultValue`; `valueChangeDetails` output `{ value, details }`, `valueCommit` output: the color) |
+| ColorSlider's parts | `ColorSlider.Root` (`channel`, `colorSpace`, `orientation`), `.Label`, `.Output`, `.Track`, `.Thumb` | the same | `[colorSliderRoot]` (`[channel]`, `[colorSpace]`, `[orientation]`), `[colorSliderLabel]`, `output[colorSliderOutput]`, `[colorSliderTrack]`, `[colorSliderThumb]` |
+| ColorArea's parts | `ColorArea.Root` (`xChannel`, `yChannel`, `colorSpace`), `.Thumb`, `.Input` (`axis`) | the same | `[colorAreaRoot]`, `[colorAreaThumb]`, `input[colorAreaInput]` (`axis="x"`) |
+| ColorWheel's parts | `ColorWheel.Root` (`outerRadius`, `innerRadius`), `.Track`, `.Thumb` | the same | `[colorWheelRoot]`, `[colorWheelTrack]`, `[colorWheelThumb]` |
+| ColorField's parts | `ColorField.Root` (`channel`, `colorSpace`, `id`), `.Input` | the same | `[colorFieldRoot]` (`[channel]`, `[id]`), `input[colorFieldInput]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`

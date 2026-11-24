@@ -50,7 +50,9 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-editing` | a tags input's tag while its tag input edits it; an editable's parts while it edits |
 | `data-visible` | a password input's parts while its text is shown |
 | `data-copied`, `data-failed` | a clipboard's parts while its last copy succeeded, or failed, until its timeout |
-| `data-dragging` | a slider while a pointer drags a thumb; a carousel's slides' container while a mouse drags them |
+| `data-dragging` | a slider (a color slider, a color area, a color wheel) while a pointer drags a thumb; a carousel's slides' container while a mouse drags them |
+| `data-channel` | a color slider's and a color field's parts, a color area's inputs: the color channel they edit (a value: `hue`, `saturation`, `lightness`, `brightness`, `red`, `green`, `blue`, `alpha`) |
+| `data-axis` | a color area's input: `x` or `y` (a value) |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index; a carousel slide's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
 | `data-required` | a required checkbox, switch, radio group, segmented control or rating, and its radios; every part of a required number field, OTP field, date or time field, or range field |
@@ -77,7 +79,7 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-side` | the side a positioned overlay ended up on (a value: `top`, `bottom`, `inline-start`, `inline-end`, `left`, `right`, named as it was asked) |
 | `data-align` | `start`, `center` or `end` (a value) |
 | `data-disabled` | a disabled part |
-| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb, a segmented control and its parts, the steps' parts, a carousel and its slides' container and indicator group |
+| `data-orientation` | `horizontal` or `vertical` (a value): tabs, an accordion, a slider, a radio group given an `orientation`, a separator, a toggle group, a toolbar and its parts, a menubar, a scroll area's scrollbar and thumb, a segmented control and its parts, the steps' parts, a carousel and its slides' container and indicator group, a color slider and its parts |
 | `data-activation` | `automatic` or `manual` on tabs (a value) |
 | `data-activation-direction` | where the newly selected tab sits from the previous one, on every tabs part (a physical value: `left`, `right`, `up`, `down`, `none`) |
 | `data-today`, `data-outside-month`, `data-unavailable` | a calendar cell of today, of another month's day, of a date the app marked unavailable |

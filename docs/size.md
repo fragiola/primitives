@@ -23,12 +23,13 @@ No peers: everything is bundled.
 
 | entry | min | min + gzip |
 | --- | ---: | ---: |
-| `@fragiola/primitives` | 123,854 B | 42,315 B |
+| `@fragiola/primitives` | 133,451 B | 45,708 B |
 | `@fragiola/primitives/async-list` | 839 B | 447 B |
 | `@fragiola/primitives/calendar-systems` | 9,711 B | 3,608 B |
 | `@fragiola/primitives/carousel` | 6,722 B | 2,539 B |
 | `@fragiola/primitives/clipboard` | 412 B | 284 B |
 | `@fragiola/primitives/collection` | 10,242 B | 3,657 B |
+| `@fragiola/primitives/color` | 9,434 B | 3,434 B |
 | `@fragiola/primitives/date` | 3,703 B | 1,624 B |
 | `@fragiola/primitives/direction` | 151 B | 135 B |
 | `@fragiola/primitives/focus` | 2,155 B | 976 B |
@@ -62,7 +63,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 354,981 B | 109,985 B | 258,938 B | 76,575 B |
+| `@fragiola/primitives-react` | 380,508 B | 117,610 B | 275,927 B | 81,554 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -79,6 +80,10 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/checkbox-group` | 5,033 B | 2,250 B | 4,579 B | 2,082 B |
 | `@fragiola/primitives-react/clipboard` | 4,159 B | 1,758 B | 3,875 B | 1,632 B |
 | `@fragiola/primitives-react/collapsible` | 5,502 B | 2,265 B | 4,609 B | 1,983 B |
+| `@fragiola/primitives-react/color-area` | 15,865 B | 6,115 B | 6,440 B | 2,777 B |
+| `@fragiola/primitives-react/color-field` | 16,257 B | 6,422 B | 8,193 B | 3,397 B |
+| `@fragiola/primitives-react/color-slider` | 17,041 B | 6,486 B | 8,818 B | 3,605 B |
+| `@fragiola/primitives-react/color-wheel` | 12,892 B | 5,025 B | 5,392 B | 2,351 B |
 | `@fragiola/primitives-react/combobox` | 46,661 B | 16,858 B | 20,659 B | 7,495 B |
 | `@fragiola/primitives-react/combobox-virtual` | 52,619 B | 19,134 B | 22,546 B | 8,246 B |
 | `@fragiola/primitives-react/context-menu` | 45,670 B | 16,215 B | 19,061 B | 6,821 B |
@@ -151,7 +156,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 402,814 B | 110,877 B | 306,663 B | 76,914 B |
+| `@fragiola/primitives-vue` | 431,170 B | 118,353 B | 326,480 B | 81,901 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -168,6 +173,10 @@ External: `vue`.
 | `@fragiola/primitives-vue/checkbox-group` | 4,483 B | 2,011 B | 4,067 B | 1,841 B |
 | `@fragiola/primitives-vue/clipboard` | 3,761 B | 1,637 B | 3,515 B | 1,506 B |
 | `@fragiola/primitives-vue/collapsible` | 5,296 B | 2,140 B | 4,403 B | 1,852 B |
+| `@fragiola/primitives-vue/color-area` | 16,138 B | 6,134 B | 6,731 B | 2,782 B |
+| `@fragiola/primitives-vue/color-field` | 15,963 B | 6,257 B | 7,926 B | 3,252 B |
+| `@fragiola/primitives-vue/color-slider` | 17,156 B | 6,317 B | 8,989 B | 3,438 B |
+| `@fragiola/primitives-vue/color-wheel` | 12,697 B | 4,926 B | 5,235 B | 2,227 B |
 | `@fragiola/primitives-vue/combobox` | 48,319 B | 16,669 B | 22,328 B | 7,222 B |
 | `@fragiola/primitives-vue/combobox-virtual` | 55,519 B | 19,308 B | 25,436 B | 8,376 B |
 | `@fragiola/primitives-vue/context-menu` | 47,810 B | 16,157 B | 21,218 B | 6,671 B |
@@ -240,7 +249,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 1,040,533 B | 170,573 B | 944,360 B | 135,696 B |
+| `@fragiola/primitives-angular` | 1,104,550 B | 180,895 B | 999,810 B | 143,451 B |
 | `@fragiola/primitives-angular/internal` | 39,783 B | 14,413 B | 17,912 B | 6,315 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -258,6 +267,10 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/checkbox-group` | 28,306 B | 6,245 B | 26,236 B | 5,470 B |
 | `@fragiola/primitives-angular/clipboard` | 8,647 B | 2,327 B | 8,555 B | 2,233 B |
 | `@fragiola/primitives-angular/collapsible` | 10,432 B | 3,110 B | 9,693 B | 2,860 B |
+| `@fragiola/primitives-angular/color-area` | 24,669 B | 7,296 B | 15,327 B | 3,967 B |
+| `@fragiola/primitives-angular/color-field` | 45,957 B | 11,276 B | 36,238 B | 7,664 B |
+| `@fragiola/primitives-angular/color-slider` | 50,076 B | 11,277 B | 40,191 B | 7,818 B |
+| `@fragiola/primitives-angular/color-wheel` | 20,048 B | 5,988 B | 12,696 B | 3,333 B |
 | `@fragiola/primitives-angular/combobox` | 97,744 B | 23,316 B | 69,930 B | 13,255 B |
 | `@fragiola/primitives-angular/combobox-virtual` | 107,907 B | 26,406 B | 76,017 B | 14,529 B |
 | `@fragiola/primitives-angular/context-menu` | 96,408 B | 20,897 B | 69,829 B | 11,495 B |

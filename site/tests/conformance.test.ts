@@ -44,9 +44,16 @@ describe("the conformance registry", () => {
         expect(ports.size).toBe(IMPLEMENTATIONS.length * 2);
     });
 
+    // a spec with no scenario of its own (spec/color.md, the toolkit's color model, Epic #99) is
+    // held by the toolkit's unit tests and its components' specs
     it("has a test folder per component, with the three layers", () => {
         for (const component of readdirSync(join(root, "spec")).filter(
-            (name) => name.endsWith(".md") && name !== "README.md",
+            (name) =>
+                name.endsWith(".md") &&
+                name !== "README.md" &&
+                /\n### `\//.test(
+                    readFileSync(join(root, "spec", name), "utf8"),
+                ),
         )) {
             const dir = join(
                 root,

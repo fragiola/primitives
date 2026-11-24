@@ -33,3 +33,7 @@ export const FLOATING_BOX = `palette-raised bg-palette-base text-palette-contras
 /** A row of a list (menu item, submenu trigger, select and combobox item). */
 export const LIST_ITEM =
     "flex items-center gap-2 h-(--pr-control-height) px-2 rounded-control cursor-default select-none outline-none data-highlighted:bg-palette-soft data-disabled:opacity-50";
+
+/** A white-ringed disc of the value's color (the part's CSS variable). */
+export const COLOR_THUMB =
+    "box-border size-5 rounded-full border-2 border-white shadow-sm ring-1 ring-black/40 data-disabled:opacity-50";

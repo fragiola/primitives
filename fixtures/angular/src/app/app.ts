@@ -45,6 +45,17 @@ import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.ts";
 import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.ts";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.ts";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.ts";
+import { ColorAreaBasic } from "../scenarios/color-area/color-area-basic.ts";
+import { ColorAreaRgb } from "../scenarios/color-area/color-area-rgb.ts";
+import { ColorFieldBasic } from "../scenarios/color-field/color-field-basic.ts";
+import { ColorFieldChannel } from "../scenarios/color-field/color-field-channel.ts";
+import { ColorFieldField } from "../scenarios/color-field/color-field-field.ts";
+import { ColorSliderAlpha } from "../scenarios/color-slider/color-slider-alpha.ts";
+import { ColorSliderBasic } from "../scenarios/color-slider/color-slider-basic.ts";
+import { ColorSliderSpace } from "../scenarios/color-slider/color-slider-space.ts";
+import { ColorSliderVertical } from "../scenarios/color-slider/color-slider-vertical.ts";
+import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.ts";
+import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.ts";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.ts";
@@ -360,6 +371,17 @@ import { ROUTES } from "./routes.ts";
         DirectionProviderScenario,
         AvatarBasic,
         ButtonBasic,
+        ColorSliderBasic,
+        ColorSliderAlpha,
+        ColorSliderVertical,
+        ColorSliderSpace,
+        ColorAreaBasic,
+        ColorAreaRgb,
+        ColorWheelBasic,
+        ColorWheelDisabled,
+        ColorFieldBasic,
+        ColorFieldChannel,
+        ColorFieldField,
         FieldSettings,
         LabelControls,
         ListboxField,
@@ -563,6 +585,19 @@ import { ROUTES } from "./routes.ts";
             @case ("/switch/basic") { <main class="p-6" scenario-switch-basic></main> }
             @case ("/switch/controlled") { <main class="p-6" scenario-switch-controlled></main> }
             @case ("/button/basic") { <main class="p-6" scenario-button-basic></main> }
+            @case ("/color-slider/basic") { <main class="p-6" scenario-color-slider-basic></main> }
+            @case ("/color-slider/alpha") { <main class="p-6" scenario-color-slider-alpha></main> }
+            @case ("/color-slider/vertical") { <main class="p-6" scenario-color-slider-vertical></main> }
+            @case ("/color-slider/rtl") { <main class="p-6" scenario-color-slider-basic></main> }
+            @case ("/color-slider/space") { <main class="p-6" scenario-color-slider-space></main> }
+            @case ("/color-area/basic") { <main class="p-6" scenario-color-area-basic></main> }
+            @case ("/color-area/rtl") { <main class="p-6" scenario-color-area-basic></main> }
+            @case ("/color-area/rgb") { <main class="p-6" scenario-color-area-rgb></main> }
+            @case ("/color-wheel/basic") { <main class="p-6" scenario-color-wheel-basic></main> }
+            @case ("/color-wheel/disabled") { <main class="p-6" scenario-color-wheel-disabled></main> }
+            @case ("/color-field/basic") { <main class="p-6" scenario-color-field-basic></main> }
+            @case ("/color-field/channel") { <main class="p-6" scenario-color-field-channel></main> }
+            @case ("/color-field/field") { <main class="p-6" scenario-color-field-field></main> }
             @case ("/slider/basic") { <main class="p-6" scenario-slider-basic></main> }
             @case ("/slider/range") { <main class="p-6" scenario-slider-range></main> }
             @case ("/slider/vertical") { <main class="p-6" scenario-slider-vertical></main> }

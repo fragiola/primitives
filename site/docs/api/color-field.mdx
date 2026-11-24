@@ -1,0 +1,131 @@
+---
+title: ColorField
+description: A color typed as hex (or any CSS color text), or one channel typed as a number, committed on Enter and blur, in each framework.
+---
+
+Type a color: a text input that reads hex, `rgb()`, `hsl()` or `hsb()` and writes the value back
+as hex, or, with `channel`, one channel as a number (an APG
+[spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/)). The typed text is free
+until Enter or a blur commits it. It works in a native `<form>` and a [Field](/docs/api/field).
+
+<Example id="color-editor" />
+
+## Behaviour
+
+- **Value**: a `Color`, a string or `null` (empty); `onValueChange` reports a commit or a step,
+  never the typing.
+- **Hex mode** (no `channel`): the text is the value's hex. A commit parses the text (any text
+  `parseColor` reads): a color becomes the value, an empty text gives `null`, anything else goes
+  back to the value's text. ArrowUp / ArrowDown add or subtract 1 to the color as a 24-bit
+  number.
+- **Channel mode** (`channel`): a `spinbutton` with the channel's value, its text from `Intl`
+  (`"120°"`, `"50%"`). A commit parses the number in the locale (with or without its unit),
+  clamps it and sets the channel; the APG spinbutton keys step it.
+- **Forms**: a hidden input submits the hex (channel mode: the channel's number), `required`
+  when the field is.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-field-root` | holds the value and the text |
+| Input | `input` | `color-field-input` | a textbox, or a `spinbutton` with `channel` |
+| (hidden input) | `input` | `color-field-hidden-input` | what the form submits and validates |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorField } from "@fragiola/primitives-react/color-field";
+
+<label htmlFor="brand">Brand color</label>
+<ColorField.Root id="brand" name="brand" defaultValue="#336699">
+    <ColorField.Input />
+</ColorField.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorField.Root v-model:value="color" channel="hue" locale="en-US">
+        <ColorField.Input aria-label="Hue" />
+    </ColorField.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorFieldRoot, ColorFieldInput],
+    template: `
+        <label for="brand">Brand color</label>
+        <div colorFieldRoot id="brand" name="brand" [(value)]="color">
+            <input colorFieldInput />
+        </div>
+    `,
+})
+export class BrandColor {
+    protected readonly color = signal<Color | string | null>("#336699");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-commit`), and Angular as inputs and outputs (`[(value)]`, `(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string \| null` | | the color, controlled |
+| `defaultValue` | `Color \| string \| null` | `null` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color \| null, details: { reason }) => void` | | a commit (`keyboard`, `input-blur`, `input-clear`) or a step (`keyboard`) |
+| `channel` | `ColorChannel` | | the channel it edits; none: the whole color as hex |
+| `colorSpace` | `"rgb" \| "hsl" \| "hsb"` | the value's, else the channel's | with `channel`, the space it edits it in |
+| `locale` | `string` | the runtime's | the locale of the channel's text |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+| `id` | `string` | generated | the Input's id |
+| `disabled` | `boolean` | `false` | disables the Input |
+| `readOnly` | `boolean` | `false` | the text cannot change |
+| `required` | `boolean` | `false` | the hidden input is `required` |
+
+### Input
+
+No props of its own; name it with a `<label for>`, `aria-label` or a Field's Label.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-readonly`, `data-required`, `data-channel`; in a Field, the field's states |
+| Input | `id`, `type="text"`, `autocomplete="off"`, `spellcheck="false"`, `aria-required`, `aria-readonly`; with `channel`: `role="spinbutton"`, `inputmode="decimal"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext` |
+| hidden input | visually hidden, `aria-hidden="true"`, `tabindex="-1"`, `name`, `value`, `required`, `disabled` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter | commits the typed text |
+| ArrowUp / ArrowDown | hex: ± 1 on the 24-bit number; channel: ± one step (Shift: the large step) |
+| Page Up / Page Down | channel: ± the large step |
+| Home / End | channel: its `min` / `max` (hex: the caret) |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-field` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorField`, `ColorFieldInputProps`, `ColorFieldRootProps`, `ColorFieldState`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-field` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorField`, `ColorFieldRootEmits`, `ColorFieldRootProps`, `ColorFieldState`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-field` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorFieldInput`, `ColorFieldRoot`, `ColorFieldState`, `ColorSpace`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |

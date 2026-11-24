@@ -7,6 +7,7 @@ export * from "./calendar-systems/index.ts";
 export * from "./carousel/index.ts";
 export * from "./clipboard/index.ts";
 export * from "./collection/index.ts";
+export * from "./color/index.ts";
 export * from "./date/index.ts";
 export * from "./direction/index.ts";
 export * from "./focus/index.ts";

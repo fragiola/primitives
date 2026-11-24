@@ -94,8 +94,12 @@ describe("the frameworks of project.json", () => {
     });
 });
 
-/** The examples that import a toolkit entry themselves (a calendar system, a time zone). */
-const TOOLKIT_EXAMPLES = ["calendar-system", "date-field-time-zone"];
+/** The examples that import a toolkit entry themselves (a calendar system, a time zone, the color model). */
+const TOOLKIT_EXAMPLES = [
+    "calendar-system",
+    "date-field-time-zone",
+    "color-editor",
+];
 
 /** The examples that render their links through the framework's router: it is installed too. */
 const ROUTER_EXAMPLES = ["link", "breadcrumbs"];
@@ -137,6 +141,7 @@ describe("the embeds", () => {
             "checkbox",
             "clipboard",
             "collapsible",
+            "color-editor",
             "combobox",
             "combobox-virtual",
             "context-menu",
@@ -245,6 +250,7 @@ describe("the embeds", () => {
                 "password-input",
                 "search-field",
                 "editable",
+                "color-editor",
                 "date-picker",
                 "calendar",
                 "date-field",

@@ -1,0 +1,148 @@
+---
+title: ColorArea
+description: Two channels of a color chosen at once on a two-dimensional area, as two APG sliders (one native range input per axis), in each framework.
+---
+
+Choose two channels of a color (saturation and brightness, by default) by dragging a thumb over
+an area, or with the keyboard. The APG has no two-dimensional slider: the area is **two
+[APG sliders](https://www.w3.org/WAI/ARIA/apg/patterns/slider/)**,
+one native `<input type="range">` per axis, visually hidden in the thumb, so a screen reader
+meets two named sliders with their values. Its value is a [color](/docs/api/toolkit#color).
+
+<Example id="color-editor" />
+
+## Behaviour
+
+- **Value**: a `Color` or a string; changes report a `Color` in the area's space.
+- **Channels**: `xChannel` and `yChannel`, two channels of one space (no alpha); by default the
+  space's (rgb: red and green; hsl: saturation and lightness; hsb: saturation and brightness).
+- **Keyboard**: one tab stop. Either Input takes every key: the horizontal arrows move `x`
+  (swapped in RTL), the vertical arrows `y`, Shift by the large step, Page Up / Page Down `y` by
+  the large step, Home / End `x` to its ends. The focus follows the axis a key moved, so a screen
+  reader announces the slider that changed.
+- **Pointer**: a press moves both axes to the point (`track-press`), focuses the tab-stop Input
+  and drags with pointer capture (`drag`, `data-dragging`), clamped to the area. `x` runs from the
+  inline start, `y` from the bottom.
+- **Background**: the Root sets `--color-area-background` and
+  `--color-area-background-blend-mode` (two gradient layers that give the exact color at each
+  point); the Thumb `--color-area-thumb-color`.
+- **Forms**: each Input's `name` submits its channel's value (a native range input).
+- **Names**: the app names the group (`aria-label`) and each Input; no channel name of its own.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-area-root` | a `group`; the interactive area and its background |
+| Thumb | `div` | `color-area-thumb` | marks the point; holds the Inputs |
+| Input | `input type="range"` | `color-area-input` | one per axis, the two sliders |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorArea } from "@fragiola/primitives-react/color-area";
+
+<ColorArea.Root aria-label="Color" value={color} onValueChange={setColor} xChannel="saturation" yChannel="brightness">
+    <ColorArea.Thumb>
+        <ColorArea.Input axis="x" aria-label="Saturation" />
+        <ColorArea.Input axis="y" aria-label="Brightness" />
+    </ColorArea.Thumb>
+</ColorArea.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorArea.Root v-model:value="color" aria-label="Color" color-space="hsl">
+        <ColorArea.Thumb>
+            <ColorArea.Input axis="x" aria-label="Saturation" />
+            <ColorArea.Input axis="y" aria-label="Lightness" />
+        </ColorArea.Thumb>
+    </ColorArea.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorAreaRoot, ColorAreaThumb, ColorAreaInput],
+    template: `
+        <div colorAreaRoot aria-label="Color" [(value)]="color">
+            <div colorAreaThumb>
+                <input colorAreaInput axis="x" aria-label="Saturation" />
+                <input colorAreaInput axis="y" aria-label="Brightness" />
+            </div>
+        </div>
+    `,
+})
+export class Picker {
+    protected readonly color = signal<Color | string>("hsb(210, 50%, 50%)");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-commit`), and Angular as inputs and outputs (`[(value)]`, `(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string` | | the color, controlled |
+| `defaultValue` | `Color \| string` | `"hsb(0, 100%, 100%)"` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color, details: { reason }) => void` | | every change (`keyboard`, `track-press`, `drag`), the color in the area's space |
+| `onValueCommit` | `(value: Color, details) => void` | | once a drag ends, or after a key |
+| `xChannel` | `ColorChannel` | the space's | the horizontal axis's channel |
+| `yChannel` | `ColorChannel` | the space's | the vertical axis's channel |
+| `colorSpace` | `"rgb" \| "hsl" \| "hsb"` | the value's, else the channels' | the space of the channels |
+| `disabled` | `boolean` | `false` | ignores the pointer and the keys |
+| `locale` | `string` | the runtime's | the locale of the channels' text |
+
+### Thumb
+
+No props of its own.
+
+### Input
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `axis` | `"x" \| "y"` | | the axis this slider is (required) |
+| `name` (react, vue) | `string` | | what the form submits its channel's value as |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`, `data-disabled`, `data-dragging`; structural style `position: relative`, `touch-action: none`, `--color-area-background`, `--color-area-background-blend-mode` |
+| Thumb | `data-disabled`, `data-dragging`; structural style placing it, `--color-area-thumb-color` |
+| Input | `type="range"`, `min`, `max`, `step`, `value`, `aria-valuetext`, `aria-orientation`, `tabindex` (`0` on the tab stop, `-1` on the other), `disabled`, `data-axis`, `data-channel`; visually hidden |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowRight / ArrowLeft | `x` ± one step (swapped in RTL); Shift: the large step |
+| ArrowUp / ArrowDown | `y` ± one step; Shift: the large step |
+| Page Up / Page Down | `y` ± the large step |
+| Home / End | `x` to its `min` / `max` |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-area` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorArea`, `ColorAreaAxis`, `ColorAreaInputProps`, `ColorAreaRootProps`, `ColorAreaState`, `ColorChannel`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-area` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorArea`, `ColorAreaAxis`, `ColorAreaInputProps`, `ColorAreaRootEmits`, `ColorAreaRootProps`, `ColorAreaState`, `ColorChannel`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-area` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorAreaAxis`, `ColorAreaInput`, `ColorAreaRoot`, `ColorAreaState`, `ColorAreaThumb`, `ColorChannel`, `ColorSpace`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |

@@ -42,6 +42,17 @@ import ClipboardBasic from "../scenarios/clipboard/clipboard-basic.vue";
 import ClipboardFailure from "../scenarios/clipboard/clipboard-failure.vue";
 import CollapsibleBasic from "../scenarios/collapsible/collapsible-basic.vue";
 import CollapsibleHiddenUntilFound from "../scenarios/collapsible/collapsible-hidden-until-found.vue";
+import ColorAreaBasic from "../scenarios/color-area/color-area-basic.vue";
+import ColorAreaRgb from "../scenarios/color-area/color-area-rgb.vue";
+import ColorFieldBasic from "../scenarios/color-field/color-field-basic.vue";
+import ColorFieldChannel from "../scenarios/color-field/color-field-channel.vue";
+import ColorFieldField from "../scenarios/color-field/color-field-field.vue";
+import ColorSliderAlpha from "../scenarios/color-slider/color-slider-alpha.vue";
+import ColorSliderBasic from "../scenarios/color-slider/color-slider-basic.vue";
+import ColorSliderSpace from "../scenarios/color-slider/color-slider-space.vue";
+import ColorSliderVertical from "../scenarios/color-slider/color-slider-vertical.vue";
+import ColorWheelBasic from "../scenarios/color-wheel/color-wheel-basic.vue";
+import ColorWheelDisabled from "../scenarios/color-wheel/color-wheel-disabled.vue";
 import ComboboxBasic from "../scenarios/combobox/combobox-basic.vue";
 import ComboboxControlled from "../scenarios/combobox/combobox-controlled.vue";
 import ComboboxField from "../scenarios/combobox/combobox-field.vue";
@@ -332,6 +343,19 @@ export const routes: Record<string, Component> = {
     "/menubar/basic": MenubarBasic,
     "/menubar/vertical": MenubarVertical,
     "/menubar/modal": MenubarModal,
+    "/color-slider/basic": ColorSliderBasic,
+    "/color-slider/alpha": ColorSliderAlpha,
+    "/color-slider/vertical": ColorSliderVertical,
+    "/color-slider/rtl": ColorSliderBasic,
+    "/color-slider/space": ColorSliderSpace,
+    "/color-area/basic": ColorAreaBasic,
+    "/color-area/rtl": ColorAreaBasic,
+    "/color-area/rgb": ColorAreaRgb,
+    "/color-wheel/basic": ColorWheelBasic,
+    "/color-wheel/disabled": ColorWheelDisabled,
+    "/color-field/basic": ColorFieldBasic,
+    "/color-field/channel": ColorFieldChannel,
+    "/color-field/field": ColorFieldField,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,

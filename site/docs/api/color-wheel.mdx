@@ -1,0 +1,135 @@
+---
+title: ColorWheel
+description: A color's hue chosen on a ring, an APG slider whose track is a circle, wrapping from 359° to 0°, in each framework.
+---
+
+Choose a color's hue by moving a thumb around a ring that shows every hue (an APG
+[slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) on a circle). The hue wraps around: from
+359° on to 0°. Its value is a [color](/docs/api/toolkit#color) in hsl or hsb.
+
+<Example id="color-editor" />
+
+## Behaviour
+
+- **Value**: a `Color` or a string; changes report a `Color` in hsl or hsb (`colorSpace`, else
+  the value's own, else hsb).
+- **Ring**: `outerRadius` and `innerRadius` (px) shape it; the Root is `2 × outerRadius` square,
+  0° is at the top and the hue grows clockwise. The Track sets `--color-wheel-track-background` (a
+  CSS `conic-gradient`), the Root `--color-wheel-outer-radius` and `--color-wheel-inner-radius`
+  (mask the Track with them), the Thumb `--color-wheel-thumb-color`.
+- **Pointer**: a press on the ring moves the thumb to that angle (`track-press`), focuses it and
+  drags it with pointer capture (`drag`); a press off the ring does nothing.
+- **Keyboard**: the arrows ± 1° (Shift, Page Up and Page Down: 15°), Home 0°, End 359°; the hue
+  wraps.
+- **Forms**: a hidden input submits the color as hex.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-wheel-root` | holds the value; the interactive square |
+| Track | `div` | `color-wheel-track` | the ring's gradient |
+| Thumb | `div` | `color-wheel-thumb` | the `slider` |
+| (hidden input) | `input type="hidden"` | `color-wheel-input` | the color as hex |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorWheel } from "@fragiola/primitives-react/color-wheel";
+
+<ColorWheel.Root value={color} onValueChange={setColor} outerRadius={100} innerRadius={76}>
+    <ColorWheel.Track />
+    <ColorWheel.Thumb aria-label="Hue" />
+</ColorWheel.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorWheel.Root v-model:value="color" :outer-radius="80" :inner-radius="60">
+        <ColorWheel.Track />
+        <ColorWheel.Thumb aria-label="Hue" />
+    </ColorWheel.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorWheelRoot, ColorWheelTrack, ColorWheelThumb],
+    template: `
+        <div colorWheelRoot [(value)]="color" [outerRadius]="80" [innerRadius]="60">
+            <div colorWheelTrack></div>
+            <div colorWheelThumb aria-label="Hue"></div>
+        </div>
+    `,
+})
+export class HueWheel {
+    protected readonly color = signal<Color | string>("hsl(210, 80%, 50%)");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-commit`), and Angular as inputs and outputs (`[(value)]`, `(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string` | | the color, controlled |
+| `defaultValue` | `Color \| string` | `"hsl(0, 100%, 50%)"` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color, details: { reason }) => void` | | every change (`keyboard`, `track-press`, `drag`) |
+| `onValueCommit` | `(value: Color, details) => void` | | once a drag ends, or after a key |
+| `colorSpace` | `"hsl" \| "hsb"` | the value's, else hsb | the space of the hue |
+| `outerRadius` | `number` | `100` | the ring's outer radius, in px |
+| `innerRadius` | `number` | `75` | the ring's inner radius, in px |
+| `disabled` | `boolean` | `false` | ignores the pointer and the keys |
+| `name` | `string` | | the form name of the hidden input |
+| `locale` | `string` | the runtime's | the locale of the hue's text |
+
+### Track
+
+No props of its own.
+
+### Thumb
+
+No props of its own; name it with `aria-label` or `aria-labelledby`.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `data-disabled`, `data-dragging`; structural style `position: relative`, its size, `touch-action: none`, `--color-wheel-outer-radius`, `--color-wheel-inner-radius` |
+| Track | `data-disabled`, `data-dragging`; structural style `position: absolute`, `inset: 0`, `--color-wheel-track-background` |
+| Thumb | `role="slider"`, `tabindex="0"`, `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax="360"`, `aria-valuetext`, `aria-disabled`, `data-disabled`, `data-dragging`; structural style placing it, `--color-wheel-thumb-color` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowRight, ArrowUp | + 1° (Shift: 15°), wrapping |
+| ArrowLeft, ArrowDown | − 1° (Shift: 15°), wrapping |
+| Page Up / Page Down | ± 15° |
+| Home / End | 0° / 359° |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-wheel` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorWheel`, `ColorWheelRootProps`, `ColorWheelState`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-wheel` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorWheel`, `ColorWheelRootEmits`, `ColorWheelRootProps`, `ColorWheelState`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-wheel` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorWheelRoot`, `ColorWheelState`, `ColorWheelThumb`, `ColorWheelTrack`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |

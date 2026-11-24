@@ -133,6 +133,26 @@
             "types": "./dist/types/fragiola-primitives-angular-collapsible.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-collapsible.mjs"
         },
+        "./color-area": {
+            "@fragiola/source": "./color-area/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-area.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-area.mjs"
+        },
+        "./color-field": {
+            "@fragiola/source": "./color-field/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-field.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-field.mjs"
+        },
+        "./color-slider": {
+            "@fragiola/source": "./color-slider/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-slider.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-slider.mjs"
+        },
+        "./color-wheel": {
+            "@fragiola/source": "./color-wheel/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-wheel.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-wheel.mjs"
+        },
         "./combobox": {
             "@fragiola/source": "./combobox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-combobox.d.ts",
