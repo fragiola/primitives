@@ -125,7 +125,7 @@ LTR and Left in RTL (the Trigger's direction, `@fragiola/primitives/direction`; 
 | --- | --- | --- |
 | ArrowDown, ArrowUp, Enter, Space | opens on the chosen path (every level of it open, the chosen item highlighted), else on the first enabled item of the first level (reason `list-navigation`) | ArrowDown / ArrowUp: the next / previous item of the highlighted item's level (stops at the ends); Enter / Space: see "Choosing" |
 | Home / End | opens on the first / last item of the first level | the first / last item of the level |
-| inline-end (Right in LTR) | | on an enabled parent: opens its level and highlights its first item (reason `list-navigation` for the level, none for the value) |
+| inline-end (Right in LTR) | | on an enabled parent: opens its level and highlights its first enabled item |
 | inline-start (Left in LTR) | | in a deeper level: closes it and highlights its parent; in the first level, nothing |
 | a printable character | opens the popup on the first item of the first level whose label starts with the typed text (as Select's "Typing while closed") | typeahead **within the highlighted item's level** (the toolkit's `createTypeahead`); Space right after a typed character continues the text |
 | Escape | | closes without choosing (reason `escape-key`) |
@@ -215,7 +215,7 @@ Checks:
 
 1. One `combobox` named "Location", `aria-expanded="false"`, `aria-haspopup="listbox"`, showing
    "Choose a place".
-2. ArrowDown opens one `listbox` named "Location" with five options; "Africa" is highlighted
+2. ArrowDown opens one `listbox` with five options; "Africa" is highlighted
    (`aria-activedescendant`); it has `data-has-children`, "Antarctica" has not; no other level is
    shown.
 3. ArrowDown three times highlights "Europe"; no second level opens. ArrowRight opens a second
