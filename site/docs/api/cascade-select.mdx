@@ -14,6 +14,8 @@ and close as the APG menu's submenus do (Right opens, Left closes, mirrored in R
 [Menu](/docs/api/menu)'s hover delay and safe area. Zag's and Ark's cascade select and Ant
 Design's Cascader were read for the behaviour, never copied.
 
+<Example id="cascade-select" />
+
 ## Behaviour
 
 - **The value is a path**: the values from the first level down (`["europe", "france", "paris"]`),
@@ -245,7 +247,7 @@ Angular reads `items()` through `exportAs`.
 
 | prop | type | default | description |
 | --- | --- | --- | --- |
-| `keepMounted` (react, vue) | `boolean` | `false` | keep it rendered while its Item is not on the chosen path |
+| `keepMounted` | `boolean` | `false` | keep it rendered while its Item is not on the chosen path (Angular: `*cascadeSelectItemIndicator="true"`) |
 
 ## State and part attributes
 
@@ -278,5 +280,5 @@ DOM focus stays on the Trigger. "Inline-end" is Right in LTR and Left in RTL.
 | entry | exports |
 | --- | --- |
 | `@fragiola/primitives-react/cascade-select` | `Align`, `CascadeItem`, `CascadeSelect`, `CascadeSelectItemIndicatorProps`, `CascadeSelectItemProps`, `CascadeSelectItemState`, `CascadeSelectLevelProps`, `CascadeSelectLevelState`, `CascadeSelectPortalProps`, `CascadeSelectPositionerProps`, `CascadeSelectPositionerState`, `CascadeSelectRootProps`, `CascadeSelectTriggerState`, `CascadeSelectValueProps`, `ChangeDetails`, `ChangeReason`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PositionerProps`, `RenderProp`, `Side` |
-| `@fragiola/primitives-vue/cascade-select` | `Align`, `CascadeItem`, `CascadeSelect`, `CascadeSelectRootEmits`, `CascadeSelectRootProps`, `ChangeDetails`, `ChangeReason`, `OpenChangeDetails`, `OverlayActions`, `RenderSlotProps`, `Side` |
-| `@fragiola/primitives-angular/cascade-select` | `Align`, `CascadeItem`, `CascadeSelectItem`, `CascadeSelectItemIndicator`, `CascadeSelectLevel`, `CascadeSelectPopup`, `CascadeSelectPortal`, `CascadeSelectPositioner`, `CascadeSelectRoot`, `CascadeSelectTrigger`, `CascadeSelectValue`, `ChangeDetails`, `ChangeReason`, `OpenChangeDetails`, `Side`, `ValueChangeEvent` |
+| `@fragiola/primitives-vue/cascade-select` | `Align`, `CascadeItem`, `CascadeSelect`, `CascadeSelectItemIndicatorProps`, `CascadeSelectItemIndicatorState`, `CascadeSelectItemProps`, `CascadeSelectItemState`, `CascadeSelectLevelProps`, `CascadeSelectLevelState`, `CascadeSelectPopupState`, `CascadeSelectPortalProps`, `CascadeSelectPositionerState`, `CascadeSelectRootEmits`, `CascadeSelectRootProps`, `CascadeSelectTriggerState`, `CascadeSelectValueProps`, `CascadeSelectValueState`, `ChangeDetails`, `ChangeReason`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PositionerProps`, `RenderSlotProps`, `Side` |
+| `@fragiola/primitives-angular/cascade-select` | `Align`, `CascadeItem`, `CascadeSelectItem`, `CascadeSelectItemIndicator`, `CascadeSelectItemState`, `CascadeSelectLevel`, `CascadeSelectLevelState`, `CascadeSelectPopup`, `CascadeSelectPortal`, `CascadeSelectPositioner`, `CascadeSelectRoot`, `CascadeSelectState`, `CascadeSelectTrigger`, `CascadeSelectTriggerState`, `CascadeSelectValue`, `ChangeDetails`, `ChangeReason`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `OverlayPortalOptions`, `Side`, `ValueChangeEvent` |
