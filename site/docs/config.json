@@ -428,6 +428,14 @@
                 {
                     "label": "Clipboard",
                     "path": "api/clipboard"
+                },
+                {
+                    "label": "DropZone",
+                    "path": "api/drop-zone"
+                },
+                {
+                    "label": "FileUpload",
+                    "path": "api/file-upload"
                 }
             ]
         },

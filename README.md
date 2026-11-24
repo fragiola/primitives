@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 82 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
+Today, 86 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2, 3 and 4 complete (stage 5, the niche components, comes only on demand):
 
 | group | components |
 | --- | --- |
@@ -28,12 +28,14 @@ Today, 82 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2
 | navigation | **Link** (current and disabled, on your router's link, no router dependency), **Breadcrumbs** (the APG trail, a collapsed middle opening a Menu), **Steps** (a linear process with `aria-current="step"`), **Carousel** (the APG carousel, basic or tabbed, native scroll snapping and the rotation rules) |
 | color controls | **ColorSlider** (one channel along a gradient track), **ColorArea** (two channels on a 2D area, two APG sliders), **ColorWheel** (the hue on a ring, wrapping), **ColorField** (hex or one channel typed, committed on Enter and blur), on the toolkit's color model (`/color`: rgb, hsl and hsb with alpha) |
 | color pickers | **ColorSwatch** (a color over a checkerboard, an image), **ColorSwatchPicker** (a palette, the APG listbox in rows), **ColorPicker** (one color shared by the controls inside it, a format switch, the eyedropper; an inline picker bundles no overlay code), **ColorPickerPopover** (its opt-in popup) |
+| commands and cascades | **Command** (a command palette: the APG combobox with an always shown list of actions, its scorer, nested pages, and the opt-in **CommandVirtual** list), **CascadeSelect** (a select whose popup opens one list per level of a tree) |
+| files | **DropZone** (a drop target for files: drag, paste, or a press that opens the file dialog, with a polite announcement), **FileUpload** (a form control holding a list of files: the checks and their reasons, sizes, image previews, the native form through its hidden file input; the app uploads) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 
 Plus the [direction provider](spec/direction.md) and the render utilities. Stage 0 ported the
 cross-framework POC's components to production; stage 1 brought the production scope and
-Fragiola UI parity; stage 2 the consensus set; stage 3 the dates and times (`docs/handoff.md` §5). See [`docs/handoff.md`](docs/handoff.md),
+Fragiola UI parity; stage 2 the consensus set; stage 3 the dates and times; stage 4 the differentiators, from TagGroup to FileUpload (`docs/handoff.md` §5). See [`docs/handoff.md`](docs/handoff.md),
 [`docs/catalog.md`](docs/catalog.md) and [`docs/decisions.md`](docs/decisions.md); the rules are in [`AGENTS.md`](AGENTS.md).
 
 ```sh

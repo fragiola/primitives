@@ -279,6 +279,12 @@
             "import": "./dist/drawer.js",
             "default": "./dist/drawer.js"
         },
+        "./drop-zone": {
+            "@fragiola/source": "./src/components/drop-zone/index.ts",
+            "types": "./dist/drop-zone.d.ts",
+            "import": "./dist/drop-zone.js",
+            "default": "./dist/drop-zone.js"
+        },
         "./editable": {
             "@fragiola/source": "./src/components/editable/index.ts",
             "types": "./dist/editable.d.ts",
@@ -296,6 +302,12 @@
             "types": "./dist/fieldset.d.ts",
             "import": "./dist/fieldset.js",
             "default": "./dist/fieldset.js"
+        },
+        "./file-upload": {
+            "@fragiola/source": "./src/components/file-upload/index.ts",
+            "types": "./dist/file-upload.d.ts",
+            "import": "./dist/file-upload.js",
+            "default": "./dist/file-upload.js"
         },
         "./form": {
             "@fragiola/source": "./src/components/form/index.ts",
@@ -808,6 +820,11 @@
                 "import": "./dist/drawer.js",
                 "default": "./dist/drawer.js"
             },
+            "./drop-zone": {
+                "types": "./dist/drop-zone.d.ts",
+                "import": "./dist/drop-zone.js",
+                "default": "./dist/drop-zone.js"
+            },
             "./editable": {
                 "types": "./dist/editable.d.ts",
                 "import": "./dist/editable.js",
@@ -822,6 +839,11 @@
                 "types": "./dist/fieldset.d.ts",
                 "import": "./dist/fieldset.js",
                 "default": "./dist/fieldset.js"
+            },
+            "./file-upload": {
+                "types": "./dist/file-upload.d.ts",
+                "import": "./dist/file-upload.js",
+                "default": "./dist/file-upload.js"
             },
             "./form": {
                 "types": "./dist/form.d.ts",

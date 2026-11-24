@@ -110,6 +110,9 @@ import DrawerLifecycle from "../scenarios/drawer/drawer-lifecycle.vue";
 import DrawerNested from "../scenarios/drawer/drawer-nested.vue";
 import DrawerSide from "../scenarios/drawer/drawer-side.vue";
 import DrawerSnapPoints from "../scenarios/drawer/drawer-snap-points.vue";
+import DropZoneBasic from "../scenarios/drop-zone/drop-zone-basic.vue";
+import DropZoneDisabled from "../scenarios/drop-zone/drop-zone-disabled.vue";
+import DropZoneSingle from "../scenarios/drop-zone/drop-zone-single.vue";
 import EditableBasic from "../scenarios/editable/editable-basic.vue";
 import EditableField from "../scenarios/editable/editable-field.vue";
 import EditableModes from "../scenarios/editable/editable-modes.vue";
@@ -123,6 +126,10 @@ import FieldMoreControls from "../scenarios/field/field-more-controls.vue";
 import FieldSettings from "../scenarios/field/field-settings.vue";
 import FieldValidation from "../scenarios/field/field-validation.vue";
 import FieldsetBasic from "../scenarios/fieldset/fieldset-basic.vue";
+import FileUploadBasic from "../scenarios/file-upload/file-upload-basic.vue";
+import FileUploadDisabled from "../scenarios/file-upload/file-upload-disabled.vue";
+import FileUploadForm from "../scenarios/file-upload/file-upload-form.vue";
+import FileUploadSingle from "../scenarios/file-upload/file-upload-single.vue";
 import FormBasic from "../scenarios/form/form-basic.vue";
 import HoverCardBasic from "../scenarios/hover-card/hover-card-basic.vue";
 import HoverCardDetached from "../scenarios/hover-card/hover-card-detached.vue";
@@ -507,6 +514,13 @@ export const routes: Record<string, Component> = {
     "/search-field/field": SearchFieldField,
     "/clipboard/basic": ClipboardBasic,
     "/clipboard/failure": ClipboardFailure,
+    "/drop-zone/basic": DropZoneBasic,
+    "/drop-zone/single": DropZoneSingle,
+    "/drop-zone/disabled": DropZoneDisabled,
+    "/file-upload/basic": FileUploadBasic,
+    "/file-upload/single": FileUploadSingle,
+    "/file-upload/form": FileUploadForm,
+    "/file-upload/disabled": FileUploadDisabled,
     "/editable/basic": EditableBasic,
     "/editable/modes": EditableModes,
     "/editable/states": EditableStates,

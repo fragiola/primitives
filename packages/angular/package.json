@@ -243,6 +243,11 @@
             "types": "./dist/types/fragiola-primitives-angular-drawer.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-drawer.mjs"
         },
+        "./drop-zone": {
+            "@fragiola/source": "./drop-zone/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-drop-zone.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-drop-zone.mjs"
+        },
         "./editable": {
             "@fragiola/source": "./editable/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-editable.d.ts",
@@ -257,6 +262,11 @@
             "@fragiola/source": "./fieldset/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-fieldset.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-fieldset.mjs"
+        },
+        "./file-upload": {
+            "@fragiola/source": "./file-upload/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-file-upload.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-file-upload.mjs"
         },
         "./form": {
             "@fragiola/source": "./form/public-api.ts",

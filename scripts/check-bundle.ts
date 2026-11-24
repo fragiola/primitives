@@ -130,6 +130,9 @@ export const ENTRY_DEPENDENCIES: Readonly<
     drawer: ["dialog"],
     editable: ["field"],
     fieldset: ["field"],
+    // its Dropzone shares DropZone's drop target through each framework's shared code, not
+    // DropZone's entry (Epic #106)
+    "file-upload": ["field"],
     form: ["field"],
     listbox: ["field"],
     "listbox-virtual": ["listbox", "field"],
@@ -231,6 +234,9 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
     ],
     // the command palette's scorer and keys (Epic #104): Command's and its virtual list's only
     command: ["command", "command-virtual"],
+    // a drop target for files, the file dialog and a FileUpload's checks (Epic #106): DropZone's
+    // and FileUpload's only
+    file: ["drop-zone", "file-upload"],
     // the month and year values, grid and names (Epic #79): the day calendars never import them
     "month-year": MONTH_YEAR,
     segments: SEGMENTED,

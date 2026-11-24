@@ -37,6 +37,8 @@ export type ChangeReason =
     | "imperative-action"
     | "page-change"
     | "backspace-key"
+    | "drop"
+    | "delete-press"
     | "none";
 
 /** What a change reports besides its value (spec/README.md, "Change details"). */

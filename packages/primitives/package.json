@@ -96,6 +96,12 @@
             "import": "./dist/direction.js",
             "default": "./dist/direction.js"
         },
+        "./file": {
+            "@fragiola/source": "./src/file/index.ts",
+            "types": "./dist/file.d.ts",
+            "import": "./dist/file.js",
+            "default": "./dist/file.js"
+        },
         "./focus": {
             "@fragiola/source": "./src/focus/index.ts",
             "types": "./dist/focus.d.ts",
@@ -304,6 +310,11 @@
                 "types": "./dist/direction.d.ts",
                 "import": "./dist/direction.js",
                 "default": "./dist/direction.js"
+            },
+            "./file": {
+                "types": "./dist/file.d.ts",
+                "import": "./dist/file.js",
+                "default": "./dist/file.js"
             },
             "./focus": {
                 "types": "./dist/focus.d.ts",

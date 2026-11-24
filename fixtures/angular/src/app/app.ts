@@ -113,6 +113,9 @@ import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.ts";
 import { DrawerNested } from "../scenarios/drawer/drawer-nested.ts";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.ts";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.ts";
+import { DropZoneBasic } from "../scenarios/drop-zone/drop-zone-basic.ts";
+import { DropZoneDisabled } from "../scenarios/drop-zone/drop-zone-disabled.ts";
+import { DropZoneSingle } from "../scenarios/drop-zone/drop-zone-single.ts";
 import { EditableBasic } from "../scenarios/editable/editable-basic.ts";
 import { EditableField } from "../scenarios/editable/editable-field.ts";
 import { EditableModes } from "../scenarios/editable/editable-modes.ts";
@@ -126,6 +129,10 @@ import { FieldMoreControls } from "../scenarios/field/field-more-controls.ts";
 import { FieldSettings } from "../scenarios/field/field-settings.ts";
 import { FieldValidation } from "../scenarios/field/field-validation.ts";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.ts";
+import { FileUploadBasic } from "../scenarios/file-upload/file-upload-basic.ts";
+import { FileUploadDisabled } from "../scenarios/file-upload/file-upload-disabled.ts";
+import { FileUploadForm } from "../scenarios/file-upload/file-upload-form.ts";
+import { FileUploadSingle } from "../scenarios/file-upload/file-upload-single.ts";
 import { FormBasic } from "../scenarios/form/form-basic.ts";
 import { HoverCardBasic } from "../scenarios/hover-card/hover-card-basic.ts";
 import { HoverCardDetached } from "../scenarios/hover-card/hover-card-detached.ts";
@@ -519,6 +526,13 @@ import { ROUTES } from "./routes.ts";
         SearchFieldField,
         ClipboardBasic,
         ClipboardFailure,
+        DropZoneBasic,
+        DropZoneSingle,
+        DropZoneDisabled,
+        FileUploadBasic,
+        FileUploadSingle,
+        FileUploadForm,
+        FileUploadDisabled,
         EditableBasic,
         EditableModes,
         EditableStates,
@@ -778,6 +792,13 @@ import { ROUTES } from "./routes.ts";
             @case ("/search-field/field") { <main class="p-6" scenario-search-field-field></main> }
             @case ("/clipboard/basic") { <main class="p-6" scenario-clipboard-basic></main> }
             @case ("/clipboard/failure") { <main class="p-6" scenario-clipboard-failure></main> }
+            @case ("/drop-zone/basic") { <main class="p-6" scenario-drop-zone-basic></main> }
+            @case ("/drop-zone/single") { <main class="p-6" scenario-drop-zone-single></main> }
+            @case ("/drop-zone/disabled") { <main class="p-6" scenario-drop-zone-disabled></main> }
+            @case ("/file-upload/basic") { <main class="p-6" scenario-file-upload-basic></main> }
+            @case ("/file-upload/single") { <main class="p-6" scenario-file-upload-single></main> }
+            @case ("/file-upload/form") { <main class="p-6" scenario-file-upload-form></main> }
+            @case ("/file-upload/disabled") { <main class="p-6" scenario-file-upload-disabled></main> }
             @case ("/editable/basic") { <main class="p-6" scenario-editable-basic></main> }
             @case ("/editable/modes") { <main class="p-6" scenario-editable-modes></main> }
             @case ("/editable/states") { <main class="p-6" scenario-editable-states></main> }
