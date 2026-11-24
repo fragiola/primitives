@@ -292,6 +292,45 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["color-area"]).toBeUndefined();
     });
 
+    // Epic #104 (#103): the cascading select's levels are CascadeSelect's own, on Field only
+    it("keeps /cascade to /cascade-select, built on Field alone", () => {
+        expect(
+            mechanismLeaks("cascade-select", [
+                "cascade",
+                "collection",
+                "pointer",
+                "positioning",
+            ]),
+        ).toEqual([]);
+        expect(mechanismLeaks("select", ["cascade"])).toEqual([
+            '/select: imports the toolkit mechanism "/cascade"',
+        ]);
+        expect(ENTRY_DEPENDENCIES["cascade-select"]).toEqual(["field"]);
+    });
+
+    // Epic #104: a Command without the virtual list bundles no virtualizer, and the scorer is
+    // Command's own
+    it("keeps /virtual and /async-list out of /command, and /command to the command entries", () => {
+        expect(MECHANISMS_KEPT_OUT.command).toEqual(["virtual", "async-list"]);
+        expect(mechanismLeaks("command", ["collection", "command"])).toEqual(
+            [],
+        );
+        expect(mechanismLeaks("command", ["command", "virtual"])).toEqual([
+            '/command: imports the toolkit mechanism "/virtual"',
+        ]);
+        expect(mechanismLeaks("command", ["async-list"])).toEqual([
+            '/command: imports the toolkit mechanism "/async-list"',
+        ]);
+        expect(
+            mechanismLeaks("command-virtual", ["command", "virtual"]),
+        ).toEqual([]);
+        expect(mechanismLeaks("autocomplete", ["command"])).toEqual([
+            '/autocomplete: imports the toolkit mechanism "/command"',
+        ]);
+        expect(ENTRY_DEPENDENCIES.command).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES["command-virtual"]).toEqual(["command"]);
+    });
+
     // Epic #73: the segment editing and the time values stay out of the calendars and pickers
     it("fails a toolkit mechanism kept for other components", () => {
         // Epic #76: the range fields and the pickers' typed input are segmented too

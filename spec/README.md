@@ -71,6 +71,8 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [color-swatch.md](color-swatch.md) | ColorSwatch (a color preview: an `img` named by the app, else by the color's CSS text; the checkerboard the recipe's) |
 | [color-swatch-picker.md](color-swatch-picker.md) | ColorSwatchPicker (the APG listbox of swatches in wrapping rows, the vertical arrows between rows, decided there; on the toolkit's `/selection`) |
 | [color-picker.md](color-picker.md) | ColorPicker (no APG pattern and no Base UI component: a Root sharing one color with the color controls inside it, a format switch, an eyedropper; ColorPickerPopover, its opt-in popup on Popover's overlay lifecycle) |
+| [command.md](command.md) | Command (the APG combobox with an always displayed listbox of actions, focus in the input; the toolkit's scorer `/command`, nested pages, the opt-in virtual list `/command-virtual`, the Command dialog as a composition) |
+| [cascade-select.md](cascade-select.md) | CascadeSelect (no APG pattern and no Base UI component: the APG select-only combobox whose popup holds one listbox per open level, the levels opened and closed as the APG menu's submenus, with Menu's hover delay and safe area; the path value, `changeOnSelect`, the toolkit's `/cascade`) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -125,7 +127,9 @@ ColorWheel and ColorField, [color-slider.md](color-slider.md), [color-area.md](c
 toolkit's new `/color`, [color.md](color.md)), then the color pickers (Epic #101, Issue #100:
 ColorSwatch, ColorSwatchPicker and ColorPicker with its opt-in popup,
 [color-swatch.md](color-swatch.md), [color-swatch-picker.md](color-swatch-picker.md),
-[color-picker.md](color-picker.md)), which complete the Color family.
+[color-picker.md](color-picker.md)), which complete the Color family, then the command palette (Epic #104, Issue #102: Command,
+[command.md](command.md), on the toolkit's new `/command`) and the cascading select (Issue #103: CascadeSelect,
+[cascade-select.md](cascade-select.md), on the toolkit's new `/cascade`).
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -176,9 +180,12 @@ The vocabulary is shared by every component:
 | `data-starting-style` | an element that just mounted, for one frame, so a CSS transition starts from it |
 | `data-ending-style` | an element whose exit animation is running; it unmounts when its animations finish |
 | `data-disabled` | the part is disabled |
-| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox and autocomplete item, select item); a Listbox's focused option while the focus is in the list; a Rating's star drawn filled (whole or half) by the value or the pointer's preview ([rating.md](rating.md#state-attributes-and-aria)) |
+| `data-highlighted` | the item that keyboard or pointer navigation points at (menu item, checkbox and radio item, combobox, autocomplete and command item, select item); a Listbox's focused option while the focus is in the list; a Rating's star drawn filled (whole or half) by the value or the pointer's preview ([rating.md](rating.md#state-attributes-and-aria)) |
 | `data-half` | a Rating's star drawn half filled |
-| `data-selected` | a selected tab, combobox item, listbox option or calendar date |
+| `data-selected` | a selected tab, combobox item, listbox option or calendar date; a CascadeSelect item on the chosen path |
+| `data-has-children` | a CascadeSelect item that is a parent (spec/cascade-select.md) |
+| `data-expanded` | a CascadeSelect parent whose level is open (spec/cascade-select.md) |
+| `data-depth` | a CascadeSelect Level's depth, `0` for the first (spec/cascade-select.md) |
 | `data-pressed` | a pressed Toggle (spec/toggle.md) |
 | `data-orientation` | `horizontal` or `vertical` (a value, not a boolean) |
 | `data-multiple` | a ToggleGroup or a Listbox with `multiple` |
@@ -192,7 +199,7 @@ The vocabulary is shared by every component:
 | `data-readonly` | a read-only calendar or switch; a read-only Rating's Root and stars |
 | `data-range-start`, `data-range-end`, `data-in-range` | the range of a RangeCalendar |
 | `data-range-preview` | a cell inside the range being chosen (between the start and the hovered or focused date) |
-| `data-empty` | a combobox's or an autocomplete's list with no item; a TagGroup's Root and List with no tag (once mounted); a TagsInput's Root and Control with no tag; a SearchField's parts and an Editable's Root, Area, Preview and Input while the value is `""` |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a Command's List showing no item (once mounted); a TagGroup's Root and List with no tag (once mounted); a TagsInput's Root and Control with no tag; a SearchField's parts and an Editable's Root, Area, Preview and Input while the value is `""` |
 | `data-editing` | a TagsInput's Tag while its TagInput edits it; an Editable's Root, Area, Input and Submit and Cancel triggers while it edits |
 | `data-visible` | a PasswordInput's parts while its text is shown |
 | `data-copied`, `data-failed` | a Clipboard's parts while its last copy succeeded, or failed, until its `timeout` |
@@ -242,7 +249,7 @@ The reasons are shared:
 | `escape-key` | Escape dismissed the overlay; Escape cleared a SearchField, or reverted an Editable's edit |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value; a Carousel Indicator's press changed its page; a press on a ColorSwatchPicker's Item chose its color |
+| `item-press` | a menu, combobox, autocomplete or CascadeSelect item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value; a Carousel Indicator's press changed its page; a press on a ColorSwatchPicker's Item chose its color |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
 | `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text; a ColorPicker's FormatSelect changed its format (and the value it converted to the format's space) |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
@@ -265,6 +272,8 @@ The reasons are shared:
 | `autoplay` | a Carousel's rotation moved to its next page |
 | `focus-in` | focus entering a Carousel stopped its rotation (spec/carousel.md) |
 | `imperative-action` | a handle's `open`, `openWithPayload` or `close`, or the actions' `close()` ([Overlays](#overlays)); its focus return is the one of `none` in every overlay (Base UI's reason) |
+| `page-change` | a Command's page changed, which emptied its text (spec/command.md) |
+| `backspace-key` | Backspace on a Command's empty Input went back to the previous page (spec/command.md) |
 | `none` | anything else (a programmatic change; an overlay closed because the overlay it was opened from closed; a form reset; a form submission that hid a PasswordInput's text; a Clipboard's status returning to `idle`) |
 
 ### Normalized API names
@@ -540,6 +549,8 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | ColorSwatchPicker's value and parts | `value` + `onValueChange(color \| null, details)` (`defaultValue`) on `ColorSwatchPicker.Root`; `.Item` (`value`, `disabled`) | `v-model:value` (`default-value`, `@value-change`); the same parts | `[(value)]` on `[colorSwatchPickerRoot]` (`defaultValue`, `valueChangeDetails` output); `[colorSwatchPickerItem]` (`[value]`) |
 | ColorPicker's value, format and parts | `value` + `onValueChange(color, details)` (`defaultValue`), `onValueCommit`, `format` + `onFormatChange(format, details)` (`defaultFormat`) on `ColorPicker.Root`; `.FormatSelect`, `.EyeDropperTrigger` | `v-model:value`, `v-model:format` (`default-value`, `default-format`, `@value-change`, `@value-commit`, `@format-change`); the same parts | `[(value)]`, `[(format)]` on `[colorPickerRoot]` (`defaultValue`, `defaultFormat`; `valueChangeDetails`, `formatChangeDetails`, `valueCommit` outputs); `select[colorPickerFormatSelect]`, structural `*colorPickerEyeDropperTrigger` on a `button` (rendered only where the API exists) |
 | ColorPickerPopover's parts | `ColorPickerPopover.Root` (`open` + `onOpenChange`, `defaultOpen`), `.Trigger`, `.Portal`, `.Positioner`, `.Popup` | `v-model:open`; the same parts | `[colorPickerPopoverRoot]` (`[(open)]`), `button[colorPickerPopoverTrigger]`, `*colorPickerPopoverPortal`, `[colorPickerPopoverPositioner]`, `[colorPickerPopoverPopup]` |
+| Command's text, pages and parts | `inputValue` + `onInputValueChange(value, details)` (`defaultInputValue`), `pages` + `onPagesChange(pages, details)` (`defaultPages`), `filter`, `loading`, `loopFocus` on `Command.Root`; `.Input`, `.List`, `.Group`, `.GroupLabel`, `.Separator` (`forceMount`), `.Item` (`value`, `keywords`, `disabled`, `forceMount`, `onSelect(value, event)`), `.Empty`, `.Loading`; `CommandVirtual.List` (`items`, children `(entry, index) => ...`) | `v-model:input-value`, `v-model:pages` (`default-input-value`, `default-pages`, `@input-value-change`, `@pages-change`); the same parts, the Item's `@select`, the virtual List's default scoped slot | `[(inputValue)]`, `[(pages)]` on `[commandRoot]` (`defaultInputValue`, `defaultPages`; `inputValueChangeDetails`, `pagesChangeDetails` outputs); `input[commandInput]`, `[commandList]`, `[commandGroup]`, `[commandGroupLabel]`, `[commandSeparator]`, `[commandItem]` (`(itemSelect)`), `[commandEmpty]`, `[commandLoading]`; `[commandVirtualList]` (`rows()`) with `[commandVirtualRow]`; `injectCommand()` |
+| CascadeSelect's value and parts | `value` + `onValueChange(path, details)` (`defaultValue`), `open` + `onOpenChange`, `changeOnSelect`, `valueSeparator`, `items`, `name`, `required`, `disabled` on `CascadeSelect.Root`; `.Trigger`, `.Value` (`placeholder`, `separator`), `.Portal`, `.Positioner`, `.Popup`, `.Level` (`depth`, children `(items) => ...`), `.Item` (`value`), `.ItemIndicator` | `v-model:value`, `v-model:open` (`default-value`, `default-open`); the same parts, the Level's default scoped slot `{ items }` | `[(value)]`, `[(open)]` on `[cascadeSelectRoot]` (`defaultValue`, `defaultOpen`; `valueChangeDetails`, `openChangeDetails` outputs); `button[cascadeSelectTrigger]`, `[cascadeSelectValue]`, `[cascadeSelectPortal]`, `[cascadeSelectPositioner]`, `[cascadeSelectPopup]`, `[cascadeSelectLevel]` (`[depth]`, `#level="cascadeSelectLevel"` then `level.items()`), `[cascadeSelectItem]`, `[cascadeSelectItemIndicator]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`

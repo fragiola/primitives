@@ -34,6 +34,9 @@ import { CarouselBasic } from "../scenarios/carousel/carousel-basic.tsx";
 import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.tsx";
 import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.tsx";
 import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.tsx";
+import { CascadeSelectBasic } from "../scenarios/cascade-select/cascade-select-basic.tsx";
+import { CascadeSelectChangeOnSelect } from "../scenarios/cascade-select/cascade-select-change-on-select.tsx";
+import { CascadeSelectField } from "../scenarios/cascade-select/cascade-select-field.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
@@ -70,6 +73,12 @@ import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.tsx"
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.tsx";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.tsx";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.tsx";
+import { CommandAsync } from "../scenarios/command/command-async.tsx";
+import { CommandBasic } from "../scenarios/command/command-basic.tsx";
+import { CommandDialog } from "../scenarios/command/command-dialog.tsx";
+import { CommandFilter } from "../scenarios/command/command-filter.tsx";
+import { CommandPages } from "../scenarios/command/command-pages.tsx";
+import { CommandVirtualBasic } from "../scenarios/command/command-virtual-basic.tsx";
 import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.tsx";
 import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.tsx";
 import { DateFieldBasic } from "../scenarios/date-field/date-field-basic.tsx";
@@ -333,6 +342,9 @@ export const routes: Record<
     "/select/modal": SelectModal,
     "/select/lifecycle": SelectLifecycle,
     "/select/groups": SelectGroups,
+    "/cascade-select/basic": CascadeSelectBasic,
+    "/cascade-select/change-on-select": CascadeSelectChangeOnSelect,
+    "/cascade-select/field": CascadeSelectField,
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
@@ -453,6 +465,12 @@ export const routes: Record<
     "/combobox-virtual/async": ComboboxVirtualAsync,
     "/autocomplete-virtual/basic": AutocompleteVirtualBasic,
     "/autocomplete-virtual/async": AutocompleteVirtualAsync,
+    "/command/basic": CommandBasic,
+    "/command/filter": CommandFilter,
+    "/command/pages": CommandPages,
+    "/command/async": CommandAsync,
+    "/command/dialog": CommandDialog,
+    "/command-virtual/basic": CommandVirtualBasic,
     "/toast/basic": ToastBasic,
     "/toast/limit": ToastLimit,
     "/toast/promise": ToastPromise,

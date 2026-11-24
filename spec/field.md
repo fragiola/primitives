@@ -209,6 +209,7 @@ Outside a `Field.Root`, a control behaves exactly as without the layer.
 | Switch | Switch.Root (`button`) | Switch.Root | `checked` | Switch.Root | its hidden `checkbox` input |
 | RadioGroup | none (a `radiogroup`) | the RadioGroup | the value, or `null` | its Radios (focus within the group; `touched` once focus leaves it) | its first enabled Radio's hidden `radio` input (radios of one name share their validity). Its Radios take the field's `name` and `disabled`, and do not register as the field's control themselves |
 | Select | Select.Trigger (`button`) | Select.Trigger | the value, or `null` | Select.Trigger | its hidden input |
+| CascadeSelect | CascadeSelect.Trigger (`button`) | CascadeSelect.Trigger | the path (an array, `[]` for none) | CascadeSelect.Trigger | its hidden input ([cascade-select.md](cascade-select.md#forms)) |
 | Combobox | Combobox.Input (`input`) | Combobox.Input | the value: an item or `null`, or the list of items with `multiple` | Combobox.Input | its visually hidden input (combobox.md, "Forms") |
 | Autocomplete | Autocomplete.Input (`input`) | Autocomplete.Input | the value, the text | Autocomplete.Input | the Input itself (autocomplete.md, "Forms") |
 | Listbox | none (a `listbox`) | Listbox.Root | the value, or `null`, or the values with `multiple` | its options (focus within the list; `touched` once focus leaves it) | its visually hidden input ([listbox.md](listbox.md#forms)) |

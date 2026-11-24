@@ -37,6 +37,9 @@ import { CarouselBasic } from "../scenarios/carousel/carousel-basic.ts";
 import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.ts";
 import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.ts";
 import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.ts";
+import { CascadeSelectBasic } from "../scenarios/cascade-select/cascade-select-basic.ts";
+import { CascadeSelectChangeOnSelect } from "../scenarios/cascade-select/cascade-select-change-on-select.ts";
+import { CascadeSelectField } from "../scenarios/cascade-select/cascade-select-field.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
@@ -73,6 +76,12 @@ import { ComboboxLifecycle } from "../scenarios/combobox/combobox-lifecycle.ts";
 import { ComboboxMultiple } from "../scenarios/combobox/combobox-multiple.ts";
 import { ComboboxObjects } from "../scenarios/combobox/combobox-objects.ts";
 import { ComboboxRejectedInput } from "../scenarios/combobox/combobox-rejected-input.ts";
+import { CommandAsync } from "../scenarios/command/command-async.ts";
+import { CommandBasic } from "../scenarios/command/command-basic.ts";
+import { CommandDialog } from "../scenarios/command/command-dialog.ts";
+import { CommandFilter } from "../scenarios/command/command-filter.ts";
+import { CommandPages } from "../scenarios/command/command-pages.ts";
+import { CommandVirtualBasic } from "../scenarios/command/command-virtual-basic.ts";
 import { ContextMenuBasic } from "../scenarios/context-menu/context-menu-basic.ts";
 import { ContextMenuLifecycle } from "../scenarios/context-menu/context-menu-lifecycle.ts";
 import { DateFieldBasic } from "../scenarios/date-field/date-field-basic.ts";
@@ -310,6 +319,15 @@ import { ROUTES } from "./routes.ts";
         NavigationMenuBasic,
         NavigationMenuNested,
         MenuCheckboxRadio,
+        CommandBasic,
+        CommandFilter,
+        CommandPages,
+        CommandAsync,
+        CommandDialog,
+        CommandVirtualBasic,
+        CascadeSelectBasic,
+        CascadeSelectChangeOnSelect,
+        CascadeSelectField,
         ContextMenuBasic,
         ContextMenuLifecycle,
         CheckboxBasic,
@@ -564,6 +582,15 @@ import { ROUTES } from "./routes.ts";
             @case ("/navigation-menu/basic") { <main class="p-6" scenario-navigation-menu-basic></main> }
             @case ("/navigation-menu/nested") { <main class="p-6" scenario-navigation-menu-nested></main> }
             @case ("/menu/checkbox-radio") { <main class="p-6" scenario-menu-checkbox-radio></main> }
+            @case ("/command/basic") { <main class="p-6" scenario-command-basic></main> }
+            @case ("/command/filter") { <main class="p-6" scenario-command-filter></main> }
+            @case ("/command/pages") { <main class="p-6" scenario-command-pages></main> }
+            @case ("/command/async") { <main class="p-6" scenario-command-async></main> }
+            @case ("/command/dialog") { <main class="p-6" scenario-command-dialog></main> }
+            @case ("/command-virtual/basic") { <main class="p-6" scenario-command-virtual-basic></main> }
+            @case ("/cascade-select/basic") { <main class="p-6" scenario-cascade-select-basic></main> }
+            @case ("/cascade-select/change-on-select") { <main class="p-6" scenario-cascade-select-change-on-select></main> }
+            @case ("/cascade-select/field") { <main class="p-6" scenario-cascade-select-field></main> }
             @case ("/context-menu/basic") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/lifecycle") { <main class="p-6" scenario-context-menu-lifecycle [cancel]="query.cancel"></main> }

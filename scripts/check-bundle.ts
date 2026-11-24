@@ -94,6 +94,7 @@ export const ENTRY_DEPENDENCIES: Readonly<
     // Calendar's namespace too, so its modules stay one chunk
     "calendar-preset": ["calendar"],
     "calendar-view": ["calendar", "month-calendar"],
+    "cascade-select": ["field"],
     checkbox: ["checkbox-group", "field"],
     "checkbox-group": ["field"],
     "color-field": ["field"],
@@ -102,6 +103,8 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "color-swatch-picker": ["field"],
     combobox: ["field"],
     "combobox-virtual": ["combobox", "field"],
+    // its List is Command's, over the toolkit's virtualizer (Epic #104)
+    "command-virtual": ["command"],
     "context-menu": ["menu"],
     "date-field": ["field"],
     "date-picker": ["calendar", "field"],
@@ -213,6 +216,8 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
     // `timeZone={timeZone(...)}`), so no component entry imports them and an app that passes none
     // bundles none of their code
     "calendar-systems": [],
+    // a cascading select's tree, levels and keys (Epic #104): CascadeSelect's only
+    cascade: ["cascade-select"],
     // the color model (Epic #99): the color components' only, so no other entry bundles it (the
     // pickers' too, Epic #101; the popup's entry needs none of it)
     color: [
@@ -224,6 +229,8 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
         "color-swatch-picker",
         "color-wheel",
     ],
+    // the command palette's scorer and keys (Epic #104): Command's and its virtual list's only
+    command: ["command", "command-virtual"],
     // the month and year values, grid and names (Epic #79): the day calendars never import them
     "month-year": MONTH_YEAR,
     segments: SEGMENTED,
@@ -240,6 +247,9 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
 export const MECHANISMS_KEPT_OUT: Readonly<Record<string, readonly string[]>> =
     {
         "color-picker": ["overlay", "positioning", "presence"],
+        // a Command without the virtual list bundles no virtualizer (Epic #104): it is the
+        // opt-in `/command-virtual`; async results are the app's `useAsyncList`
+        command: ["virtual", "async-list"],
     };
 
 /**

@@ -113,6 +113,11 @@
             "types": "./dist/types/fragiola-primitives-angular-carousel.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-carousel.mjs"
         },
+        "./cascade-select": {
+            "@fragiola/source": "./cascade-select/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-cascade-select.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-cascade-select.mjs"
+        },
         "./checkbox": {
             "@fragiola/source": "./checkbox/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-checkbox.d.ts",
@@ -182,6 +187,16 @@
             "@fragiola/source": "./combobox-virtual/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-combobox-virtual.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-combobox-virtual.mjs"
+        },
+        "./command": {
+            "@fragiola/source": "./command/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-command.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-command.mjs"
+        },
+        "./command-virtual": {
+            "@fragiola/source": "./command-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-command-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-command-virtual.mjs"
         },
         "./context-menu": {
             "@fragiola/source": "./context-menu/public-api.ts",

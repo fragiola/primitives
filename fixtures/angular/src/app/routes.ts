@@ -258,4 +258,13 @@ export const ROUTES: readonly string[] = [
     "/calendar-systems/pickers",
     "/time-zones/field",
     "/time-zones/picker",
+    "/command/basic",
+    "/command/filter",
+    "/command/pages",
+    "/command/async",
+    "/command/dialog",
+    "/command-virtual/basic",
+    "/cascade-select/basic",
+    "/cascade-select/change-on-select",
+    "/cascade-select/field",
 ];

@@ -123,6 +123,12 @@
             "import": "./dist/carousel.js",
             "default": "./dist/carousel.js"
         },
+        "./cascade-select": {
+            "@fragiola/source": "./src/components/cascade-select/index.ts",
+            "types": "./dist/cascade-select.d.ts",
+            "import": "./dist/cascade-select.js",
+            "default": "./dist/cascade-select.js"
+        },
         "./checkbox": {
             "@fragiola/source": "./src/components/checkbox/index.ts",
             "types": "./dist/checkbox.d.ts",
@@ -206,6 +212,18 @@
             "types": "./dist/combobox-virtual.d.ts",
             "import": "./dist/combobox-virtual.js",
             "default": "./dist/combobox-virtual.js"
+        },
+        "./command": {
+            "@fragiola/source": "./src/components/command/index.ts",
+            "types": "./dist/command.d.ts",
+            "import": "./dist/command.js",
+            "default": "./dist/command.js"
+        },
+        "./command-virtual": {
+            "@fragiola/source": "./src/components/command-virtual/index.ts",
+            "types": "./dist/command-virtual.d.ts",
+            "import": "./dist/command-virtual.js",
+            "default": "./dist/command-virtual.js"
         },
         "./context-menu": {
             "@fragiola/source": "./src/components/context-menu/index.ts",
@@ -660,6 +678,11 @@
                 "import": "./dist/carousel.js",
                 "default": "./dist/carousel.js"
             },
+            "./cascade-select": {
+                "types": "./dist/cascade-select.d.ts",
+                "import": "./dist/cascade-select.js",
+                "default": "./dist/cascade-select.js"
+            },
             "./checkbox": {
                 "types": "./dist/checkbox.d.ts",
                 "import": "./dist/checkbox.js",
@@ -729,6 +752,16 @@
                 "types": "./dist/combobox-virtual.d.ts",
                 "import": "./dist/combobox-virtual.js",
                 "default": "./dist/combobox-virtual.js"
+            },
+            "./command": {
+                "types": "./dist/command.d.ts",
+                "import": "./dist/command.js",
+                "default": "./dist/command.js"
+            },
+            "./command-virtual": {
+                "types": "./dist/command-virtual.d.ts",
+                "import": "./dist/command-virtual.js",
+                "default": "./dist/command-virtual.js"
             },
             "./context-menu": {
                 "types": "./dist/context-menu.d.ts",

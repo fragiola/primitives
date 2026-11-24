@@ -34,19 +34,19 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-open` | an open overlay (a popup, its positioner, its arrow, a dialog's backdrop and viewport); an open collapsible, accordion item and their parts |
 | `data-closed` | a rendered overlay part that is not open (its exit runs, or the Portal's `keepMounted` keeps it, `hidden`); a closed collapsible, accordion item and their parts (with `data-open`: exactly one is present) |
 | `data-panel-open` | a collapsible's or an accordion's trigger while its panel is open |
-| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's, a date picker's or a color picker popover's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
+| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's, a CascadeSelect's, a date picker's or a color picker popover's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts (or is hidden) once its animations end: an overlay, a tabs panel, a collapsible or accordion panel |
-| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a selected tag of a tag group, a selected color swatch picker option, a chosen calendar date |
+| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a cascade select's option on the chosen path, a selected tag of a tag group, a selected color swatch picker option, a chosen calendar date |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's; a segmented control's item and its text; a rating's star (the one that holds the value is checked) |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
 | `data-readonly` | a read-only number field's, OTP field's, date field's, time field's or range field's parts (and a read-only calendar or switch); a read-only rating and its stars; a read-only password input's, search field's or editable's parts |
 | `data-pressed` | a pressed toggle |
 | `data-multiple` | a toggle group or a listbox with `multiple` |
-| `data-placeholder` | a Select showing its placeholder; a date or time field's segment with no value; an editable's preview showing its placeholder |
+| `data-placeholder` | a Select or a CascadeSelect showing its placeholder; a date or time field's segment with no value; an editable's preview showing its placeholder |
 | `data-type` | a date or time field's segment: its type (`era`, `year`, `month`, `day`, `hour`, `minute`, `second`, `dayPeriod`, `timeZoneName`, `literal`; a value) |
-| `data-empty` | a combobox's or an autocomplete's list with no item; a tag group's root and list with no tag (once mounted); a tags input's root and control with no tag; a search field's parts and an editable's parts while the value is empty |
+| `data-empty` | a combobox's or an autocomplete's list with no item; a command's list with no item shown (once mounted); a tag group's root and list with no tag (once mounted); a tags input's root and control with no tag; a search field's parts and an editable's parts while the value is empty |
 | `data-editing` | a tags input's tag while its tag input edits it; an editable's parts while it edits |
 | `data-visible` | a password input's parts while its text is shown |
 | `data-copied`, `data-failed` | a clipboard's parts while its last copy succeeded, or failed, until its timeout |
@@ -55,14 +55,16 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-axis` | a color area's input: `x` or `y` (a value) |
 | `data-format` | a color picker and its FormatSelect: its format (a value: `hex`, `rgb`, `hsl`, `hsb`) |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index; a carousel slide's index (a value) |
-| `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
+| `data-loading` | a virtual list while `loading` (with `aria-busy="true"`); a command's list while `loading` |
 | `data-required` | a required checkbox, switch, radio group, segmented control or rating, and its radios; every part of a required number field, OTP field, date or time field, or range field |
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid; `data-invalid` also on every part of a date, time or range field whose value is out of range or unavailable (a range: or whose end is before its start), and on a typed picker's segments whose complete entry is |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTP field slot that holds a character |
-| `data-highlighted` | the menu item, select, combobox or autocomplete option the keyboard or the pointer points at; a listbox's focused option; a rating's star drawn filled, whole or half (by the value, or the pointer's preview) |
+| `data-highlighted` | the menu item, select, cascade select, combobox, autocomplete or command option the keyboard or the pointer points at; a listbox's focused option; a rating's star drawn filled, whole or half (by the value, or the pointer's preview) |
 | `data-half` | a rating's star drawn half filled |
 | `data-instant` | a tooltip that opened with no delay (focus, or a hand-off in its group); a hover card moved to another of its triggers |
-| `data-expanded` | a toast viewport and its toasts while the pointer is over it or the keyboard is in it |
+| `data-expanded` | a toast viewport and its toasts while the pointer is over it or the keyboard is in it; a cascade select's parent option while its level is open |
+| `data-has-children` | a cascade select's parent option (an item with children) |
+| `data-depth` | a cascade select's level: its depth, `0` for the first (a value) |
 | `data-limited` | a toast queued past the limit (with `inert`) |
 | `data-swiping`, `data-swipe-direction` | a toast while a swipe moves it, and the direction it moves in (a value); a drawer's popup |
 | `data-type` | a toast's type, on its parts (a value: `loading`, `success`, `error`, or the app's own) |

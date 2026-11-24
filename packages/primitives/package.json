@@ -54,6 +54,12 @@
             "import": "./dist/carousel.js",
             "default": "./dist/carousel.js"
         },
+        "./cascade": {
+            "@fragiola/source": "./src/cascade/index.ts",
+            "types": "./dist/cascade.d.ts",
+            "import": "./dist/cascade.js",
+            "default": "./dist/cascade.js"
+        },
         "./clipboard": {
             "@fragiola/source": "./src/clipboard/index.ts",
             "types": "./dist/clipboard.d.ts",
@@ -71,6 +77,12 @@
             "types": "./dist/color.d.ts",
             "import": "./dist/color.js",
             "default": "./dist/color.js"
+        },
+        "./command": {
+            "@fragiola/source": "./src/command/index.ts",
+            "types": "./dist/command.d.ts",
+            "import": "./dist/command.js",
+            "default": "./dist/command.js"
         },
         "./date": {
             "@fragiola/source": "./src/date/index.ts",
@@ -258,6 +270,11 @@
                 "import": "./dist/carousel.js",
                 "default": "./dist/carousel.js"
             },
+            "./cascade": {
+                "types": "./dist/cascade.d.ts",
+                "import": "./dist/cascade.js",
+                "default": "./dist/cascade.js"
+            },
             "./clipboard": {
                 "types": "./dist/clipboard.d.ts",
                 "import": "./dist/clipboard.js",
@@ -272,6 +289,11 @@
                 "types": "./dist/color.d.ts",
                 "import": "./dist/color.js",
                 "default": "./dist/color.js"
+            },
+            "./command": {
+                "types": "./dist/command.d.ts",
+                "import": "./dist/command.js",
+                "default": "./dist/command.js"
             },
             "./date": {
                 "types": "./dist/date.d.ts",

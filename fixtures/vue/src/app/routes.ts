@@ -34,6 +34,9 @@ import CarouselBasic from "../scenarios/carousel/carousel-basic.vue";
 import CarouselMultiple from "../scenarios/carousel/carousel-multiple.vue";
 import CarouselTabbed from "../scenarios/carousel/carousel-tabbed.vue";
 import CarouselVertical from "../scenarios/carousel/carousel-vertical.vue";
+import CascadeSelectBasic from "../scenarios/cascade-select/cascade-select-basic.vue";
+import CascadeSelectChangeOnSelect from "../scenarios/cascade-select/cascade-select-change-on-select.vue";
+import CascadeSelectField from "../scenarios/cascade-select/cascade-select-field.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
@@ -70,6 +73,12 @@ import ComboboxLifecycle from "../scenarios/combobox/combobox-lifecycle.vue";
 import ComboboxMultiple from "../scenarios/combobox/combobox-multiple.vue";
 import ComboboxObjects from "../scenarios/combobox/combobox-objects.vue";
 import ComboboxRejectedInput from "../scenarios/combobox/combobox-rejected-input.vue";
+import CommandAsync from "../scenarios/command/command-async.vue";
+import CommandBasic from "../scenarios/command/command-basic.vue";
+import CommandDialog from "../scenarios/command/command-dialog.vue";
+import CommandFilter from "../scenarios/command/command-filter.vue";
+import CommandPages from "../scenarios/command/command-pages.vue";
+import CommandVirtualBasic from "../scenarios/command/command-virtual-basic.vue";
 import ContextMenuBasic from "../scenarios/context-menu/context-menu-basic.vue";
 import ContextMenuLifecycle from "../scenarios/context-menu/context-menu-lifecycle.vue";
 import DateFieldBasic from "../scenarios/date-field/date-field-basic.vue";
@@ -360,6 +369,12 @@ export const routes: Record<string, Component> = {
     "/color-area/rgb": ColorAreaRgb,
     "/color-wheel/basic": ColorWheelBasic,
     "/color-wheel/disabled": ColorWheelDisabled,
+    "/command/basic": CommandBasic,
+    "/command/filter": CommandFilter,
+    "/command/pages": CommandPages,
+    "/command/async": CommandAsync,
+    "/command/dialog": CommandDialog,
+    "/command-virtual/basic": CommandVirtualBasic,
     "/color-field/basic": ColorFieldBasic,
     "/color-field/channel": ColorFieldChannel,
     "/color-field/field": ColorFieldField,
@@ -507,6 +522,9 @@ export const routes: Record<string, Component> = {
     "/carousel/tabbed": CarouselTabbed,
     "/carousel/multiple": CarouselMultiple,
     "/carousel/vertical": CarouselVertical,
+    "/cascade-select/basic": CascadeSelectBasic,
+    "/cascade-select/change-on-select": CascadeSelectChangeOnSelect,
+    "/cascade-select/field": CascadeSelectField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
