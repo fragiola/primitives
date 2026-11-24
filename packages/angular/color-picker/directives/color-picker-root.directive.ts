@@ -180,6 +180,8 @@ export class ColorPickerRoot {
     };
     /** The popups' positioners, portalled out of the Root: inside the picker for its Field. */
     private readonly popups = new Set<HTMLElement>();
+    /** Focus left a popup for nowhere: the next focus decides whether the picker was left. */
+    private stopReturnWatch: (() => void) | null = null;
 
     constructor() {
         const host = this.host;
@@ -238,6 +240,7 @@ export class ColorPickerRoot {
         inject(DestroyRef).onDestroy(() => {
             stop?.();
             this.hidden?.remove();
+            this.stopReturnWatch?.();
         });
     }
 
@@ -262,17 +265,38 @@ export class ColorPickerRoot {
 
     protected onFocusOut(event: FocusEvent): void {
         const next = event.relatedTarget;
-        const inPopup = (node: Node) =>
+        const inPicker = (node: Node) =>
+            this.host.contains(node) ||
             [...this.popups].some((popup) => popup.contains(node));
+        this.stopReturnWatch?.();
         // focus that leaves a closing popup for nowhere is returned to its trigger (Popover's
-        // focus return): no blur
-        const returned =
+        // focus return): no blur. The next focus decides: the popup's Tab out closes it (its view
+        // removed at once, zoneless) before it focuses the element after the trigger
+        if (
             next === null &&
             event.target instanceof Node &&
-            inPopup(event.target);
-        const inside =
-            next instanceof Node && (this.host.contains(next) || inPopup(next));
-        if (!inside && !returned) {
+            [...this.popups].some((popup) =>
+                popup.contains(event.target as Node),
+            )
+        ) {
+            const doc = this.host.ownerDocument;
+            const onFocusIn = (focus: FocusEvent) => {
+                this.stopReturnWatch?.();
+                if (
+                    !(focus.target instanceof Node) ||
+                    !inPicker(focus.target)
+                ) {
+                    this.field.blurred();
+                }
+            };
+            doc.addEventListener("focusin", onFocusIn, true);
+            this.stopReturnWatch = () => {
+                doc.removeEventListener("focusin", onFocusIn, true);
+                this.stopReturnWatch = null;
+            };
+            return;
+        }
+        if (!(next instanceof Node) || !inPicker(next)) {
             this.field.blurred();
         }
     }
