@@ -183,6 +183,16 @@
             "types": "./dist/types/fragiola-primitives-angular-combobox-virtual.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-combobox-virtual.mjs"
         },
+        "./command": {
+            "@fragiola/source": "./command/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-command.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-command.mjs"
+        },
+        "./command-virtual": {
+            "@fragiola/source": "./command-virtual/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-command-virtual.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-command-virtual.mjs"
+        },
         "./context-menu": {
             "@fragiola/source": "./context-menu/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-context-menu.d.ts",

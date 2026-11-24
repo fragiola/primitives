@@ -35,6 +35,8 @@ export type ChangeReason =
     | "autoplay"
     | "focus-in"
     | "imperative-action"
+    | "page-change"
+    | "backspace-key"
     | "none";
 
 /** What a change reports besides its value (spec/README.md, "Change details"). */

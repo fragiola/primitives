@@ -31,6 +31,8 @@ export * from "@fragiola/primitives-angular/color-swatch-picker";
 export * from "@fragiola/primitives-angular/color-wheel";
 export * from "@fragiola/primitives-angular/combobox";
 export * from "@fragiola/primitives-angular/combobox-virtual";
+export * from "@fragiola/primitives-angular/command";
+export * from "@fragiola/primitives-angular/command-virtual";
 export * from "@fragiola/primitives-angular/context-menu";
 export * from "@fragiola/primitives-angular/date-field";
 export * from "@fragiola/primitives-angular/date-picker";
