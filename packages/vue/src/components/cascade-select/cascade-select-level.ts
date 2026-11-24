@@ -1,11 +1,16 @@
 import type { CascadeItem } from "@fragiola/primitives/cascade";
-import { defineComponent, provide } from "vue";
+import { defineComponent, provide, type VNode } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
-    type PartComponent,
+    type PublicComponent,
     publicComponent,
 } from "../../utils/public-component.ts";
-import { asProp, renderPart } from "../../utils/render-part.ts";
+import {
+    type AsProp,
+    asProp,
+    type RenderSlotProps,
+    renderPart,
+} from "../../utils/render-part.ts";
 import {
     CascadeSelectKey,
     CascadeSelectLevelKey,
@@ -21,6 +26,14 @@ export interface CascadeSelectLevelProps {
     depth: number;
 }
 
+export interface CascadeSelectLevelSlots {
+    default?: (scope: {
+        items: readonly CascadeItem[];
+        state: CascadeSelectLevelState;
+    }) => VNode[];
+    render?: (scope: RenderSlotProps<CascadeSelectLevelState>) => VNode[];
+}
+
 const NO_ITEMS: readonly CascadeItem[] = [];
 
 /**
@@ -28,9 +41,9 @@ const NO_ITEMS: readonly CascadeItem[] = [];
  * `{ items }`: an Item per entry, in order (none while the level is not open;
  * spec/cascade-select.md).
  */
-export const CascadeSelectLevel: PartComponent<
-    CascadeSelectLevelProps,
-    CascadeSelectLevelState
+export const CascadeSelectLevel: PublicComponent<
+    CascadeSelectLevelProps & { as?: AsProp },
+    CascadeSelectLevelSlots
 > = publicComponent(
     defineComponent({
         name: "CascadeSelectLevel",
