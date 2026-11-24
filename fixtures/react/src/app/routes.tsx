@@ -110,6 +110,9 @@ import { DrawerLifecycle } from "../scenarios/drawer/drawer-lifecycle.tsx";
 import { DrawerNested } from "../scenarios/drawer/drawer-nested.tsx";
 import { DrawerSide } from "../scenarios/drawer/drawer-side.tsx";
 import { DrawerSnapPoints } from "../scenarios/drawer/drawer-snap-points.tsx";
+import { DropZoneBasic } from "../scenarios/drop-zone/drop-zone-basic.tsx";
+import { DropZoneDisabled } from "../scenarios/drop-zone/drop-zone-disabled.tsx";
+import { DropZoneSingle } from "../scenarios/drop-zone/drop-zone-single.tsx";
 import { EditableBasic } from "../scenarios/editable/editable-basic.tsx";
 import { EditableField } from "../scenarios/editable/editable-field.tsx";
 import { EditableModes } from "../scenarios/editable/editable-modes.tsx";
@@ -123,6 +126,10 @@ import { FieldMoreControls } from "../scenarios/field/field-more-controls.tsx";
 import { FieldSettings } from "../scenarios/field/field-settings.tsx";
 import { FieldValidation } from "../scenarios/field/field-validation.tsx";
 import { FieldsetBasic } from "../scenarios/fieldset/fieldset-basic.tsx";
+import { FileUploadBasic } from "../scenarios/file-upload/file-upload-basic.tsx";
+import { FileUploadDisabled } from "../scenarios/file-upload/file-upload-disabled.tsx";
+import { FileUploadForm } from "../scenarios/file-upload/file-upload-form.tsx";
+import { FileUploadSingle } from "../scenarios/file-upload/file-upload-single.tsx";
 import { FormBasic } from "../scenarios/form/form-basic.tsx";
 import { HoverCardBasic } from "../scenarios/hover-card/hover-card-basic.tsx";
 import { HoverCardDetached } from "../scenarios/hover-card/hover-card-detached.tsx";
@@ -512,6 +519,13 @@ export const routes: Record<
     "/search-field/field": SearchFieldField,
     "/clipboard/basic": ClipboardBasic,
     "/clipboard/failure": ClipboardFailure,
+    "/drop-zone/basic": DropZoneBasic,
+    "/drop-zone/single": DropZoneSingle,
+    "/drop-zone/disabled": DropZoneDisabled,
+    "/file-upload/basic": FileUploadBasic,
+    "/file-upload/single": FileUploadSingle,
+    "/file-upload/form": FileUploadForm,
+    "/file-upload/disabled": FileUploadDisabled,
     "/editable/basic": EditableBasic,
     "/editable/modes": EditableModes,
     "/editable/states": EditableStates,
