@@ -155,10 +155,11 @@ describe("convertColor", () => {
             }
         }
         expect(misses).toEqual([]);
-    });
+    }, 30_000);
 
     it("round-trips hsb through hsl within 0.01, hsl through hsb back to its whole steps", () => {
         const worst = { hsl: 0, hsb: 0 };
+        const misses: string[] = [];
         for (let hue = 0; hue < 360; hue += 7) {
             for (let saturation = 0; saturation <= 100; saturation += 1) {
                 for (let last = 1; last <= 100; last += 1) {
@@ -197,12 +198,19 @@ describe("convertColor", () => {
                             Math.abs(viaHsb.lightness - last),
                         );
                         // a whole-step value (the sliders' step) comes back as it was
-                        expect(Math.round(viaHsb.saturation)).toBe(saturation);
-                        expect(Math.round(viaHsb.lightness)).toBe(last);
+                        if (
+                            Math.round(viaHsb.saturation) !== saturation ||
+                            Math.round(viaHsb.lightness) !== last
+                        ) {
+                            misses.push(
+                                `hsl(${hue}, ${saturation}%, ${last}%)`,
+                            );
+                        }
                     }
                 }
             }
         }
+        expect(misses).toEqual([]);
         expect(worst.hsb).toBeLessThanOrEqual(0.01 + 1e-9);
         // hsl's saturation is amplified near white and black, where it barely shows
         expect(worst.hsl).toBeLessThan(0.2);

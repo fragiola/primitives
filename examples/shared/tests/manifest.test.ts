@@ -61,6 +61,12 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     // the zoned DateField's Field
     "calendar-system": ["_recipes/date-field.ts", "_recipes/field.ts"],
     "date-field-time-zone": ["_recipes/field.ts"],
+    // the HSL editor (Epic #99): the wheel, the slider and the field beside the area's recipe
+    "color-editor": [
+        "_recipes/color-field.ts",
+        "_recipes/color-slider.ts",
+        "_recipes/color-wheel.ts",
+    ],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -83,6 +89,7 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
 /** The examples that show a component under another id (a second Menu example). */
 const RECIPE_OF: Record<string, string> = {
     "carousel-tabbed": "carousel",
+    "color-editor": "color-area",
     "menu-view-options": "menu",
     "drawer-side-panel": "drawer",
     "toast-promise": "toast",
@@ -123,6 +130,7 @@ const ROUTER_EXAMPLES: ReadonlySet<string> = new Set(["link", "breadcrumbs"]);
 const TOOLKIT_EXAMPLES: ReadonlySet<string> = new Set([
     "calendar-system",
     "date-field-time-zone",
+    "color-editor",
 ]);
 
 describe("the manifest", () => {
@@ -178,6 +186,7 @@ describe("the manifest", () => {
                 "password-input",
                 "search-field",
                 "editable",
+                "color-editor",
                 "date-picker",
                 "calendar",
                 "date-field",
