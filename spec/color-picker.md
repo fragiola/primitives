@@ -96,7 +96,8 @@ the value props, so a bound child never holds a stale copy.
 Every control inside the Root is disabled when the picker is, and reads no [Field](field.md) (the
 picker is the field's control, so a ColorSlider inside a Field's picker does not take the field's
 name or label). A bound child also renders no hidden form value of its own (ColorSlider's and ColorWheel's hidden inputs have no
-`name`, a ColorSwatchPicker's none; the picker's submits); and is never reset by a form reset
+`name`, a ColorSwatchPicker's none; the picker's submits; a ColorArea's Inputs keep the `name`s the
+app gives them, its own form values); and is never reset by a form reset
 itself (the picker is). A ColorField bound to the picker never commits `null`: an empty text goes
 back to the picker's hex. A ColorSwatch with no `color` shows the picker's color.
 
@@ -109,12 +110,17 @@ it). The value never changes by itself.
 The format is the picker's state for the app's channel controls: which fields to show
 (`hex`: one hex ColorField; `rgb`: red, green and blue; `hsl`, `hsb`: hue, saturation and
 lightness or brightness), as the theme picker example does. The FormatSelect sets it
-(`input-change`) and **converts the value to the format's space** (`hex` and `rgb`: rgb; `hsl`;
-`hsb`), reported with `onValueChange` when the space changes (Zag/Ark's rule): the channel controls
-of the new format then edit the value in their space by default (spec/color.md, `colorSpaceFor`:
-the value's own space when it has the channel). The color itself does not change, nor does the form
-value (always hex, spec/color.md "Formatting"). A format set through the controlled `format`
-converts nothing (the app holds both). `data-format` on the Root and the render state expose it.
+(`input-change`) and, for `hsl` and `hsb`, **converts the value to the format's space**, reported
+with `onValueChange` when the space changes (Zag/Ark's rule, narrowed): the hue, saturation and
+lightness or brightness controls of the new format then edit the value in their space by default
+(spec/color.md, `colorSpaceFor`: the value's own space when it has the channel; `saturation` is in
+both spaces, so the value's space decides). hsl and hsb convert into each other directly, keeping
+the hue, so the color does not change. `hex` and `rgb` convert nothing: red, green and blue are rgb's
+channels only, a hex field reads any space, and a conversion to rgb would round the channels to
+whole numbers (a gray would lose its hue). The form value does not change (always hex, spec/color.md
+"Formatting"). A format the app sets itself (the controlled `format`) converts nothing; a change the
+app refuses (a controlled `format` it keeps) shows the kept format again in the FormatSelect.
+`data-format` on the Root and the render state expose it.
 
 Alternatives discarded: a FormatTrigger cycling the formats (Zag's second part: a button whose
 meaning changes on every press, where a native select names its choices); a FormatSelect that
@@ -128,7 +134,8 @@ checked once mounted: the server and the first render have none, so hydration ma
 nothing (the Issue's "hidden otherwise"; no fallback, the Epic's out of scope). A press opens the
 browser's eyedropper (`openEyeDropper`); a pick sets the picker's color (reason `trigger-press`)
 **in the space of the current value, keeping its alpha** (a screen pixel has none: Zag's rule) and
-commits it; a cancelled pick (Escape) changes nothing. Disabled with the picker.
+commits it; a cancelled pick (Escape) changes nothing, and so does a pick that resolves once the
+picker is disabled or the trigger unmounted (its eyedropper is aborted on unmount). Disabled with the picker.
 
 ## State attributes and ARIA
 
@@ -160,7 +167,9 @@ The hidden input submits the color as hex (`#rrggbb`, `#rrggbbaa` below full alp
 returns an uncontrolled picker to its `defaultValue` (reason `none`) and with it every bound child.
 In a Field the Root is the field's control (a `group`, RadioGroup's way): named by the
 `Field.Label` (`aria-labelledby`), described by the field; focus and blur are the focus entering
-and leaving it; `validate` gets the color; the field's `name` and `disabled` win
+and leaving it, its popup included (the popup's positioner registers with the picker through the
+binding contract, so moving between the trigger and the popup, or inside the popup, is no blur);
+`validate` gets the color; the field's `name` and `disabled` win
 (`ENTRY_DEPENDENCIES` `["field"]`; the popup's entry is built on nothing).
 
 ## RTL
@@ -169,7 +178,8 @@ The controls follow their own specs; the popup's sides follow Popover's.
 
 ## Server rendering
 
-The hidden input, the CSS variable and the bound children's values are in place before hydration.
+The hidden input, the CSS variable and the bound children's values are in place before hydration
+(Angular creates the hidden input in the browser, as its ColorSlider's and Slider's).
 The EyeDropperTrigger renders once mounted only (its API is the browser's); a popover renders closed.
 The FormatSelect's selected option is the select's own state, set once mounted (and made its
 default option, so a form reset, which resets a select to its default, shows the picker's format
@@ -210,7 +220,8 @@ Checks:
 6. "Opacity" focused, Home → 0: `value: #00ff0000`; End → `value: #00ff00`.
 7. "Format" set to `hsl` → `format: hsl`, `data-format="hsl"`, `space: hsl`, `value: #00ff00`.
 8. "Submit": `form: color=#00ff00`.
-9. "Reset": "Hue" 210, "Hex" `#4d7399`, `value: #4d7399`, "Own hue" 0; "Format" stays `hsl`
+9. "Reset" with nothing changed: "Saturation" 50 and "Brightness" 60 (the native range inputs
+   show the color again); "Reset": "Hue" 210, "Hex" `#4d7399`, `value: #4d7399`, "Own hue" 0; "Format" stays `hsl`
    (the format is no form value).
 10. Axe finds no violation.
 
@@ -248,16 +259,21 @@ Checks:
 ### `/color-picker/field`
 
 A `<form>`: a Field (`name` `"brand"`) with a `Field.Label` **"Brand color"**, a ColorPicker
-(`defaultValue` `"#336699"`) holding a hue ColorSlider (**"Hue"**, `name` `"hue"`) and a
-ColorSwatch, a `Field.Description` **"Used for links."**; a **"Submit"** button. Output: `value:
-...`, `form: ...`.
+(`defaultValue` `"#336699"`) holding a hue ColorSlider (**"Hue"**, `name` `"hue"`), a
+ColorSwatch and a ColorPickerPopover (its Trigger **"More options"**, its Popup **"More"** holding
+a hex ColorField **"Hex"**), a `Field.Description` **"Used for links."**; a **"Submit"** button.
+Output: `value: ...`, `form: ...`.
 
 Checks:
 
 1. The `group` is named "Brand color" and described by "Used for links."; the slider is named
    "Hue" (not by the Field's label).
-2. "Submit": `form: brand=#336699` (the slider's own `name` submits nothing: it is bound).
-3. "Hue" focused, ArrowRight → 211: `value: #336499`; "Submit": `form: brand=#336499`.
+2. A click on "More options" opens the popup, "Hex" focused: the `group` has `data-focused` and no
+   `data-touched` (focus in the popup is focus in the picker); Escape: focus on the trigger, still
+   no `data-touched`; reopened, Tab from "Hex" closes it and leaves the picker: `data-touched`, no
+   `data-focused`.
+3. "Submit": `form: brand=#336699` (the slider's own `name` submits nothing: it is bound).
+4. "Hue" focused, ArrowRight → 211: `value: #336499`; "Submit": `form: brand=#336499`.
 
 ### `/color-picker/disabled`
 
