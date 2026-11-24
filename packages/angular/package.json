@@ -48,6 +48,16 @@
             "types": "./dist/types/fragiola-primitives-angular.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular.mjs"
         },
+        "./drop-zone": {
+            "@fragiola/source": "./drop-zone/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-drop-zone.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-drop-zone.mjs"
+        },
+        "./file-upload": {
+            "@fragiola/source": "./file-upload/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-file-upload.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-file-upload.mjs"
+        },
         "./internal": {
             "@fragiola/source": "./internal/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-internal.d.ts",
