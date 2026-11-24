@@ -257,7 +257,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 1,142,526 B | 187,098 B | 1,037,137 B | 149,297 B |
+| `@fragiola/primitives-angular` | 1,142,883 B | 187,146 B | 1,037,494 B | 149,348 B |
 | `@fragiola/primitives-angular/internal` | 39,935 B | 14,480 B | 18,063 B | 6,377 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -277,7 +277,7 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/collapsible` | 10,432 B | 3,110 B | 9,693 B | 2,860 B |
 | `@fragiola/primitives-angular/color-area` | 25,328 B | 7,469 B | 15,988 B | 4,150 B |
 | `@fragiola/primitives-angular/color-field` | 46,669 B | 11,458 B | 36,956 B | 7,860 B |
-| `@fragiola/primitives-angular/color-picker` | 40,731 B | 9,728 B | 32,553 B | 6,817 B |
+| `@fragiola/primitives-angular/color-picker` | 41,088 B | 9,785 B | 32,910 B | 6,872 B |
 | `@fragiola/primitives-angular/color-picker-popover` | 41,327 B | 13,350 B | 18,097 B | 4,820 B |
 | `@fragiola/primitives-angular/color-slider` | 50,780 B | 11,471 B | 40,895 B | 8,022 B |
 | `@fragiola/primitives-angular/color-swatch` | 7,743 B | 2,697 B | 3,694 B | 1,186 B |
