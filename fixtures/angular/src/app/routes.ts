@@ -264,4 +264,7 @@ export const ROUTES: readonly string[] = [
     "/command/async",
     "/command/dialog",
     "/command-virtual/basic",
+    "/cascade-select/basic",
+    "/cascade-select/change-on-select",
+    "/cascade-select/field",
 ];

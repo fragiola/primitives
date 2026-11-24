@@ -37,6 +37,9 @@ import { CarouselBasic } from "../scenarios/carousel/carousel-basic.ts";
 import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.ts";
 import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.ts";
 import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.ts";
+import { CascadeSelectBasic } from "../scenarios/cascade-select/cascade-select-basic.ts";
+import { CascadeSelectChangeOnSelect } from "../scenarios/cascade-select/cascade-select-change-on-select.ts";
+import { CascadeSelectField } from "../scenarios/cascade-select/cascade-select-field.ts";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.ts";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.ts";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.ts";
@@ -322,6 +325,9 @@ import { ROUTES } from "./routes.ts";
         CommandAsync,
         CommandDialog,
         CommandVirtualBasic,
+        CascadeSelectBasic,
+        CascadeSelectChangeOnSelect,
+        CascadeSelectField,
         ContextMenuBasic,
         ContextMenuLifecycle,
         CheckboxBasic,
@@ -582,6 +588,9 @@ import { ROUTES } from "./routes.ts";
             @case ("/command/async") { <main class="p-6" scenario-command-async></main> }
             @case ("/command/dialog") { <main class="p-6" scenario-command-dialog></main> }
             @case ("/command-virtual/basic") { <main class="p-6" scenario-command-virtual-basic></main> }
+            @case ("/cascade-select/basic") { <main class="p-6" scenario-cascade-select-basic></main> }
+            @case ("/cascade-select/change-on-select") { <main class="p-6" scenario-cascade-select-change-on-select></main> }
+            @case ("/cascade-select/field") { <main class="p-6" scenario-cascade-select-field></main> }
             @case ("/context-menu/basic") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/lifecycle") { <main class="p-6" scenario-context-menu-lifecycle [cancel]="query.cancel"></main> }
