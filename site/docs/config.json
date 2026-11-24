@@ -242,6 +242,22 @@
                     "path": "api/editable"
                 },
                 {
+                    "label": "ColorSlider",
+                    "path": "api/color-slider"
+                },
+                {
+                    "label": "ColorArea",
+                    "path": "api/color-area"
+                },
+                {
+                    "label": "ColorWheel",
+                    "path": "api/color-wheel"
+                },
+                {
+                    "label": "ColorField",
+                    "path": "api/color-field"
+                },
+                {
                     "label": "Select",
                     "path": "api/select"
                 },

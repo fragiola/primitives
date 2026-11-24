@@ -12,7 +12,7 @@ DOM toolkit and one conformance suite. Docs: <https://fragiola.com/primitives>.
 | [`@fragiola/primitives-vue`](packages/vue) | the Vue primitives, one entry per component |
 | [`@fragiola/primitives-angular`](packages/angular) | the Angular directives, one secondary entry point per component |
 
-Today, 74 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
+Today, 78 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2 and 3 complete, stage 4 under way:
 
 | group | components |
 | --- | --- |
@@ -26,6 +26,7 @@ Today, 74 components in React, Vue and Angular ([`spec/`](spec)), stages 0, 1, 2
 | tags and choices | **TagGroup** (a grid of removable, selectable tags), **TagsInput** (tags typed, pasted, edited in place; a form control), **SegmentedControl** (a radio group with a moving Indicator), **Rating** (stars in whole or half steps) |
 | text inputs | **PasswordInput** (a toggle button shows the text, keeping the caret), **SearchField** (Escape and a clear button), **Editable** (a text edited in place, its modes and focus return), **Clipboard** (a copy button, its copied state and a polite announcement) |
 | navigation | **Link** (current and disabled, on your router's link, no router dependency), **Breadcrumbs** (the APG trail, a collapsed middle opening a Menu), **Steps** (a linear process with `aria-current="step"`), **Carousel** (the APG carousel, basic or tabbed, native scroll snapping and the rotation rules) |
+| color controls | **ColorSlider** (one channel along a gradient track), **ColorArea** (two channels on a 2D area, two APG sliders), **ColorWheel** (the hue on a ring, wrapping), **ColorField** (hex or one channel typed, committed on Enter and blur), on the toolkit's color model (`/color`: rgb, hsl and hsb with alpha) |
 | toggles and bars | **Toggle**, **ToggleGroup**, **Toolbar**, **Menubar** (on Menu) |
 | display | **Progress**, **Meter**, **Avatar**, **Separator**, **ScrollArea** (native scrolling, custom scrollbars), **AspectRatio** |
 

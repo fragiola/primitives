@@ -66,6 +66,7 @@ alone: a list that does not opt in imports neither. The root entry,
 | `@fragiola/primitives/async-list` | `createAsyncList`, `AsyncList`, `AsyncListOptions`, `AsyncListLoad`, `AsyncListPage`, `AsyncListRequest`, `AsyncListState`, `AsyncListStatus` |
 | `@fragiola/primitives/calendar-systems` | `buddhist`, `coptic`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamicCivil`, `islamicTbla`, `islamicUmalqura`, `japanese`, `persian`, `roc`, `CalendarSystem`, `CalendarId`, `CalendarDateFields`, `CalendarFieldsInput`, `CalendarYearMonth`, `CalendarUnit`, `CalendarUnits` |
 | `@fragiola/primitives/collection` | `scrollIntoViewWithin`, `placeTabsIndicator`, `tabsIndicatorBox`, `TabsIndicatorBox`, `placeSegmentIndicator`, `segmentIndicatorBox`, `SegmentIndicatorBox`, `activationDirection`, `ActivationDirection`, `tabsKeyTarget`, `TabsKeyOptions`, `accordionKeyTarget`, `AccordionKeyOptions`, `menuKeyTarget`, `submenuKeys`, `radioKeyTarget`, `RadioKeyOptions`, `rovingKeyTarget`, `rovingKeys`, `rovingTabStop`, `textFieldKeepsKey`, `inDocumentOrder`, `RovingKeyOptions`, `RovingKeys`, `RovingOrientation`, `stepIndex`, `edgeIndex`, `stepThroughNone`, `NavigationOptions`, `createTypeahead`, `filterItems`, `flattenItems`, `containsFilter`, `textContains`, `queryIsLabel`, `isItemGroup`, `itemLabel`, `itemFormValue`, `itemsEqual`, `includesItem`, `toggleItem`, `chipKeyTarget`, `chipArrows`, `ChipKeyAction`, `tagGroupKeyTarget`, `removalFocusIndex`, `tagsInputInputKeyTarget`, `tagsInputTagKeyTarget`, `TagGroupKeyAction`, `TagGroupKeyOptions`, `TagKeyEvent`, `TagsInputInputKeyAction`, `TagsInputTagKeyAction`, `FilterItemsOptions`, `ItemEquality`, `ItemFilter`, `ItemGroup` |
+| `@fragiola/primitives/color` | `Color`, `ColorSpace`, `ColorChannel`, `RgbColor`, `HslColor`, `HsbColor`, `ColorChannelRange`, `colorChannelRange`, `colorChannels`, `hasColorChannel`, `colorSpaceFor`, `getColorChannel`, `setColorChannel`, `clampColorChannel`, `isSameColor`, `ColorAreaChannels`, `colorAreaChannels`, `parseColor`, `formatColor`, `ColorFormat`, `colorChannelFormat`, `formatColorChannel`, `convertColor`, `colorChannelGradient`, `ColorGradientDirection`, `colorAreaBackground`, `ColorAreaBackground`, `colorWheelGradient`, `colorAreaKeyTarget`, `ColorAreaKeyOptions`, `colorWheelKeyTarget`, `wrapHue`, `hueAtPoint`, `isOnColorWheel`, `colorWheelThumbOffset` |
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
@@ -192,6 +193,16 @@ alone: a list that does not opt in imports neither. The root entry,
   (`needsTabStop`); `slideScrollPosition` and `nearestCarouselPage` are its geometry, RTL
   included. `createRotationTimer(element)` is the rotation's delay, paused with the time it had
   left ([Carousel](/docs/api/carousel)).
+- **Color**: the color model ([color](#color), below). An immutable `Color` in rgb, hsl or hsb with
+  alpha, a plain object whose `space` is its discriminant; `parseColor` (hex, `rgb()`, `hsl()`,
+  `hsb()`; `null` for anything else), `formatColor` (`hex`, `hexa`, the functions, `css`),
+  `convertColor` (hsl and hsb directly, the others through rgb; rgb in whole numbers, hue,
+  saturation, lightness and brightness to 2 decimals, alpha to 4), the channels' ranges and steps
+  (`colorChannelRange`), their `Intl` text (`formatColorChannel`: `"120°"`, `"50%"`), and the CSS
+  gradients of a track (`colorChannelGradient`), an area (`colorAreaBackground`, exact layers) and a
+  wheel (`colorWheelGradient`); the keys and geometry of an area and a wheel. Only the color
+  components import it ([ColorSlider](/docs/api/color-slider), [ColorArea](/docs/api/color-area),
+  [ColorWheel](/docs/api/color-wheel), [ColorField](/docs/api/color-field)).
 - **Clipboard**: `writeClipboard(element, text)` writes the text with the asynchronous Clipboard
   API of the element's window (`navigator.clipboard.writeText`) and returns its promise, which
   rejects where the API is missing (an insecure context) or the browser refuses the write: there
@@ -307,6 +318,23 @@ alone: a list that does not opt in imports neither. The root entry,
   to those. `segmentTarget(segment, move)` finds the segment a move reaches, ArrowLeft and
   ArrowRight measured on screen; `focusOnLabelPress` focuses the first segment from a Field's
   label.
+
+## Color
+
+`@fragiola/primitives/color` holds the value the color components share, so an app (or a color
+picker built of several controls) keeps one color and hands it to each of them:
+
+```ts
+import { convertColor, formatColor, parseColor, setColorChannel } from "@fragiola/primitives/color";
+
+const color = parseColor("#336699"); // { space: "rgb", red: 51, green: 102, blue: 153, alpha: 1 }
+const hsl = convertColor(color, "hsl"); // { space: "hsl", hue: 210, saturation: 50, lightness: 40, alpha: 1 }
+formatColor(setColorChannel(hsl, "lightness", 60), "hex"); // "#6699cc"
+```
+
+A control takes `Color | string` and reports a `Color` in the space it edits. The precision of a
+conversion is fixed per channel and unit-tested on round trips: every rgb color goes through hsl
+and hsb and back unchanged. The channel names are not provided (no text): name each control.
 
 ## Calendar systems
 

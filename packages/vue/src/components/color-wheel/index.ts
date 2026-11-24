@@ -3,7 +3,6 @@
 
 export type {
     Color,
-    ColorChannel,
     ColorSpace,
     HsbColor,
     HslColor,

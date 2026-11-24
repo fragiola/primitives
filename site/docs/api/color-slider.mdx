@@ -1,0 +1,163 @@
+---
+title: ColorSlider
+description: One channel of a color chosen along a track drawn with its colors, following the APG's slider pattern, in each framework.
+---
+
+Choose one channel of a color along a track drawn with that channel's colors (WAI-ARIA APG
+[slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/)). Its value is a
+[color](/docs/api/toolkit#color) in rgb, hsl or hsb; the channel is the thumb's `aria-valuenow`,
+and its text (`"120°"`, `"50%"`) comes from `Intl`. It works in a native `<form>` and a
+[Field](/docs/api/field).
+
+<Example id="color-editor" />
+
+## Behaviour
+
+- **Value**: a `Color` or a string (`"#336699"`, `"hsl(210, 50%, 40%)"`); changes report a
+  `Color` in the slider's space: `colorSpace`, else the value's own when it has the channel,
+  else the channel's own (red, green, blue: rgb; lightness: hsl; hue, saturation, brightness:
+  hsb). Several sliders can share one value, each editing its channel.
+- **Range**: the channel's (hue 0–360, saturation, lightness and brightness 0–100, red, green and
+  blue 0–255, alpha 0–1), its step and large step; values snap to the step.
+- **Track**: the interactive area. A press moves the thumb there (reason `track-press`), focuses
+  it and drags it with pointer capture (`drag`, `data-dragging`). It sets
+  `--color-slider-track-background` (a CSS `linear-gradient` of the channel), and the Thumb
+  `--color-slider-thumb-color`; draw with them (`background: var(--color-slider-track-background)`).
+- **Commit**: `onValueCommit` once a drag ends, or after a key changed the value.
+- **Label**: names the Root and the Thumb (when it has no name of its own); a press on it focuses
+  the Thumb. No channel name of its own: the library renders no text.
+- **Output**: an `output` for the Thumb showing the channel's text, or the content you give it.
+- **RTL**: a horizontal slider runs right to left, the arrows swap and the gradient runs `to left`.
+- **Forms**: a hidden input submits the color as hex (`#rrggbb`, or `#rrggbbaa` below full
+  alpha), whatever the channel.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-slider-root` | the `group`; holds the value |
+| Label | `div` | `color-slider-label` | names the Root and the Thumb |
+| Output | `output` | `color-slider-output` | the channel's text |
+| Track | `div` | `color-slider-track` | the interactive area and the gradient |
+| Thumb | `div` | `color-slider-thumb` | the `slider` |
+| (hidden input) | `input type="hidden"` | `color-slider-input` | the color as hex, what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorSlider } from "@fragiola/primitives-react/color-slider";
+
+<ColorSlider.Root channel="hue" value={color} onValueChange={setColor} name="color">
+    <ColorSlider.Label>Hue</ColorSlider.Label>
+    <ColorSlider.Track>
+        <ColorSlider.Thumb />
+    </ColorSlider.Track>
+    <ColorSlider.Output />
+</ColorSlider.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorSlider.Root v-model:value="color" channel="alpha" locale="en-US">
+        <ColorSlider.Label>Opacity</ColorSlider.Label>
+        <ColorSlider.Track><ColorSlider.Thumb /></ColorSlider.Track>
+        <ColorSlider.Output />
+    </ColorSlider.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorSliderRoot, ColorSliderLabel, ColorSliderTrack, ColorSliderThumb, ColorSliderOutput],
+    template: `
+        <div colorSliderRoot channel="hue" [(value)]="color">
+            <div colorSliderLabel>Hue</div>
+            <div colorSliderTrack><div colorSliderThumb></div></div>
+            <output colorSliderOutput></output>
+        </div>
+    `,
+})
+export class HueSlider {
+    protected readonly color = signal<Color | string>("hsl(210, 80%, 50%)");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-commit`), and Angular as inputs and outputs (`[(value)]`, `(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string` | | the color, controlled |
+| `defaultValue` | `Color \| string` | `"#000000"` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color, details: { reason }) => void` | | every change (`keyboard`, `track-press`, `drag`), the color in the slider's space |
+| `onValueCommit` | `(value: Color, details) => void` | | once a drag ends, or after a key |
+| `channel` | `ColorChannel` | | the channel it edits (required) |
+| `colorSpace` | `"rgb" \| "hsl" \| "hsb"` | the value's, else the channel's | the space it edits the channel in |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | the axis |
+| `disabled` | `boolean` | `false` | ignores the pointer and the keys |
+| `name` | `string` | | the form name of the hidden input (a Field's wins) |
+| `locale` | `string` | the runtime's | the locale of the channel's text (a BCP 47 tag) |
+
+### Label
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the id the Root's and the Thumb's `aria-labelledby` point at |
+
+### Output
+
+No props of its own. Its children replace the channel's text.
+
+### Track
+
+No props of its own.
+
+### Thumb
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | the thumb's id, the Output's `for` |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`, `aria-labelledby`, `data-orientation`, `data-channel`, `data-disabled`, `data-dragging`; in a Field, the field's states |
+| Label, Output | `data-orientation`, `data-channel`, `data-disabled`; the Output `for` and `aria-live="off"` |
+| Track | `data-orientation`, `data-channel`, `data-disabled`, `data-dragging`; structural style `position: relative`, `touch-action: none`, `--color-slider-track-background` |
+| Thumb | `role="slider"`, `id`, `tabindex="0"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, `aria-orientation`, `aria-labelledby`, `aria-disabled`, `data-orientation`, `data-channel`, `data-disabled`, `data-dragging`; structural style placing it, `--color-slider-thumb-color` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowRight, ArrowUp | + one step (ArrowLeft in RTL) |
+| ArrowLeft, ArrowDown | − one step (ArrowRight in RTL) |
+| Page Up / Page Down, Shift+Arrow | ± the large step |
+| Home / End | the channel's `min` / `max` |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-slider` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorSlider`, `ColorSliderLabelProps`, `ColorSliderOutputProps`, `ColorSliderRootProps`, `ColorSliderState`, `ColorSliderThumbProps`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-slider` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorSlider`, `ColorSliderLabelProps`, `ColorSliderRootEmits`, `ColorSliderRootProps`, `ColorSliderState`, `ColorSliderThumbProps`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-slider` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorChannel`, `ColorSliderLabel`, `ColorSliderOutput`, `ColorSliderRoot`, `ColorSliderState`, `ColorSliderThumb`, `ColorSliderTrack`, `ColorSpace`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |
