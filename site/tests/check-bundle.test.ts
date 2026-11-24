@@ -292,6 +292,22 @@ describe("the bundle guard, entry by entry", () => {
         expect(ENTRY_DEPENDENCIES["color-area"]).toBeUndefined();
     });
 
+    // Epic #104 (#103): the cascading select's levels are CascadeSelect's own, on Field only
+    it("keeps /cascade to /cascade-select, built on Field alone", () => {
+        expect(
+            mechanismLeaks("cascade-select", [
+                "cascade",
+                "collection",
+                "pointer",
+                "positioning",
+            ]),
+        ).toEqual([]);
+        expect(mechanismLeaks("select", ["cascade"])).toEqual([
+            '/select: imports the toolkit mechanism "/cascade"',
+        ]);
+        expect(ENTRY_DEPENDENCIES["cascade-select"]).toEqual(["field"]);
+    });
+
     // Epic #104: a Command without the virtual list bundles no virtualizer, and the scorer is
     // Command's own
     it("keeps /virtual and /async-list out of /command, and /command to the command entries", () => {
