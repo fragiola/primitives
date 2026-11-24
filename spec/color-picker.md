@@ -18,9 +18,18 @@ the popup) are the behaviour references, read and never copied.
 the EyeDropperTrigger: an inline picker bundles no overlay code. `/color-picker-popover` holds the
 popup's parts (Root, Trigger, Portal, Positioner, Popup), built on each framework's overlay root,
 the toolkit's `/overlay`, `/positioning`, `/focus` and `/presence`, never on Popover's entry; the
-bundle guard fails when `/color-picker` imports `/overlay` or `/positioning`
-(`MECHANISM_USERS`). One namespace with optional popup parts was discarded: its entry would carry
-the overlay code into every inline picker.
+bundle guard fails when `/color-picker` imports `/overlay`, `/positioning` or `/presence`
+(`MECHANISMS_KEPT_OUT`) or holds the popup's code. One namespace with optional popup parts was
+discarded: its entry would carry the overlay code into every inline picker.
+
+**The binding contract.** What a control inside the Root reads (the color, its setter and commit,
+`disabled`) is a small contract in each framework's shared internals (React's `hooks/` and
+`utils/`, Vue's `composables/`, Angular's `/internal`), as the roving composite's context is, not a
+module of ColorPicker's folder: a ColorSlider, ColorArea, ColorWheel, ColorField, ColorSwatch or
+ColorSwatchPicker used alone carries none of ColorPicker's code (their `ENTRY_DEPENDENCIES` do not
+change), and the popup's entry reads the picker's `disabled` through it without importing
+`/color-picker`. A context in ColorPicker's folder (Field's way) was discarded: in Angular every
+color control would import the whole `/color-picker` entry, and with it Field's.
 
 ## Anatomy
 
@@ -84,9 +93,9 @@ risk: a child used alone keeps its own state). React Aria's ColorPicker gives it
 child through their contexts, the child's own props winning; here the rule is the same, stated on
 the value props, so a bound child never holds a stale copy.
 
-A bound child: is disabled when the picker is; reads no [Field](field.md) (the picker is the
-field's control, so a ColorSlider inside a Field's picker does not take the field's name or label);
-renders no hidden form value of its own (ColorSlider's and ColorWheel's hidden inputs have no
+Every control inside the Root is disabled when the picker is, and reads no [Field](field.md) (the
+picker is the field's control, so a ColorSlider inside a Field's picker does not take the field's
+name or label). A bound child also renders no hidden form value of its own (ColorSlider's and ColorWheel's hidden inputs have no
 `name`, a ColorSwatchPicker's none; the picker's submits); and is never reset by a form reset
 itself (the picker is). A ColorField bound to the picker never commits `null`: an empty text goes
 back to the picker's hex. A ColorSwatch with no `color` shows the picker's color.
@@ -129,7 +138,7 @@ commits it; a cancelled pick (Escape) changes nothing. Disabled with the picker.
 | FormatSelect | `value` (the format), `disabled` with the picker, `data-format`, `data-disabled` |
 | EyeDropperTrigger | `type="button"`, `disabled` with the picker, `data-disabled` |
 | hidden input | `type="hidden"`, `name`, `value` (`formatColor(color, "hex")`) |
-| popover Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while open, `disabled` and `data-disabled` with the picker, an `id`; structural style `--color-picker-color` |
+| popover Trigger | `type="button"`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` (while open), `data-popup-open` while open, `disabled` and `data-disabled` with the picker, an `id` |
 | popover Positioner | Popover's: `role="presentation"`, `data-side`, `data-align`, `data-open` / `data-closed`, its CSS variables and structural style, `hidden` while kept mounted and closed |
 | popover Popup | `role="dialog"` (no `aria-modal`), an `id`, `tabindex="-1"`, `data-side`, `data-align`, `data-open` / `data-closed`, `data-starting-style`, `data-ending-style` |
 
@@ -152,7 +161,7 @@ returns an uncontrolled picker to its `defaultValue` (reason `none`) and with it
 In a Field the Root is the field's control (a `group`, RadioGroup's way): named by the
 `Field.Label` (`aria-labelledby`), described by the field; focus and blur are the focus entering
 and leaving it; `validate` gets the color; the field's `name` and `disabled` win
-(`ENTRY_DEPENDENCIES` `["field"]`).
+(`ENTRY_DEPENDENCIES` `["field"]`; the popup's entry is built on nothing).
 
 ## RTL
 
@@ -162,6 +171,9 @@ The controls follow their own specs; the popup's sides follow Popover's.
 
 The hidden input, the CSS variable and the bound children's values are in place before hydration.
 The EyeDropperTrigger renders once mounted only (its API is the browser's); a popover renders closed.
+The FormatSelect's selected option is the select's own state, set once mounted (and made its
+default option, so a form reset, which resets a select to its default, shows the picker's format
+again): a server render marks no option, so the browser shows the first until then.
 
 ## Scenarios
 

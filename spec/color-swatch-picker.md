@@ -110,7 +110,7 @@ arrows do not change.
 The swatches: **Red** `#ff0000`, **Orange** `#ff8000`, **Yellow** `#ffff00`, **Green** `#00ff00`,
 **Cyan** `#00ffff`, **Blue** `#0000ff`, **Purple** `#8000ff`, **Gray** `#808080` (disabled): each
 an Item holding a ColorSwatch with `aria-label` (its name) and the same `color`. The Root lays them
-out in rows of four (32 px swatches, 8 px apart, 160 px wide). Output values print the value as
+out in rows of four (a grid of four 32 px columns, 8 px apart: whole pixels). Output values print the value as
 `formatColor(color, "hex")`, and `none` for `null`.
 
 ### `/color-swatch-picker/basic`
