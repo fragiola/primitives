@@ -34,6 +34,9 @@ import CarouselBasic from "../scenarios/carousel/carousel-basic.vue";
 import CarouselMultiple from "../scenarios/carousel/carousel-multiple.vue";
 import CarouselTabbed from "../scenarios/carousel/carousel-tabbed.vue";
 import CarouselVertical from "../scenarios/carousel/carousel-vertical.vue";
+import CascadeSelectBasic from "../scenarios/cascade-select/cascade-select-basic.vue";
+import CascadeSelectChangeOnSelect from "../scenarios/cascade-select/cascade-select-change-on-select.vue";
+import CascadeSelectField from "../scenarios/cascade-select/cascade-select-field.vue";
 import CheckboxBasic from "../scenarios/checkbox/checkbox-basic.vue";
 import CheckboxControlled from "../scenarios/checkbox/checkbox-controlled.vue";
 import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-form.vue";
@@ -519,6 +522,9 @@ export const routes: Record<string, Component> = {
     "/carousel/tabbed": CarouselTabbed,
     "/carousel/multiple": CarouselMultiple,
     "/carousel/vertical": CarouselVertical,
+    "/cascade-select/basic": CascadeSelectBasic,
+    "/cascade-select/change-on-select": CascadeSelectChangeOnSelect,
+    "/cascade-select/field": CascadeSelectField,
     "/calendar-systems/basic": CalendarSystemsBasic,
     "/calendar-systems/pickers": CalendarSystemsPickers,
     "/time-zones/field": TimeZonesField,
