@@ -153,6 +153,8 @@ export function CascadeSelectRoot({
             safeArea.current = null;
         }
     }, [root.open]);
+    // nor does an unmounted one fire it
+    useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
     const latest = useRef({
         defaultValue,
