@@ -30,6 +30,8 @@ export * from "./components/color-swatch-picker/index.ts";
 export * from "./components/color-wheel/index.ts";
 export * from "./components/combobox/index.ts";
 export * from "./components/combobox-virtual/index.ts";
+export * from "./components/command/index.ts";
+export * from "./components/command-virtual/index.ts";
 export * from "./components/context-menu/index.ts";
 export * from "./components/date-field/index.ts";
 export * from "./components/date-picker/index.ts";
