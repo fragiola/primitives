@@ -63,7 +63,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 392,035 B | 120,610 B | 286,806 B | 84,424 B |
+| `@fragiola/primitives-react` | 392,604 B | 120,821 B | 287,375 B | 84,635 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -82,8 +82,8 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/collapsible` | 5,502 B | 2,265 B | 4,609 B | 1,983 B |
 | `@fragiola/primitives-react/color-area` | 16,185 B | 6,236 B | 6,765 B | 2,895 B |
 | `@fragiola/primitives-react/color-field` | 16,576 B | 6,544 B | 8,518 B | 3,513 B |
-| `@fragiola/primitives-react/color-picker` | 13,094 B | 5,132 B | 6,546 B | 2,734 B |
-| `@fragiola/primitives-react/color-picker-popover` | 32,226 B | 12,157 B | 8,873 B | 3,634 B |
+| `@fragiola/primitives-react/color-picker` | 13,576 B | 5,313 B | 7,026 B | 2,923 B |
+| `@fragiola/primitives-react/color-picker-popover` | 32,315 B | 12,198 B | 8,962 B | 3,673 B |
 | `@fragiola/primitives-react/color-slider` | 17,383 B | 6,607 B | 9,167 B | 3,718 B |
 | `@fragiola/primitives-react/color-swatch` | 5,783 B | 2,314 B | 1,542 B | 777 B |
 | `@fragiola/primitives-react/color-swatch-picker` | 15,772 B | 6,265 B | 7,799 B | 3,330 B |
@@ -160,7 +160,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 444,543 B | 121,435 B | 339,203 B | 84,796 B |
+| `@fragiola/primitives-vue` | 445,117 B | 121,668 B | 339,787 B | 85,026 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -177,13 +177,13 @@ External: `vue`.
 | `@fragiola/primitives-vue/checkbox-group` | 4,483 B | 2,011 B | 4,067 B | 1,841 B |
 | `@fragiola/primitives-vue/clipboard` | 3,761 B | 1,637 B | 3,515 B | 1,506 B |
 | `@fragiola/primitives-vue/collapsible` | 5,296 B | 2,140 B | 4,403 B | 1,852 B |
-| `@fragiola/primitives-vue/color-area` | 16,545 B | 6,296 B | 7,134 B | 2,941 B |
-| `@fragiola/primitives-vue/color-field` | 16,450 B | 6,438 B | 8,419 B | 3,419 B |
-| `@fragiola/primitives-vue/color-picker` | 12,849 B | 4,992 B | 6,305 B | 2,575 B |
-| `@fragiola/primitives-vue/color-picker-popover` | 31,872 B | 11,952 B | 8,536 B | 3,363 B |
-| `@fragiola/primitives-vue/color-slider` | 17,588 B | 6,477 B | 9,421 B | 3,590 B |
+| `@fragiola/primitives-vue/color-area` | 16,537 B | 6,292 B | 7,126 B | 2,936 B |
+| `@fragiola/primitives-vue/color-field` | 16,462 B | 6,444 B | 8,432 B | 3,423 B |
+| `@fragiola/primitives-vue/color-picker` | 13,309 B | 5,169 B | 6,765 B | 2,791 B |
+| `@fragiola/primitives-vue/color-picker-popover` | 31,969 B | 11,982 B | 8,633 B | 3,396 B |
+| `@fragiola/primitives-vue/color-slider` | 17,599 B | 6,481 B | 9,432 B | 3,595 B |
 | `@fragiola/primitives-vue/color-swatch` | 5,370 B | 2,200 B | 1,129 B | 638 B |
-| `@fragiola/primitives-vue/color-swatch-picker` | 15,651 B | 6,136 B | 7,704 B | 3,206 B |
+| `@fragiola/primitives-vue/color-swatch-picker` | 15,662 B | 6,140 B | 7,715 B | 3,210 B |
 | `@fragiola/primitives-vue/color-wheel` | 13,122 B | 5,096 B | 5,656 B | 2,398 B |
 | `@fragiola/primitives-vue/combobox` | 48,319 B | 16,669 B | 22,328 B | 7,222 B |
 | `@fragiola/primitives-vue/combobox-virtual` | 55,519 B | 19,308 B | 25,436 B | 8,376 B |
@@ -257,7 +257,7 @@ External: `@angular/core`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-angular` | 1,141,749 B | 186,828 B | 1,036,360 B | 149,032 B |
+| `@fragiola/primitives-angular` | 1,142,526 B | 187,098 B | 1,037,137 B | 149,297 B |
 | `@fragiola/primitives-angular/internal` | 39,935 B | 14,480 B | 18,063 B | 6,377 B |
 | `@fragiola/primitives-angular/accordion` | 16,086 B | 4,154 B | 14,771 B | 3,683 B |
 | `@fragiola/primitives-angular/alert-dialog` | 43,761 B | 8,442 B | 38,371 B | 6,669 B |
@@ -277,8 +277,8 @@ External: `@angular/core`.
 | `@fragiola/primitives-angular/collapsible` | 10,432 B | 3,110 B | 9,693 B | 2,860 B |
 | `@fragiola/primitives-angular/color-area` | 25,328 B | 7,469 B | 15,988 B | 4,150 B |
 | `@fragiola/primitives-angular/color-field` | 46,669 B | 11,458 B | 36,956 B | 7,860 B |
-| `@fragiola/primitives-angular/color-picker` | 40,079 B | 9,537 B | 31,901 B | 6,622 B |
-| `@fragiola/primitives-angular/color-picker-popover` | 41,202 B | 13,318 B | 17,972 B | 4,789 B |
+| `@fragiola/primitives-angular/color-picker` | 40,731 B | 9,728 B | 32,553 B | 6,817 B |
+| `@fragiola/primitives-angular/color-picker-popover` | 41,327 B | 13,350 B | 18,097 B | 4,820 B |
 | `@fragiola/primitives-angular/color-slider` | 50,780 B | 11,471 B | 40,895 B | 8,022 B |
 | `@fragiola/primitives-angular/color-swatch` | 7,743 B | 2,697 B | 3,694 B | 1,186 B |
 | `@fragiola/primitives-angular/color-swatch-picker` | 42,988 B | 10,476 B | 33,332 B | 7,011 B |
