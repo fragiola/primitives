@@ -17,6 +17,7 @@ export * from "@fragiola/primitives-angular/calendar";
 export * from "@fragiola/primitives-angular/calendar-preset";
 export * from "@fragiola/primitives-angular/calendar-view";
 export * from "@fragiola/primitives-angular/carousel";
+export * from "@fragiola/primitives-angular/cascade-select";
 export * from "@fragiola/primitives-angular/checkbox";
 export * from "@fragiola/primitives-angular/checkbox-group";
 export * from "@fragiola/primitives-angular/clipboard";
