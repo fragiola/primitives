@@ -1,7 +1,7 @@
 // The entry of @fragiola/primitives/color: the color model (spec/color.md): an immutable color
 // value in rgb, hsl and hsb with alpha, its parsing, formatting and conversions, the channels'
-// ranges and `Intl` text, the CSS gradients of a track, an area and a wheel, and the keys and
-// geometry of an area and a wheel. Only the color components import it (D8).
+// ranges and `Intl` text, the CSS gradients of a track, an area and a wheel, the keys and
+// geometry of an area and a wheel, and the browser's eyedropper (a color picker's). Only the color components import it (D8).
 
 export {
     type ColorAreaBackground,
@@ -41,6 +41,7 @@ export {
     isOnColorWheel,
 } from "./color-wheel-geometry.ts";
 export { convertColor } from "./convert-color.ts";
+export { openEyeDropper, supportsEyeDropper } from "./eye-dropper.ts";
 export {
     type ColorFormat,
     colorChannelFormat,
