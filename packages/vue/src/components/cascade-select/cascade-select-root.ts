@@ -13,6 +13,7 @@ import {
     defineComponent,
     Fragment,
     h,
+    onBeforeUnmount,
     type PropType,
     provide,
     ref,
@@ -146,6 +147,8 @@ export const CascadeSelectRoot: PublicComponent<
             const hoverTimer: {
                 current: ReturnType<typeof setTimeout> | undefined;
             } = { current: undefined };
+            // an unmounted root never fires its hover timer
+            onBeforeUnmount(() => clearTimeout(hoverTimer.current));
             const baseId = useId();
             const setActive = (next: readonly string[], nextPeek = false) => {
                 active.value = next;
