@@ -34,6 +34,9 @@ import { CarouselBasic } from "../scenarios/carousel/carousel-basic.tsx";
 import { CarouselMultiple } from "../scenarios/carousel/carousel-multiple.tsx";
 import { CarouselTabbed } from "../scenarios/carousel/carousel-tabbed.tsx";
 import { CarouselVertical } from "../scenarios/carousel/carousel-vertical.tsx";
+import { CascadeSelectBasic } from "../scenarios/cascade-select/cascade-select-basic.tsx";
+import { CascadeSelectChangeOnSelect } from "../scenarios/cascade-select/cascade-select-change-on-select.tsx";
+import { CascadeSelectField } from "../scenarios/cascade-select/cascade-select-field.tsx";
 import { CheckboxBasic } from "../scenarios/checkbox/checkbox-basic.tsx";
 import { CheckboxControlled } from "../scenarios/checkbox/checkbox-controlled.tsx";
 import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlled-form.tsx";
@@ -339,6 +342,9 @@ export const routes: Record<
     "/select/modal": SelectModal,
     "/select/lifecycle": SelectLifecycle,
     "/select/groups": SelectGroups,
+    "/cascade-select/basic": CascadeSelectBasic,
+    "/cascade-select/change-on-select": CascadeSelectChangeOnSelect,
+    "/cascade-select/field": CascadeSelectField,
     "/checkbox/basic": CheckboxBasic,
     "/checkbox/group": CheckboxGroupScenario,
     "/checkbox/controlled": CheckboxControlled,
