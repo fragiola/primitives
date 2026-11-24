@@ -130,6 +130,7 @@ export const MECHANISMS = [
     "clipboard",
     "collection",
     "color",
+    "command",
     "date",
     "direction",
     "focus",
