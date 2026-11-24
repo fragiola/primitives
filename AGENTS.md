@@ -38,7 +38,7 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
    math only: functions and small classes that take elements and options and return values or a
    cleanup (the overlay session, layers, focus, scroll lock, inert, positioning, collection key
    maps, typeahead, presence, pointer drags, hover intent, range math, form bridges, ids,
-   direction, dates, image loading, swipes, a scroll area's measurement, page ranges, a clipboard write, a carousel's scrolling and rotation delay, the color model, a command palette's scorer). It never holds a component's open/selected/value state, its lifecycle or
+   direction, dates, image loading, swipes, a scroll area's measurement, page ranges, a clipboard write, a carousel's scrolling and rotation delay, the color model, a command palette's scorer, a cascading select's levels). It never holds a component's open/selected/value state, its lifecycle or
    its API; it never imports a framework; it never touches the global `document` or `window`
    (only an element's `ownerDocument` / `defaultView`); it has no top-level side effects and no
    `any` in its exported declarations; its **only runtime dependency is `@floating-ui/dom`**
@@ -143,7 +143,7 @@ fails on a tracked name that is not kebab-case and on a non-entry file at the ro
 
   | package | folders |
   | --- | --- |
-  | `primitives` | one folder per mechanism, each an entry: `positioning/`, `overlay/`, `layers/`, `focus/`, `scroll-lock/`, `inert/`, `collection/`, `presence/`, `pointer/`, `hover/`, `range/`, `form/`, `id/`, `direction/`, `date/`, `image/`, `swipe/`, `number/`, `selection/`, `virtual/`, `async-list/`, `toast/`, `scroll-area/`, `pagination/`, `clipboard/`, `carousel/`, `color/`, `command/` |
+  | `primitives` | one folder per mechanism, each an entry: `positioning/`, `overlay/`, `layers/`, `focus/`, `scroll-lock/`, `inert/`, `collection/`, `presence/`, `pointer/`, `hover/`, `range/`, `form/`, `id/`, `direction/`, `date/`, `image/`, `swipe/`, `number/`, `selection/`, `virtual/`, `async-list/`, `toast/`, `scroll-area/`, `pagination/`, `clipboard/`, `carousel/`, `cascade/`, `color/`, `command/` |
   | `react` | `components/<component>/` (its parts, its context, `parts.ts` the namespace), `hooks/`, `utils/` |
   | `vue` | `components/<component>/`, `composables/`, `utils/` |
   | `angular` | one ng-packagr secondary entry point per component, its folder organized like a `src/`: `packages/angular/<component>/` (`public-api.ts`, `ng-package.json`, `directives/`, `inject/`); the code the entries share in `packages/angular/internal/` (`utils/`, the `/internal` entry: not an app's API); `src/public-api.ts` only re-exports the components' entries. ng-packagr compiles an entry point from its own folder (a file outside fails with TS6059), as Tree's feature entries; `check:layout` also keeps an entry folder's root to `public-api.ts` and `ng-package.json` |

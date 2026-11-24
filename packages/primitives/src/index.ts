@@ -5,6 +5,7 @@
 export * from "./async-list/index.ts";
 export * from "./calendar-systems/index.ts";
 export * from "./carousel/index.ts";
+export * from "./cascade/index.ts";
 export * from "./clipboard/index.ts";
 export * from "./collection/index.ts";
 export * from "./color/index.ts";
