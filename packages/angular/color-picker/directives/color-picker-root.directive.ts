@@ -61,9 +61,13 @@ function toColor(value: Color | string): Color {
     return parseColor(value) ?? BLACK;
 }
 
-/** The space a format edits in (`hex`: rgb). */
-function formatSpace(format: ColorPickerFormat): ColorSpace {
-    return format === "hex" ? "rgb" : format;
+/**
+ * The space a format converts the value to: hsl and hsb (they share `saturation`, so the value's
+ * space decides); none for hex and rgb (red, green and blue are rgb's only, a hex reads any space,
+ * and a conversion to rgb would round the channels away: a gray's hue).
+ */
+function formatSpace(format: ColorPickerFormat): ColorSpace | null {
+    return format === "hsl" || format === "hsb" ? format : null;
 }
 
 /**
@@ -172,7 +176,10 @@ export class ColorPickerRoot {
         disabled: this.isDisabled,
         setValue: (color, details) => this.current.set(color, details),
         commit: (color) => this.valueCommit.emit(color),
+        registerPopup: (element) => this.registerPopup(element),
     };
+    /** The popups' positioners, portalled out of the Root: inside the picker for its Field. */
+    private readonly popups = new Set<HTMLElement>();
 
     constructor() {
         const host = this.host;
@@ -240,7 +247,7 @@ export class ColorPickerRoot {
         this.ownFormat.set(format, details);
         const now = untracked(this.color);
         const space = formatSpace(format);
-        if (now.space !== space) {
+        if (space !== null && now.space !== space) {
             this.current.set(convertColor(now, space), details);
         }
     }
@@ -255,9 +262,32 @@ export class ColorPickerRoot {
 
     protected onFocusOut(event: FocusEvent): void {
         const next = event.relatedTarget;
-        if (next instanceof Node && this.host.contains(next)) {
-            return;
+        const inPopup = (node: Node) =>
+            [...this.popups].some((popup) => popup.contains(node));
+        // focus that leaves a closing popup for nowhere is returned to its trigger (Popover's
+        // focus return): no blur
+        const returned =
+            next === null &&
+            event.target instanceof Node &&
+            inPopup(event.target);
+        const inside =
+            next instanceof Node && (this.host.contains(next) || inPopup(next));
+        if (!inside && !returned) {
+            this.field.blurred();
         }
-        this.field.blurred();
+    }
+
+    /** A popup's positioner is part of the picker: its focus is the Field's (native listeners). */
+    private registerPopup(element: HTMLElement): () => void {
+        this.popups.add(element);
+        const onFocusIn = () => this.field.focused();
+        const onFocusOut = (event: FocusEvent) => this.onFocusOut(event);
+        element.addEventListener("focusin", onFocusIn);
+        element.addEventListener("focusout", onFocusOut);
+        return () => {
+            this.popups.delete(element);
+            element.removeEventListener("focusin", onFocusIn);
+            element.removeEventListener("focusout", onFocusOut);
+        };
     }
 }

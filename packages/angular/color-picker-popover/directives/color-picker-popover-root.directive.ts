@@ -1,4 +1,11 @@
-import { computed, Directive, input, output } from "@angular/core";
+import {
+    computed,
+    Directive,
+    effect,
+    input,
+    output,
+    untracked,
+} from "@angular/core";
 import {
     createOverlayRoot,
     injectColorPickerBinding,
@@ -43,6 +50,18 @@ export class ColorPickerPopoverRoot implements OverlayActions {
         open: this.overlay.open(),
         disabled: this.disabled(),
     }));
+
+    constructor() {
+        // the popup is part of the picker: focus in it is no blur of the picker's Field (an effect
+        // runs before the popup's after-render focus moves in)
+        effect((onCleanup) => {
+            const positioner = this.overlay.positioner();
+            const picker = this.picker;
+            if (positioner !== null && picker !== null) {
+                onCleanup(untracked(() => picker.registerPopup(positioner)));
+            }
+        });
+    }
 
     /** Closes the popup (reason `imperative-action`). */
     close(): void {

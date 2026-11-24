@@ -16,6 +16,11 @@ export interface ColorPickerBinding {
     setValue: (color: Color, details: ChangeDetails) => void;
     /** A bound control's change is complete. */
     commit: (color: Color, details: ChangeDetails) => void;
+    /**
+     * The picker's popup (its positioner, portalled out of the Root) is part of the picker: focus
+     * in it is focus in the picker's Field control. Returns its cleanup.
+     */
+    registerPopup: (element: HTMLElement) => () => void;
 }
 
 // pure: an entry that never injects it bundles none of it (every other entry's size stays as it

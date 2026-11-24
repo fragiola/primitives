@@ -23,6 +23,16 @@ import {
                         <div colorSliderTrack [class]="styles.slider.track"><div colorSliderThumb aria-label="Hue" [class]="styles.slider.thumb"></div></div>
                     </div>
                     <div colorSwatch aria-label="Brand color preview" [class]="styles.swatch.root"></div>
+                    <ng-container colorPickerPopoverRoot>
+                        <button colorPickerPopoverTrigger [class]="styles.popover.trigger">More options</button>
+                        <ng-container *colorPickerPopoverPortal>
+                            <div colorPickerPopoverPositioner [sideOffset]="8" [class]="styles.popover.positioner">
+                                <div colorPickerPopoverPopup aria-label="More" [class]="styles.popover.popup">
+                                    <div colorFieldRoot [class]="styles.field.root"><input colorFieldInput aria-label="Hex" [class]="styles.field.input" /></div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
                 </div>
                 <p fieldDescription [class]="fieldStyles.description">Used for links.</p>
             </div>

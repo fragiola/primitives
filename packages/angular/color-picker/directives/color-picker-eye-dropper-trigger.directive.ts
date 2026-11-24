@@ -1,6 +1,7 @@
 import {
     afterNextRender,
     computed,
+    DestroyRef,
     Directive,
     effect,
     inject,
@@ -30,6 +31,8 @@ export class ColorPickerEyeDropperTrigger {
     // the API is the browser's: read after the first render, so the server render and hydration
     // match
     private readonly supported = signal(false);
+    /** The pick in progress: aborted by the next press and when the trigger is destroyed. */
+    private pending: AbortController | null = null;
     protected readonly element = conditionalView(this.supported, (element) => {
         element.setAttribute("type", "button");
         element.setAttribute(
@@ -40,8 +43,17 @@ export class ColorPickerEyeDropperTrigger {
             if (untracked(this.state).disabled) {
                 return;
             }
-            void openEyeDropper(element).then((picked) => {
-                if (picked !== null) {
+            this.pending?.abort();
+            const controller = new AbortController();
+            this.pending = controller;
+            void openEyeDropper(element, controller.signal).then((picked) => {
+                // a pick that resolves once the picker is disabled, or the trigger destroyed,
+                // is dropped
+                if (
+                    picked !== null &&
+                    !controller.signal.aborted &&
+                    !untracked(this.state).disabled
+                ) {
                     this.root.pick(picked, event);
                 }
             });
@@ -49,6 +61,7 @@ export class ColorPickerEyeDropperTrigger {
     });
 
     constructor() {
+        inject(DestroyRef).onDestroy(() => this.pending?.abort());
         afterNextRender(() =>
             this.supported.set(supportsEyeDropper(this.root.host)),
         );
