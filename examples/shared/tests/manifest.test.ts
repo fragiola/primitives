@@ -79,6 +79,8 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
     // the command menu's Dialog (Epic #104); the place picker's Field
     command: ["_recipes/dialog.ts"],
     "cascade-select": ["_recipes/field.ts"],
+    // the attachments field's Field (Epic #106)
+    "file-upload": ["_recipes/field.ts"],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -122,6 +124,8 @@ const RECIPE_OF: Record<string, string> = {
     // a virtual part is its component's part: its component's recipe styles it
     "select-virtual": "select",
     "combobox-virtual": "combobox",
+    // a second FileUpload example (Epic #106)
+    "file-upload-avatar": "file-upload",
 };
 
 /**
@@ -203,6 +207,8 @@ describe("the manifest", () => {
                 "color-editor",
                 "color-picker",
                 "cascade-select",
+                "file-upload",
+                "file-upload-avatar",
                 "date-picker",
                 "calendar",
                 "date-field",
