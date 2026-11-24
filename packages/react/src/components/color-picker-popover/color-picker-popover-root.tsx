@@ -1,5 +1,11 @@
 import type { Align, Side } from "@fragiola/primitives/positioning";
-import { type ReactNode, useContext, useMemo, useState } from "react";
+import {
+    type ReactNode,
+    useContext,
+    useLayoutEffect,
+    useMemo,
+    useState,
+} from "react";
 import {
     type OverlayRootProps,
     useOverlayRoot,
@@ -22,6 +28,17 @@ export function ColorPickerPopoverRoot({
     const root = useOverlayRoot(overlayProps);
     const picker = useContext(ColorPickerBindingContext);
     const disabled = picker?.disabled ?? false;
+    // the popup is part of the picker: focus in it is no blur of the picker's Field
+    const { positioner } = root;
+    const registerPopup = picker?.registerPopup;
+    // before the popup's focus moves in (a passive effect)
+    useLayoutEffect(
+        () =>
+            positioner === null || registerPopup === undefined
+                ? undefined
+                : registerPopup(positioner),
+        [positioner, registerPopup],
+    );
     const [placed, setPlaced] = useState<{ side: Side; align: Align }>({
         side: "bottom",
         align: "start",

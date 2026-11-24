@@ -2,7 +2,8 @@ import { type Color, formatColor } from "@fragiola/primitives/color";
 import { useState } from "react";
 import { formEntries } from "../../kit/form-entries.ts";
 import { Output } from "../../kit/output.tsx";
-import { ColorPicker } from "../../kit/ui/color-picker.tsx";
+import { ColorField } from "../../kit/ui/color-field.tsx";
+import { ColorPicker, ColorPickerPopover } from "../../kit/ui/color-picker.tsx";
 import { ColorSlider } from "../../kit/ui/color-slider.tsx";
 import { ColorSwatch } from "../../kit/ui/color-swatch.tsx";
 import { Field } from "../../kit/ui/field.tsx";
@@ -38,6 +39,20 @@ export function ColorPickerField() {
                             </ColorSlider.Track>
                         </ColorSlider.Root>
                         <ColorSwatch aria-label="Brand color preview" />
+                        <ColorPickerPopover.Root>
+                            <ColorPickerPopover.Trigger>
+                                More options
+                            </ColorPickerPopover.Trigger>
+                            <ColorPickerPopover.Portal>
+                                <ColorPickerPopover.Positioner sideOffset={8}>
+                                    <ColorPickerPopover.Popup aria-label="More">
+                                        <ColorField.Root>
+                                            <ColorField.Input aria-label="Hex" />
+                                        </ColorField.Root>
+                                    </ColorPickerPopover.Popup>
+                                </ColorPickerPopover.Positioner>
+                            </ColorPickerPopover.Portal>
+                        </ColorPickerPopover.Root>
                     </ColorPicker.Root>
                     <Field.Description>Used for links.</Field.Description>
                 </Field.Root>

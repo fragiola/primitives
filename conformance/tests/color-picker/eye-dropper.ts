@@ -17,6 +17,9 @@ export async function stubEyeDropper(
         }
         view.EyeDropper = class {
             open(): Promise<{ sRGBHex: string }> {
+                (
+                    window as Window & { eyeDropperOpened?: boolean }
+                ).eyeDropperOpened = true;
                 return picked === "cancel"
                     ? Promise.reject(new DOMException("aborted", "AbortError"))
                     : Promise.resolve({ sRGBHex: picked });

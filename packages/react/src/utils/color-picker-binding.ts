@@ -16,6 +16,11 @@ export interface ColorPickerBinding {
     commit: (color: Color, details: ChangeDetails) => void;
     /** Every control inside is disabled. */
     disabled: boolean;
+    /**
+     * The picker's popup (its positioner, portalled out of the Root) is part of the picker: focus
+     * in it is focus in the picker's Field control. Returns its cleanup.
+     */
+    registerPopup: (element: HTMLElement) => () => void;
 }
 
 export const ColorPickerBindingContext =

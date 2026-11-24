@@ -49,6 +49,9 @@ export function ColorPickerFormatSelect(props: ColorPickerFormatSelectProps) {
                 if (COLOR_PICKER_FORMATS.includes(next)) {
                     context.setFormat(next, event.nativeEvent);
                 }
+                // the format the picker holds, until a render shows the accepted one (a change
+                // a controlled `format` refuses renders nothing)
+                event.currentTarget.value = format;
             },
         },
         ref,

@@ -36,8 +36,13 @@ function toColor(value: Color | string | undefined): Color | undefined {
 }
 
 /** The space a format edits in (`hex`: rgb). */
-function formatSpace(format: ColorPickerFormat): ColorSpace {
-    return format === "hex" ? "rgb" : format;
+/**
+ * The space a format converts the value to: hsl and hsb (they share `saturation`, so the value's
+ * space decides); none for hex and rgb (red, green and blue are rgb's only, a hex reads any space,
+ * and a conversion to rgb would round the channels away: a gray's hue).
+ */
+function formatSpace(format: ColorPickerFormat): ColorSpace | null {
+    return format === "hsl" || format === "hsb" ? format : null;
 }
 
 export interface ColorPickerRootProps extends PartProps<ColorPickerState> {
@@ -111,7 +116,7 @@ export function ColorPickerRoot({
             setOwnFormat(next, details);
             const { value: now, setValue: set } = latest.current;
             const space = formatSpace(next);
-            if (now.space !== space) {
+            if (space !== null && now.space !== space) {
                 set(convertColor(now, space), details);
             }
         },
@@ -150,9 +155,17 @@ export function ColorPickerRoot({
         });
     }, []);
 
+    // the popup's positioner, portalled out of the Root, is inside the picker for its Field
+    const popups = useRef(new Set<HTMLElement>());
+    const registerPopup = useCallback((popup: HTMLElement) => {
+        popups.current.add(popup);
+        return () => {
+            popups.current.delete(popup);
+        };
+    }, []);
     const binding = useMemo(
-        () => ({ value, setValue, commit, disabled }),
-        [value, setValue, commit, disabled],
+        () => ({ value, setValue, commit, disabled, registerPopup }),
+        [value, setValue, commit, disabled, registerPopup],
     );
     const context = useMemo(
         () => ({
@@ -201,10 +214,21 @@ export function ColorPickerRoot({
                         onFocus: field.onFocus,
                         onBlur: (event: FocusEvent<HTMLElement>) => {
                             const next = event.relatedTarget;
-                            if (
-                                !(next instanceof Node) ||
-                                !event.currentTarget.contains(next)
-                            ) {
+                            const inPopup = (node: Node) =>
+                                [...popups.current].some((popup) =>
+                                    popup.contains(node),
+                                );
+                            // focus that leaves a closing popup for nowhere is returned to its
+                            // trigger (Popover's focus return): no blur
+                            const returned =
+                                next === null &&
+                                event.target instanceof Node &&
+                                inPopup(event.target);
+                            const inside =
+                                next instanceof Node &&
+                                (event.currentTarget.contains(next) ||
+                                    inPopup(next));
+                            if (!inside && !returned) {
                                 field.onBlur();
                             }
                         },

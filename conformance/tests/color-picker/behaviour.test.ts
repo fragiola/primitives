@@ -108,6 +108,19 @@ test.describe("color-picker / basic", () => {
         await expectOutput(page, "value", "#00ff00");
     });
 
+    test("a reset with nothing changed shows the color again in every control", async ({
+        page,
+    }) => {
+        await resetForm(page);
+        await page.evaluate(() => new Promise((done) => setTimeout(done, 50)));
+        await expectValueNow(page, "Saturation", 50);
+        await expectValueNow(page, "Brightness", 60);
+        await expectValueNow(page, "Hue", 210);
+        await expect(page.getByRole("textbox", { name: "Hex" })).toHaveValue(
+            "#4d7399",
+        );
+    });
+
     test("the format, the form value and a reset", async ({ page }) => {
         await page.getByRole("option", { name: "Green", exact: true }).click();
         await page
@@ -131,6 +144,8 @@ test.describe("color-picker / basic", () => {
         );
         await expectOutput(page, "value", "#4d7399");
         await expectValueNow(page, "Own hue", 0);
+        await expectValueNow(page, "Saturation", 50);
+        await expectValueNow(page, "Brightness", 60);
         await expect(
             page.getByRole("combobox", { name: "Format" }),
         ).toHaveValue("hsl");
@@ -181,7 +196,9 @@ test("color-picker / basic: a cancelled pick changes nothing", async ({
     await stubEyeDropper(page, "cancel");
     await openScenario(page, "/color-picker/basic");
     await page.getByRole("button", { name: "Pick a color" }).click();
-    await page.waitForTimeout(100);
+    // the stub's rejection has been seen, and the tasks after it ran
+    await page.waitForFunction(() => "eyeDropperOpened" in window);
+    await page.evaluate(() => new Promise((done) => setTimeout(done, 50)));
     await expectOutput(page, "value", "none");
     await expectOutput(page, "committed", "none");
 });
@@ -259,6 +276,24 @@ test("color-picker / field: the Field names and describes the group; the bound s
     const group = page.getByRole("group", { name: "Brand color" });
     await expect(group).toHaveAccessibleDescription("Used for links.");
     await expect(slider(page, "Hue")).toBeVisible();
+
+    // focus in the popup is focus in the picker: no blur until it leaves both
+    const more = page.getByRole("button", { name: "More options" });
+    const hex = page.getByRole("textbox", { name: "Hex" });
+    await more.click();
+    await expect(hex).toBeFocused();
+    await expect(group).toHaveAttribute("data-focused", "");
+    await expect(group).not.toHaveAttribute("data-touched");
+    await page.keyboard.press("Escape");
+    await expect(more).toBeFocused();
+    await expect(group).not.toHaveAttribute("data-touched");
+    await page.keyboard.press("Enter");
+    await expect(hex).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(group).toHaveAttribute("data-touched", "");
+    await expect(group).not.toHaveAttribute("data-focused");
+
     await page.getByRole("button", { name: "Submit" }).click();
     await expectSubmitted(page, "brand=#336699");
     await slider(page, "Hue").focus();

@@ -1,5 +1,5 @@
 import { openEyeDropper, supportsEyeDropper } from "@fragiola/primitives/color";
-import { type MouseEvent, useEffect, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useRequiredContext } from "../../hooks/use-required-context.ts";
 import { type PartProps, renderElement } from "../../utils/render-element.tsx";
 import { stateAttributes } from "../../utils/state-attributes.ts";
@@ -28,6 +28,11 @@ export function ColorPickerEyeDropperTrigger(
     useEffect(() => {
         setSupported(root !== null && supportsEyeDropper(root));
     }, [root]);
+    // a pick that resolves once the picker is disabled, or the trigger unmounted, is dropped
+    const latest = useRef({ disabled, pick });
+    latest.current = { disabled, pick };
+    const pending = useRef<AbortController | null>(null);
+    useEffect(() => () => pending.current?.abort(), []);
     if (!supported) {
         return null;
     }
@@ -42,9 +47,19 @@ export function ColorPickerEyeDropperTrigger(
             ...stateAttributes({ disabled }),
             onClick: (event: MouseEvent<HTMLButtonElement>) => {
                 const native = event.nativeEvent;
-                void openEyeDropper(event.currentTarget).then((picked) => {
-                    if (picked !== null) {
-                        pick(picked, native);
+                pending.current?.abort();
+                const controller = new AbortController();
+                pending.current = controller;
+                void openEyeDropper(
+                    event.currentTarget,
+                    controller.signal,
+                ).then((picked) => {
+                    if (
+                        picked !== null &&
+                        !controller.signal.aborted &&
+                        !latest.current.disabled
+                    ) {
+                        latest.current.pick(picked, native);
                     }
                 });
             },
