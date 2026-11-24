@@ -26,7 +26,10 @@ import {
 } from "vue";
 import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
-import { useFieldControl } from "../../composables/use-field-control.ts";
+import {
+    OUTSIDE_FIELD,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
 import type {
     ChangeDetails,
     ChangeReason,
@@ -169,15 +172,19 @@ export const ColorSliderRoot: PartComponent<
             const thumb = shallowRef<HTMLElement | null>(null);
             const dragging = ref(false);
             const labelId = ref<string>();
-            const field = useFieldControl({
-                id: () => undefined,
-                labelable: false,
-                value: () => hex.value,
-                // a slider always has a value
-                filled: () => true,
-                input: () => input.value,
-                focusTarget: () => thumb.value,
-            });
+            // inside a ColorPicker, the picker is the field's control: the control reads none
+            const field =
+                picker !== null
+                    ? OUTSIDE_FIELD
+                    : useFieldControl({
+                          id: () => undefined,
+                          labelable: false,
+                          value: () => hex.value,
+                          // a slider always has a value
+                          filled: () => true,
+                          input: () => input.value,
+                          focusTarget: () => thumb.value,
+                      });
 
             const context: ColorSliderContext = {
                 field,

@@ -67,12 +67,15 @@ export const ColorPickerFormatSelect: PartComponent<
                             disabled: current.disabled,
                         }),
                         onChange: (event: Event) => {
-                            const next = (
-                                event.currentTarget as HTMLSelectElement
-                            ).value as ColorPickerFormat;
+                            const select =
+                                event.currentTarget as HTMLSelectElement;
+                            const next = select.value as ColorPickerFormat;
                             if (COLOR_PICKER_FORMATS.includes(next)) {
                                 context.setFormat(next, event);
                             }
+                            // the format the picker holds, until an update shows the accepted
+                            // one (a change a controlled `format` refuses updates nothing)
+                            select.value = context.state().format;
                         },
                         ref: setElement,
                     },

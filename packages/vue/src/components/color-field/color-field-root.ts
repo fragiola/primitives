@@ -33,7 +33,10 @@ import {
 } from "vue";
 import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
-import { useFieldControl } from "../../composables/use-field-control.ts";
+import {
+    OUTSIDE_FIELD,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import type {
     ChangeDetails,
@@ -234,14 +237,19 @@ export const ColorFieldRoot: PartComponent<
                       ? formatColor(value.value, "hex")
                       : String(channelValue.value),
             );
-            const field = useFieldControl({
-                id: inputId,
-                labelable: true,
-                value: () => (formValue.value === "" ? null : formValue.value),
-                filled: () => value.value !== null,
-                input: () => hidden.value,
-                focusTarget: () => input.value,
-            });
+            // inside a ColorPicker, the picker is the field's control: the control reads none
+            const field =
+                picker !== null
+                    ? OUTSIDE_FIELD
+                    : useFieldControl({
+                          id: inputId,
+                          labelable: true,
+                          value: () =>
+                              formValue.value === "" ? null : formValue.value,
+                          filled: () => value.value !== null,
+                          input: () => hidden.value,
+                          focusTarget: () => input.value,
+                      });
             const disabled = () =>
                 props.disabled ||
                 field.disabled() ||

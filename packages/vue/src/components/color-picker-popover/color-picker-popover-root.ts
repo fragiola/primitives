@@ -1,5 +1,5 @@
 import type { Align, Side } from "@fragiola/primitives/positioning";
-import { defineComponent, inject, provide, ref } from "vue";
+import { defineComponent, inject, provide, ref, watch } from "vue";
 import {
     type OverlayRootEmits,
     type OverlayRootProps,
@@ -37,6 +37,17 @@ export const ColorPickerPopoverRoot: PublicComponent<
             const root = useOverlayRoot(props, emit);
             expose(root.actions);
             const picker = inject(ColorPickerBindingKey, null);
+            // the popup is part of the picker: focus in it is no blur of the picker's Field
+            // (registered as its positioner mounts, before the popup's focus moves in)
+            watch(
+                root.positioner,
+                (positioner, _, onCleanup) => {
+                    if (positioner !== null && picker !== null) {
+                        onCleanup(picker.registerPopup(positioner));
+                    }
+                },
+                { flush: "sync", immediate: true },
+            );
             provide(ColorPickerPopoverKey, {
                 ...root,
                 placed: ref<{ side: Side; align: Align }>({

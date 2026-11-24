@@ -244,12 +244,13 @@ export const ColorAreaRoot: PartComponent<
                     onCleanup(
                         bridgeForm(first, {
                             reset: () => {
-                                // a bound control is reset by its picker
-                                if (bound() !== null) {
-                                    return;
-                                }
+                                // a bound control is reset by its picker; its inputs still
+                                // show the color again
                                 const next = toColor(defaultValue());
-                                if (!isSameColor(next, state.value.value)) {
+                                if (
+                                    bound() === null &&
+                                    !isSameColor(next, state.value.value)
+                                ) {
                                     state.set(next, { reason: "none" });
                                 }
                                 // the rendered values: Vue sets `value` as a property only, so

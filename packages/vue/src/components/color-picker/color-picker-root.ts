@@ -12,7 +12,6 @@ import {
     computed,
     defineComponent,
     h,
-    type InjectionKey,
     type PropType,
     provide,
     shallowRef,
@@ -28,7 +27,6 @@ import {
 } from "../../utils/public-component.ts";
 import { asProp, renderPart } from "../../utils/render-part.ts";
 import { stateAttributes } from "../../utils/state-attributes.ts";
-import { type FieldContext, FieldKey } from "../field/field-context.ts";
 import {
     type ColorPickerFormat,
     ColorPickerKey,
@@ -43,9 +41,13 @@ function toColor(value: Color | string): Color {
     return parseColor(value) ?? BLACK;
 }
 
-/** The space a format edits in (`hex`: rgb). */
-function formatSpace(format: ColorPickerFormat): ColorSpace {
-    return format === "hex" ? "rgb" : format;
+/**
+ * The space a format converts the value to: hsl and hsb (they share `saturation`, so the value's
+ * space decides); none for hex and rgb (red, green and blue are rgb's only, a hex reads any space,
+ * and a conversion to rgb would round the channels away: a gray's hue).
+ */
+function formatSpace(format: ColorPickerFormat): ColorSpace | null {
+    return format === "hsl" || format === "hsb" ? format : null;
 }
 
 export interface ColorPickerRootProps {
@@ -150,9 +152,36 @@ export const ColorPickerRoot: PartComponent<
                         : (getTabbables(element.value)[0] ?? null),
             });
             const disabled = () => props.disabled || field.disabled();
-            // the controls inside read no Field: the picker is the field's control
-            // (spec/color-picker.md, "Sharing the color")
-            provide(FieldKey as InjectionKey<FieldContext | null>, null);
+            // the popup's positioner, teleported out of the Root, is inside the picker for its
+            // Field: its focus events are listened to natively (they do not bubble to the Root)
+            const popups = new Set<HTMLElement>();
+            const inPopup = (node: Node) =>
+                [...popups].some((popup) => popup.contains(node));
+            const onFocusin = () => field.onFocus();
+            const onFocusout = (event: FocusEvent) => {
+                const next = event.relatedTarget as Node | null;
+                const target = event.target as Node | null;
+                // focus that leaves a closing popup for nowhere is returned to its trigger
+                // (Popover's focus return): no blur
+                const returned =
+                    next === null && target !== null && inPopup(target);
+                const inside =
+                    next !== null &&
+                    ((element.value?.contains(next) ?? false) || inPopup(next));
+                if (!inside && !returned) {
+                    field.onBlur();
+                }
+            };
+            const registerPopup = (popup: HTMLElement) => {
+                popups.add(popup);
+                popup.addEventListener("focusin", onFocusin);
+                popup.addEventListener("focusout", onFocusout);
+                return () => {
+                    popups.delete(popup);
+                    popup.removeEventListener("focusin", onFocusin);
+                    popup.removeEventListener("focusout", onFocusout);
+                };
+            };
             const commit = (color: Color, details: ChangeDetails) => {
                 emit("valueCommit", color, details);
             };
@@ -161,6 +190,7 @@ export const ColorPickerRoot: PartComponent<
                 setValue: (color, details) => value.set(color, details),
                 commit,
                 disabled,
+                registerPopup,
             });
             const state = (): ColorPickerState => ({
                 color: value.value.value,
@@ -175,7 +205,7 @@ export const ColorPickerRoot: PartComponent<
                     format.set(next, details);
                     const now = value.value.value;
                     const space = formatSpace(next);
-                    if (now.space !== space) {
+                    if (space !== null && now.space !== space) {
                         value.set(convertColor(now, space), details);
                     }
                 },
@@ -213,13 +243,6 @@ export const ColorPickerRoot: PartComponent<
                 { flush: "post" },
             );
 
-            const onFocusin = () => field.onFocus();
-            const onFocusout = (event: FocusEvent) => {
-                const next = event.relatedTarget as Node | null;
-                if (next === null || !element.value?.contains(next)) {
-                    field.onBlur();
-                }
-            };
             const setHidden = (node: unknown) => {
                 hidden.value = node as HTMLInputElement | null;
             };

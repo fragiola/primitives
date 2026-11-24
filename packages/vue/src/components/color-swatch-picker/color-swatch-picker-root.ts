@@ -22,7 +22,10 @@ import {
 } from "vue";
 import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
-import { useFieldControl } from "../../composables/use-field-control.ts";
+import {
+    OUTSIDE_FIELD,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useProvidedDirection } from "../../direction/direction-context.ts";
 import type {
@@ -189,15 +192,19 @@ export const ColorSwatchPickerRoot: PartComponent<
             const tabStopElement = () => tabStopOf(selected.value);
 
             // in a Field, the list is the field's control (spec/color-swatch-picker.md)
-            const field = useFieldControl({
-                id: () => undefined,
-                labelable: false,
-                value: () => state.value.value,
-                filled: () => state.value.value !== null,
-                input: () => hidden.value,
-                element: () => element.value,
-                focusTarget: tabStopElement,
-            });
+            // inside a ColorPicker, the picker is the field's control: the control reads none
+            const field =
+                picker !== null
+                    ? OUTSIDE_FIELD
+                    : useFieldControl({
+                          id: () => undefined,
+                          labelable: false,
+                          value: () => state.value.value,
+                          filled: () => state.value.value !== null,
+                          input: () => hidden.value,
+                          element: () => element.value,
+                          focusTarget: tabStopElement,
+                      });
             const disabled = () =>
                 props.disabled ||
                 field.disabled() ||

@@ -1,5 +1,5 @@
 import { openEyeDropper, supportsEyeDropper } from "@fragiola/primitives/color";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import { useRequiredContext } from "../../composables/use-required-context.ts";
 import {
     type PartComponent,
@@ -41,6 +41,10 @@ export const ColorPickerEyeDropperTrigger: PartComponent<
                 },
                 { flush: "post", immediate: true },
             );
+            // a pick that resolves once the picker is disabled, or the trigger unmounted, is
+            // dropped
+            let pending: AbortController | null = null;
+            onBeforeUnmount(() => pending?.abort());
             return () => {
                 if (!supported.value) {
                     return null;
@@ -58,10 +62,18 @@ export const ColorPickerEyeDropperTrigger: PartComponent<
                             "color-picker-eye-dropper-trigger",
                         ...stateAttributes({ disabled: current.disabled }),
                         onClick: (event: MouseEvent) => {
+                            pending?.abort();
+                            const controller = new AbortController();
+                            pending = controller;
                             void openEyeDropper(
                                 event.currentTarget as HTMLElement,
+                                controller.signal,
                             ).then((picked) => {
-                                if (picked !== null) {
+                                if (
+                                    picked !== null &&
+                                    !controller.signal.aborted &&
+                                    !context.state().disabled
+                                ) {
                                     context.pick(picked, event);
                                 }
                             });
