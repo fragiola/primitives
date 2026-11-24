@@ -137,3 +137,14 @@ describe("assignFiles", () => {
         }
     });
 });
+
+describe("watchFileDrop and a file input inside the target", () => {
+    it("is no press when the input's own click bubbles up", () => {
+        const { element, presses } = setup();
+        const input = document.createElement("input");
+        input.type = "file";
+        element.append(input);
+        input.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(presses).toEqual([]);
+    });
+});

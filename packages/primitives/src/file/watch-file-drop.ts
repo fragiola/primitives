@@ -96,6 +96,11 @@ export function watchFileDrop(
         }
     };
     const onClick = (event: MouseEvent) => {
+        // the click a file input inside the target gets when it is opened bubbles here: it is
+        // no press (it would open the dialog again)
+        if ((event.target as Element | null)?.tagName === "INPUT") {
+            return;
+        }
         if (!options.disabled()) {
             options.onActivate?.(event);
         }
