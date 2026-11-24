@@ -16,6 +16,7 @@ import {
     checkFiles,
     type FileAccept,
     type FileRejection,
+    fieldFiles,
 } from "@fragiola/primitives/file";
 import { bridgeForm } from "@fragiola/primitives/form";
 import { fieldControl } from "@fragiola/primitives-angular/field";
@@ -148,7 +149,7 @@ export class FileUploadRoot {
     readonly field = fieldControl({
         id: this.inputId,
         labelable: true,
-        value: this.files.value,
+        value: computed(() => fieldFiles(this.files.value())),
         filled: computed(() => this.files.value().length > 0),
         input: () => untracked(this.input),
         focusTarget: () => untracked(this.trigger) ?? untracked(this.dropzone),
@@ -241,7 +242,7 @@ export class FileUploadRoot {
         this.syncs.update((count) => count + 1);
         this.rejected.set(result.rejected);
         const details = { reason, event };
-        if (result.value !== current) {
+        if (result.accepted.length > 0) {
             this.files.set(result.value, details);
         }
         if (result.rejected.length > 0) {
@@ -308,7 +309,9 @@ export class FileUploadRoot {
     clear(event: Event): void {
         this.focusControl();
         this.rejected.set([]);
-        this.files.set(NO_FILES, { reason: "clear-press", event });
+        if (untracked(this.files.value).length > 0) {
+            this.files.set(NO_FILES, { reason: "clear-press", event });
+        }
     }
 
     protected onFocusOut(event: FocusEvent): void {

@@ -14,7 +14,7 @@ import {
     encapsulation: ViewEncapsulation.None,
     imports: [FILE_UPLOAD_PARTS, Output],
     template: `
-        <div fileUploadRoot #upload="fileUploadRoot" [accept]="'image/*'" (valueChangeDetails)="reason.set($event.details.reason)" (fileReject)="reason.set($event.details.reason)" class="${fileUpload.root}">
+        <div fileUploadRoot #upload="fileUploadRoot" [accept]="'image/*'" (valueChangeDetails)="reason.set($event.details.reason); changes.set(changes() + 1)" (fileReject)="reason.set($event.details.reason)" class="${fileUpload.root}">
             <label fileUploadLabel class="${fileUpload.label}">Avatar</label>
             <div fileUploadDropzone class="${fileUpload.dropzone}">Drop an image</div>
             <div class="flex items-center gap-2">
@@ -29,12 +29,13 @@ import {
                     </li>
                 }
             </ul>
-            <pre fixtureOutput [values]="{ value: fileNames(upload.state().value), rejected: rejections(upload.state().rejectedFiles), reason: reason() }"></pre>
+            <pre fixtureOutput [values]="{ value: fileNames(upload.state().value), rejected: rejections(upload.state().rejectedFiles), reason: reason(), changes: changes() }"></pre>
         </div>
     `,
 })
 export class FileUploadSingle {
     protected readonly reason = signal<string | undefined>(undefined);
+    protected readonly changes = signal(0);
     protected readonly fileNames = fileNames;
     protected readonly rejections = (
         rejected: readonly FileRejection<File>[],

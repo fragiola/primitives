@@ -7,13 +7,18 @@ import { fileNames, rejections } from "./file-upload-output.ts";
 
 // An avatar uploader (spec/file-upload.md, `/file-upload/single`).
 const reason = ref<string>();
+const changes = ref(0);
 const onChange = (_value: unknown, details: ChangeDetails) => {
     reason.value = details.reason;
+};
+const onValueChange = (value: unknown, details: ChangeDetails) => {
+    onChange(value, details);
+    changes.value += 1;
 };
 </script>
 
 <template>
-    <FileUpload.Root accept="image/*" @value-change="onChange" @file-reject="onChange">
+    <FileUpload.Root accept="image/*" @value-change="onValueChange" @file-reject="onChange">
         <template #default="{ value, rejectedFiles }">
             <FileUpload.Label>Avatar</FileUpload.Label>
             <FileUpload.Dropzone>Drop an image</FileUpload.Dropzone>
@@ -29,7 +34,7 @@ const onChange = (_value: unknown, details: ChangeDetails) => {
                     <FileUpload.ItemName />
                 </FileUpload.Item>
             </FileUpload.ItemGroup>
-            <Output :values="{ value: fileNames(value), rejected: rejections(rejectedFiles), reason }" />
+            <Output :values="{ value: fileNames(value), rejected: rejections(rejectedFiles), reason, changes }" />
         </template>
     </FileUpload.Root>
 </template>

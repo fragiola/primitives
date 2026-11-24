@@ -86,10 +86,16 @@ describe("watchFileDrop", () => {
         });
         element.dispatchEvent(space);
         expect(space.defaultPrevented).toBe(true);
+        expect(presses).toEqual(["click", "keydown"]);
+        element.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
+        expect(presses).toEqual(["click", "keydown", "keyup"]);
+        // a Space released after the focus left is no press
+        element.dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
+        element.dispatchEvent(new FocusEvent("blur"));
+        element.dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
         element.dispatchEvent(
-            new KeyboardEvent("keydown", { key: " ", repeat: true }),
+            new KeyboardEvent("keydown", { key: "Enter", repeat: true }),
         );
-        expect(presses).toEqual(["click", "keydown", "keydown"]);
         stop();
         element.click();
         expect(presses).toHaveLength(3);

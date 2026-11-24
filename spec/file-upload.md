@@ -62,7 +62,9 @@ framework's shared code, never DropZone's entry; its announcement is the toolkit
 
 **Root**:
 
-- `value` / `defaultValue` (`File[]`, `[]`) / `onValueChange(value, details)`: the accepted files.
+- `value` / `defaultValue` (`File[]`, `[]`) / `onValueChange(value, details)`: the accepted files;
+  called only when they change (a pick that accepts nothing, a ClearTrigger with no accepted file
+  call nothing).
   Reasons: `drop`, `input-paste` (the Dropzone), `input-change` (the dialog), `delete-press` (an
   ItemDeleteTrigger), `clear-press` (the ClearTrigger), `none` (a form reset).
 - `onFileReject(rejections, details)`: a pick had rejected files (`{ file, reasons }[]`, reasons
@@ -145,7 +147,9 @@ each file under `name` (`FormData.getAll(name)` holds the `File`s). `required` i
 `valueMissing` of an input with no file. A form reset empties the input (the browser) and returns
 the Root to `defaultValue` (reason `none`, no Field change), the rejected list emptied. In a Field
 (spec/field.md) the Root reports its value (the files), its filled state (a file) and the input's
-validity; the Field's label is `for` the HiddenInput.
+validity; the Field's label is `for` the HiddenInput. The Field compares the files by their name,
+size, type and last modification (the toolkit's `fieldFiles`: a `File`'s JSON is `{}`), so a
+replaced file is a change.
 
 ## RTL
 
@@ -198,14 +202,15 @@ Checks:
 An avatar uploader: a Root with `accept="image/*"` (`maxFiles` `1`), a Label **"Avatar"**, a
 Dropzone **"Drop an image"**, a Trigger **"Choose image"**, the HiddenInput and one Item for the
 value with its ItemPreview and ItemPreviewImage `alt="Avatar preview"`. Output: `value: ...`,
-`rejected: ...`, `reason: ...`.
+`rejected: ...`, `reason: ...`, `changes: ...` (the count of `onValueChange` calls).
 
 Checks:
 
 1. The HiddenInput has no `multiple`.
 2. Dropping `a.png` sets `value: a.png`; dropping `b.png` replaces it (`value: b.png`) and revokes
    `a.png`'s object URL.
-3. Dropping `c.png` and `d.png` together rejects both (`too-many`), the value unchanged.
+3. Dropping `c.png` and `d.png` together rejects both (`too-many`), the value unchanged and no
+   `onValueChange` (`changes: 2`): a pick that accepts nothing is no change.
 
 ### `/file-upload/form`
 

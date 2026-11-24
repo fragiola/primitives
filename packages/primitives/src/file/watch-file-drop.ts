@@ -23,8 +23,8 @@ export function dragHasFiles(event: DragEvent): boolean {
  * over it (counted across its children's enters and leaves) is reported and shows the `copy`
  * effect, its drop hands over the files, and a paste on it hands over the clipboard's files; a
  * drag of anything else is left alone. While `disabled()`, a drag of files shows the `none` effect
- * and its drop is canceled, so the browser does not open the file. A click, Enter or Space is a
- * press (`onActivate`; Space and Enter do not scroll the page nor repeat). Native listeners, so
+ * and its drop is canceled, so the browser does not open the file. A click, Enter (keydown) or Space (keyup)
+ * is a press (`onActivate`; neither scrolls the page, Enter does not repeat). Native listeners, so
  * every framework sees the same events. Returns the cleanup.
  */
 export function watchFileDrop(
@@ -105,6 +105,9 @@ export function watchFileDrop(
             options.onActivate?.(event);
         }
     };
+    // Enter presses on keydown, Space on keyup, as a native button (the APG button): moving the
+    // focus away before Space is released cancels the press
+    let spacePressed = false;
     const onKeyDown = (event: KeyboardEvent) => {
         if (
             event.target !== element ||
@@ -113,9 +116,25 @@ export function watchFileDrop(
             return;
         }
         event.preventDefault();
+        if (event.key === " ") {
+            spacePressed = true;
+            return;
+        }
         if (!event.repeat && !options.disabled()) {
             options.onActivate?.(event);
         }
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+        if (event.key !== " " || !spacePressed) {
+            return;
+        }
+        spacePressed = false;
+        if (event.target === element && !options.disabled()) {
+            options.onActivate?.(event);
+        }
+    };
+    const onBlur = () => {
+        spacePressed = false;
     };
     element.addEventListener("dragenter", onDragEnter);
     element.addEventListener("dragover", onDragOver);
@@ -124,6 +143,8 @@ export function watchFileDrop(
     element.addEventListener("paste", onPaste);
     element.addEventListener("click", onClick);
     element.addEventListener("keydown", onKeyDown);
+    element.addEventListener("keyup", onKeyUp);
+    element.addEventListener("blur", onBlur);
     return () => {
         element.removeEventListener("dragenter", onDragEnter);
         element.removeEventListener("dragover", onDragOver);
@@ -132,5 +153,7 @@ export function watchFileDrop(
         element.removeEventListener("paste", onPaste);
         element.removeEventListener("click", onClick);
         element.removeEventListener("keydown", onKeyDown);
+        element.removeEventListener("keyup", onKeyUp);
+        element.removeEventListener("blur", onBlur);
     };
 }

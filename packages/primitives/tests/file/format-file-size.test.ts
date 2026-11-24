@@ -10,6 +10,12 @@ describe("formatFileSize", () => {
         expect(formatFileSize(1500, "de-DE")).toBe("1,5 kB");
     });
 
+    it("chooses the unit after rounding", () => {
+        expect(formatFileSize(999_950, "en-US")).toBe("1 MB");
+        expect(formatFileSize(999_940, "en-US")).toBe("999.9 kB");
+        expect(formatFileSize(999, "en-US")).toBe("999 byte");
+    });
+
     it("stops at terabytes", () => {
         expect(formatFileSize(5e15, "en-US")).toBe("5,000 TB");
     });

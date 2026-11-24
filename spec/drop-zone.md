@@ -82,7 +82,7 @@ through `exportAs`, `#zone="dropZoneRoot"`) receive the state `{ dropTarget, dis
 | key | action |
 | --- | --- |
 | Tab | the Root is a tab stop (none while disabled) |
-| Enter, Space | open the file dialog (reason `input-change` when files are picked); Space does not scroll the page |
+| Enter, Space | open the file dialog (reason `input-change` when files are picked): Enter on keydown, Space on keyup, as a native button (the focus leaving before Space is released cancels it); Space does not scroll the page |
 | Ctrl+V, ⌘V | the browser's `paste` on the focused Root: its files are taken (reason `input-paste`); a paste of text only is ignored |
 
 ## Focus

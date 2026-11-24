@@ -12,7 +12,8 @@ export function formatFileSize(
 ): string {
     let value = Math.max(0, bytes);
     let unit = 0;
-    while (value >= 1000 && unit < UNITS.length - 1) {
+    // the unit is chosen after rounding to one fraction digit: 999 950 bytes is `1 MB`
+    while (Math.round(value * 10) / 10 >= 1000 && unit < UNITS.length - 1) {
         value /= 1000;
         unit += 1;
     }

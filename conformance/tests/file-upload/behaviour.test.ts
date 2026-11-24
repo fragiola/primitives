@@ -174,6 +174,8 @@ test.describe("file-upload / single", () => {
             "c.png (too-many); d.png (too-many)",
         );
         await expectOutput(page, "value", "b.png");
+        // a pick that accepts nothing is no change of the value
+        await expectOutput(page, "changes", "2");
         await expectNoAxeViolations(page);
     });
 });

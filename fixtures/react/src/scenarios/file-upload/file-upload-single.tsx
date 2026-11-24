@@ -7,12 +7,14 @@ import { fileNames, rejections } from "./file-upload-output.ts";
 /** An avatar uploader (spec/file-upload.md, `/file-upload/single`). */
 export function FileUploadSingle() {
     const [reason, setReason] = useState<string>();
+    const [changes, setChanges] = useState(0);
     return (
         <FileUpload.Root
             accept="image/*"
-            onValueChange={(_value: File[], details: ChangeDetails) =>
-                setReason(details.reason)
-            }
+            onValueChange={(_value: File[], details: ChangeDetails) => {
+                setReason(details.reason);
+                setChanges((count) => count + 1);
+            }}
             onFileReject={(_rejected, details: ChangeDetails) =>
                 setReason(details.reason)
             }
@@ -40,6 +42,7 @@ export function FileUploadSingle() {
                             value: fileNames(value),
                             rejected: rejections(rejectedFiles),
                             reason,
+                            changes,
                         }}
                     />
                 </>

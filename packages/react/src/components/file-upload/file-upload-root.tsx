@@ -5,6 +5,7 @@ import {
     checkFiles,
     type FileAccept,
     type FileRejection,
+    fieldFiles,
 } from "@fragiola/primitives/file";
 import { bridgeForm } from "@fragiola/primitives/form";
 import {
@@ -126,7 +127,7 @@ export function FileUploadRoot({
     const field = useFieldControl({
         id: inputId,
         labelable: true,
-        value,
+        value: useMemo(() => fieldFiles(value), [value]),
         filled: value.length > 0,
         input: () => input,
         focusTarget: () => trigger ?? dropzone,
@@ -175,7 +176,7 @@ export function FileUploadRoot({
             setSyncs((count) => count + 1);
             setRejectedFiles(result.rejected);
             const details = { reason, event };
-            if (result.value !== current.value) {
+            if (result.accepted.length > 0) {
                 setValue(result.value, details);
             }
             if (result.rejected.length > 0) {
@@ -249,7 +250,9 @@ export function FileUploadRoot({
         (event: Event) => {
             focusControl();
             setRejectedFiles([]);
-            setValue([], { reason: "clear-press", event });
+            if (latest.current.value.length > 0) {
+                setValue([], { reason: "clear-press", event });
+            }
         },
         [setValue, focusControl],
     );

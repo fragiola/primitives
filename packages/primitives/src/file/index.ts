@@ -19,6 +19,7 @@ export {
     type FileRejectionReason,
     type FileRules,
 } from "./check-files.ts";
+export { fieldFiles } from "./field-files.ts";
 export { formatFileSize } from "./format-file-size.ts";
 export { type FileDialogOptions, openFileDialog } from "./open-file-dialog.ts";
 export {

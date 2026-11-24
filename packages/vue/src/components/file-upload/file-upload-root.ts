@@ -5,6 +5,7 @@ import {
     checkFiles,
     type FileAccept,
     type FileRejection,
+    fieldFiles,
 } from "@fragiola/primitives/file";
 import { bridgeForm } from "@fragiola/primitives/form";
 import {
@@ -184,10 +185,11 @@ export const FileUploadRoot: PublicComponent<
             const labelId = `${generatedId}label`;
             const fileInput = () => input.value as HTMLInputElement | null;
 
+            const fieldValue = computed(() => fieldFiles(value.value));
             const field = useFieldControl({
                 id: inputId,
                 labelable: true,
-                value: () => value.value,
+                value: () => fieldValue.value,
                 filled: () => value.value.length > 0,
                 input: fileInput,
                 focusTarget: () => trigger.value ?? dropzone.value,
@@ -223,7 +225,7 @@ export const FileUploadRoot: PublicComponent<
                 syncs.value += 1;
                 rejectedFiles.value = result.rejected;
                 const details = { reason, event };
-                if (result.value !== value.value) {
+                if (result.accepted.length > 0) {
                     own.set(result.value, details);
                 }
                 if (result.rejected.length > 0) {
@@ -284,7 +286,9 @@ export const FileUploadRoot: PublicComponent<
             const clear = (event: Event) => {
                 focusControl();
                 rejectedFiles.value = [];
-                own.set([], { reason: "clear-press", event });
+                if (value.value.length > 0) {
+                    own.set([], { reason: "clear-press", event });
+                }
             };
 
             // a form reset returns to the default value (spec/file-upload.md, "Forms")
