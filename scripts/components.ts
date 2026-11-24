@@ -31,6 +31,8 @@ export const COMPONENTS = [
     "color-wheel",
     "combobox",
     "combobox-virtual",
+    "command",
+    "command-virtual",
     "context-menu",
     "date-field",
     "date-picker",
