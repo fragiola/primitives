@@ -137,6 +137,7 @@ export const MECHANISMS = [
     "command",
     "date",
     "direction",
+    "file",
     "focus",
     "form",
     "hover",

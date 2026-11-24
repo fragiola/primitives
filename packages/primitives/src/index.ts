@@ -12,6 +12,7 @@ export * from "./color/index.ts";
 export * from "./command/index.ts";
 export * from "./date/index.ts";
 export * from "./direction/index.ts";
+export * from "./file/index.ts";
 export * from "./focus/index.ts";
 export * from "./form/index.ts";
 export * from "./hover/index.ts";
