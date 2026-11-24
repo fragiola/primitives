@@ -75,7 +75,10 @@ export const GUARD = {
  * nothing (it holds no form value), and none of them imports Button's or Toast's entry. Link,
  * Breadcrumbs, Steps and Carousel are built on nothing (Epic #97): Breadcrumbs' Link shares Link's
  * behaviour through each framework's own code, its Ellipsis never imports Menu, and Carousel's
- * tabbed Indicators never import Tabs. Any other component's code in an entry is a leak; a
+ * tabbed Indicators never import Tabs. ColorSlider and ColorField are Field controls (Epic #99);
+ * ColorArea and ColorWheel are built on nothing, and none of the four imports Slider's or
+ * NumberField's entry (their range, drag and number code is the toolkit's). Any other component's
+ * code in an entry is a leak; a
  * utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
@@ -90,6 +93,8 @@ export const ENTRY_DEPENDENCIES: Readonly<
     "calendar-view": ["calendar", "month-calendar"],
     checkbox: ["checkbox-group", "field"],
     "checkbox-group": ["field"],
+    "color-field": ["field"],
+    "color-slider": ["field"],
     combobox: ["field"],
     "combobox-virtual": ["combobox", "field"],
     "context-menu": ["menu"],
@@ -203,6 +208,8 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
     // `timeZone={timeZone(...)}`), so no component entry imports them and an app that passes none
     // bundles none of their code
     "calendar-systems": [],
+    // the color model (Epic #99): the color components' only, so no other entry bundles it
+    color: ["color-area", "color-field", "color-slider", "color-wheel"],
     // the month and year values, grid and names (Epic #79): the day calendars never import them
     "month-year": MONTH_YEAR,
     segments: SEGMENTED,
