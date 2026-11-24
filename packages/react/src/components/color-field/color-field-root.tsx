@@ -20,6 +20,7 @@ import {
 } from "@fragiola/primitives/form";
 import { parseNumber } from "@fragiola/primitives/number";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useColorPickerBinding } from "../../hooks/use-color-picker-binding.ts";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
 import type {
@@ -101,7 +102,7 @@ export interface ColorFieldRootProps extends PartProps<ColorFieldState> {
  */
 export function ColorFieldRoot({
     value: valueProp,
-    defaultValue = null,
+    defaultValue: defaultValueProp,
     onValueChange,
     channel,
     colorSpace,
@@ -116,10 +117,29 @@ export function ColorFieldRoot({
 }: ColorFieldRootProps) {
     const generatedId = useId();
     const inputId = idProp ?? generatedId;
-    const [current, setOwnValue] = useControllableState<
-        Color | null,
-        ChangeDetails
-    >(toColor(valueProp), toColor(defaultValue) ?? null, onValueChange);
+    const defaultValue = defaultValueProp ?? null;
+    // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+    const { picker, bound } = useColorPickerBinding(
+        valueProp !== undefined || defaultValueProp !== undefined,
+    );
+    const [own, setOwn] = useControllableState<Color | null, ChangeDetails>(
+        toColor(valueProp),
+        toColor(defaultValue) ?? null,
+        onValueChange,
+    );
+    const current = bound === null ? own : bound.value;
+    const setOwnValue =
+        bound === null
+            ? setOwn
+            : (next: Color | null, details: ChangeDetails) => {
+                  // a bound field never commits `null`: its text goes back to the picker's
+                  if (next === null) {
+                      return;
+                  }
+                  onValueChange?.(next, details);
+                  bound.setValue(next, details);
+                  bound.commit(next, details);
+              };
     const space =
         channel === undefined
             ? (current?.space ?? "rgb")
@@ -155,8 +175,11 @@ export function ColorFieldRoot({
         filled: value !== null,
         input: () => hidden.current,
         focusTarget: () => input,
+        // inside a ColorPicker, the picker is the field's control
+        skip: picker !== null,
     });
-    const disabled = disabledProp || field.disabled;
+    const disabled =
+        disabledProp || field.disabled || (picker?.disabled ?? false);
 
     const latest = useRef({
         value,
@@ -169,6 +192,7 @@ export function ColorFieldRoot({
         defaultValue,
         setOwnValue,
         reset: field.reset,
+        bound,
     });
     latest.current = {
         value,
@@ -181,6 +205,7 @@ export function ColorFieldRoot({
         defaultValue,
         setOwnValue,
         reset: field.reset,
+        bound,
     };
 
     const actions = useMemo(() => {
@@ -303,8 +328,12 @@ export function ColorFieldRoot({
         return bridgeForm(element, {
             reset: () => {
                 const state = latest.current;
-                state.reset();
                 setTyped(null);
+                // a bound field is reset by its picker
+                if (state.bound !== null) {
+                    return;
+                }
+                state.reset();
                 const next = toColor(state.defaultValue) ?? null;
                 if (!isSameColor(next, state.value)) {
                     state.setOwnValue(next, { reason: "none" });
@@ -355,7 +384,7 @@ export function ColorFieldRoot({
                 type="text"
                 aria-hidden="true"
                 tabIndex={-1}
-                name={field.name ?? name}
+                name={bound === null ? (field.name ?? name) : undefined}
                 value={formValue}
                 required={required}
                 disabled={disabled}

@@ -34,10 +34,10 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-open` | an open overlay (a popup, its positioner, its arrow, a dialog's backdrop and viewport); an open collapsible, accordion item and their parts |
 | `data-closed` | a rendered overlay part that is not open (its exit runs, or the Portal's `keepMounted` keeps it, `hidden`); a closed collapsible, accordion item and their parts (with `data-open`: exactly one is present) |
 | `data-panel-open` | a collapsible's or an accordion's trigger while its panel is open |
-| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's or a date picker's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
+| `data-popup-open` | a trigger while its overlay is open: the active one of several detached triggers only (a Select's, a date picker's or a color picker popover's trigger, a Combobox's or an Autocomplete's input, input group and trigger too, a context menu's area) |
 | `data-starting-style` | an element that just mounted, for one frame: transition from it |
 | `data-ending-style` | an element whose exit animation runs; it unmounts (or is hidden) once its animations end: an overlay, a tabs panel, a collapsible or accordion panel |
-| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a selected tag of a tag group, a chosen calendar date |
+| `data-selected` | a selected tab and its panel, a selected select, combobox or listbox option, a selected tag of a tag group, a selected color swatch picker option, a chosen calendar date |
 | `data-checked`, `data-unchecked`, `data-indeterminate` | a checkbox's state (exactly one is present) and its indicator; a switch's and a radio's `data-checked` or `data-unchecked`, on its thumb or indicator too; a menu checkbox or radio item's, and its indicator's; a segmented control's item and its text; a rating's star (the one that holds the value is checked) |
 | `data-indeterminate`, `data-progressing`, `data-complete` | a progress bar's status, on every part (exactly one is present): no value, a value below `max`, `max`; `data-complete` also on every part of an OTP field whose code is complete |
 | `data-scrubbing` | every part of a number field while its scrub area scrubs |
@@ -53,6 +53,7 @@ A boolean state is an attribute that is **present** (with an empty value) or **a
 | `data-dragging` | a slider (a color slider, a color area, a color wheel) while a pointer drags a thumb; a carousel's slides' container while a mouse drags them |
 | `data-channel` | a color slider's and a color field's parts, a color area's inputs: the color channel they edit (a value: `hue`, `saturation`, `lightness`, `brightness`, `red`, `green`, `blue`, `alpha`) |
 | `data-axis` | a color area's input: `x` or `y` (a value) |
+| `data-format` | a color picker and its FormatSelect: its format (a value: `hex`, `rgb`, `hsl`, `hsb`) |
 | `data-index` | a slider thumb's value index; an OTP field slot's index; a virtual list's rendered option's index; a carousel slide's index (a value) |
 | `data-loading` | a virtual list while `loading` (with `aria-busy="true"`) |
 | `data-required` | a required checkbox, switch, radio group, segmented control or rating, and its radios; every part of a required number field, OTP field, date or time field, or range field |

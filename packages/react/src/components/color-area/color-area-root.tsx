@@ -29,6 +29,7 @@ import {
     useState,
 } from "react";
 import { DirectionContext } from "../../direction/direction-context.ts";
+import { useColorPickerBinding } from "../../hooks/use-color-picker-binding.ts";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useElement } from "../../hooks/use-element.ts";
 import type {
@@ -77,23 +78,37 @@ export interface ColorAreaRootProps extends PartProps<ColorAreaState> {
  */
 export function ColorAreaRoot({
     value: valueProp,
-    defaultValue = WHITE_HUE,
+    defaultValue: defaultValueProp,
     onValueChange,
     onValueCommit,
     xChannel: xChannelProp,
     yChannel: yChannelProp,
     colorSpace,
-    disabled = false,
+    disabled: disabledProp = false,
     locale,
     children,
     ...props
 }: ColorAreaRootProps) {
     const direction = useContext(DirectionContext);
-    const [current, setCurrent] = useControllableState<Color, ChangeDetails>(
+    const defaultValue = defaultValueProp ?? WHITE_HUE;
+    // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+    const { picker, bound } = useColorPickerBinding(
+        valueProp !== undefined || defaultValueProp !== undefined,
+    );
+    const disabled = disabledProp || (picker?.disabled ?? false);
+    const [own, setOwn] = useControllableState<Color, ChangeDetails>(
         toColor(valueProp),
         toColor(defaultValue) as Color,
         onValueChange,
     );
+    const current = bound === null ? own : bound.value;
+    const setCurrent =
+        bound === null
+            ? setOwn
+            : (next: Color, details: ChangeDetails) => {
+                  onValueChange?.(next, details);
+                  bound.setValue(next, details);
+              };
     const { space, xChannel, yChannel } = colorAreaChannels(current, {
         xChannel: xChannelProp,
         yChannel: yChannelProp,
@@ -123,6 +138,7 @@ export function ColorAreaRoot({
         disabled,
         onValueCommit,
         setCurrent,
+        bound,
     });
     latest.current = {
         current,
@@ -134,6 +150,7 @@ export function ColorAreaRoot({
         disabled,
         onValueCommit,
         setCurrent,
+        bound,
     };
     const provided = useRef(direction);
     provided.current = direction;
@@ -165,8 +182,13 @@ export function ColorAreaRoot({
         [],
     );
     const commit = useCallback((committed?: Color) => {
-        const { color: now, onValueCommit: onCommit } = latest.current;
+        const {
+            color: now,
+            onValueCommit: onCommit,
+            bound: to,
+        } = latest.current;
         onCommit?.(committed ?? now, { reason: "none" });
+        to?.commit(committed ?? now, { reason: "none" });
     }, []);
     const registerInput = useCallback(
         (axis: ColorAreaAxis, input: HTMLInputElement | null) =>
@@ -186,6 +208,10 @@ export function ColorAreaRoot({
         }
         return bridgeForm(first, {
             reset: () => {
+                // a bound control is reset by its picker
+                if (latest.current.bound !== null) {
+                    return;
+                }
                 const next = toColor(initial.current) as Color;
                 if (!isSameColor(next, latest.current.current)) {
                     latest.current.setCurrent(next, { reason: "none" });

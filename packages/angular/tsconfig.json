@@ -104,6 +104,10 @@
         "color-field",
         "color-slider",
         "color-wheel",
+        "color-swatch",
+        "color-swatch-picker",
+        "color-picker",
+        "color-picker-popover",
         "tests",
         "*.config.ts"
     ]

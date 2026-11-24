@@ -1,0 +1,169 @@
+---
+title: ColorPickerPopover
+description: A ColorPicker's opt-in popup, a trigger and a non-modal dialog on Popover's overlay lifecycle, in each framework.
+---
+
+Open a [ColorPicker](/docs/api/color-picker) in a popover: a Trigger (showing a
+[ColorSwatch](/docs/api/color-swatch) of the color) and a non-modal [dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) (Popover's) holding the controls,
+placed inside the picker's Root, so the form keeps the color while the popup is closed. It is its
+own entry: an inline picker never bundles it.
+
+<Example id="color-picker" />
+
+## Behaviour
+
+- **Focus**: on open, the popup's first tabbable control; not trapped; Tab from its last control
+  moves past the trigger and closes it, Shift+Tab from its first returns to the trigger.
+- **Dismissal**: Escape (focus back on the trigger), a press outside (focus back on the trigger
+  unless the press focused something), focus leaving.
+- **Placement**: below the trigger, aligned to its start, flipping and shifting to stay in view.
+- **Disabled** with its picker: the Trigger opens nothing.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | none | | holds the open state |
+| Trigger | `button` | `color-picker-popover-trigger` | toggles the popup |
+| Portal | none | | moves the Positioner to the body |
+| Positioner | `div` | `color-picker-popover-positioner` | places the popup |
+| Popup | `div` | `color-picker-popover-popup` | the non-modal `dialog` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorPicker } from "@fragiola/primitives-react/color-picker";
+import { ColorPickerPopover } from "@fragiola/primitives-react/color-picker-popover";
+import { ColorSwatch } from "@fragiola/primitives-react/color-swatch";
+
+<ColorPicker.Root name="accent" defaultValue="#336699">
+    <ColorPickerPopover.Root>
+        <ColorPickerPopover.Trigger aria-label="Accent color">
+            <ColorSwatch />
+        </ColorPickerPopover.Trigger>
+        <ColorPickerPopover.Portal>
+            <ColorPickerPopover.Positioner sideOffset={8}>
+                <ColorPickerPopover.Popup aria-label="Accent color picker">
+                    {/* ColorArea, ColorSlider, ColorField... */}
+                </ColorPickerPopover.Popup>
+            </ColorPickerPopover.Positioner>
+        </ColorPickerPopover.Portal>
+    </ColorPickerPopover.Root>
+</ColorPicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorPicker.Root v-model:value="color">
+        <ColorPickerPopover.Root v-model:open="open">
+            <ColorPickerPopover.Trigger aria-label="Accent color"><ColorSwatch /></ColorPickerPopover.Trigger>
+            <ColorPickerPopover.Portal>
+                <ColorPickerPopover.Positioner :side-offset="8">
+                    <ColorPickerPopover.Popup aria-label="Accent color picker">...</ColorPickerPopover.Popup>
+                </ColorPickerPopover.Positioner>
+            </ColorPickerPopover.Portal>
+        </ColorPickerPopover.Root>
+    </ColorPicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorPickerRoot, ColorPickerPopoverRoot, ColorPickerPopoverTrigger, ColorPickerPopoverPortal, ColorPickerPopoverPositioner, ColorPickerPopoverPopup, ColorSwatch],
+    template: `
+        <div colorPickerRoot [(value)]="color">
+            <div colorPickerPopoverRoot>
+                <button colorPickerPopoverTrigger aria-label="Accent color"><div colorSwatch></div></button>
+                <ng-template colorPickerPopoverPortal>
+                    <div colorPickerPopoverPositioner [sideOffset]="8">
+                        <div colorPickerPopoverPopup aria-label="Accent color picker">...</div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    `,
+})
+export class AccentColor {
+    protected readonly color = signal<Color | string>("#336699");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives. The
+names below are React's; Vue binds them the same way (`v-model:open`), and Angular as inputs and
+outputs (`[(open)]`, `(openChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | | open, controlled |
+| `defaultOpen` | `boolean` | `false` | open at first, uncontrolled |
+| `onOpenChange` | `(open, details: OpenChangeDetails) => void` | | before it opens or closes (`trigger-press`, `escape-key`, `outside-press`, `focus-out`) |
+| `onOpenChangeComplete` | `(open) => void` | | its transition finished |
+| `actionsRef` (react) | `{ current: OverlayActions \| null }` | | `close()`, `unmount()` |
+
+### Trigger
+
+No props of its own.
+
+### Portal
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `container` (react, vue) | `Element` | the body | where the Positioner moves |
+| `keepMounted` (react, vue) | `boolean` | `false` | stays mounted while closed |
+| `options` (angular) | `Element \| { container?, keepMounted? }` | `{}` | the same two options: `*colorPickerPopoverPortal="{ keepMounted: true }"` |
+
+### Positioner
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `side` | `Side` | `"bottom"` | the side of the trigger |
+| `align` | `Align` | `"start"` | the alignment on that side |
+| `sideOffset` | `number` | `0` | px from the trigger |
+| `alignOffset` | `number` | `0` | px along the side |
+| `collisionPadding` | `number` | `8` | px kept from the viewport's edges |
+| `anchor` | `HTMLElement` | the Trigger | what it is placed against |
+
+### Popup
+
+No props of its own; name it with `aria-label` or `aria-labelledby`.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Trigger | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-popup-open`, `data-disabled` |
+| Positioner | `role="presentation"`, `data-side`, `data-align`, `data-open`, `data-closed`, its CSS variables |
+| Popup | `role="dialog"`, `tabindex="-1"`, `data-side`, `data-align`, `data-open`, `data-closed`, `data-starting-style`, `data-ending-style` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Enter, Space on the Trigger | toggles the popup |
+| Tab | moves through the popup; from its last control, to the element after the trigger, closing it |
+| Shift+Tab | from its first control, back to the trigger, closing it |
+| Escape | closes it and focuses the trigger |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-picker-popover` | `Align`, `ChangeDetails`, `ChangeReason`, `ColorPickerPopover`, `ColorPickerPopoverPopupProps`, `ColorPickerPopoverPopupState`, `ColorPickerPopoverPortalProps`, `ColorPickerPopoverPositionerProps`, `ColorPickerPopoverPositionerState`, `ColorPickerPopoverRootProps`, `ColorPickerPopoverTriggerProps`, `ColorPickerPopoverTriggerState`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootProps`, `PositionerProps`, `RenderProp`, `Side` |
+| `@fragiola/primitives-vue/color-picker-popover` | `Align`, `ChangeDetails`, `ChangeReason`, `ColorPickerPopover`, `ColorPickerPopoverPopupProps`, `ColorPickerPopoverPopupState`, `ColorPickerPopoverPortalProps`, `ColorPickerPopoverPositionerState`, `ColorPickerPopoverRootEmits`, `ColorPickerPopoverRootProps`, `ColorPickerPopoverTriggerProps`, `ColorPickerPopoverTriggerState`, `OpenChangeDetails`, `OverlayActions`, `OverlayPortalProps`, `OverlayRootEmits`, `OverlayRootProps`, `PositionerProps`, `RenderSlotProps`, `Side` |
+| `@fragiola/primitives-angular/color-picker-popover` | `Align`, `ChangeDetails`, `ChangeReason`, `ColorPickerPopoverPopup`, `ColorPickerPopoverPopupState`, `ColorPickerPopoverPortal`, `ColorPickerPopoverPositioner`, `ColorPickerPopoverPositionerState`, `ColorPickerPopoverRoot`, `ColorPickerPopoverState`, `ColorPickerPopoverTrigger`, `OpenChangeDetails`, `OpenChangeEvent`, `OverlayActions`, `OverlayPortalOptions`, `Side` |

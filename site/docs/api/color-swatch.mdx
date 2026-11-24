@@ -1,0 +1,98 @@
+---
+title: ColorSwatch
+description: A preview of a color, an image over the recipe's checkerboard, named by the app, in each framework.
+---
+
+Show a color: an `img` (the [APG](https://www.w3.org/WAI/ARIA/apg/patterns/)'s `img` role, named) whose color is a CSS variable, drawn over a checkerboard by your styles so
+its transparency shows. It has no behaviour of its own: inside a
+[ColorPicker](/docs/api/color-picker) it shows the picker's color, and inside a
+[ColorSwatchPicker](/docs/api/color-swatch-picker) Item it is the option's content.
+
+<Example id="color-picker" />
+
+## Behaviour
+
+- **Color**: `color` (a `Color` or a string); without one, an enclosing ColorPicker's color, else
+  transparent black.
+- **Name**: yours (`aria-label`, `aria-labelledby`). Without one, the swatch is named by the
+  color's CSS text (`"rgb(51, 102, 153)"`): data, not words, since an image must have a name. The
+  library has no color names (English copy).
+- **Drawing**: `--color-swatch-color` (with its alpha) and `--color-swatch-color-opaque`; the
+  checkerboard is your style: `background: linear-gradient(var(--color-swatch-color),
+  var(--color-swatch-color)), repeating-conic-gradient(#d4d4d8 0% 25%, #fff 0% 50%) 50% / 12px
+  12px`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| ColorSwatch | `div` | `color-swatch-root` | the `img` |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorSwatch } from "@fragiola/primitives-react/color-swatch";
+
+<ColorSwatch color="#336699" aria-label="Ocean" />;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorSwatch color="rgba(255, 0, 0, 0.5)" aria-label="Translucent red" />
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorSwatch],
+    template: `<div colorSwatch [color]="color()" aria-label="Brand color"></div>`,
+})
+export class BrandSwatch {
+    protected readonly color = signal("#336699");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. Angular declares `aria-label` and `aria-labelledby` as inputs, so it knows whether
+you named the swatch (bind them as `[aria-label]`).
+
+### ColorSwatch
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `color` | `Color \| string` | the picker's, else transparent | the color it shows |
+| `ariaLabel` (angular) | `string` | the color's CSS text | its name |
+| `ariaLabelledby` (angular) | `string` | | the element that names it |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| ColorSwatch | `role="img"`, `aria-label` (the color's CSS text, unless you name it), `--color-swatch-color`, `--color-swatch-color-opaque` |
+
+## Keyboard
+
+None: a swatch is an image and takes no focus (inside a ColorSwatchPicker, its Item does).
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-swatch` | `Color`, `ColorSpace`, `ColorSwatch`, `ColorSwatchProps`, `ColorSwatchState`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-swatch` | `Color`, `ColorSpace`, `ColorSwatch`, `ColorSwatchProps`, `ColorSwatchState`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-swatch` | `Color`, `ColorSpace`, `ColorSwatch`, `ColorSwatchState`, `HsbColor`, `HslColor`, `RgbColor` |

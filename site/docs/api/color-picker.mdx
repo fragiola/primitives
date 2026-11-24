@@ -1,0 +1,160 @@
+---
+title: ColorPicker
+description: One color shared by the color controls inside it, a format switch, the browser's eyedropper and its form value, in each framework.
+---
+
+Edit one color with several controls: a `Root` holds the color and shares it with every
+[ColorArea](/docs/api/color-area), [ColorSlider](/docs/api/color-slider),
+[ColorWheel](/docs/api/color-wheel), [ColorField](/docs/api/color-field),
+[ColorSwatchPicker](/docs/api/color-swatch-picker) and [ColorSwatch](/docs/api/color-swatch) placed
+inside it. Inline it renders in the page; in a popover, add the opt-in
+[ColorPickerPopover](/docs/api/color-picker-popover): an inline picker bundles no overlay code.
+
+<Example id="color-picker" />
+
+## Behaviour
+
+- **Sharing**: a control inside the Root with neither `value` nor `defaultValue` is bound to it:
+  it shows the picker's color and every change it makes is the picker's (its own `onValueChange`
+  fires too). A control given its own `value` or `defaultValue` keeps its own state.
+- **Inside the picker**, every control is disabled with it and reads no Field (the picker is the
+  field's control); a bound control submits nothing of its own.
+- **Value**: reported as the control that changed it reports it (each in the space it edits);
+  `onValueCommit` once a change is complete (a drag ended, a key, a ColorField's commit, a
+  swatch chosen, an eyedropper pick).
+- **Format**: `hex`, `rgb`, `hsl` or `hsb`: which channel fields you show. The FormatSelect sets it
+  and converts the value to the format's space, so those fields edit it in their space.
+- **Eyedropper**: the EyeDropperTrigger renders only where the browser has `EyeDropper`
+  (Chromium), once mounted; a pick keeps the value's space and alpha.
+- **Forms**: a hidden input submits the color as hex; a form reset returns the picker, and every
+  bound control with it, to the default.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-picker-root` | a `group` holding the color and the format |
+| FormatSelect | `select` | `color-picker-format-select` | the format; its options are yours |
+| EyeDropperTrigger | `button` | `color-picker-eye-dropper-trigger` | picks a color on screen |
+| (hidden input) | `input type="hidden"` | `color-picker-input` | the color as hex |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorArea } from "@fragiola/primitives-react/color-area";
+import { ColorPicker } from "@fragiola/primitives-react/color-picker";
+import { ColorSlider } from "@fragiola/primitives-react/color-slider";
+
+<ColorPicker.Root aria-label="Theme color" name="theme" defaultValue="#7c3aed">
+    <ColorArea.Root xChannel="saturation" yChannel="brightness">
+        <ColorArea.Thumb>
+            <ColorArea.Input axis="x" aria-label="Saturation" />
+            <ColorArea.Input axis="y" aria-label="Brightness" />
+        </ColorArea.Thumb>
+    </ColorArea.Root>
+    <ColorSlider.Root channel="hue">
+        <ColorSlider.Track>
+            <ColorSlider.Thumb aria-label="Hue" />
+        </ColorSlider.Track>
+    </ColorSlider.Root>
+    <ColorPicker.EyeDropperTrigger>Pick from the screen</ColorPicker.EyeDropperTrigger>
+</ColorPicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorPicker.Root v-model:value="color" v-model:format="format" aria-label="Theme color">
+        <ColorSlider.Root channel="hue">
+            <ColorSlider.Track><ColorSlider.Thumb aria-label="Hue" /></ColorSlider.Track>
+        </ColorSlider.Root>
+        <ColorPicker.FormatSelect aria-label="Format">
+            <option value="hex">Hex</option>
+            <option value="rgb">RGB</option>
+        </ColorPicker.FormatSelect>
+        <ColorField.Root v-if="format === 'hex'"><ColorField.Input aria-label="Hex" /></ColorField.Root>
+    </ColorPicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorPickerRoot, ColorPickerEyeDropperTrigger, ColorSliderRoot, ColorSliderTrack, ColorSliderThumb],
+    template: `
+        <div colorPickerRoot aria-label="Theme color" [(value)]="color">
+            <div colorSliderRoot channel="hue">
+                <div colorSliderTrack><div colorSliderThumb aria-label="Hue"></div></div>
+            </div>
+            <button *colorPickerEyeDropperTrigger>Pick from the screen</button>
+        </div>
+    `,
+})
+export class ThemeColor {
+    protected readonly color = signal<Color | string>("#7c3aed");
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`v-model:format`, `@value-commit`), and Angular as inputs and outputs (`[(value)]`, `[(format)]`,
+`(valueCommit)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string` | | the color, controlled |
+| `defaultValue` | `Color \| string` | `"#000000"` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color, details: { reason }) => void` | | a bound control's change, the format's conversion (`input-change`), a pick (`trigger-press`), a reset (`none`) |
+| `onValueCommit` | `(value: Color, details: { reason }) => void` | | a change is complete |
+| `format` | `"hex" \| "rgb" \| "hsl" \| "hsb"` | | the format, controlled |
+| `defaultFormat` | `"hex" \| "rgb" \| "hsl" \| "hsb"` | `"hex"` | the initial format |
+| `onFormatChange` | `(format, details: { reason }) => void` | | the FormatSelect changed it (`input-change`) |
+| `disabled` | `boolean` | `false` | every control inside is disabled |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+
+### FormatSelect
+
+No props of its own; its children are your `<option value="hex">` (and `rgb`, `hsl`, `hsb`).
+
+### EyeDropperTrigger
+
+No props of its own; its content and name are yours.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`, `data-format`, `data-disabled`, `--color-picker-color`; in a Field, its ids and states |
+| FormatSelect | `disabled`, `data-format`, `data-disabled` |
+| EyeDropperTrigger | `type="button"`, `disabled`, `data-disabled` |
+| hidden input | `type="hidden"`, `name`, `value` (the hex), `disabled` |
+
+## Keyboard
+
+The Root adds no key of its own: each control inside keeps its own (the
+[slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) keys of a ColorSlider, a ColorArea and
+a ColorWheel, a ColorField's Enter and arrows, a ColorSwatchPicker's listbox keys); the
+FormatSelect is a native `select` and the EyeDropperTrigger a native `button`.
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorPicker`, `ColorPickerEyeDropperTriggerProps`, `ColorPickerFormat`, `ColorPickerFormatSelectProps`, `ColorPickerRootProps`, `ColorPickerState`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorPicker`, `ColorPickerEyeDropperTriggerProps`, `ColorPickerFormat`, `ColorPickerFormatSelectProps`, `ColorPickerRootEmits`, `ColorPickerRootProps`, `ColorPickerState`, `ColorSpace`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorPickerEyeDropperTrigger`, `ColorPickerFormat`, `ColorPickerFormatSelect`, `ColorPickerRoot`, `ColorPickerState`, `ColorSpace`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |

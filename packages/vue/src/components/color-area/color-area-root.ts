@@ -29,6 +29,7 @@ import {
     shallowRef,
     watch,
 } from "vue";
+import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
 import { useProvidedDirection } from "../../direction/direction-context.ts";
@@ -101,7 +102,7 @@ export const ColorAreaRoot: PartComponent<
             },
             defaultValue: {
                 type: [Object, String] as PropType<Color | string>,
-                default: () => WHITE_HUE,
+                default: undefined,
             },
             xChannel: {
                 type: String as PropType<ColorChannel>,
@@ -127,17 +128,29 @@ export const ColorAreaRoot: PartComponent<
         },
         setup(props, { attrs, slots, emit }) {
             const direction = useProvidedDirection();
-            const state = useControllable<Color, ChangeDetails>(
+            const report = (next: Color, details: ChangeDetails) => {
+                emit("update:value", next);
+                emit("valueChange", next, details);
+            };
+            const defaultValue = () => props.defaultValue ?? WHITE_HUE;
+            // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+            const state = useColorPickerBinding(
                 () =>
-                    props.value === undefined
-                        ? undefined
-                        : toColor(props.value),
-                toColor(props.defaultValue),
-                (next, details) => {
-                    emit("update:value", next);
-                    emit("valueChange", next, details);
-                },
+                    props.value !== undefined ||
+                    props.defaultValue !== undefined,
+                useControllable<Color, ChangeDetails>(
+                    () =>
+                        props.value === undefined
+                            ? undefined
+                            : toColor(props.value),
+                    toColor(defaultValue()),
+                    report,
+                ),
+                report,
             );
+            const { picker, bound } = state;
+            const disabled = () =>
+                props.disabled || (picker?.disabled() ?? false);
             const channels = computed(() =>
                 colorAreaChannels(state.value.value, {
                     xChannel: props.xChannel,
@@ -173,7 +186,7 @@ export const ColorAreaRoot: PartComponent<
                 yValue,
                 xRange: () => colorChannelRange(channels.value.xChannel),
                 yRange: () => colorChannelRange(channels.value.yChannel),
-                disabled: () => props.disabled,
+                disabled,
                 dragging,
                 locale: () => props.locale,
                 activeAxis,
@@ -205,9 +218,9 @@ export const ColorAreaRoot: PartComponent<
                     return next;
                 },
                 commit(committed?: Color) {
-                    emit("valueCommit", committed ?? color.value, {
-                        reason: "none",
-                    });
+                    const done = committed ?? color.value;
+                    emit("valueCommit", done, { reason: "none" });
+                    bound()?.commit(done, { reason: "none" });
                 },
                 inputs,
                 registerInput(
@@ -231,8 +244,13 @@ export const ColorAreaRoot: PartComponent<
                     onCleanup(
                         bridgeForm(first, {
                             reset: () => {
-                                const next = toColor(props.defaultValue);
-                                if (!isSameColor(next, state.value.value)) {
+                                // a bound control is reset by its picker; its inputs still
+                                // show the color again
+                                const next = toColor(defaultValue());
+                                if (
+                                    bound() === null &&
+                                    !isSameColor(next, state.value.value)
+                                ) {
                                     state.set(next, { reason: "none" });
                                 }
                                 // the rendered values: Vue sets `value` as a property only, so
@@ -277,7 +295,7 @@ export const ColorAreaRoot: PartComponent<
 
             const onPointerdown = (event: PointerEvent) => {
                 if (
-                    props.disabled ||
+                    disabled() ||
                     (event.pointerType === "mouse" && event.button !== 0)
                 ) {
                     return;

@@ -143,10 +143,30 @@
             "types": "./dist/types/fragiola-primitives-angular-color-field.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-color-field.mjs"
         },
+        "./color-picker": {
+            "@fragiola/source": "./color-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-picker.mjs"
+        },
+        "./color-picker-popover": {
+            "@fragiola/source": "./color-picker-popover/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-picker-popover.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-picker-popover.mjs"
+        },
         "./color-slider": {
             "@fragiola/source": "./color-slider/public-api.ts",
             "types": "./dist/types/fragiola-primitives-angular-color-slider.d.ts",
             "default": "./dist/fesm2022/fragiola-primitives-angular-color-slider.mjs"
+        },
+        "./color-swatch": {
+            "@fragiola/source": "./color-swatch/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-swatch.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-swatch.mjs"
+        },
+        "./color-swatch-picker": {
+            "@fragiola/source": "./color-swatch-picker/public-api.ts",
+            "types": "./dist/types/fragiola-primitives-angular-color-swatch-picker.d.ts",
+            "default": "./dist/fesm2022/fragiola-primitives-angular-color-swatch-picker.mjs"
         },
         "./color-wheel": {
             "@fragiola/source": "./color-wheel/public-api.ts",

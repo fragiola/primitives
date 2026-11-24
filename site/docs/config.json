@@ -258,6 +258,22 @@
                     "path": "api/color-field"
                 },
                 {
+                    "label": "ColorSwatch",
+                    "path": "api/color-swatch"
+                },
+                {
+                    "label": "ColorSwatchPicker",
+                    "path": "api/color-swatch-picker"
+                },
+                {
+                    "label": "ColorPicker",
+                    "path": "api/color-picker"
+                },
+                {
+                    "label": "ColorPickerPopover",
+                    "path": "api/color-picker-popover"
+                },
+                {
                     "label": "Select",
                     "path": "api/select"
                 },

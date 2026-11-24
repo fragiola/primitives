@@ -25,6 +25,7 @@ import {
     shallowRef,
     watch,
 } from "vue";
+import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
 import type {
     ChangeDetails,
@@ -98,7 +99,7 @@ export const ColorWheelRoot: PartComponent<
             },
             defaultValue: {
                 type: [Object, String] as PropType<Color | string>,
-                default: () => RED,
+                default: undefined,
             },
             /** The space of the hue (default: the value's, else hsb). */
             colorSpace: {
@@ -121,17 +122,29 @@ export const ColorWheelRoot: PartComponent<
             valueCommit: (_value: Color, _details: ChangeDetails) => true,
         },
         setup(props, { attrs, slots, emit }) {
-            const state = useControllable<Color, ChangeDetails>(
+            const report = (next: Color, details: ChangeDetails) => {
+                emit("update:value", next);
+                emit("valueChange", next, details);
+            };
+            const defaultValue = () => props.defaultValue ?? RED;
+            // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+            const state = useColorPickerBinding(
                 () =>
-                    props.value === undefined
-                        ? undefined
-                        : toColor(props.value),
-                toColor(props.defaultValue),
-                (next, details) => {
-                    emit("update:value", next);
-                    emit("valueChange", next, details);
-                },
+                    props.value !== undefined ||
+                    props.defaultValue !== undefined,
+                useControllable<Color, ChangeDetails>(
+                    () =>
+                        props.value === undefined
+                            ? undefined
+                            : toColor(props.value),
+                    toColor(defaultValue()),
+                    report,
+                ),
+                report,
             );
+            const { picker, bound } = state;
+            const disabled = () =>
+                props.disabled || (picker?.disabled() ?? false);
             const color = computed(() =>
                 convertColor(
                     state.value.value,
@@ -153,7 +166,7 @@ export const ColorWheelRoot: PartComponent<
                 hue,
                 outerRadius: () => props.outerRadius,
                 innerRadius: () => props.innerRadius,
-                disabled: () => props.disabled,
+                disabled,
                 dragging,
                 valueText,
                 setHue(next: number, reason: ChangeReason) {
@@ -167,9 +180,9 @@ export const ColorWheelRoot: PartComponent<
                     return changed;
                 },
                 commit(committed?: Color) {
-                    emit("valueCommit", committed ?? color.value, {
-                        reason: "none",
-                    });
+                    const done = committed ?? color.value;
+                    emit("valueCommit", done, { reason: "none" });
+                    bound()?.commit(done, { reason: "none" });
                 },
                 thumb,
             };
@@ -185,7 +198,11 @@ export const ColorWheelRoot: PartComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
-                                const next = toColor(props.defaultValue);
+                                // a bound wheel is reset by its picker
+                                if (bound() !== null) {
+                                    return;
+                                }
+                                const next = toColor(defaultValue());
                                 if (!isSameColor(next, state.value.value)) {
                                     state.set(next, { reason: "none" });
                                 }
@@ -198,7 +215,7 @@ export const ColorWheelRoot: PartComponent<
 
             const onPointerdown = (event: PointerEvent) => {
                 if (
-                    props.disabled ||
+                    disabled() ||
                     (event.pointerType === "mouse" && event.button !== 0)
                 ) {
                     return;
@@ -273,7 +290,7 @@ export const ColorWheelRoot: PartComponent<
                                     element as HTMLInputElement | null;
                             },
                             type: "hidden",
-                            name: props.name,
+                            name: bound() === null ? props.name : undefined,
                             value: formatColor(current.color, "hex"),
                             "data-primitives-part": "color-wheel-input",
                         }),

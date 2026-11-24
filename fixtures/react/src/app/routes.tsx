@@ -47,10 +47,17 @@ import { ColorAreaRgb } from "../scenarios/color-area/color-area-rgb.tsx";
 import { ColorFieldBasic } from "../scenarios/color-field/color-field-basic.tsx";
 import { ColorFieldChannel } from "../scenarios/color-field/color-field-channel.tsx";
 import { ColorFieldField } from "../scenarios/color-field/color-field-field.tsx";
+import { ColorPickerBasic } from "../scenarios/color-picker/color-picker-basic.tsx";
+import { ColorPickerDisabled } from "../scenarios/color-picker/color-picker-disabled.tsx";
+import { ColorPickerField } from "../scenarios/color-picker/color-picker-field.tsx";
+import { ColorPickerPopoverScenario } from "../scenarios/color-picker/color-picker-popover.tsx";
 import { ColorSliderAlpha } from "../scenarios/color-slider/color-slider-alpha.tsx";
 import { ColorSliderBasic } from "../scenarios/color-slider/color-slider-basic.tsx";
 import { ColorSliderSpace } from "../scenarios/color-slider/color-slider-space.tsx";
 import { ColorSliderVertical } from "../scenarios/color-slider/color-slider-vertical.tsx";
+import { ColorSwatchBasic } from "../scenarios/color-swatch/color-swatch-basic.tsx";
+import { ColorSwatchPickerBasic } from "../scenarios/color-swatch-picker/color-swatch-picker-basic.tsx";
+import { ColorSwatchPickerField } from "../scenarios/color-swatch-picker/color-swatch-picker-field.tsx";
 import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.tsx";
 import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.tsx";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
@@ -348,6 +355,14 @@ export const routes: Record<
     "/color-field/basic": ColorFieldBasic,
     "/color-field/channel": ColorFieldChannel,
     "/color-field/field": ColorFieldField,
+    "/color-swatch/basic": ColorSwatchBasic,
+    "/color-swatch-picker/basic": ColorSwatchPickerBasic,
+    "/color-swatch-picker/rtl": ColorSwatchPickerBasic,
+    "/color-swatch-picker/field": ColorSwatchPickerField,
+    "/color-picker/basic": ColorPickerBasic,
+    "/color-picker/popover": ColorPickerPopoverScenario,
+    "/color-picker/field": ColorPickerField,
+    "/color-picker/disabled": ColorPickerDisabled,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,

@@ -1,5 +1,5 @@
 // The entry of @fragiola/primitives-angular/internal: what the components' entries share (state
-// attributes, controllable inputs, the overlay root, presence, the portal, host registration,
+// attributes, a color picker's binding, controllable inputs, the overlay root, presence, the portal, host registration,
 // ids and label ids, change details, the handles and triggers of detached triggers, the hidden form inputs, structural views, own attributes, the
 // provided direction, a disclosure panel's transitions, a button's behaviour, a disabled link's press, the roving-focus scope and a
 // ToggleGroup's context, the virtual lists' rows).
@@ -9,6 +9,7 @@
 
 export * from "./utils/button-behaviour.ts";
 export * from "./utils/change-details.ts";
+export * from "./utils/color-picker-binding.ts";
 export * from "./utils/conditional-view.ts";
 export * from "./utils/controllable.ts";
 export * from "./utils/flush.ts";

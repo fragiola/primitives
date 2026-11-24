@@ -15,6 +15,7 @@ import {
 import { bridgeForm } from "@fragiola/primitives/form";
 import { snapToStep } from "@fragiola/primitives/range";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useColorPickerBinding } from "../../hooks/use-color-picker-binding.ts";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import { useFieldControl } from "../../hooks/use-field-control.ts";
 import type {
@@ -60,7 +61,7 @@ export interface ColorSliderRootProps extends PartProps<ColorSliderState> {
  */
 export function ColorSliderRoot({
     value: valueProp,
-    defaultValue = "#000000",
+    defaultValue: defaultValueProp,
     onValueChange,
     onValueCommit,
     channel,
@@ -72,11 +73,24 @@ export function ColorSliderRoot({
     children,
     ...props
 }: ColorSliderRootProps) {
-    const [current, setCurrent] = useControllableState<Color, ChangeDetails>(
+    const defaultValue = defaultValueProp ?? "#000000";
+    // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+    const { picker, bound } = useColorPickerBinding(
+        valueProp !== undefined || defaultValueProp !== undefined,
+    );
+    const [own, setOwn] = useControllableState<Color, ChangeDetails>(
         toColor(valueProp),
         toColor(defaultValue) as Color,
         onValueChange,
     );
+    const current = bound === null ? own : bound.value;
+    const setCurrent =
+        bound === null
+            ? setOwn
+            : (next: Color, details: ChangeDetails) => {
+                  onValueChange?.(next, details);
+                  bound.setValue(next, details);
+              };
     const space = colorSpaceFor(channel, current, colorSpace);
     const color = convertColor(current, space);
     const value = getColorChannel(color, channel);
@@ -94,8 +108,11 @@ export function ColorSliderRoot({
         filled: true,
         input: () => input.current,
         focusTarget: () => thumb,
+        // inside a ColorPicker, the picker is the field's control
+        skip: picker !== null,
     });
-    const disabled = disabledProp || field.disabled;
+    const disabled =
+        disabledProp || field.disabled || (picker?.disabled ?? false);
 
     const latest = useRef({
         current,
@@ -103,8 +120,16 @@ export function ColorSliderRoot({
         channel,
         onValueCommit,
         setCurrent,
+        bound,
     });
-    latest.current = { current, color, channel, onValueCommit, setCurrent };
+    latest.current = {
+        current,
+        color,
+        channel,
+        onValueCommit,
+        setCurrent,
+        bound,
+    };
 
     // a form reset returns the slider to its default (spec/README.md, "Forms")
     const initial = useRef({ defaultValue, reset: field.reset });
@@ -116,6 +141,10 @@ export function ColorSliderRoot({
         }
         return bridgeForm(element, {
             reset: () => {
+                // a bound slider is reset by its picker
+                if (latest.current.bound !== null) {
+                    return;
+                }
                 const next = toColor(initial.current.defaultValue) as Color;
                 // no change reported when the slider already is at its default
                 if (!isSameColor(next, latest.current.current)) {
@@ -140,8 +169,13 @@ export function ColorSliderRoot({
         [],
     );
     const commit = useCallback((committed?: Color) => {
-        const { color: now, onValueCommit: onCommit } = latest.current;
+        const {
+            color: now,
+            onValueCommit: onCommit,
+            bound: to,
+        } = latest.current;
         onCommit?.(committed ?? now, { reason: "none" });
+        to?.commit(committed ?? now, { reason: "none" });
     }, []);
 
     const valueText = formatColorChannel(color, channel, locale, value);
@@ -194,7 +228,11 @@ export function ColorSliderRoot({
                             <input
                                 ref={input}
                                 type="hidden"
-                                name={field.name ?? name}
+                                name={
+                                    bound === null
+                                        ? (field.name ?? name)
+                                        : undefined
+                                }
                                 value={hex}
                                 data-primitives-part="color-slider-input"
                             />

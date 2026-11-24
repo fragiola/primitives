@@ -36,6 +36,7 @@ import {
     controllable,
     createHiddenInput,
     dataValues,
+    injectColorPickerBinding,
     injectFlush,
     injectHost,
     injectId,
@@ -117,7 +118,7 @@ export class ColorFieldRoot {
     /** A `Color`, a string `parseColor` reads, or `null` (empty); bound, the field is controlled. */
     readonly value = input<Color | string | null | undefined>(undefined);
     readonly valueChange = output<Color | null>();
-    readonly defaultValue = input<Color | string | null>(null);
+    readonly defaultValue = input<Color | string | null | undefined>(undefined);
     readonly valueChangeDetails = output<ValueChangeEvent<Color | null>>();
     /** The channel the field edits (none: the whole color, as hex). */
     readonly channel = input<ColorChannel | undefined>(undefined);
@@ -137,15 +138,48 @@ export class ColorFieldRoot {
     private readonly generatedId = injectId("primitives-color-field");
     /** The Input's `id`. */
     readonly inputId = computed(() => this.id() ?? this.generatedId);
-    private readonly own = controllable<Color | null, ChangeDetails>(
+    private readonly ownValue = controllable<Color | null, ChangeDetails>(
         computed(() => {
             const value = this.value();
             return value === undefined ? undefined : toColor(value);
         }),
         this.valueChange,
-        () => toColor(this.defaultValue()),
+        () => toColor(this.defaultValue() ?? null),
         (value, details) => this.valueChangeDetails.emit({ value, details }),
     );
+
+    /** The enclosing ColorPicker's binding (spec/color-picker.md, "Sharing the color"). */
+    private readonly picker = injectColorPickerBinding();
+    /** Bound to the picker's color: inside one, with neither `value` nor `defaultValue`. */
+    private readonly bound = computed(() =>
+        this.picker !== null &&
+        this.value() === undefined &&
+        this.defaultValue() === undefined
+            ? this.picker
+            : null,
+    );
+    /** The value: the picker's when bound, else its own. */
+    private readonly own = {
+        value: computed(() => {
+            const bound = this.bound();
+            return bound === null ? this.ownValue.value() : bound.value();
+        }),
+        set: (next: Color | null, details: ChangeDetails) => {
+            const bound = untracked(this.bound);
+            if (bound === null) {
+                this.ownValue.set(next, details);
+                return;
+            }
+            // a bound field never commits `null`: its text goes back to the picker's
+            if (next === null) {
+                return;
+            }
+            this.valueChange.emit(next);
+            this.valueChangeDetails.emit({ value: next, details });
+            bound.setValue(next, details);
+            bound.commit(next, details);
+        },
+    };
     private readonly space = computed(() => {
         const current = this.own.value();
         const channel = this.channel();
@@ -216,9 +250,14 @@ export class ColorFieldRoot {
         filled: computed(() => this.color() !== null),
         input: () => this.hidden,
         focusTarget: () => this.inputElement(),
+        // inside a ColorPicker, the picker is the field's control
+        part: this.picker !== null,
     });
     readonly isDisabled = computed(
-        () => this.disabled() || this.field.disabled(),
+        () =>
+            this.disabled() ||
+            this.field.disabled() ||
+            (this.picker?.disabled() ?? false),
     );
     readonly state = computed<ColorFieldState>(() => ({
         value: this.color(),
@@ -249,8 +288,10 @@ export class ColorFieldRoot {
 
     constructor() {
         const hidden = this.hidden;
-        const formName = computed(
-            () => this.field.name() ?? this.name() ?? null,
+        const formName = computed(() =>
+            this.bound() === null
+                ? (this.field.name() ?? this.name() ?? null)
+                : null,
         );
         effect(() => {
             const state = this.state();
@@ -270,9 +311,15 @@ export class ColorFieldRoot {
         afterNextRender(() => {
             stop = bridgeForm(hidden, {
                 reset: () => {
-                    this.field.reset();
                     this.typed.set(null);
-                    const next = toColor(untracked(this.defaultValue));
+                    // a bound field is reset by its picker
+                    if (untracked(this.bound) !== null) {
+                        this.flush();
+                        this.writeText();
+                        return;
+                    }
+                    this.field.reset();
+                    const next = toColor(untracked(this.defaultValue) ?? null);
                     if (!isSameColor(next, untracked(this.color))) {
                         this.own.set(next, { reason: "none" });
                     }

@@ -67,6 +67,15 @@ const MORE_RECIPES: Record<string, readonly string[]> = {
         "_recipes/color-slider.ts",
         "_recipes/color-wheel.ts",
     ],
+    // the theme color picker (Epic #101): its popup and every control bound to the picker
+    "color-picker": [
+        "_recipes/color-area.ts",
+        "_recipes/color-field.ts",
+        "_recipes/color-picker-popover.ts",
+        "_recipes/color-slider.ts",
+        "_recipes/color-swatch-picker.ts",
+        "_recipes/color-swatch.ts",
+    ],
     fieldset: ["_recipes/checkbox.ts", "_recipes/field.ts"],
     form: ["_recipes/field.ts"],
     // the toggles of a ToggleGroup, the ToggleGroups of a Toolbar, the menus of a Menubar
@@ -131,6 +140,7 @@ const TOOLKIT_EXAMPLES: ReadonlySet<string> = new Set([
     "calendar-system",
     "date-field-time-zone",
     "color-editor",
+    "color-picker",
 ]);
 
 describe("the manifest", () => {
@@ -187,6 +197,7 @@ describe("the manifest", () => {
                 "search-field",
                 "editable",
                 "color-editor",
+                "color-picker",
                 "date-picker",
                 "calendar",
                 "date-field",

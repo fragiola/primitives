@@ -22,6 +22,7 @@ import {
     useRef,
     useState,
 } from "react";
+import { useColorPickerBinding } from "../../hooks/use-color-picker-binding.ts";
 import { useControllableState } from "../../hooks/use-controllable-state.ts";
 import type {
     ChangeDetails,
@@ -72,23 +73,37 @@ export interface ColorWheelRootProps extends PartProps<ColorWheelState> {
  */
 export function ColorWheelRoot({
     value: valueProp,
-    defaultValue = RED,
+    defaultValue: defaultValueProp,
     onValueChange,
     onValueCommit,
     colorSpace,
     outerRadius = 100,
     innerRadius = 75,
-    disabled = false,
+    disabled: disabledProp = false,
     name,
     locale,
     children,
     ...props
 }: ColorWheelRootProps) {
-    const [current, setCurrent] = useControllableState<Color, ChangeDetails>(
+    const defaultValue = defaultValueProp ?? RED;
+    // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+    const { picker, bound } = useColorPickerBinding(
+        valueProp !== undefined || defaultValueProp !== undefined,
+    );
+    const disabled = disabledProp || (picker?.disabled ?? false);
+    const [own, setOwn] = useControllableState<Color, ChangeDetails>(
         toColor(valueProp),
         toColor(defaultValue) as Color,
         onValueChange,
     );
+    const current = bound === null ? own : bound.value;
+    const setCurrent =
+        bound === null
+            ? setOwn
+            : (next: Color, details: ChangeDetails) => {
+                  onValueChange?.(next, details);
+                  bound.setValue(next, details);
+              };
     const color = convertColor(
         current,
         colorSpaceFor("hue", current, colorSpace),
@@ -108,6 +123,7 @@ export function ColorWheelRoot({
         outerRadius,
         onValueCommit,
         setCurrent,
+        bound,
     });
     latest.current = {
         current,
@@ -116,6 +132,7 @@ export function ColorWheelRoot({
         outerRadius,
         onValueCommit,
         setCurrent,
+        bound,
     };
 
     // a form reset returns the wheel to its default (spec/color-wheel.md, "Forms")
@@ -128,6 +145,10 @@ export function ColorWheelRoot({
         }
         return bridgeForm(element, {
             reset: () => {
+                // a bound control is reset by its picker
+                if (latest.current.bound !== null) {
+                    return;
+                }
                 const next = toColor(initial.current) as Color;
                 if (!isSameColor(next, latest.current.current)) {
                     latest.current.setCurrent(next, { reason: "none" });
@@ -147,8 +168,13 @@ export function ColorWheelRoot({
         return changed;
     }, []);
     const commit = useCallback((committed?: Color) => {
-        const { color: now, onValueCommit: onCommit } = latest.current;
+        const {
+            color: now,
+            onValueCommit: onCommit,
+            bound: to,
+        } = latest.current;
         onCommit?.(committed ?? now, { reason: "none" });
+        to?.commit(committed ?? now, { reason: "none" });
     }, []);
 
     const onPointerDown = (event: PointerEvent<HTMLElement>) => {
@@ -232,7 +258,7 @@ export function ColorWheelRoot({
                             <input
                                 ref={input}
                                 type="hidden"
-                                name={name}
+                                name={bound === null ? name : undefined}
                                 value={hex}
                                 data-primitives-part="color-wheel-input"
                             />

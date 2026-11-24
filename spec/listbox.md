@@ -72,6 +72,9 @@ options (rule 2: no component state):
   size and the typeahead;
 - `pageTarget(elements, current, delta, container, orientation)`: the option a page away
   (PageUp, PageDown), measured on the scroll container.
+- `rowTarget(elements, current, delta)`: the option in the row above or below, in a list laid
+  out in wrapping rows, measured on the rendered boxes (ColorSwatchPicker's ArrowUp and ArrowDown,
+  spec/color-swatch-picker.md).
 
 Typeahead is `createTypeahead` from `/collection`. Each framework registers its items, holds the
 value, the focused option and the anchor, and calls these.

@@ -1,0 +1,142 @@
+---
+title: ColorSwatchPicker
+description: A palette of swatches for choosing one color, the APG listbox laid out in rows, as a form control, in each framework.
+---
+
+Choose one color from a palette: the APG
+[listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) in single selection, its options laid
+out in wrapping rows by your styles, the vertical arrows moving between rows. It works in a native
+`<form>` and a [Field](/docs/api/field), and inside a [ColorPicker](/docs/api/color-picker) it
+shows and sets the picker's color.
+
+<Example id="color-picker" />
+
+## Behaviour
+
+- **Value**: a `Color` or `null`; an option is selected when its color is the value's (compared
+  as `#rrggbbaa`, so an `hsb` value selects the `#ff0000` swatch of the same color).
+- **Keys**: ArrowRight / ArrowLeft along the list (swapped in RTL, wrapping), ArrowDown / ArrowUp
+  to the nearest option of the row below or above (measured on the rendered layout), Home / End;
+  a focus move never selects, Space and Enter do (the APG's recommended model).
+- **Pointer**: a press focuses and selects; a disabled option takes focus, never the selection.
+- **Forms**: a hidden input submits the selected color as hex; a form reset returns to the default.
+- **In a ColorPicker**, with neither `value` nor `defaultValue`, it is bound to the picker's color
+  (and submits nothing of its own).
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `color-swatch-picker-root` | the `listbox` |
+| Item | `div` | `color-swatch-picker-item` | an `option`, its content a ColorSwatch |
+| (hidden input) | `input type="hidden"` | `color-swatch-picker-input` | what the form submits |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { ColorSwatch } from "@fragiola/primitives-react/color-swatch";
+import { ColorSwatchPicker } from "@fragiola/primitives-react/color-swatch-picker";
+
+<ColorSwatchPicker.Root aria-label="Accent" name="accent" defaultValue="#2563eb">
+    <ColorSwatchPicker.Item value="#2563eb">
+        <ColorSwatch color="#2563eb" aria-label="Blue" />
+    </ColorSwatchPicker.Item>
+    <ColorSwatchPicker.Item value="#16a34a">
+        <ColorSwatch color="#16a34a" aria-label="Green" />
+    </ColorSwatchPicker.Item>
+</ColorSwatchPicker.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <ColorSwatchPicker.Root v-model:value="accent" aria-label="Accent">
+        <ColorSwatchPicker.Item v-for="swatch in swatches" :key="swatch.color" :value="swatch.color">
+            <ColorSwatch :color="swatch.color" :aria-label="swatch.name" />
+        </ColorSwatchPicker.Item>
+    </ColorSwatchPicker.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [ColorSwatchPickerRoot, ColorSwatchPickerItem, ColorSwatch],
+    template: `
+        <div colorSwatchPickerRoot aria-label="Accent" [(value)]="accent">
+            @for (swatch of swatches; track swatch.color) {
+                <div colorSwatchPickerItem [value]="swatch.color">
+                    <div colorSwatch [color]="swatch.color" [aria-label]="swatch.name"></div>
+                </div>
+            }
+        </div>
+    `,
+})
+export class Accent {
+    protected readonly accent = signal<Color | string | null>(null);
+    protected readonly swatches = [
+        { name: "Blue", color: "#2563eb" },
+        { name: "Green", color: "#16a34a" },
+    ];
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`), and
+Angular as inputs and outputs (`[(value)]`, `(valueChangeDetails)`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string \| null` | | the selected color, controlled |
+| `defaultValue` | `Color \| string \| null` | `null` | the initial color, uncontrolled |
+| `onValueChange` | `(value: Color \| null, details: { reason }) => void` | | a choice (`item-press`, `keyboard`) or a form reset (`none`) |
+| `disabled` | `boolean` | `false` | every option is disabled and none takes focus |
+| `name` | `string` | | the hidden input's form name (a Field's wins) |
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `Color \| string` | | the color it selects (required) |
+| `disabled` | `boolean` | `false` | takes focus, never the selection |
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="listbox"`, `aria-orientation="horizontal"`, `aria-disabled`, `data-disabled`; in a Field, its ids and states |
+| Item | `role="option"`, `tabindex` (roving), `aria-selected`, `aria-disabled`, `data-selected`, `data-highlighted`, `data-disabled`, `--color-swatch-picker-item-color` |
+| hidden input | `type="hidden"`, `name`, `value` (the hex, or `""`), `disabled` |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| ArrowRight / ArrowLeft | the next / previous option (swapped in RTL), wrapping |
+| ArrowDown / ArrowUp | the option in the row below / above |
+| Home / End | the first / last option |
+| Space, Enter | selects the focused option |
+| Tab | leaves; the next Tab in lands on the selected option |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/color-swatch-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorSwatchPicker`, `ColorSwatchPickerItemProps`, `ColorSwatchPickerItemState`, `ColorSwatchPickerRootProps`, `ColorSwatchPickerRootState`, `HsbColor`, `HslColor`, `RenderProp`, `RgbColor` |
+| `@fragiola/primitives-vue/color-swatch-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorSwatchPicker`, `ColorSwatchPickerItemProps`, `ColorSwatchPickerItemState`, `ColorSwatchPickerRootEmits`, `ColorSwatchPickerRootProps`, `ColorSwatchPickerRootState`, `HsbColor`, `HslColor`, `RenderSlotProps`, `RgbColor` |
+| `@fragiola/primitives-angular/color-swatch-picker` | `ChangeDetails`, `ChangeReason`, `Color`, `ColorSpace`, `ColorSwatchPickerItem`, `ColorSwatchPickerItemState`, `ColorSwatchPickerRoot`, `ColorSwatchPickerRootState`, `HsbColor`, `HslColor`, `RgbColor`, `ValueChangeEvent` |

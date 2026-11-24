@@ -24,8 +24,12 @@ import {
     shallowRef,
     watch,
 } from "vue";
+import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
-import { useFieldControl } from "../../composables/use-field-control.ts";
+import {
+    OUTSIDE_FIELD,
+    useFieldControl,
+} from "../../composables/use-field-control.ts";
 import type {
     ChangeDetails,
     ChangeReason,
@@ -92,7 +96,7 @@ export const ColorSliderRoot: PartComponent<
             },
             defaultValue: {
                 type: [Object, String] as PropType<Color | string>,
-                default: "#000000",
+                default: undefined,
             },
             /** The channel the slider edits. */
             channel: {
@@ -120,17 +124,27 @@ export const ColorSliderRoot: PartComponent<
             valueCommit: (_value: Color, _details: ChangeDetails) => true,
         },
         setup(props, { attrs, slots, emit }) {
-            const state = useControllable<Color, ChangeDetails>(
+            const report = (next: Color, details: ChangeDetails) => {
+                emit("update:value", next);
+                emit("valueChange", next, details);
+            };
+            const defaultValue = () => props.defaultValue ?? "#000000";
+            // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+            const state = useColorPickerBinding(
                 () =>
-                    props.value === undefined
-                        ? undefined
-                        : toColor(props.value),
-                toColor(props.defaultValue),
-                (next, details) => {
-                    emit("update:value", next);
-                    emit("valueChange", next, details);
-                },
+                    props.value !== undefined ||
+                    props.defaultValue !== undefined,
+                useControllable<Color, ChangeDetails>(
+                    () =>
+                        props.value === undefined
+                            ? undefined
+                            : toColor(props.value),
+                    toColor(defaultValue()),
+                    report,
+                ),
+                report,
             );
+            const { picker, bound } = state;
             const space = computed(() =>
                 colorSpaceFor(
                     props.channel,
@@ -158,15 +172,19 @@ export const ColorSliderRoot: PartComponent<
             const thumb = shallowRef<HTMLElement | null>(null);
             const dragging = ref(false);
             const labelId = ref<string>();
-            const field = useFieldControl({
-                id: () => undefined,
-                labelable: false,
-                value: () => hex.value,
-                // a slider always has a value
-                filled: () => true,
-                input: () => input.value,
-                focusTarget: () => thumb.value,
-            });
+            // inside a ColorPicker, the picker is the field's control: the control reads none
+            const field =
+                picker !== null
+                    ? OUTSIDE_FIELD
+                    : useFieldControl({
+                          id: () => undefined,
+                          labelable: false,
+                          value: () => hex.value,
+                          // a slider always has a value
+                          filled: () => true,
+                          input: () => input.value,
+                          focusTarget: () => thumb.value,
+                      });
 
             const context: ColorSliderContext = {
                 field,
@@ -176,7 +194,10 @@ export const ColorSliderRoot: PartComponent<
                 value,
                 range,
                 orientation: () => props.orientation,
-                disabled: () => props.disabled || field.disabled(),
+                disabled: () =>
+                    props.disabled ||
+                    field.disabled() ||
+                    (picker?.disabled() ?? false),
                 dragging,
                 valueText,
                 setChannelValue(next: number, reason: ChangeReason) {
@@ -197,9 +218,9 @@ export const ColorSliderRoot: PartComponent<
                     return changed;
                 },
                 commit(committed?: Color) {
-                    emit("valueCommit", committed ?? color.value, {
-                        reason: "none",
-                    });
+                    const done = committed ?? color.value;
+                    emit("valueCommit", done, { reason: "none" });
+                    bound()?.commit(done, { reason: "none" });
                 },
                 thumb,
                 labelId,
@@ -216,7 +237,11 @@ export const ColorSliderRoot: PartComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
-                                const next = toColor(props.defaultValue);
+                                // a bound slider is reset by its picker
+                                if (bound() !== null) {
+                                    return;
+                                }
+                                const next = toColor(defaultValue());
                                 // no change reported when it already is at its default
                                 if (!isSameColor(next, state.value.value)) {
                                     field.reset();
@@ -255,7 +280,10 @@ export const ColorSliderRoot: PartComponent<
                                     element as HTMLInputElement | null;
                             },
                             type: "hidden",
-                            name: field.name() ?? props.name,
+                            name:
+                                bound() === null
+                                    ? (field.name() ?? props.name)
+                                    : undefined,
                             value: hex.value,
                             "data-primitives-part": "color-slider-input",
                         }),

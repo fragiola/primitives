@@ -159,11 +159,35 @@
             "import": "./dist/color-field.js",
             "default": "./dist/color-field.js"
         },
+        "./color-picker": {
+            "@fragiola/source": "./src/components/color-picker/index.ts",
+            "types": "./dist/color-picker.d.ts",
+            "import": "./dist/color-picker.js",
+            "default": "./dist/color-picker.js"
+        },
+        "./color-picker-popover": {
+            "@fragiola/source": "./src/components/color-picker-popover/index.ts",
+            "types": "./dist/color-picker-popover.d.ts",
+            "import": "./dist/color-picker-popover.js",
+            "default": "./dist/color-picker-popover.js"
+        },
         "./color-slider": {
             "@fragiola/source": "./src/components/color-slider/index.ts",
             "types": "./dist/color-slider.d.ts",
             "import": "./dist/color-slider.js",
             "default": "./dist/color-slider.js"
+        },
+        "./color-swatch": {
+            "@fragiola/source": "./src/components/color-swatch/index.ts",
+            "types": "./dist/color-swatch.d.ts",
+            "import": "./dist/color-swatch.js",
+            "default": "./dist/color-swatch.js"
+        },
+        "./color-swatch-picker": {
+            "@fragiola/source": "./src/components/color-swatch-picker/index.ts",
+            "types": "./dist/color-swatch-picker.d.ts",
+            "import": "./dist/color-swatch-picker.js",
+            "default": "./dist/color-swatch-picker.js"
         },
         "./color-wheel": {
             "@fragiola/source": "./src/components/color-wheel/index.ts",
@@ -666,10 +690,30 @@
                 "import": "./dist/color-field.js",
                 "default": "./dist/color-field.js"
             },
+            "./color-picker": {
+                "types": "./dist/color-picker.d.ts",
+                "import": "./dist/color-picker.js",
+                "default": "./dist/color-picker.js"
+            },
+            "./color-picker-popover": {
+                "types": "./dist/color-picker-popover.d.ts",
+                "import": "./dist/color-picker-popover.js",
+                "default": "./dist/color-picker-popover.js"
+            },
             "./color-slider": {
                 "types": "./dist/color-slider.d.ts",
                 "import": "./dist/color-slider.js",
                 "default": "./dist/color-slider.js"
+            },
+            "./color-swatch": {
+                "types": "./dist/color-swatch.d.ts",
+                "import": "./dist/color-swatch.js",
+                "default": "./dist/color-swatch.js"
+            },
+            "./color-swatch-picker": {
+                "types": "./dist/color-swatch-picker.d.ts",
+                "import": "./dist/color-swatch-picker.js",
+                "default": "./dist/color-swatch-picker.js"
             },
             "./color-wheel": {
                 "types": "./dist/color-wheel.d.ts",

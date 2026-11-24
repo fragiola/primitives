@@ -77,8 +77,11 @@ export const GUARD = {
  * behaviour through each framework's own code, its Ellipsis never imports Menu, and Carousel's
  * tabbed Indicators never import Tabs. ColorSlider and ColorField are Field controls (Epic #99);
  * ColorArea and ColorWheel are built on nothing, and none of the four imports Slider's or
- * NumberField's entry (their range, drag and number code is the toolkit's). Any other component's
- * code in an entry is a leak; a
+ * NumberField's entry (their range, drag and number code is the toolkit's). ColorPicker and
+ * ColorSwatchPicker are Field controls (Epic #101); ColorSwatch and ColorPickerPopover are built on
+ * nothing: the controls inside a picker read its color through each framework's shared internals,
+ * never ColorPicker's entry, and the popup's parts are the overlay hooks and the toolkit, never
+ * Popover's entry. Any other component's code in an entry is a leak; a
  * utility entry (UTILITIES) has none.
  */
 export const ENTRY_DEPENDENCIES: Readonly<
@@ -94,7 +97,9 @@ export const ENTRY_DEPENDENCIES: Readonly<
     checkbox: ["checkbox-group", "field"],
     "checkbox-group": ["field"],
     "color-field": ["field"],
+    "color-picker": ["field"],
     "color-slider": ["field"],
+    "color-swatch-picker": ["field"],
     combobox: ["field"],
     "combobox-virtual": ["combobox", "field"],
     "context-menu": ["menu"],
@@ -208,8 +213,17 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
     // `timeZone={timeZone(...)}`), so no component entry imports them and an app that passes none
     // bundles none of their code
     "calendar-systems": [],
-    // the color model (Epic #99): the color components' only, so no other entry bundles it
-    color: ["color-area", "color-field", "color-slider", "color-wheel"],
+    // the color model (Epic #99): the color components' only, so no other entry bundles it (the
+    // pickers' too, Epic #101; the popup's entry needs none of it)
+    color: [
+        "color-area",
+        "color-field",
+        "color-picker",
+        "color-slider",
+        "color-swatch",
+        "color-swatch-picker",
+        "color-wheel",
+    ],
     // the month and year values, grid and names (Epic #79): the day calendars never import them
     "month-year": MONTH_YEAR,
     segments: SEGMENTED,
@@ -218,18 +232,33 @@ export const MECHANISM_USERS: Readonly<Record<string, readonly string[]>> = {
 };
 
 /**
+ * The toolkit mechanisms an entry must never import, whoever else does (D8: an opt-in part stays
+ * out of the entry that does not need it). An inline ColorPicker bundles no overlay code: its
+ * popup is the opt-in `/color-picker-popover` (Epic #101, the Epic's bundle guard), so `/color-picker`
+ * never imports the overlay session, the positioning or the presence.
+ */
+export const MECHANISMS_KEPT_OUT: Readonly<Record<string, readonly string[]>> =
+    {
+        "color-picker": ["overlay", "positioning", "presence"],
+    };
+
+/**
  * The toolkit mechanisms an entry imports (`@fragiola/primitives/<mechanism>`, with the entries
- * of its own package it imports) that MECHANISM_USERS keeps from it.
+ * of its own package it imports) that MECHANISM_USERS (or MECHANISMS_KEPT_OUT) keeps from it.
  */
 export function mechanismLeaks(
     component: string,
     mechanisms: readonly string[],
     users: Readonly<Record<string, readonly string[]>> = MECHANISM_USERS,
+    keptOut: Readonly<Record<string, readonly string[]>> = MECHANISMS_KEPT_OUT,
 ): string[] {
     return mechanisms
         .filter((name) => {
             const allowed = users[name];
-            return allowed !== undefined && !allowed.includes(component);
+            return (
+                (allowed !== undefined && !allowed.includes(component)) ||
+                (keptOut[component]?.includes(name) ?? false)
+            );
         })
         .map(
             (name) => `/${component}: imports the toolkit mechanism "/${name}"`,
@@ -597,7 +626,13 @@ function main(): void {
         process.exit(1);
     }
     console.log(
-        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on (and imports ${Object.keys(MECHANISM_USERS).join(" and ")} only in ${[...new Set(Object.values(MECHANISM_USERS).flat())].join(" and ")}), and the ${UTILITIES.length} utility entries no component's code`,
+        `check-bundle: an app importing ${GUARD.components.join(" and ")} bundles only them and ${GUARD.mechanisms.join(", ")}, in ${FRAMEWORKS.join(", ")}; each of the ${COMPONENTS.length} component entries holds only its own code and the components it is built on (and imports ${Object.keys(MECHANISM_USERS).join(" and ")} only in ${[...new Set(Object.values(MECHANISM_USERS).flat())].join(" and ")})${Object.entries(
+            MECHANISMS_KEPT_OUT,
+        )
+            .map(([entry, kept]) => `, /${entry} none of ${kept.join(", ")}`)
+            .join(
+                "",
+            )}, and the ${UTILITIES.length} utility entries no component's code`,
     );
 }
 

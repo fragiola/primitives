@@ -7,6 +7,7 @@ import {
     GUARD,
     type GuardRules,
     MECHANISM_USERS,
+    MECHANISMS_KEPT_OUT,
     mechanismLeaks,
     ownerOf,
 } from "../../scripts/check-bundle.ts";
@@ -253,6 +254,42 @@ describe("the bundle guard, entry by entry", () => {
             "calendar",
             "field",
         ]);
+    });
+
+    // Epic #101: an inline ColorPicker bundles no overlay code, its popup is the opt-in entry
+    it("keeps the overlay mechanisms out of /color-picker, and /color to the color entries", () => {
+        expect(MECHANISMS_KEPT_OUT["color-picker"]).toEqual([
+            "overlay",
+            "positioning",
+            "presence",
+        ]);
+        expect(mechanismLeaks("color-picker", ["color", "form"])).toEqual([]);
+        expect(
+            mechanismLeaks("color-picker", ["color", "overlay", "positioning"]),
+        ).toEqual([
+            '/color-picker: imports the toolkit mechanism "/overlay"',
+            '/color-picker: imports the toolkit mechanism "/positioning"',
+        ]);
+        expect(
+            mechanismLeaks("color-picker-popover", [
+                "focus",
+                "overlay",
+                "positioning",
+                "presence",
+            ]),
+        ).toEqual([]);
+        expect(mechanismLeaks("color-picker-popover", ["color"])).toEqual([
+            '/color-picker-popover: imports the toolkit mechanism "/color"',
+        ]);
+        expect(
+            mechanismLeaks("color-swatch-picker", ["color", "selection"]),
+        ).toEqual([]);
+        expect(ENTRY_DEPENDENCIES["color-picker"]).toEqual(["field"]);
+        expect(ENTRY_DEPENDENCIES["color-picker-popover"]).toBeUndefined();
+        expect(ENTRY_DEPENDENCIES["color-swatch"]).toBeUndefined();
+        // the controls inside a picker read it through the framework's internals
+        expect(ENTRY_DEPENDENCIES["color-slider"]).toEqual(["field"]);
+        expect(ENTRY_DEPENDENCIES["color-area"]).toBeUndefined();
     });
 
     // Epic #73: the segment editing and the time values stay out of the calendars and pickers

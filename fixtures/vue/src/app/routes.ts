@@ -47,10 +47,17 @@ import ColorAreaRgb from "../scenarios/color-area/color-area-rgb.vue";
 import ColorFieldBasic from "../scenarios/color-field/color-field-basic.vue";
 import ColorFieldChannel from "../scenarios/color-field/color-field-channel.vue";
 import ColorFieldField from "../scenarios/color-field/color-field-field.vue";
+import ColorPickerBasic from "../scenarios/color-picker/color-picker-basic.vue";
+import ColorPickerDisabled from "../scenarios/color-picker/color-picker-disabled.vue";
+import ColorPickerField from "../scenarios/color-picker/color-picker-field.vue";
+import ColorPickerPopover from "../scenarios/color-picker/color-picker-popover.vue";
 import ColorSliderAlpha from "../scenarios/color-slider/color-slider-alpha.vue";
 import ColorSliderBasic from "../scenarios/color-slider/color-slider-basic.vue";
 import ColorSliderSpace from "../scenarios/color-slider/color-slider-space.vue";
 import ColorSliderVertical from "../scenarios/color-slider/color-slider-vertical.vue";
+import ColorSwatchBasic from "../scenarios/color-swatch/color-swatch-basic.vue";
+import ColorSwatchPickerBasic from "../scenarios/color-swatch-picker/color-swatch-picker-basic.vue";
+import ColorSwatchPickerField from "../scenarios/color-swatch-picker/color-swatch-picker-field.vue";
 import ColorWheelBasic from "../scenarios/color-wheel/color-wheel-basic.vue";
 import ColorWheelDisabled from "../scenarios/color-wheel/color-wheel-disabled.vue";
 import ComboboxBasic from "../scenarios/combobox/combobox-basic.vue";
@@ -356,6 +363,14 @@ export const routes: Record<string, Component> = {
     "/color-field/basic": ColorFieldBasic,
     "/color-field/channel": ColorFieldChannel,
     "/color-field/field": ColorFieldField,
+    "/color-swatch/basic": ColorSwatchBasic,
+    "/color-swatch-picker/basic": ColorSwatchPickerBasic,
+    "/color-swatch-picker/rtl": ColorSwatchPickerBasic,
+    "/color-swatch-picker/field": ColorSwatchPickerField,
+    "/color-picker/basic": ColorPickerBasic,
+    "/color-picker/popover": ColorPickerPopover,
+    "/color-picker/field": ColorPickerField,
+    "/color-picker/disabled": ColorPickerDisabled,
     "/slider/basic": SliderBasic,
     "/slider/range": SliderRange,
     "/slider/vertical": SliderVertical,
