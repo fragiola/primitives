@@ -147,6 +147,30 @@
             "import": "./dist/collapsible.js",
             "default": "./dist/collapsible.js"
         },
+        "./color-area": {
+            "@fragiola/source": "./src/components/color-area/index.ts",
+            "types": "./dist/color-area.d.ts",
+            "import": "./dist/color-area.js",
+            "default": "./dist/color-area.js"
+        },
+        "./color-field": {
+            "@fragiola/source": "./src/components/color-field/index.ts",
+            "types": "./dist/color-field.d.ts",
+            "import": "./dist/color-field.js",
+            "default": "./dist/color-field.js"
+        },
+        "./color-slider": {
+            "@fragiola/source": "./src/components/color-slider/index.ts",
+            "types": "./dist/color-slider.d.ts",
+            "import": "./dist/color-slider.js",
+            "default": "./dist/color-slider.js"
+        },
+        "./color-wheel": {
+            "@fragiola/source": "./src/components/color-wheel/index.ts",
+            "types": "./dist/color-wheel.d.ts",
+            "import": "./dist/color-wheel.js",
+            "default": "./dist/color-wheel.js"
+        },
         "./combobox": {
             "@fragiola/source": "./src/components/combobox/index.ts",
             "types": "./dist/combobox.d.ts",
@@ -631,6 +655,26 @@
                 "types": "./dist/collapsible.d.ts",
                 "import": "./dist/collapsible.js",
                 "default": "./dist/collapsible.js"
+            },
+            "./color-area": {
+                "types": "./dist/color-area.d.ts",
+                "import": "./dist/color-area.js",
+                "default": "./dist/color-area.js"
+            },
+            "./color-field": {
+                "types": "./dist/color-field.d.ts",
+                "import": "./dist/color-field.js",
+                "default": "./dist/color-field.js"
+            },
+            "./color-slider": {
+                "types": "./dist/color-slider.d.ts",
+                "import": "./dist/color-slider.js",
+                "default": "./dist/color-slider.js"
+            },
+            "./color-wheel": {
+                "types": "./dist/color-wheel.d.ts",
+                "import": "./dist/color-wheel.js",
+                "default": "./dist/color-wheel.js"
             },
             "./combobox": {
                 "types": "./dist/combobox.d.ts",
