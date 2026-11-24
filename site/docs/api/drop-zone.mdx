@@ -1,0 +1,149 @@
+---
+title: DropZone
+description: A target files are dropped on, pasted on or picked for in the browser's file dialog, an APG button that announces the app's text politely, in each framework.
+---
+
+A target files are dropped on: dragged from the desktop or a file manager, pasted with Ctrl+V
+(⌘V), or picked in the browser's file dialog, which the target opens when it is pressed (Enter,
+Space or a click). It reports the files it accepted (by `accept`) and the ones it rejected, and
+writes the app's text into a polite live region. The Root is an APG button
+([button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)); the announcement follows
+WAI-ARIA's live regions, as [Clipboard](/docs/api/clipboard)'s. The APG has no drop zone pattern
+and Base UI no DropZone: it follows React Aria's DropZone.
+
+It holds no form value and no list of files: [FileUpload](/docs/api/file-upload) is the form
+control with a list, built on the same drop target. It is **native file drag only**: dragging the
+page's own elements (a sortable list, a board) is `@fragiola/dnd`'s.
+
+## Behaviour
+
+- **Drops**: a drag of files (`dataTransfer.types` holding `"Files"`) over the Root sets
+  `data-drop-target` and the `copy` drop effect; entering and leaving its children does not end
+  it. A drop hands its files over (reason `drop`). A drag of anything else (text, a link, an
+  element of the page) is not a drop target and its drop is left alone.
+- **`accept`** filters a drop and a paste the way a file input's `accept` reads it: MIME types
+  (`image/png`), wildcards (`image/*`) and extensions (`.pdf`, case insensitive). With
+  `multiple={false}`, a drop of several files rejects them all, as a native file input refuses it.
+- **The press**: Enter, Space and a click open the browser's file dialog, through a file `input`
+  the toolkit creates for the press and never puts in the document, with the Root's `accept` and
+  `multiple` (reason `input-change`). A dialog closed with no file reports nothing.
+- **Paste**: Ctrl+V (⌘V) on the focused Root takes the clipboard's files (reason `input-paste`); a
+  paste of text only is ignored.
+- **Announcements**: the Root renders, as its last child, a visually hidden polite live region,
+  empty until a drop, a paste or a pick writes the text your `announcement` returns into it as a
+  new text node, so the same text is announced twice. Angular's Root appends it once the page
+  renders in the browser.
+- **Disabled**: no drop, paste or press does anything, and the Root leaves the tab order; a drag
+  of files shows the `none` effect and its drop is canceled, so the browser does not open the
+  file either.
+- **Focus**: nothing moves it; the dialog returns it to the Root.
+
+The Root holds no focusable element (a `button` may not hold one). Its content is yours ("Drop
+files here or press to choose"), which names it; an icon-only Root takes your `aria-label`.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `drop-zone-root` | button; the drop target |
+| (announcer) | `span` | `drop-zone-announcer` | the Root's polite live region |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { DropZone } from "@fragiola/primitives-react/drop-zone";
+
+<DropZone.Root
+    accept="image/*,.pdf"
+    onFileDrop={({ acceptedFiles }) => upload(acceptedFiles)}
+    announcement={({ acceptedFiles, rejectedFiles }) =>
+        `${acceptedFiles.length} added, ${rejectedFiles.length} rejected`
+    }
+>
+    Drop images or PDFs here, or press to choose
+</DropZone.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <DropZone.Root
+        accept="image/*,.pdf"
+        :announcement="(d) => `${d.acceptedFiles.length} added, ${d.rejectedFiles.length} rejected`"
+        @file-drop="({ acceptedFiles }) => upload(acceptedFiles)"
+    >
+        Drop images or PDFs here, or press to choose
+    </DropZone.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [DropZoneRoot],
+    template: `
+        <div dropZoneRoot accept="image/*,.pdf" [announcement]="announce" (fileDrop)="upload($event.acceptedFiles)">
+            Drop images or PDFs here, or press to choose
+        </div>
+    `,
+})
+export class Attachments {
+    announce = (d: DropZoneDropDetails) =>
+        `${d.acceptedFiles.length} added, ${d.rejectedFiles.length} rejected`;
+}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`@file-drop`,
+`@drop-target-change`), and Angular as inputs and outputs (`(fileDrop)` with the details,
+`(dropTargetChange)` with `{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `accept` | `string \| string[]` | | the file types it takes, as a file input's `accept`; every file without it |
+| `multiple` | `boolean` | `true` | the dialog picks several files; when `false`, a drop or paste of several rejects them all |
+| `disabled` | `boolean` | `false` | takes no drop, paste or press, and leaves the tab order |
+| `onFileDrop` | `(details: { acceptedFiles, rejectedFiles, reason, event }) => void` | | files arrived (`reason`: `drop`, `input-paste`, `input-change`) |
+| `onDropTargetChange` | `(active: boolean, details: { reason, event }) => void` | | a drag of files entered or left (reason `drop`) |
+| `announcement` | `(details) => string` | | the text announced politely after each drop, paste or pick |
+
+The state, `{ dropTarget, disabled }`, reaches `render` and the class and style functions (Vue: the
+`render` slot; Angular: `state()` through `exportAs`, `#zone="dropZoneRoot"`).
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="button"`, `tabindex="0"` (none while disabled); `data-drop-target` while a drag of files is over it; `data-disabled` and `aria-disabled="true"` while disabled |
+| announcer | `aria-live="polite"`, `aria-atomic="true"`, a visually hidden inline style |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab | the Root is a tab stop (none while disabled) |
+| Enter, Space | open the file dialog; Space does not scroll the page |
+| Ctrl+V, ⌘V | pastes the clipboard's files |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/drop-zone` | `ChangeDetails`, `ChangeReason`, `DropZone`, `DropZoneDropDetails`, `DropZoneRootProps`, `DropZoneState`, `FileAccept`, `RenderProp` |
+| `@fragiola/primitives-vue/drop-zone` | `ChangeDetails`, `ChangeReason`, `DropZone`, `DropZoneDropDetails`, `DropZoneRootEmits`, `DropZoneRootProps`, `DropZoneState`, `FileAccept`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/drop-zone` | `ChangeDetails`, `ChangeReason`, `DropZoneDropDetails`, `DropZoneRoot`, `DropZoneState`, `FileAccept` |

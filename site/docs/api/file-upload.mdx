@@ -1,0 +1,279 @@
+---
+title: FileUpload
+description: A form control holding a list of files, its accepted and rejected lists, previews and the native form through a hidden file input, in each framework.
+---
+
+A form control that holds a list of files: picked in the browser's file dialog (a Trigger, the
+Label, or the Dropzone pressed), dropped on its Dropzone or pasted on it. It checks each file
+(`accept`, `maxFiles`, `minFileSize`, `maxFileSize`, `validate`) into an accepted list, its value,
+and a rejected list with the reasons; it renders your Items for them (a name, a localized size, an
+image preview, a delete button) and submits the accepted files with the native form, through its
+hidden file input. The controls are APG buttons
+([button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)); the Dropzone is
+[DropZone](/docs/api/drop-zone)'s drop target. The APG has no file upload pattern and Base UI no
+FileUpload: it follows Zag/Ark's and Kobalte's FileUpload.
+
+It does **not upload**: no request, no progress, no retry. Read the value (or the form's
+`FormData`) and send it yourself.
+
+## Behaviour
+
+- **Picks**: the dialog (reason `input-change`), a drop on the Dropzone (`drop`) and a paste on it
+  (`input-paste`). Each file of a pick is checked in order and every failing check is a reason:
+  `invalid-type` (`accept`), `too-large`, `too-small`, your `validate`'s own, and `too-many` for
+  the files over `maxFiles` (the first ones are kept). A pick replaces the rejected list.
+- **One file** (`maxFiles` `1`, the default) is a native single file input: a new pick replaces
+  the file, and a drop of several files rejects them all (`too-many`). Over `1`, the HiddenInput is
+  `multiple` and a pick adds to the value.
+- **The form**: after every change the accepted files are assigned to the HiddenInput
+  (`input.files = dataTransfer.files`, a `DataTransfer` built with them), so the native form
+  submits each one under `name`, `required` is the input's native `valueMissing`, and
+  `FormData.getAll(name)` holds the `File`s. Verified in Chromium; Firefox (57+) and Safari
+  (14.1+) accept the same assignment by the HTML standard. A form reset returns to `defaultValue`
+  (reason `none`) and empties the rejected list.
+- **In a [Field](/docs/api/field)**, the Root reports its value, its filled state (a file) and the
+  input's validity; the Field's label is `for` the HiddenInput and names the Root.
+- **Sizes**: ItemSizeText writes the size with `Intl.NumberFormat`'s `unit` style in the Root's
+  `locale`, short, in decimal units (Intl's are SI: 1 kB = 1000 bytes): `512 byte`, `1.5 kB`,
+  `2 MB` in `en-US`. Your children replace it.
+- **Previews**: ItemPreview renders only for a file of its `type` (`image/*`); ItemPreviewImage
+  shows the file through an object URL made once it is mounted and revoked when it unmounts (its
+  file removed, its Item or the Root unmounted).
+- **Focus**: a deleted Item's button moves the focus to the next Item's delete button in its
+  ItemGroup, else the previous one's, else the Trigger, else the Dropzone. The ClearTrigger (then
+  hidden) moves it to the Trigger, else the Dropzone. A form's failed validation focuses the
+  Trigger, else the Dropzone.
+- **Announcements**: the Root renders, as its last child, a polite live region into which the text
+  your `announcement` returns is written after each pick (Angular: appended in the browser).
+- **Reasons**: `drop`, `input-paste`, `input-change`, `delete-press` (an ItemDeleteTrigger),
+  `clear-press` (the ClearTrigger), `none` (a form reset).
+
+The HiddenInput is hidden from the tab order and the accessibility tree (its native button has the
+browser's text and cannot be styled): the Trigger and the Dropzone are the controls. The Dropzone
+holds no focusable element, so keep the Trigger beside it, not inside.
+
+## Anatomy
+
+| part | element | `data-primitives-part` | role |
+| --- | --- | --- | --- |
+| Root | `div` | `file-upload-root` | group |
+| Label | `label` | `file-upload-label` | `for` the HiddenInput; names the Root |
+| Dropzone | `div` | `file-upload-dropzone` | button; DropZone's drop target |
+| Trigger | `button` | `file-upload-trigger` | button; opens the dialog |
+| HiddenInput | `input` | `file-upload-hidden-input` | `type="file"`, hidden; the form's control |
+| ItemGroup | `ul` | `file-upload-item-group` | list |
+| Item | `li` | `file-upload-item` | listitem; one file, accepted or rejected |
+| ItemName | `span` | `file-upload-item-name` | the file's name |
+| ItemSizeText | `span` | `file-upload-item-size-text` | the file's size |
+| ItemPreview | `div` | `file-upload-item-preview` | rendered only for a file of its type |
+| ItemPreviewImage | `img` | `file-upload-item-preview-image` | the file through an object URL |
+| ItemDeleteTrigger | `button` | `file-upload-item-delete-trigger` | button; removes its file |
+| ClearTrigger | `button` | `file-upload-clear-trigger` | button; removes every file |
+| (announcer) | `span` | `file-upload-announcer` | the Root's polite live region |
+
+## Usage
+
+<Framework name="react">
+
+```tsx
+import { FileUpload } from "@fragiola/primitives-react/file-upload";
+
+<FileUpload.Root name="attachments" maxFiles={5} accept="image/*,.pdf" maxFileSize={5_000_000}>
+    {({ value }) => (
+        <>
+            <FileUpload.Label>Attachments</FileUpload.Label>
+            <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+            <FileUpload.Trigger>Choose files</FileUpload.Trigger>
+            <FileUpload.HiddenInput />
+            <FileUpload.ItemGroup>
+                {value.map((file) => (
+                    <FileUpload.Item key={file.name} file={file}>
+                        <FileUpload.ItemPreview>
+                            <FileUpload.ItemPreviewImage alt="" />
+                        </FileUpload.ItemPreview>
+                        <FileUpload.ItemName />
+                        <FileUpload.ItemSizeText />
+                        <FileUpload.ItemDeleteTrigger aria-label={`Remove ${file.name}`}>×</FileUpload.ItemDeleteTrigger>
+                    </FileUpload.Item>
+                ))}
+            </FileUpload.ItemGroup>
+        </>
+    )}
+</FileUpload.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <FileUpload.Root v-slot="{ value }" name="attachments" :max-files="5" accept="image/*,.pdf">
+        <FileUpload.Label>Attachments</FileUpload.Label>
+        <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+        <FileUpload.Trigger>Choose files</FileUpload.Trigger>
+        <FileUpload.HiddenInput />
+        <FileUpload.ItemGroup>
+            <FileUpload.Item v-for="file in value" :key="file.name" :file="file">
+                <FileUpload.ItemPreview>
+                    <FileUpload.ItemPreviewImage alt="" />
+                </FileUpload.ItemPreview>
+                <FileUpload.ItemName />
+                <FileUpload.ItemSizeText />
+                <FileUpload.ItemDeleteTrigger :aria-label="`Remove ${file.name}`">×</FileUpload.ItemDeleteTrigger>
+            </FileUpload.Item>
+        </FileUpload.ItemGroup>
+    </FileUpload.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```ts
+@Component({
+    imports: [
+        FileUploadRoot, FileUploadLabel, FileUploadDropzone, FileUploadTrigger, FileUploadHiddenInput,
+        FileUploadItemGroup, FileUploadItem, FileUploadItemName, FileUploadItemSizeText,
+        FileUploadItemPreview, FileUploadItemPreviewImage, FileUploadItemDeleteTrigger,
+    ],
+    template: `
+        <div fileUploadRoot #upload="fileUploadRoot" name="attachments" [maxFiles]="5" accept="image/*,.pdf">
+            <label fileUploadLabel>Attachments</label>
+            <div fileUploadDropzone>Drop files here</div>
+            <button fileUploadTrigger>Choose files</button>
+            <input fileUploadHiddenInput />
+            <ul fileUploadItemGroup>
+                @for (file of upload.state().value; track file) {
+                    <li fileUploadItem [file]="file">
+                        <div *fileUploadItemPreview="'image/*'"><img fileUploadItemPreviewImage alt="" /></div>
+                        <span fileUploadItemName></span>
+                        <span fileUploadItemSizeText></span>
+                        <button fileUploadItemDeleteTrigger [attr.aria-label]="'Remove ' + file.name">×</button>
+                    </li>
+                }
+            </ul>
+        </div>
+    `,
+})
+export class Attachments {}
+```
+
+</Framework>
+
+## Props
+
+Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
+`render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
+it forwards. The names below are React's; Vue binds them the same way (`v-model:value`,
+`@value-change`, `@file-reject`), and Angular as inputs and outputs (`[(value)]`,
+`(valueChangeDetails)` and `(fileReject)`, each with `{ value, details }`).
+
+### Root
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `value` | `File[]` | | the accepted files, controlled |
+| `defaultValue` | `File[]` | `[]` | the initial files, uncontrolled |
+| `onValueChange` | `(value: File[], details: { reason, event }) => void` | | every change of the accepted files |
+| `onFileReject` | `(rejections: { file, reasons }[], details: { reason, event }) => void` | | a pick had rejected files |
+| `accept` | `string \| string[]` | | the file types it takes, as a file input's `accept` |
+| `maxFiles` | `number` | `1` | the most accepted files; `1` replaces the file on a new pick |
+| `minFileSize` | `number` | `0` | the smallest size, in bytes, inclusive |
+| `maxFileSize` | `number` | `Infinity` | the largest size, in bytes, inclusive |
+| `validate` | `(file: File, value: File[]) => string[] \| null` | | your own reasons for a file; `value` is the files accepted so far |
+| `name` | `string` | | the HiddenInput's name (a Field's wins) |
+| `required` | `boolean` | `false` | the form's validation fails while there is no file |
+| `disabled` | `boolean` | `false` | disables every part |
+| `capture` | `"user" \| "environment"` | | the camera a phone opens, the HiddenInput's `capture` |
+| `id` | `string` | | the HiddenInput's id (a Field gives its own) |
+| `locale` | `string` | the runtime's | ItemSizeText's locale |
+| `announcement` | `(details: { value, acceptedFiles, rejectedFiles, reason, event }) => string` | | the text announced politely after each pick |
+
+Its children may be a function of the state, `{ value, rejectedFiles, disabled, empty, dropTarget }`
+(Vue: the default scoped slot; Angular: `state()` through `exportAs`, `#upload="fileUploadRoot"`).
+
+### Label
+
+No props of its own.
+
+### Dropzone
+
+No props of its own.
+
+### Trigger
+
+No props of its own.
+
+### HiddenInput
+
+No props of its own.
+
+### ItemGroup
+
+No props of its own.
+
+### Item
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `file` | `File` | | required: an accepted file, or a rejected one |
+
+The Item parts' state adds `{ file, rejected, reasons }`.
+
+### ItemName
+
+No props of its own.
+
+### ItemSizeText
+
+No props of its own.
+
+### ItemPreview
+
+| prop | type | default | description |
+| --- | --- | --- | --- |
+| `type` | `string` | `"image/*"` | the files it previews, an `accept` pattern (Angular: the structural directive's value, `*fileUploadItemPreview="'image/*'"`) |
+
+### ItemPreviewImage
+
+No props of its own.
+
+### ItemDeleteTrigger
+
+No props of its own.
+
+### ClearTrigger
+
+No props of its own.
+
+## State and part attributes
+
+| part | attributes |
+| --- | --- |
+| Root | `role="group"`, `aria-labelledby` the Label (in a Field: the Field's label, `aria-describedby`, `aria-invalid`); `data-disabled`, `data-empty` (no accepted file), `data-drop-target` while a drag of files is over the Dropzone; in a Field, the field's states |
+| Label, Trigger, ItemGroup, ClearTrigger | the Root's `data-disabled`, `data-empty`, `data-drop-target` |
+| Dropzone | `role="button"`, `tabindex="0"` (none while disabled), `data-drop-target`, `aria-disabled="true"` and `data-disabled` while disabled |
+| Trigger, ItemDeleteTrigger, ClearTrigger | `type="button"`, `disabled` while the Root is |
+| ClearTrigger | `hidden` while there is no accepted and no rejected file |
+| HiddenInput | `type="file"`, `tabindex="-1"`, `aria-hidden="true"`, a visually hidden inline style; `multiple` when `maxFiles` is over 1; its `files` are the value |
+| Item and its parts | `data-rejected` for a rejected file |
+| ItemPreviewImage | `src`: a `blob:` URL, once mounted |
+| announcer | `aria-live="polite"`, `aria-atomic="true"`, a visually hidden inline style |
+
+## Keyboard
+
+| key | action |
+| --- | --- |
+| Tab | the Dropzone, the Trigger, every ItemDeleteTrigger and the ClearTrigger, in your order; the HiddenInput is no tab stop |
+| Enter, Space | on the Dropzone or the Trigger: open the dialog; on a delete button or the ClearTrigger: press it |
+| Ctrl+V, ⌘V | on the Dropzone: picks the clipboard's files |
+
+## Exports
+
+| entry | exports |
+| --- | --- |
+| `@fragiola/primitives-react/file-upload` | `ChangeDetails`, `ChangeReason`, `CheckedFile`, `FileAccept`, `FileRejection`, `FileRejectionReason`, `FileUpload`, `FileUploadClearTriggerProps`, `FileUploadDropzoneProps`, `FileUploadHiddenInputProps`, `FileUploadItemDeleteTriggerProps`, `FileUploadItemGroupProps`, `FileUploadItemNameProps`, `FileUploadItemPreviewImageProps`, `FileUploadItemPreviewProps`, `FileUploadItemProps`, `FileUploadItemSizeTextProps`, `FileUploadItemState`, `FileUploadLabelProps`, `FileUploadPickDetails`, `FileUploadRootProps`, `FileUploadState`, `FileUploadTriggerProps`, `RenderProp` |
+| `@fragiola/primitives-vue/file-upload` | `ChangeDetails`, `ChangeReason`, `CheckedFile`, `FileAccept`, `FileRejection`, `FileRejectionReason`, `FileUpload`, `FileUploadItemState`, `FileUploadPickDetails`, `FileUploadRootEmits`, `FileUploadRootProps`, `FileUploadState`, `RenderSlotProps` |
+| `@fragiola/primitives-angular/file-upload` | `ChangeDetails`, `ChangeReason`, `CheckedFile`, `FileAccept`, `FileRejection`, `FileRejectionReason`, `FileUploadClearTrigger`, `FileUploadDropzone`, `FileUploadHiddenInput`, `FileUploadItem`, `FileUploadItemDeleteTrigger`, `FileUploadItemGroup`, `FileUploadItemName`, `FileUploadItemPreview`, `FileUploadItemPreviewImage`, `FileUploadItemSizeText`, `FileUploadItemState`, `FileUploadLabel`, `FileUploadPickDetails`, `FileUploadRoot`, `FileUploadState`, `FileUploadTrigger` |

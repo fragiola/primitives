@@ -25,7 +25,7 @@ parts, the same, with the focus trap's `holdOutsidePress`); Tabs uses `/collecti
 Popover adds `/positioning`; Tooltip uses `/hover`, `/pointer` and `/positioning`;
 Menu uses `/collection`, `/pointer`, `/positioning` and, for its `modal` option, `/inert` and
 `/scroll-lock`; ContextMenu, built on Menu's parts, adds the long press of `/pointer` and the
-virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); Carousel `/carousel` (its pages, its scrolling and mouse drag, its hover and focus watch and its rotation delay, which no other component imports) with `/collection` and `/direction` (the tabbed Indicators' keys); Link and Breadcrumbs use none; Steps uses none; AspectRatio uses none; Clipboard uses `/clipboard` alone (its copy and its announcement, which no other component imports); Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
+virtual anchor of `/positioning` (each in its own module, so Menu and Dialog do not pull them); Drawer, built on Dialog's parts, adds `/swipe`; ScrollArea uses `/scroll-area` alone (its measurement, its scrollbars' pointer and its hover, which no other component imports) and Pagination `/pagination` alone (its range, pure math); Carousel `/carousel` (its pages, its scrolling and mouse drag, its hover and focus watch and its rotation delay, which no other component imports) with `/collection` and `/direction` (the tabbed Indicators' keys); Link and Breadcrumbs use none; Steps uses none; AspectRatio uses none; Clipboard uses `/clipboard` alone (its copy and its announcement); DropZone and FileUpload use `/file` (their drop target, file dialog, `accept` matching, checks, sizes and the files assigned to an input, which no other component imports) and `/clipboard`'s `announceText`, FileUpload `/form` too; Toast uses `/toast` (the queue, which no other component imports), `/swipe` and `/presence`; HoverCard uses Tooltip's `/hover` and `/pointer`, with `/overlay` and `/positioning`; NavigationMenu uses `/overlay`, `/positioning`, `/hover`, `/pointer` (the hover bridge), `/focus`, `/collection`, `/direction` and `/presence`. The form controls use `/form` (the hidden inputs, the form bridges and the Field
 layer), so Field's form code reaches only the components that import it: Field (and Fieldset
 and Form, built on it), Checkbox, Switch and Radio use it alone; RadioGroup uses `/collection`
 and `/direction` for its arrow keys; Slider adds `/range`, `/pointer` and
@@ -76,6 +76,7 @@ component imports it) with Select's mechanisms (`/collection`, `/overlay`, `/pos
 | `@fragiola/primitives/date` | `PlainDate`, `DateRange`, `Weekday`, `plainDate`, `today`, `fromIsoDate`, `toIsoDate`, `toLocalDate`, `addDays`, `addMonths`, `addYears`, `clampDate`, `compareDates`, `isSameDate`, `isSameMonth`, `isBetween`, `isWithinBounds`, `dayOfWeek`, `daysInMonth`, `startOfMonth`, `endOfMonth`, `startOfWeek`, `endOfWeek`, `monthsBetween`, `firstDayOfWeek`, `weekdays`, `monthGrid`, `calendarKeyTarget`, `CalendarKeyOptions`, `formatDayNumber`, `formatFullDate`, `formatMonthYear`, `watchDocumentLanguage` |
 | `@fragiola/primitives/month-year` | `PlainYearMonth`, `PlainYear`, `YearMonthRange`, `YearRange`, `monthIndex`, `fromMonthIndex`, `currentYearMonth`, `toIsoYearMonth`, `toIsoYear`, `UNIT_PAGE_SIZE`, `unitPageStart`, `unitRows`, `unitKeyTarget`, `UnitKeyOptions`, `formatMonthName`, `formatYearMonth`, `formatYear`, `formatYearSpan` |
 | `@fragiola/primitives/direction` | `getDirection`, `Direction` |
+| `@fragiola/primitives/file` | `watchFileDrop`, `dragHasFiles`, `FileDropOptions`, `FileDropReason`, `openFileDialog`, `FileDialogOptions`, `acceptsFile`, `acceptFiles`, `acceptAttribute`, `FileAccept`, `FileLike`, `checkFiles`, `CheckedFile`, `FileCheck`, `FileRejection`, `FileRejectionReason`, `FileRules`, `formatFileSize`, `assignFiles` |
 | `@fragiola/primitives/focus` | `focusInitial`, `trapFocus`, `getTabbables`, `nextTabbableAfter`, `previousTabbableBefore`, `isKeyboardModality`, `FocusTrapOptions` |
 | `@fragiola/primitives/form` | `bridgeForm`, `FormBridgeOptions`, `validateField`, `ValidateFieldOptions`, `createFieldValidator`, `FieldValidator`, `validatesOnChange`, `shownAfterChange`, `fieldErrorShown`, `fieldErrorMessages`, `fieldDescribedBy`, `fieldStateAttributes`, `onSubmitAttempt`, `guardFormSubmit`, `firstInDocumentOrder`, `focusFieldControl`, `formErrorsFor`, `withoutFormErrors`, `CLEARED`, `UNVALIDATED`, `VALIDITY_KEYS`, `VISUALLY_HIDDEN_INPUT_STYLE`, `FieldErrorMatch`, `FieldState`, `FieldValidate`, `FieldValidateResult`, `FieldValidation`, `FieldValidationMode`, `FieldValidity`, `FormErrors`, `ValidityKey`, `preventLabelSelection`, `labelFocusTarget`, `normalizeOtp`, `replaceOtp`, `removeOtpCharacter`, `otpAccepts`, `otpInputMode`, `otpPattern`, `OtpValidationType`, `takeTags`, `typesDelimiter`, `editTag`, `TagRules`, `TakenTags`, `RefusedTag`, `TagRefusal`, `EditedTag` |
 | `@fragiola/primitives/hover` | `createHoverIntent`, `HoverIntent`, `createDelayGroup`, `DelayGroup` |
@@ -215,6 +216,21 @@ component imports it) with Select's mechanisms (`/collection`, `/overlay`, `/pos
   is no `execCommand` fallback. `announceText(region, text)` replaces a live region's content with
   a new text node, so the same text said twice is announced twice (`""` empties it)
   ([Clipboard](/docs/api/clipboard)).
+- **Files** (Epic #106): a drop target for files and a FileUpload's rules. `watchFileDrop(element,
+  { disabled, onDropTargetChange, onFiles, onActivate })` makes an element a target: a drag of
+  files (`dragHasFiles`: `dataTransfer.types` holds `"Files"`) counted across its children shows
+  the `copy` effect and its drop hands the files over, a paste hands the clipboard's files over, a
+  click, Enter or Space is a press; while disabled a drag shows `none` and its drop is canceled.
+  `openFileDialog(element, { accept, multiple, capture }, onFiles)` opens the browser's dialog
+  through a file input created for the press and never put in the document. `acceptsFile(file,
+  accept)` reads `accept` as a file input does (MIME types, `type/*`, `.ext`), `acceptFiles(files,
+  accept, multiple)` splits a drop, `acceptAttribute(accept)` writes the attribute.
+  `checkFiles(value, files, rules)` checks a pick (`accept`, `maxFiles`, `minFileSize`,
+  `maxFileSize`, `validate`) into the new value, the accepted and the rejected files with their
+  reasons (`invalid-type`, `too-large`, `too-small`, the app's, `too-many`). `formatFileSize(bytes,
+  locale)` writes `Intl.NumberFormat`'s short decimal units (`1.5 kB`), and `assignFiles(input,
+  files)` puts files into a file input through a `DataTransfer`, so the native form submits them
+  ([DropZone](/docs/api/drop-zone), [FileUpload](/docs/api/file-upload)).
 - **Pagination range**: `paginationRange({ page, count, siblingCount, boundaryCount })` gives the
   pages and ellipses in order (every page while they fit, else a constant number of items with
   the window kept whole near the ends, no ellipsis for a single page); `pageCount({ count, total,
