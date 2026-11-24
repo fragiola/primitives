@@ -34,6 +34,7 @@ import {
     type ChangeReason,
     controllable,
     dataValues,
+    injectColorPickerBinding,
     injectFlush,
     injectHost,
     type ValueChangeEvent,
@@ -88,7 +89,7 @@ export class ColorWheelRoot {
     /** A `Color`, or a string `parseColor` reads; bound, the wheel is controlled. */
     readonly value = input<Color | string | undefined>(undefined);
     readonly valueChange = output<Color>();
-    readonly defaultValue = input<Color | string>(RED);
+    readonly defaultValue = input<Color | string | undefined>(undefined);
     readonly valueChangeDetails = output<ValueChangeEvent<Color>>();
     /** When a drag ends, or after a key changed the value. */
     readonly valueCommit = output<Color>();
@@ -105,15 +106,43 @@ export class ColorWheelRoot {
 
     private readonly host = injectHost();
     private readonly flush = injectFlush();
-    private readonly current = controllable<Color, ChangeDetails>(
+    private readonly own = controllable<Color, ChangeDetails>(
         computed(() => {
             const value = this.value();
             return value === undefined ? undefined : toColor(value);
         }),
         this.valueChange,
-        () => toColor(this.defaultValue()),
+        () => toColor(this.defaultValue() ?? RED),
         (value, details) => this.valueChangeDetails.emit({ value, details }),
     );
+
+    /** The enclosing ColorPicker's binding (spec/color-picker.md, "Sharing the color"). */
+    private readonly picker = injectColorPickerBinding();
+    /** Bound to the picker's color: inside one, with neither `value` nor `defaultValue`. */
+    private readonly bound = computed(() =>
+        this.picker !== null &&
+        this.value() === undefined &&
+        this.defaultValue() === undefined
+            ? this.picker
+            : null,
+    );
+    /** The value: the picker's when bound, else its own. */
+    private readonly current = {
+        value: computed(() => {
+            const bound = this.bound();
+            return bound === null ? this.own.value() : bound.value();
+        }),
+        set: (next: Color, details: ChangeDetails) => {
+            const bound = untracked(this.bound);
+            if (bound === null) {
+                this.own.set(next, details);
+                return;
+            }
+            this.valueChange.emit(next);
+            this.valueChangeDetails.emit({ value: next, details });
+            bound.setValue(next, details);
+        },
+    };
     /** The value, in the wheel's space (hsl or hsb). */
     readonly color = computed(() => {
         const current = this.current.value();
@@ -131,7 +160,9 @@ export class ColorWheelRoot {
     readonly dragging = signal(false);
     /** The Thumb, while one is rendered. */
     readonly thumb = signal<HTMLElement | null>(null);
-    readonly isDisabled = computed(() => this.disabled());
+    readonly isDisabled = computed(
+        () => this.disabled() || (this.picker?.disabled() ?? false),
+    );
     protected readonly size = computed(() => `${this.outerRadius() * 2}px`);
     readonly state = computed<ColorWheelState>(() => ({
         color: this.color(),
@@ -160,7 +191,7 @@ export class ColorWheelRoot {
                 return;
             }
             const hex = this.hex();
-            const name = this.name();
+            const name = this.bound() === null ? this.name() : undefined;
             untracked(() => {
                 if (this.hidden === null) {
                     const element = host.ownerDocument.createElement("input");
@@ -188,7 +219,13 @@ export class ColorWheelRoot {
             if (hidden !== null) {
                 stop = bridgeForm(hidden, {
                     reset: () => {
-                        const next = toColor(untracked(this.defaultValue));
+                        // a bound control is reset by its picker
+                        if (untracked(this.bound) !== null) {
+                            return;
+                        }
+                        const next = toColor(
+                            untracked(this.defaultValue) ?? RED,
+                        );
                         if (!isSameColor(next, untracked(this.current.value))) {
                             this.current.set(next, { reason: "none" });
                         }
@@ -217,7 +254,9 @@ export class ColorWheelRoot {
 
     /** Reports the color (default: the current one) as committed. */
     commit(color?: Color): void {
-        this.valueCommit.emit(color ?? untracked(this.color));
+        const committed = color ?? untracked(this.color);
+        this.valueCommit.emit(committed);
+        untracked(this.bound)?.commit(committed, { reason: "none" });
     }
 
     protected onPointerDown(event: PointerEvent): void {

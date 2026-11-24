@@ -37,6 +37,7 @@ import {
     type ChangeReason,
     controllable,
     dataValues,
+    injectColorPickerBinding,
     injectFlush,
     injectHost,
     injectProvidedDirection,
@@ -97,7 +98,7 @@ export class ColorAreaRoot {
     /** A `Color`, or a string `parseColor` reads; bound, the area is controlled. */
     readonly value = input<Color | string | undefined>(undefined);
     readonly valueChange = output<Color>();
-    readonly defaultValue = input<Color | string>(WHITE_HUE);
+    readonly defaultValue = input<Color | string | undefined>(undefined);
     readonly valueChangeDetails = output<ValueChangeEvent<Color>>();
     /** When a drag ends, or after a key changed the value. */
     readonly valueCommit = output<Color>();
@@ -110,15 +111,43 @@ export class ColorAreaRoot {
 
     private readonly host = injectHost();
     private readonly flush = injectFlush();
-    private readonly current = controllable<Color, ChangeDetails>(
+    private readonly own = controllable<Color, ChangeDetails>(
         computed(() => {
             const value = this.value();
             return value === undefined ? undefined : toColor(value);
         }),
         this.valueChange,
-        () => toColor(this.defaultValue()),
+        () => toColor(this.defaultValue() ?? WHITE_HUE),
         (value, details) => this.valueChangeDetails.emit({ value, details }),
     );
+
+    /** The enclosing ColorPicker's binding (spec/color-picker.md, "Sharing the color"). */
+    private readonly picker = injectColorPickerBinding();
+    /** Bound to the picker's color: inside one, with neither `value` nor `defaultValue`. */
+    private readonly bound = computed(() =>
+        this.picker !== null &&
+        this.value() === undefined &&
+        this.defaultValue() === undefined
+            ? this.picker
+            : null,
+    );
+    /** The value: the picker's when bound, else its own. */
+    private readonly current = {
+        value: computed(() => {
+            const bound = this.bound();
+            return bound === null ? this.own.value() : bound.value();
+        }),
+        set: (next: Color, details: ChangeDetails) => {
+            const bound = untracked(this.bound);
+            if (bound === null) {
+                this.own.set(next, details);
+                return;
+            }
+            this.valueChange.emit(next);
+            this.valueChangeDetails.emit({ value: next, details });
+            bound.setValue(next, details);
+        },
+    };
     /** The space and the channels of the two axes (`colorAreaChannels`). */
     readonly channels = computed(() =>
         colorAreaChannels(this.current.value(), {
@@ -150,7 +179,9 @@ export class ColorAreaRoot {
     readonly inputs = signal<
         Readonly<Record<ColorAreaAxis, HTMLInputElement | null>>
     >({ x: null, y: null });
-    readonly isDisabled = computed(() => this.disabled());
+    readonly isDisabled = computed(
+        () => this.disabled() || (this.picker?.disabled() ?? false),
+    );
     /** A DirectionProvider's direction, else `null` (the computed one is read). */
     readonly providedDirection = injectProvidedDirection();
     /** Rendered in the browser: the computed direction can be read (React reads it once mounted). */
@@ -195,7 +226,14 @@ export class ColorAreaRoot {
             }
             const stop = bridgeForm(first, {
                 reset: () => {
-                    const next = toColor(untracked(this.defaultValue));
+                    // a bound control is reset by its picker
+                    if (untracked(this.bound) !== null) {
+                        this.writeInputs();
+                        return;
+                    }
+                    const next = toColor(
+                        untracked(this.defaultValue) ?? WHITE_HUE,
+                    );
                     if (!isSameColor(next, untracked(this.current.value))) {
                         this.current.set(next, { reason: "none" });
                     }
@@ -237,7 +275,9 @@ export class ColorAreaRoot {
 
     /** Reports the color (default: the current one) as committed. */
     commit(color?: Color): void {
-        this.valueCommit.emit(color ?? untracked(this.color));
+        const committed = color ?? untracked(this.color);
+        this.valueCommit.emit(committed);
+        untracked(this.bound)?.commit(committed, { reason: "none" });
     }
 
     /** Registers an axis's Input; returns its unregistration. */

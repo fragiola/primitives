@@ -50,10 +50,17 @@ import { ColorAreaRgb } from "../scenarios/color-area/color-area-rgb.ts";
 import { ColorFieldBasic } from "../scenarios/color-field/color-field-basic.ts";
 import { ColorFieldChannel } from "../scenarios/color-field/color-field-channel.ts";
 import { ColorFieldField } from "../scenarios/color-field/color-field-field.ts";
+import { ColorPickerBasic } from "../scenarios/color-picker/color-picker-basic.ts";
+import { ColorPickerDisabled } from "../scenarios/color-picker/color-picker-disabled.ts";
+import { ColorPickerField } from "../scenarios/color-picker/color-picker-field.ts";
+import { ColorPickerPopoverScenario } from "../scenarios/color-picker/color-picker-popover.ts";
 import { ColorSliderAlpha } from "../scenarios/color-slider/color-slider-alpha.ts";
 import { ColorSliderBasic } from "../scenarios/color-slider/color-slider-basic.ts";
 import { ColorSliderSpace } from "../scenarios/color-slider/color-slider-space.ts";
 import { ColorSliderVertical } from "../scenarios/color-slider/color-slider-vertical.ts";
+import { ColorSwatchBasic } from "../scenarios/color-swatch/color-swatch-basic.ts";
+import { ColorSwatchPickerBasic } from "../scenarios/color-swatch-picker/color-swatch-picker-basic.ts";
+import { ColorSwatchPickerField } from "../scenarios/color-swatch-picker/color-swatch-picker-field.ts";
 import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.ts";
 import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
@@ -379,6 +386,13 @@ import { ROUTES } from "./routes.ts";
         ColorAreaRgb,
         ColorWheelBasic,
         ColorWheelDisabled,
+        ColorSwatchBasic,
+        ColorSwatchPickerBasic,
+        ColorSwatchPickerField,
+        ColorPickerBasic,
+        ColorPickerPopoverScenario,
+        ColorPickerField,
+        ColorPickerDisabled,
         ColorFieldBasic,
         ColorFieldChannel,
         ColorFieldField,
@@ -598,6 +612,14 @@ import { ROUTES } from "./routes.ts";
             @case ("/color-field/basic") { <main class="p-6" scenario-color-field-basic></main> }
             @case ("/color-field/channel") { <main class="p-6" scenario-color-field-channel></main> }
             @case ("/color-field/field") { <main class="p-6" scenario-color-field-field></main> }
+            @case ("/color-swatch/basic") { <main class="p-6" scenario-color-swatch-basic></main> }
+            @case ("/color-swatch-picker/basic") { <main class="p-6" scenario-color-swatch-picker-basic></main> }
+            @case ("/color-swatch-picker/rtl") { <main class="p-6" scenario-color-swatch-picker-basic></main> }
+            @case ("/color-swatch-picker/field") { <main class="p-6" scenario-color-swatch-picker-field></main> }
+            @case ("/color-picker/basic") { <main class="p-6" scenario-color-picker-basic></main> }
+            @case ("/color-picker/popover") { <main class="p-6" scenario-color-picker-popover></main> }
+            @case ("/color-picker/field") { <main class="p-6" scenario-color-picker-field></main> }
+            @case ("/color-picker/disabled") { <main class="p-6" scenario-color-picker-disabled></main> }
             @case ("/slider/basic") { <main class="p-6" scenario-slider-basic></main> }
             @case ("/slider/range") { <main class="p-6" scenario-slider-range></main> }
             @case ("/slider/vertical") { <main class="p-6" scenario-slider-vertical></main> }
