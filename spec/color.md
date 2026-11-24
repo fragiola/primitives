@@ -10,8 +10,9 @@ stays out of every other bundle; the bundle guard checks it). It holds no compon
 component keeps its own value and calls these functions.
 
 [ColorSlider](color-slider.md), [ColorArea](color-area.md), [ColorWheel](color-wheel.md) and
-[ColorField](color-field.md) are built on it; the color pickers of the next Epic (ColorSwatch,
-ColorSwatchPicker, ColorPicker) share one value of this type with many children.
+[ColorField](color-field.md) are built on it, and so are the color pickers (Epic #101):
+[ColorSwatch](color-swatch.md), [ColorSwatchPicker](color-swatch-picker.md) and
+[ColorPicker](color-picker.md), which shares one value of this type with the controls inside it.
 
 The behaviour references are React Aria's color package (`parseColor`, `Color`, the channel ranges
 and the color components) and Zag/Ark's color picker, read and never copied. The APG has no color
@@ -161,6 +162,13 @@ shiftKey, hue, step, largeStep)` and `wrapHue(hue, step)`, `hueAtPoint(box, poin
 `isOnColorWheel(box, point, innerRadius, outerRadius)`, `colorWheelThumbOffset(hue, radius)`. A
 slider's keys and pointer math are `/range`'s (`sliderKeyTarget`, `fractionAlong`,
 `valueAtFraction`, `snapToStep`), its drags `/pointer`'s `startDrag`, its direction `/direction`'s.
+
+## The eyedropper
+
+`supportsEyeDropper(element)` tells whether the element's window has the EyeDropper API (Chromium
+only); `openEyeDropper(element, signal?)` opens it and resolves with the picked color (an opaque
+rgb color), or `null` when the pick was cancelled, refused or is not supported: it never rejects
+(spec/color-picker.md, "EyeDropperTrigger").
 
 ## Scenarios
 

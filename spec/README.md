@@ -68,6 +68,9 @@ updated for this library's decisions (`docs/handoff.md` §3, `docs/decisions.md`
 | [color-area.md](color-area.md) | ColorArea (no APG pattern and no Base UI component: two APG sliders, one native range input per axis, decided there) |
 | [color-wheel.md](color-wheel.md) | ColorWheel (the APG slider on a ring: the hue, wrapping) |
 | [color-field.md](color-field.md) | ColorField (a hex textbox, or the APG spinbutton for one channel; commits on Enter and blur) |
+| [color-swatch.md](color-swatch.md) | ColorSwatch (a color preview: an `img` named by the app, else by the color's CSS text; the checkerboard the recipe's) |
+| [color-swatch-picker.md](color-swatch-picker.md) | ColorSwatchPicker (the APG listbox of swatches in wrapping rows, the vertical arrows between rows, decided there; on the toolkit's `/selection`) |
+| [color-picker.md](color-picker.md) | ColorPicker (no APG pattern and no Base UI component: a Root sharing one color with the color controls inside it, a format switch, an eyedropper; ColorPickerPopover, its opt-in popup on Popover's overlay lifecycle) |
 | [aspect-ratio.md](aspect-ratio.md) | AspectRatio (one structural style; why it is here despite D5) |
 | [direction.md](direction.md) | DirectionProvider and reading the direction (a global provider, no component) |
 
@@ -119,7 +122,10 @@ inputs (Epic #94, Issue #92: PasswordInput, SearchField and Clipboard,
 mouse drag, hover and focus watch and rotation delay in the toolkit's new `/carousel`), then the color controls (Epic #99, Issue #98: ColorSlider, ColorArea,
 ColorWheel and ColorField, [color-slider.md](color-slider.md), [color-area.md](color-area.md),
 [color-wheel.md](color-wheel.md), [color-field.md](color-field.md), on the color model of the
-toolkit's new `/color`, [color.md](color.md)).
+toolkit's new `/color`, [color.md](color.md)), then the color pickers (Epic #101, Issue #100:
+ColorSwatch, ColorSwatchPicker and ColorPicker with its opt-in popup,
+[color-swatch.md](color-swatch.md), [color-swatch-picker.md](color-swatch-picker.md),
+[color-picker.md](color-picker.md)), which complete the Color family.
 
 Primary source: the WAI-ARIA Authoring Practices (APG) patterns in
 `~/organizations/fragiola/references/wai-aria-practices/content/patterns/`. The behaviour rule is
@@ -210,7 +216,7 @@ The vocabulary is shared by every component:
 | `data-invalid`, `data-valid` | a field that shows an error, or that validated and is valid (neither before its first validation); `data-invalid` also on every part of a DateField or TimeField whose value is out of range or unavailable |
 | `data-dirty`, `data-touched`, `data-filled`, `data-focused` | a field whose value changed, whose control lost focus once, whose value is not empty, whose control has focus; `data-filled` also on an OTPField slot that holds a character |
 
-### No text, and the one exception
+### No text, and the exceptions
 
 Primitives render only their children: no UI copy and no accessible name of their own. The
 fixtures give every name (`aria-label`, `<label>`, text children). **The exception is locale data**
@@ -218,6 +224,9 @@ in the calendar family (and the date and time fields' segments: their texts, val
 [date-field.md](date-field.md#api)): the month heading, the weekday names, the day numbers and each cell's full
 date name come from `Intl` for the given locale. They are data, not copy, and no app could provide
 them cell by cell; the consumer can still replace each one ([calendar.md](calendar.md#api)).
+A second, narrower one: a [ColorSwatch](color-swatch.md) the app did not name is named by its
+color's CSS text (`rgb(51, 102, 153)`), data again, since an `img` must have a name; the app's
+`aria-label` replaces it.
 
 ### Change details
 
@@ -228,14 +237,14 @@ The reasons are shared:
 
 | reason | when |
 | --- | --- |
-| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area); a PasswordInput's VisibilityTrigger showed or hid its text; a Clipboard's Trigger copied (its status became `copied` or `failed`); a Steps Trigger moved to its step; a Carousel's AutoplayTrigger stopped or started the rotation |
+| `trigger-press` | the trigger toggled the overlay (a ContextMenu: a right-click or a long press on its area); a PasswordInput's VisibilityTrigger showed or hid its text; a Clipboard's Trigger copied (its status became `copied` or `failed`); a Steps Trigger moved to its step; a Carousel's AutoplayTrigger stopped or started the rotation; a ColorPicker's EyeDropperTrigger picked a color |
 | `close-press` | a `Close` part was pressed |
 | `escape-key` | Escape dismissed the overlay; Escape cleared a SearchField, or reverted an Editable's edit |
 | `outside-press` | a press outside the overlay (and its child layers) dismissed it |
 | `focus-out` | focus left a non-modal overlay |
-| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value; a Carousel Indicator's press changed its page |
+| `item-press` | a menu, combobox or autocomplete item was chosen (an autocomplete's by Enter too); a menu checkbox or radio item changed; a press changed a Listbox's or a TagGroup's selection; a Pagination Item's press changed its page; a press on a SegmentedControl's Item or a Rating's star changed its value; a Carousel Indicator's press changed its page; a press on a ColorSwatchPicker's Item chose its color |
 | `list-navigation` | the keyboard opened a menu or combobox (a ContextMenu: its `ContextMenu` key or Shift+F10), or a navigation menu's Content (its open key); a menubar's keys moved from one of its menus to another, closing one and opening the next (spec/menubar.md) |
-| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text |
+| `input-change` | typing opened or changed a combobox, or an autocomplete's text; typed (or pasted) text changed a NumberField's value, or an OTPField's (or autofill did); a typed digit or letter, or an erased digit, changed a DateField's or TimeField's value; typing changed a TagsInput's text, or a typed delimiter added its tags; typing changed a PasswordInput's, a SearchField's or an Editable's text; a ColorPicker's FormatSelect changed its format (and the value it converted to the format's space) |
 | `input-press` | a press on a combobox's input (or its input group, its chips) opened it |
 | `input-clear` | a ColorField's empty text was committed (`null`); a combobox's text was cleared: a choice with `multiple`, or a close that reset it to empty; an autocomplete's list closed as its text became empty; a NumberField's text was emptied; Backspace or Delete made a DateField's or TimeField's value `null`; an OTPField slot's character was deleted by the input itself |
 | `input-blur` | a NumberField's blur clamped its typed value (spec/number-field.md); a ColorField's blur committed its text; leaving an autocomplete's input accepted its inline completion (spec/autocomplete.md); leaving a TagsInput added or cleared its text (`blurBehavior`), or ended a tag's edit (spec/tags-input.md); the focus leaving an Editable's edit committed or reverted it (spec/editable.md) |
@@ -245,7 +254,7 @@ The reasons are shared:
 | `chip-remove-press` | a combobox chip's remove button, a TagGroup's RemoveButton or a TagsInput's TagRemove was pressed |
 | `trigger-hover` | the pointer entered or left a tooltip's trigger (or its popup), or a navigation menu's; the pointer entered a menubar's item while another of its menus was open (spec/menubar.md) |
 | `trigger-focus` | keyboard focus entered or left a tooltip's trigger |
-| `keyboard` | a key changed a slider's value (a ColorSlider's, a ColorArea's, a ColorWheel's too), committed or stepped a ColorField's, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit; a tabbed Carousel Indicator's arrow, Home or End changed its page |
+| `keyboard` | a key changed a slider's value (a ColorSlider's, a ColorArea's, a ColorWheel's too), committed or stepped a ColorField's, stepped a NumberField's or a DateField's or TimeField's segment, removed an OTPField's characters (Backspace, Delete), or changed a Listbox's, a ColorSwatchPicker's or a TagGroup's selection; Delete or Backspace removed a tag (TagGroup, TagsInput); Enter added a TagsInput's tags or ended a tag's edit; a key changed a SegmentedControl's or a Rating's value; Enter committed an Editable's edit; a tabbed Carousel Indicator's arrow, Home or End changed its page |
 | `increment-press`, `decrement-press` | a NumberField's Increment or Decrement stepped its value (a press, each repeat of a held press, or a click) |
 | `wheel` | the mouse wheel stepped a NumberField's value (`allowWheelScrub`) |
 | `scrub` | a NumberField's ScrubArea stepped its value |
@@ -527,6 +536,10 @@ The specs describe one API. Each framework expresses it with its own means, neve
 | ColorArea's parts | `ColorArea.Root` (`xChannel`, `yChannel`, `colorSpace`), `.Thumb`, `.Input` (`axis`) | the same | `[colorAreaRoot]`, `[colorAreaThumb]`, `input[colorAreaInput]` (`axis="x"`) |
 | ColorWheel's parts | `ColorWheel.Root` (`outerRadius`, `innerRadius`), `.Track`, `.Thumb` | the same | `[colorWheelRoot]`, `[colorWheelTrack]`, `[colorWheelThumb]` |
 | ColorField's parts | `ColorField.Root` (`channel`, `colorSpace`, `id`), `.Input` | the same | `[colorFieldRoot]` (`[channel]`, `[id]`), `input[colorFieldInput]` |
+| ColorSwatch | `ColorSwatch` (`color`) | the same | `[colorSwatch]` (`[color]`) |
+| ColorSwatchPicker's value and parts | `value` + `onValueChange(color \| null, details)` (`defaultValue`) on `ColorSwatchPicker.Root`; `.Item` (`value`, `disabled`) | `v-model:value` (`default-value`, `@value-change`); the same parts | `[(value)]` on `[colorSwatchPickerRoot]` (`defaultValue`, `valueChangeDetails` output); `[colorSwatchPickerItem]` (`[value]`) |
+| ColorPicker's value, format and parts | `value` + `onValueChange(color, details)` (`defaultValue`), `onValueCommit`, `format` + `onFormatChange(format, details)` (`defaultFormat`) on `ColorPicker.Root`; `.FormatSelect`, `.EyeDropperTrigger` | `v-model:value`, `v-model:format` (`default-value`, `default-format`, `@value-change`, `@value-commit`, `@format-change`); the same parts | `[(value)]`, `[(format)]` on `[colorPickerRoot]` (`defaultValue`, `defaultFormat`; `valueChangeDetails`, `formatChangeDetails`, `valueCommit` outputs); `select[colorPickerFormatSelect]`, structural `*colorPickerEyeDropperTrigger` on a `button` (rendered only where the API exists) |
+| ColorPickerPopover's parts | `ColorPickerPopover.Root` (`open` + `onOpenChange`, `defaultOpen`), `.Trigger`, `.Portal`, `.Positioner`, `.Popup` | `v-model:open`; the same parts | `[colorPickerPopoverRoot]` (`[(open)]`), `button[colorPickerPopoverTrigger]`, `*colorPickerPopoverPortal`, `[colorPickerPopoverPositioner]`, `[colorPickerPopoverPopup]` |
 
 Fragiola's existing mapping of the same contract: `~/organizations/fragiola/dockable/site/docs/concepts/primitive-contract.mdx`
 (the "In Vue" and "In Angular" sections), `dockable/packages/vue`, `dockable/packages/angular`
