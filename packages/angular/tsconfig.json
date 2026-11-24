@@ -100,6 +100,10 @@
         "breadcrumbs",
         "steps",
         "carousel",
+        "color-area",
+        "color-field",
+        "color-slider",
+        "color-wheel",
         "tests",
         "*.config.ts"
     ]
