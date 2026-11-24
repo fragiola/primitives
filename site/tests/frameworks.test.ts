@@ -99,6 +99,7 @@ const TOOLKIT_EXAMPLES = [
     "calendar-system",
     "date-field-time-zone",
     "color-editor",
+    "color-picker",
 ];
 
 /** The examples that render their links through the framework's router: it is installed too. */
@@ -142,6 +143,7 @@ describe("the embeds", () => {
             "clipboard",
             "collapsible",
             "color-editor",
+            "color-picker",
             "combobox",
             "combobox-virtual",
             "context-menu",
@@ -251,6 +253,7 @@ describe("the embeds", () => {
                 "search-field",
                 "editable",
                 "color-editor",
+                "color-picker",
                 "date-picker",
                 "calendar",
                 "date-field",
