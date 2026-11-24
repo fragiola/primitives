@@ -31,6 +31,7 @@ import {
     useId,
     watch,
 } from "vue";
+import { useColorPickerBinding } from "../../composables/use-color-picker-binding.ts";
 import { useControllable } from "../../composables/use-controllable.ts";
 import { useFieldControl } from "../../composables/use-field-control.ts";
 import { elementSetter } from "../../composables/use-overlay-root.ts";
@@ -128,7 +129,7 @@ export const ColorFieldRoot: PartComponent<
         props: {
             ...asProp,
             value: { type: COLOR_OR_NULL, default: undefined },
-            defaultValue: { type: COLOR_OR_NULL, default: null },
+            defaultValue: { type: COLOR_OR_NULL, default: undefined },
             /** The channel the field edits (none: the whole color, as hex). */
             channel: {
                 type: String as PropType<ColorChannel>,
@@ -156,14 +157,40 @@ export const ColorFieldRoot: PartComponent<
         setup(props, { attrs, slots, emit }) {
             const generatedId = useId();
             const inputId = () => props.id ?? generatedId;
-            const own = useControllable<Color | null, ChangeDetails>(
-                () => toColor(props.value),
-                toColor(props.defaultValue) ?? null,
-                (next, details) => {
-                    emit("update:value", next);
-                    emit("valueChange", next, details);
-                },
+            const report = (next: Color | null, details: ChangeDetails) => {
+                emit("update:value", next);
+                emit("valueChange", next, details);
+            };
+            const defaultValue = () => props.defaultValue ?? null;
+            // inside a ColorPicker, bound to its color unless given its own (spec/color-picker.md)
+            const binding = useColorPickerBinding(
+                () =>
+                    props.value !== undefined ||
+                    props.defaultValue !== undefined,
+                useControllable<Color | null, ChangeDetails>(
+                    () => toColor(props.value),
+                    toColor(defaultValue()) ?? null,
+                    report,
+                ),
+                report,
             );
+            const { picker, bound } = binding;
+            const own = {
+                value: binding.value,
+                set: (next: Color | null, details: ChangeDetails) => {
+                    const to = bound();
+                    if (to === null) {
+                        binding.set(next, details);
+                        return;
+                    }
+                    // a bound field never commits `null`: its text goes back to the picker's
+                    if (next === null) {
+                        return;
+                    }
+                    binding.set(next, details);
+                    to.commit(next, details);
+                },
+            };
             const space = computed<ColorSpace>(() => {
                 const current = own.value.value;
                 return props.channel === undefined
@@ -215,7 +242,10 @@ export const ColorFieldRoot: PartComponent<
                 input: () => hidden.value,
                 focusTarget: () => input.value,
             });
-            const disabled = () => props.disabled || field.disabled();
+            const disabled = () =>
+                props.disabled ||
+                field.disabled() ||
+                (picker?.disabled() ?? false);
             const state = computed<ColorFieldState>(() => ({
                 value: value.value,
                 inputValue: typed.value ?? valueText.value,
@@ -345,12 +375,15 @@ export const ColorFieldRoot: PartComponent<
                     onCleanup(
                         bridgeForm(element, {
                             reset: () => {
-                                field.reset();
                                 typed.value = null;
-                                const next =
-                                    toColor(props.defaultValue) ?? null;
-                                if (!isSameColor(next, value.value)) {
-                                    own.set(next, { reason: "none" });
+                                // a bound field is reset by its picker
+                                if (bound() === null) {
+                                    field.reset();
+                                    const next =
+                                        toColor(defaultValue()) ?? null;
+                                    if (!isSameColor(next, value.value)) {
+                                        own.set(next, { reason: "none" });
+                                    }
                                 }
                                 // the rendered texts: Vue sets `value` as a property only, so
                                 // the browser's reset emptied them, and an unchanged value
@@ -411,7 +444,10 @@ export const ColorFieldRoot: PartComponent<
                         type: "text",
                         "aria-hidden": "true",
                         tabindex: -1,
-                        name: field.name() ?? props.name,
+                        name:
+                            bound() === null
+                                ? (field.name() ?? props.name)
+                                : undefined,
                         value: formValue.value,
                         required: current.required,
                         disabled: current.disabled,
