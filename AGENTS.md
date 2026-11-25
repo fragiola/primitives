@@ -109,9 +109,12 @@ Do not "fix" these. A change that breaks one is a decision for the maintainer.
    part's `state()` (`exportAs`).
 9. **Dates** are a plain `{ year, month, day }` value with no time zone; no external date library:
    the date math is the toolkit's `/date` entry, the locale comes from `Intl`.
-10. **Nothing is released yet.** No `release.yml`, no npm publishing, no `npm trust` and no `0.0.0`
-    stubs, until the maintainer validates the library (`site/tests/ci-workflow.test.ts` checks the
-    workflow). fragiola.com is told about every push to `main` (the www trigger, Epic #17); the
+10. **Releasing is a merge (Epic #116).** `.github/workflows/release.yml` opens the Version
+    Packages PR, and merging it publishes the four packages with pnpm through npm trusted
+    publishing (OIDC, no token). After the maintainer's first `0.0.0` stub, nobody but that
+    workflow publishes; never `npm publish`, never a version bump or a changelog by hand
+    ([`docs/releasing.md`](docs/releasing.md); `site/tests/ci-workflow.test.ts` checks both
+    workflows). fragiola.com is told about every push to `main` (the www trigger, Epic #17); the
     registration in `../www/projects.json` is fragiola/www's own Epic.
 
 ## Decisions
@@ -218,9 +221,10 @@ Pin dependencies to exact versions published at least 7 days ago (`npm view <pkg
 | `pnpm e2e` | the conformance suite, then every examples app's Playwright suite |
 | `pnpm dev` | every fixture's dev server (`--framework vue` for one) |
 | `pnpm site:export` / `site:dev` | the site export (`--base /primitives`), the embeds with hot reload on port 5191 |
-| `pnpm check:package` | pack, check every `exports` subpath, `publint`, `attw --profile esm-only`, the toolkit's exact pin, a scratch app per framework (installed and built with the pinned pnpm, `pnpm dlx pnpm@<version>` when the machine's differs) |
+| `pnpm check:package` | pack, check every `exports` subpath, `publint`, `attw --profile esm-only`, the toolkit's exact pin, a scratch app per framework (installed and built with the pinned pnpm, `pnpm dlx pnpm@<version>` when the machine's differs); `node scripts/check-package.ts --tarballs <dir>` checks the tarballs in `dir` instead of packing, which the release workflow does on what `changeset pack` wrote |
 | `pnpm size` | the per-entry size report (`docs/size.md`; `--check` fails when it is stale); both fail when a date entry is over its budget (`scripts/size-budgets.ts`) |
-| `pnpm changeset` / `release:version` | Changesets |
+| `pnpm changeset` | Changesets: a changeset for a PR that changes what a package ships |
+| `pnpm release:version` | `changeset version`: bumps every package and writes their `CHANGELOG.md`. Only the release workflow runs it (the Version Packages PR) |
 
 ## CI
 
@@ -245,8 +249,17 @@ with this repository); without the secret the step is skipped, not failed.
 - The golden screenshots are written by React's conformance job when missing and uploaded as the
   `conformance-snapshots` artifact; they are reviewed and committed from it
   (`conformance/README.md`). Vue and Angular run with `--update-snapshots none`.
-- No release workflow and no publish step (rule 10). Pushing a change under
-  `.github/workflows/` needs the `workflow` scope, or a push over SSH (this repository's `origin`).
+- CI publishes nothing. `.github/workflows/release.yml` (adapted from Dockable's) runs on every
+  push to `main`, in `fragiola/primitives` only: pending changesets open or update the Version
+  Packages PR (`changeset-release/main`, which CI's Changesets job skips); with none, and a
+  version npm lacks, it builds, packs (`changeset pack`), checks those tarballs
+  (`check-package.ts --tarballs`) and publishes them from the `npm` environment (deployments from
+  `main` only), then pushes the tags and the GitHub releases. Never rename the file or the
+  environment: npm's trusted publishers name both. Its actions are pinned by commit, it grants no
+  permission by default and an OIDC token to the publish job only. The Version Packages PR gets
+  no CI by itself (the workflow's token starts no workflow): close and reopen it before merging
+  (`docs/releasing.md`).
+- Pushing a change under `.github/workflows/` needs the `workflow` scope, or a push over SSH (this repository's `origin`).
 
 ## Provenance
 

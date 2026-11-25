@@ -46,4 +46,12 @@ pnpm dev                                                  # every fixture's dev 
 pnpm site:dev                                             # the embeds on http://localhost:5191
 ```
 
+Install a framework's package (it brings the toolkit at the same version):
+
+```sh
+pnpm add @fragiola/primitives-react     # or @fragiola/primitives-vue, @fragiola/primitives-angular
+```
+
+Releasing is a merge: [`docs/releasing.md`](docs/releasing.md).
+
 MIT licence.
