@@ -34,8 +34,14 @@ export function ComboboxList<Entry = unknown>({
         if (list === null || pending === null) {
             return;
         }
-        pendingHighlight.current = null;
+        // an Item registers once its element is set, a commit after it mounts: an item the new
+        // text brought back is not registered yet, and the highlight waits for it (`itemCount`)
+        const rendered = list.querySelectorAll('[role="option"]').length;
         const items = orderedItems(context);
+        if (items.length < rendered) {
+            return;
+        }
+        pendingHighlight.current = null;
         if (pending === "typed") {
             setHighlighted(items[0]?.id ?? null);
             return;

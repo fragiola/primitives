@@ -66,7 +66,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 421,494 B | 129,705 B | 311,199 B | 91,640 B |
+| `@fragiola/primitives-react` | 421,562 B | 129,719 B | 311,267 B | 91,654 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -92,8 +92,8 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/color-swatch` | 5,783 B | 2,314 B | 1,542 B | 777 B |
 | `@fragiola/primitives-react/color-swatch-picker` | 15,772 B | 6,265 B | 7,799 B | 3,330 B |
 | `@fragiola/primitives-react/color-wheel` | 13,225 B | 5,161 B | 5,727 B | 2,476 B |
-| `@fragiola/primitives-react/combobox` | 46,803 B | 16,899 B | 20,806 B | 7,550 B |
-| `@fragiola/primitives-react/combobox-virtual` | 52,758 B | 19,167 B | 22,691 B | 8,304 B |
+| `@fragiola/primitives-react/combobox` | 46,871 B | 16,916 B | 20,874 B | 7,568 B |
+| `@fragiola/primitives-react/combobox-virtual` | 52,826 B | 19,182 B | 22,759 B | 8,322 B |
 | `@fragiola/primitives-react/command` | 8,131 B | 3,493 B | 6,663 B | 2,798 B |
 | `@fragiola/primitives-react/command-virtual` | 14,168 B | 5,891 B | 8,512 B | 3,561 B |
 | `@fragiola/primitives-react/context-menu` | 45,670 B | 16,215 B | 19,061 B | 6,821 B |
