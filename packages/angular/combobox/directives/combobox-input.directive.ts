@@ -97,8 +97,11 @@ export class ComboboxInput {
         root.setInputValue(this.input.value, "input-change");
         root.highlighted.set(null);
         root.markTyped();
-        // typing never highlights: drop what an earlier key asked for
-        root.pendingHighlight.set(null);
+        // typing highlights nothing, or the first item the text keeps (`autoHighlight`): drop
+        // what an earlier key asked for
+        root.pendingHighlight.set(
+            root.autoHighlight() && this.input.value !== "" ? "typed" : null,
+        );
         if (!root.overlay.open()) {
             root.setOpen(true, "input-change");
         }

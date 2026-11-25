@@ -82,6 +82,8 @@ export interface ComboboxRootProps {
     limit?: number;
     locale?: string;
     multiple?: boolean;
+    /** Typing highlights the first item the filter keeps, so Enter chooses it (default `false`). */
+    autoHighlight?: boolean;
     /** The selected item (or `null`), or the selected items with `multiple`. */
     value?: unknown;
     defaultValue?: unknown;
@@ -134,6 +136,7 @@ export const ComboboxRoot: PublicComponent<
             limit: { type: Number, default: -1 },
             locale: { type: String, default: undefined },
             multiple: { type: Boolean, default: false },
+            autoHighlight: { type: Boolean, default: false },
             /** The selected item (or `null`), or the selected items with `multiple`. */
             value: { type: null, default: undefined },
             defaultValue: {
@@ -302,6 +305,7 @@ export const ComboboxRoot: PublicComponent<
                 setOpen,
                 field,
                 multiple,
+                autoHighlight: () => props.autoHighlight,
                 value,
                 values,
                 inputValue,

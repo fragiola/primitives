@@ -17,7 +17,7 @@ decisions the POC applied and D10 keeps (`docs/handoff.md`).
   [field.md](field.md#integration-contract).
 
 Out of scope (later stages; the POC's `docs/reports/production-scope.md`): virtualization,
-`autoHighlight`, `readOnly`, async loading, Autocomplete (`selectionMode="none"`), grid layout, an
+`autoHighlight="always"`, `readOnly`, async loading, Autocomplete (`selectionMode="none"`), grid layout, an
 input inside the popup, Base UI's `Collection`, `Row`, `Arrow`, `Backdrop`, `Icon` and `Label` parts, `inline`, `modal`,
 `openOnInputClick={false}`, Space choosing the highlighted item, and the `useFilter` /
 `useFilteredItems` hooks.
@@ -78,6 +78,9 @@ form controls (spec/README.md, "Forms"): `combobox-input` is the Input's.
 - `limit` (`-1`, none): the most items the List renders, across groups.
 - `locale`: the collator's locale (spec/README.md, "Normalized API names").
 - `multiple` (`false`).
+- `autoHighlight` (`false`): typing highlights the first item the text keeps (after filtering,
+  in the List's order, a disabled one included), so Enter chooses it; a text that is empty or
+  keeps no item highlights nothing (Autocomplete's, [autocomplete.md](autocomplete.md)).
 - `value`, `defaultValue`, `onValueChange(value, details)`: the selected item, or `null`
   (default `null`); with `multiple`, the selected items in the order they were chosen (default
   `[]`).
@@ -173,7 +176,7 @@ DOM focus **stays on the Input** while the list is open; the highlighted item is
 
 | key | action |
 | --- | --- |
-| typing | updates the input's text (reason `input-change`), filters, and opens the list; **no item is highlighted** until the user navigates |
+| typing | updates the input's text (reason `input-change`), filters, and opens the list; **no item is highlighted** until the user navigates, unless `autoHighlight`: the first item the text keeps |
 | ArrowDown | closed: opens and highlights the selected item, else the first item (reason `list-navigation`); open: highlights the next item (the first when none is highlighted); from the last item, returns the visual focus to the input (no highlight), and the next ArrowDown highlights the first item |
 | ArrowUp | as ArrowDown, backwards: closed, the selected item, else the last item |
 | Alt+ArrowDown | opens without highlighting |
@@ -350,6 +353,18 @@ Checks:
    Enter after ArrowDown gives `fruit: Blueberry`.
 6. Replacing the text with `an` shows "No fruit found." and no option (the fixture's prefix
    filter).
+
+### `/combobox/auto-highlight`
+
+A Root with `items` the fruits and `autoHighlight`, uncontrolled: a `<label>` **"Fruit"** for the
+Input in an InputGroup, and the Popup of `/combobox/basic`. Output: `value: ...`.
+
+Checks:
+
+1. A click on the input, then `b`: "Banana" and "Blueberry", `aria-activedescendant` on
+   "Banana" (`data-highlighted`); `l` moves it to "Blueberry"; Backspace back to "Banana".
+2. `zz` (no item kept): no `aria-activedescendant`; an emptied text: none either.
+3. `ch`: "Cherry" highlighted; Enter: `value: cherry`, the input shows "Cherry", the list closes.
 
 ### `/combobox/objects`
 

@@ -72,8 +72,9 @@ export const NumberFieldScrubArea: PartComponent<
                                     Math.abs(steps),
                                 );
                             },
-                            onEnd: () => {
+                            onEnd: (event) => {
                                 context.scrubbing.value = false;
+                                context.commit(event);
                             },
                             onCursor: (point) => {
                                 context.cursor.value = point;

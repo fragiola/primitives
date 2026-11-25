@@ -66,6 +66,7 @@ import { ColorSwatchPickerBasic } from "../scenarios/color-swatch-picker/color-s
 import { ColorSwatchPickerField } from "../scenarios/color-swatch-picker/color-swatch-picker-field.ts";
 import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.ts";
 import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.ts";
+import { ComboboxAutoHighlight } from "../scenarios/combobox/combobox-auto-highlight.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.ts";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.ts";
@@ -167,6 +168,7 @@ import { MultipleCalendarForm } from "../scenarios/multiple-calendar/multiple-ca
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.ts";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.ts";
 import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.ts";
+import { NumberFieldCommit } from "../scenarios/number-field/number-field-commit.ts";
 import { NumberFieldField } from "../scenarios/number-field/number-field-field.ts";
 import { NumberFieldFormat } from "../scenarios/number-field/number-field-format.ts";
 import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.ts";
@@ -342,6 +344,7 @@ import { ROUTES } from "./routes.ts";
         CheckboxControlledForm,
         CheckboxGroupScenario,
         ComboboxBasic,
+        ComboboxAutoHighlight,
         ComboboxControlled,
         ComboboxField,
         ComboboxFiltered,
@@ -434,6 +437,7 @@ import { ROUTES } from "./routes.ts";
         NumberFieldField,
         NumberFieldFormat,
         NumberFieldScrub,
+        NumberFieldCommit,
         DateFieldBasic,
         DateFieldMinMax,
         DateFieldForm,
@@ -609,6 +613,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/lifecycle") { <main class="p-6" scenario-context-menu-lifecycle [cancel]="query.cancel"></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
+            @case ("/combobox/auto-highlight") { <main class="p-6" scenario-combobox-auto-highlight></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }
             @case ("/combobox/filtered") { <main class="p-6" scenario-combobox-filtered></main> }
@@ -714,6 +719,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/number-field/field") { <main class="p-6" scenario-number-field-field></main> }
             @case ("/number-field/format") { <main class="p-6" scenario-number-field-format [locale]="query.locale"></main> }
             @case ("/number-field/scrub") { <main class="p-6" scenario-number-field-scrub></main> }
+            @case ("/number-field/commit") { <main class="p-6" scenario-number-field-commit></main> }
             @case ("/date-field/basic") { <main class="p-6" scenario-date-field-basic [locale]="query.locale"></main> }
             @case ("/date-field/min-max") { <main class="p-6" scenario-date-field-min-max></main> }
             @case ("/date-field/form") { <main class="p-6" scenario-date-field-form></main> }

@@ -63,8 +63,11 @@ export interface ComboboxItemInfo {
     id: string;
 }
 
-/** What the keyboard highlights once the list renders: the first, the last or the selected item. */
-export type PendingHighlight = "first" | "last" | "selected" | null;
+/**
+ * What is highlighted once the list renders: the first, the last or the selected item, or the
+ * first item the typed text kept (`autoHighlight`).
+ */
+export type PendingHighlight = "first" | "last" | "selected" | "typed" | null;
 
 export interface ComboboxState {
     open: boolean;
@@ -96,6 +99,8 @@ export class ComboboxRoot implements OverlayActions {
     readonly limit = input(-1);
     readonly locale = input<string | undefined>(undefined);
     readonly multiple = input(false, { transform: booleanAttribute });
+    /** Typing highlights the first item the filter keeps, so Enter chooses it (default `false`). */
+    readonly autoHighlight = input(false, { transform: booleanAttribute });
     readonly open = input<boolean | undefined>(undefined);
     readonly openChange = output<boolean>();
     readonly defaultOpen = input(false);

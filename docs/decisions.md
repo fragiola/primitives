@@ -255,7 +255,7 @@ shared popup, the size variables, the hover and the names (D4).
 | Out of scope (NavigationMenu) | The Link's `closeOnClick`, the inline nested level (List and Viewport without a Portal), the Positioner's `collisionAvoidance`, `sticky`, `positionMethod`, `data-instant`, `data-pressed` | | `navigation-menu.md` |
 | The examples | A "Share" bottom sheet (`drawer`) and a cart side panel (`drawer-side-panel`) in the overlays category, modal drawers promoted in the embeds like dialogs; a site header (`navigation-menu`) in the navigation category after Tabs | snap points in the share sheet | |
 | A fixture text node | The drawer scenario's rows are one text node in every fixture (`Notification ${row}` in React, as Vue's and Angular's interpolation) | | |
-| Known limitations | A hover-opened NavigationMenu panel closes on the next pointer move outside it; a pointer that leaves the window or an iframe at once sends none, so it stays until then, as a Tooltip (fixed in Epic #49, "Toggles and bars"). Vue's handles stay typed `unknown` on the Root's side (no generic components) | | |
+| A pointer that leaves at once, and Vue's handle types | A hover-opened NavigationMenu panel closes on the next pointer move outside it; a pointer that leaves the window or an iframe at once sends none, so it stays until then, as a Tooltip (fixed in Epic #49, "Toggles and bars"). Vue's handles stay typed `unknown` on the Root's side (no generic components) | | |
 
 ## Toggles and bars: details decided during Epic #49 (Issues #46–#48)
 

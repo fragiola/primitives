@@ -5,6 +5,11 @@ export interface AutoRepeatOptions {
      * `false` to stop the repeat (a bound reached).
      */
     onStep: (event: Event) => boolean | undefined;
+    /**
+     * The press is over: released, canceled, left, the window blurred, or stopped at a bound; and
+     * after the single step of a click no press started. A NumberField commits its value here.
+     */
+    onEnd?: (event: Event) => void;
     /** How long a press lasts before the repeat starts, in ms (default 400, Base UI). */
     delay?: number;
     /** The time between two repeated steps, in ms (default 60, Base UI). */
@@ -30,7 +35,7 @@ export function watchAutoRepeat(
     // the click that follows a pointer press, already stepped at its pointerdown
     let swallowClick = false;
 
-    const stop = () => {
+    const stop = (event?: Event) => {
         if (timer !== undefined) {
             view?.clearTimeout(timer);
             view?.clearInterval(timer);
@@ -50,6 +55,9 @@ export function watchAutoRepeat(
         doc.removeEventListener("pointercancel", stop, true);
         element.removeEventListener("pointerleave", stop);
         view?.removeEventListener("blur", stop);
+        if (event !== undefined) {
+            options.onEnd?.(event);
+        }
     };
     const onDown = (event: PointerEvent) => {
         if (event.button !== 0 || !event.isPrimary) {
@@ -61,6 +69,7 @@ export function watchAutoRepeat(
             view?.setTimeout(() => {
                 swallowClick = false;
             }, 1000);
+            options.onEnd?.(event);
             return;
         }
         pressed = true;
@@ -71,7 +80,7 @@ export function watchAutoRepeat(
         timer = view?.setTimeout(() => {
             timer = view?.setInterval(() => {
                 if (options.onStep(event) === false) {
-                    stop();
+                    stop(event);
                 }
             }, interval);
         }, delay);
@@ -82,6 +91,7 @@ export function watchAutoRepeat(
             return;
         }
         options.onStep(event);
+        options.onEnd?.(event);
     };
     // a mouse press moves no focus: the field's input keeps it (APG: focus stays on the text
     // field)

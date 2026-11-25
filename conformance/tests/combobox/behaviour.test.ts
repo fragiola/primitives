@@ -613,3 +613,36 @@ test.describe("combobox / field", () => {
         await expectNoAxeViolations(page);
     });
 });
+
+test.describe("combobox / auto-highlight", () => {
+    test("typing highlights the first match, and Enter chooses it", async ({
+        page,
+    }) => {
+        await openScenario(page, "/combobox/auto-highlight");
+        const input = combobox(page);
+        await input.click();
+        await input.pressSequentially("b");
+        await expect(options(page)).toHaveText(["Banana", "Blueberry"]);
+        await expectActive(page, "Banana");
+        await expect(option(page, "Banana")).toHaveAttribute(
+            "data-highlighted",
+            "",
+        );
+        await input.press("l");
+        await expectActive(page, "Blueberry");
+        await input.press("Backspace");
+        await expectActive(page, "Banana");
+        // a text no item matches highlights nothing; an emptied text neither
+        await input.pressSequentially("zz");
+        await expect(options(page)).toHaveCount(0);
+        await expectActive(page, null);
+        await input.fill("");
+        await expectActive(page, null);
+        await input.pressSequentially("ch");
+        await expectActive(page, "Cherry");
+        await input.press("Enter");
+        await expectOutput(page, "value", "cherry");
+        await expect(input).toHaveValue("Cherry");
+        await expect(listbox(page)).toHaveCount(0);
+    });
+});

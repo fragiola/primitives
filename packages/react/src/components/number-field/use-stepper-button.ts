@@ -27,6 +27,7 @@ export function useStepperButton(
                     event,
                 );
             },
+            onEnd: (event) => latest.current.commit(event),
         });
     }, [element, direction]);
     const { value, min, max } = context;

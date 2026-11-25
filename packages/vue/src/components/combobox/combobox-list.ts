@@ -50,12 +50,13 @@ export const ComboboxList: PublicComponent<{ as?: AsProp }, ComboboxListSlots> =
                 const setList = elementSetter(context.list);
                 watch(
                     // runs when the list opens (a list reopened while it closes keeps its element), or its
-                    // items change
+                    // items or its text change
                     () =>
                         [
                             context.list.value,
                             context.itemCount.value,
                             context.open.value,
+                            context.inputValue.value,
                         ] as const,
                     ([list]) => {
                         const pending = context.pendingHighlight.current;
@@ -71,6 +72,10 @@ export const ComboboxList: PublicComponent<{ as?: AsProp }, ComboboxListSlots> =
                             return;
                         }
                         context.pendingHighlight.current = null;
+                        if (pending === "typed") {
+                            context.highlighted.value = items[0]?.id ?? null;
+                            return;
+                        }
                         const selected = context.multiple()
                             ? undefined
                             : items.find((item) =>

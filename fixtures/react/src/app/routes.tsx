@@ -63,6 +63,7 @@ import { ColorSwatchPickerBasic } from "../scenarios/color-swatch-picker/color-s
 import { ColorSwatchPickerField } from "../scenarios/color-swatch-picker/color-swatch-picker-field.tsx";
 import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.tsx";
 import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.tsx";
+import { ComboboxAutoHighlight } from "../scenarios/combobox/combobox-auto-highlight.tsx";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.tsx";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.tsx";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.tsx";
@@ -164,6 +165,7 @@ import { MultipleCalendarForm } from "../scenarios/multiple-calendar/multiple-ca
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.tsx";
+import { NumberFieldCommit } from "../scenarios/number-field/number-field-commit.tsx";
 import { NumberFieldField } from "../scenarios/number-field/number-field-field.tsx";
 import { NumberFieldFormat } from "../scenarios/number-field/number-field-format.tsx";
 import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.tsx";
@@ -327,6 +329,7 @@ export const routes: Record<
     "/context-menu/rtl": ContextMenuBasic,
     "/context-menu/lifecycle": ContextMenuLifecycle,
     "/combobox/basic": ComboboxBasic,
+    "/combobox/auto-highlight": ComboboxAutoHighlight,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,
     "/combobox/filtered": ComboboxFiltered,
@@ -435,6 +438,7 @@ export const routes: Record<
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,
     "/number-field/scrub": NumberFieldScrub,
+    "/number-field/commit": NumberFieldCommit,
     "/date-field/basic": DateFieldBasic,
     "/date-field/min-max": DateFieldMinMax,
     "/date-field/form": DateFieldForm,

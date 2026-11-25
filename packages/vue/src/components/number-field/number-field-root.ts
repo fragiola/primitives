@@ -73,6 +73,11 @@ export interface NumberFieldRootProps {
 export type NumberFieldRootEmits = {
     "update:value": (value: number | null) => true;
     valueChange: (value: number | null, details: ChangeDetails) => true;
+    /**
+     * The value once a change is complete: on blur after typing, at a key or wheel step, at the
+     * release of a button press or a scrub (spec/number-field.md, "Committing").
+     */
+    valueCommitted: (value: number | null, details: ChangeDetails) => true;
 };
 
 const NUMBER_OR_NULL = [Number, null] as PropType<number | null>;
@@ -115,6 +120,8 @@ export const NumberFieldRoot: PartComponent<
         emits: {
             "update:value": (_value: number | null) => true,
             valueChange: (_value: number | null, _details: ChangeDetails) =>
+                true,
+            valueCommitted: (_value: number | null, _details: ChangeDetails) =>
                 true,
         },
         setup(props, { attrs, slots, emit }) {
@@ -168,7 +175,14 @@ export const NumberFieldRoot: PartComponent<
                 },
                 { flush: "sync" },
             );
+            // the reason of the last change not committed yet
+            let pending: ChangeReason | null = null;
             const setValue = (next: number | null, details: ChangeDetails) => {
+                if (details.reason === "none") {
+                    pending = null;
+                } else if (!Object.is(next, current)) {
+                    pending = details.reason;
+                }
                 current = next;
                 own.set(next, details);
                 // an override for the steps of this task only: a consumer that refused the value
@@ -177,6 +191,18 @@ export const NumberFieldRoot: PartComponent<
                     current = own.value.value;
                 });
             };
+            /** Reports the value when a change is pending (spec/number-field.md, "Committing"). */
+            const commit = (event: Event | undefined) => {
+                const reason = pending;
+                if (reason === null) {
+                    return;
+                }
+                pending = null;
+                emit("valueCommitted", current, { reason, event });
+            };
+            /** A key or the wheel commits its step at once. */
+            const commitsAtOnce = (reason: ChangeReason) =>
+                reason === "keyboard" || reason === "wheel";
             const options = () => ({
                 locale: props.locale,
                 format: props.format,
@@ -221,6 +247,9 @@ export const NumberFieldRoot: PartComponent<
                 if (!Object.is(next, current)) {
                     setValue(next, { reason, event });
                 }
+                if (commitsAtOnce(reason)) {
+                    commit(event);
+                }
                 const bound = by > 0 ? props.max : props.min;
                 return bound === undefined || next !== bound;
             };
@@ -235,6 +264,9 @@ export const NumberFieldRoot: PartComponent<
                 typed.value = null;
                 if (!Object.is(next, current)) {
                     setValue(next, { reason, event });
+                }
+                if (commitsAtOnce(reason)) {
+                    commit(event);
                 }
             };
             const onInputText = (text: string, event: Event) => {
@@ -268,6 +300,7 @@ export const NumberFieldRoot: PartComponent<
                 if (!Object.is(next, current)) {
                     setValue(next, { reason: "input-blur", event });
                 }
+                commit(event);
             };
 
             // a form reset returns it to its default, and writes the rendered value back
@@ -331,6 +364,7 @@ export const NumberFieldRoot: PartComponent<
                 amount,
                 stepBy,
                 stepTo,
+                commit,
                 onInputText,
                 onInputBlur,
                 setInputElement: elementSetter(input),

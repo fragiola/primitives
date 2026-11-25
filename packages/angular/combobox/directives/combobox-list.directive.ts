@@ -59,6 +59,10 @@ export class ComboboxList {
                 }
                 root.pendingHighlight.set(null);
                 const items = root.orderedItems();
+                if (pending === "typed") {
+                    root.highlighted.set(items[0]?.id ?? null);
+                    return;
+                }
                 const selected = root.multiple()
                     ? undefined
                     : items.find((item) => root.isSelected(item.value));

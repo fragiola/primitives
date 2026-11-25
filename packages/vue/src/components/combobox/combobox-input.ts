@@ -153,7 +153,11 @@ export const ComboboxInput: PartComponent<
                 });
                 context.highlighted.value = null;
                 context.markTyped();
-                context.pendingHighlight.current = null;
+                // autoHighlight: the first item the text keeps, once the list renders
+                context.pendingHighlight.current =
+                    context.autoHighlight() && element.value !== ""
+                        ? "typed"
+                        : null;
                 if (!context.open.value) {
                     context.setOpen(true, "input-change", event);
                 }

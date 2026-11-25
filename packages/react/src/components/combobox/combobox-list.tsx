@@ -19,23 +19,40 @@ export function ComboboxList<Entry = unknown>({
     ...props
 }: ComboboxListProps<Entry>) {
     const context = useRequiredContext(ComboboxContext, "Combobox.List");
-    const { list, pendingHighlight, setHighlighted, itemCount, open } = context;
+    const {
+        list,
+        pendingHighlight,
+        setHighlighted,
+        itemCount,
+        open,
+        inputValue,
+    } = context;
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the list opens, or its items change
+    // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the list opens, its items or its text change
     useLayoutEffect(() => {
         const pending = pendingHighlight.current;
         if (list === null || pending === null) {
             return;
         }
-        pendingHighlight.current = null;
+        // an Item registers once its element is set, a commit after it mounts: an item the new
+        // text brought back is not registered yet, and the highlight waits for it (`itemCount`)
+        const rendered = list.querySelectorAll('[role="option"]').length;
         const items = orderedItems(context);
+        if (items.length < rendered) {
+            return;
+        }
+        pendingHighlight.current = null;
+        if (pending === "typed") {
+            setHighlighted(items[0]?.id ?? null);
+            return;
+        }
         const selected = context.multiple
             ? undefined
             : items.find((item) => context.isSelected(item.value));
         const edge = pending === "first" ? items[0] : items.at(-1);
         const target = selected ?? (pending === "selected" ? undefined : edge);
         setHighlighted(target?.id ?? null);
-    }, [list, itemCount, open]);
+    }, [list, itemCount, open, inputValue]);
 
     const empty = context.hasItems
         ? context.entries.length === 0

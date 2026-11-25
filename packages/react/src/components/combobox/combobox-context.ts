@@ -11,13 +11,18 @@ export interface ComboboxItemInfo {
     id: string;
 }
 
-/** What the keyboard highlights once the list renders: the first, the last or the selected item. */
-export type PendingHighlight = "first" | "last" | "selected" | null;
+/**
+ * What is highlighted once the list renders: the first, the last or the selected item, or the
+ * first item the typed text kept (`autoHighlight`).
+ */
+export type PendingHighlight = "first" | "last" | "selected" | "typed" | null;
 
 export interface ComboboxContextValue extends OverlayRoot {
     /** The enclosing field's binding, for the input (spec/field.md). */
     field: FieldControlBinding;
     multiple: boolean;
+    /** Typing highlights the first item the filter keeps. */
+    autoHighlight: boolean;
     /** The selected item (or `null`), or the selected items with `multiple`. */
     value: unknown;
     /** The selected items, as a list in both modes. */

@@ -29,6 +29,7 @@ export function stepperButton(
                     direction > 0 ? "increment-press" : "decrement-press",
                     event,
                 ),
+            onEnd: (event) => root.commit(event),
         });
     });
     inject(DestroyRef).onDestroy(() => stop?.());

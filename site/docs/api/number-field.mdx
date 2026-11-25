@@ -16,6 +16,10 @@ in a [Field](/docs/api/field).
 - **Value**: a number or `null`, controlled or not; every change reports `{ reason, event }`:
   `input-change`, `input-clear`, `input-blur`, `keyboard`, `increment-press`, `decrement-press`,
   `wheel`, `scrub`, `none` (a form reset).
+- **Committing**: `onValueCommitted` reports the value once per gesture that changed it: on the
+  Input's blur after typing, at once for a key or a wheel step, at the release of a button press
+  (once after a held repeat) or a scrub. A form reset is no commit. Save there instead of on every
+  `onValueChange`.
 - **Locale**: `format` (`Intl.NumberFormatOptions`) and `locale` write the value
   (`€1,234.50`, `1.234,50 €`, `‏١٬٢٣٤٫٥٠ €`) and read what is typed: the locale's digits
   (Arabic-Indic, ...), group and decimal separators, any minus sign, the currency, unit and
@@ -112,7 +116,8 @@ locked scrub runs.
 Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
 `render` (Vue: `as` and the `render` slot), a class and a style, a ref, and any attribute, which
 it forwards. Vue binds the value as `v-model:value` and `@value-change`; Angular as `[(value)]`
-and `(valueChangeDetails)` (`{ value, details }`).
+and `(valueChangeDetails)` (`{ value, details }`); the commit is `@value-committed` in Vue and
+`(valueCommitted)` (`{ value, details }`) in Angular.
 
 ### Root
 
@@ -121,6 +126,7 @@ and `(valueChangeDetails)` (`{ value, details }`).
 | `value` | `number \| null` | | the value, controlled (`null`: empty) |
 | `defaultValue` | `number \| null` | `null` | the initial value, uncontrolled |
 | `onValueChange` | `(value: number \| null, details: { reason, event }) => void` | | every change |
+| `onValueCommitted` | `(value: number \| null, details: { reason, event }) => void` | | the value once a change is complete: on blur after typing, at a key or wheel step, at the release of a button press or a scrub |
 | `min` | `number` | | the lower bound |
 | `max` | `number` | | the upper bound |
 | `step` | `number` | `1` | the amount of a step |
