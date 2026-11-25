@@ -1,5 +1,18 @@
 # @fragiola/primitives-react
 
+## 0.2.0
+
+### Minor Changes
+
+- [#123](https://github.com/fragiola/primitives/pull/123) [`18fd0ff`](https://github.com/fragiola/primitives/commit/18fd0ff180f8b7af9586db77b67b105281b89242) Thanks [@maurodesouza](https://github.com/maurodesouza)! - NumberField reports the committed value: `onValueCommitted` (Vue `@value-committed`, Angular `(valueCommitted)`) is called once a change is complete, on blur after typing, at a key or wheel step, at the release of a button press or a scrub. The toolkit's `watchAutoRepeat` takes an `onEnd` callback.
+  
+  Combobox takes `autoHighlight`: typing highlights the first item the text keeps, so Enter chooses it, as Autocomplete's.
+
+### Patch Changes
+
+- Updated dependencies [[`18fd0ff`](https://github.com/fragiola/primitives/commit/18fd0ff180f8b7af9586db77b67b105281b89242)]:
+  - @fragiola/primitives@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
