@@ -66,7 +66,7 @@ External: `react`, `react-dom`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-react` | 421,458 B | 129,700 B | 311,163 B | 91,635 B |
+| `@fragiola/primitives-react` | 421,494 B | 129,705 B | 311,199 B | 91,640 B |
 | `@fragiola/primitives-react/accordion` | 7,544 B | 3,044 B | 6,154 B | 2,553 B |
 | `@fragiola/primitives-react/alert-dialog` | 17,641 B | 6,527 B | 12,096 B | 4,703 B |
 | `@fragiola/primitives-react/aspect-ratio` | 1,208 B | 622 B | 1,208 B | 622 B |
@@ -125,7 +125,7 @@ External: `react`, `react-dom`.
 | `@fragiola/primitives-react/month-range-picker` | 39,616 B | 14,584 B | 14,593 B | 5,312 B |
 | `@fragiola/primitives-react/multiple-calendar` | 14,838 B | 5,672 B | 11,906 B | 4,540 B |
 | `@fragiola/primitives-react/navigation-menu` | 37,702 B | 13,802 B | 13,541 B | 5,064 B |
-| `@fragiola/primitives-react/number-field` | 17,249 B | 6,434 B | 11,066 B | 4,226 B |
+| `@fragiola/primitives-react/number-field` | 17,286 B | 6,439 B | 11,102 B | 4,234 B |
 | `@fragiola/primitives-react/otp-field` | 11,788 B | 4,680 B | 9,538 B | 3,812 B |
 | `@fragiola/primitives-react/pagination` | 4,413 B | 1,865 B | 3,724 B | 1,591 B |
 | `@fragiola/primitives-react/password-input` | 7,321 B | 2,905 B | 6,177 B | 2,538 B |
@@ -168,7 +168,7 @@ External: `vue`.
 
 | entry | min | min + gzip | min, toolkit external | min + gzip, toolkit external |
 | --- | ---: | ---: | ---: | ---: |
-| `@fragiola/primitives-vue` | 479,536 B | 130,562 B | 369,121 B | 92,003 B |
+| `@fragiola/primitives-vue` | 479,556 B | 130,567 B | 369,141 B | 92,009 B |
 | `@fragiola/primitives-vue/accordion` | 7,755 B | 2,963 B | 6,365 B | 2,460 B |
 | `@fragiola/primitives-vue/alert-dialog` | 17,177 B | 6,119 B | 11,636 B | 4,281 B |
 | `@fragiola/primitives-vue/aspect-ratio` | 782 B | 477 B | 782 B | 477 B |
@@ -227,7 +227,7 @@ External: `vue`.
 | `@fragiola/primitives-vue/month-range-picker` | 39,576 B | 14,418 B | 14,585 B | 5,125 B |
 | `@fragiola/primitives-vue/multiple-calendar` | 16,340 B | 5,777 B | 13,452 B | 4,645 B |
 | `@fragiola/primitives-vue/navigation-menu` | 38,394 B | 13,570 B | 14,261 B | 4,780 B |
-| `@fragiola/primitives-vue/number-field` | 17,280 B | 6,307 B | 11,133 B | 4,095 B |
+| `@fragiola/primitives-vue/number-field` | 17,300 B | 6,312 B | 11,153 B | 4,101 B |
 | `@fragiola/primitives-vue/otp-field` | 11,466 B | 4,600 B | 9,252 B | 3,736 B |
 | `@fragiola/primitives-vue/pagination` | 4,784 B | 1,861 B | 4,095 B | 1,593 B |
 | `@fragiola/primitives-vue/password-input` | 7,148 B | 2,774 B | 6,042 B | 2,399 B |

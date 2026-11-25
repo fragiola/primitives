@@ -161,7 +161,11 @@ export function NumberFieldRoot({
 
     const actions = useMemo(() => {
         const setValue = (next: number | null, details: ChangeDetails) => {
-            pending.current = details.reason === "none" ? null : details.reason;
+            if (details.reason === "none") {
+                pending.current = null;
+            } else if (!Object.is(next, current.current)) {
+                pending.current = details.reason;
+            }
             current.current = next;
             latest.current.setOwnValue(next, details);
             // an override for the steps of this task only: a consumer that refused the value

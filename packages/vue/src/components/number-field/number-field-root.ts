@@ -178,7 +178,11 @@ export const NumberFieldRoot: PartComponent<
             // the reason of the last change not committed yet
             let pending: ChangeReason | null = null;
             const setValue = (next: number | null, details: ChangeDetails) => {
-                pending = details.reason === "none" ? null : details.reason;
+                if (details.reason === "none") {
+                    pending = null;
+                } else if (!Object.is(next, current)) {
+                    pending = details.reason;
+                }
                 current = next;
                 own.set(next, details);
                 // an override for the steps of this task only: a consumer that refused the value
