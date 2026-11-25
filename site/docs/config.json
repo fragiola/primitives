@@ -475,10 +475,6 @@
                     "path": "server-rendering"
                 },
                 {
-                    "label": "Known limitations",
-                    "path": "limitations"
-                },
-                {
                     "label": "Found a problem?",
                     "href": "https://github.com/fragiola/primitives/issues",
                     "external": true

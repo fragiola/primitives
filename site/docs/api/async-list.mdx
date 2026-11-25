@@ -9,7 +9,7 @@ and give `loadMore` and `setFilterText` to the virtual lists
 ([ListboxVirtual](/docs/api/listbox-virtual), [SelectVirtual](/docs/api/select-virtual),
 [ComboboxVirtual](/docs/api/combobox-virtual),
 [AutocompleteVirtual](/docs/api/autocomplete-virtual)). Base UI leaves async loading to the
-consumer; React Aria's `useAsyncList` was read for the behaviour (no sorting here).
+consumer; React Aria's `useAsyncList` was read for the behaviour. The items keep the loader's order.
 
 It is a utility in its own entry, `/async-list`, which references no component, on the toolkit's
 [`/async-list`](/docs/api/toolkit) mechanism: you bring the fetching, it brings the order of the

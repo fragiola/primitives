@@ -285,7 +285,6 @@ describe("the sidebar", () => {
             "api/async-list",
             "api/toolkit",
             "server-rendering",
-            "limitations",
             "https://github.com/fragiola/primitives/issues",
         ]);
     });
