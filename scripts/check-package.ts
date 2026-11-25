@@ -25,9 +25,10 @@
 //   6 (`vueSmoke`); a Vite app with @analogjs/vite-plugin-angular and a standalone component
 //   checked by ngc with strict templates on TypeScript 6 (`angularSmoke`).
 //
-// `--tarballs <dir>` checks the tarballs found in `dir` (at any depth) instead of packing (for a
-// future release workflow, which would pass what `changeset pack` wrote). A package with no
-// tarball there is packed from the repo, as without the option.
+// `--tarballs <dir>` checks the tarballs found in `dir` (at any depth) instead of packing: the
+// release workflow (.github/workflows/release.yml) passes what `changeset pack` wrote, the very
+// tarballs its publish job publishes. A package with no tarball there is packed from the repo, as
+// without the option.
 import { execFileSync, spawn } from "node:child_process";
 import {
     closeSync,

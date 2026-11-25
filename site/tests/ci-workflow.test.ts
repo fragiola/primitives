@@ -67,20 +67,19 @@ describe("the CI workflow", () => {
         expect(workflow()).not.toContain("playwright install");
     });
 
-    // Releasing waits for the maintainer to validate the library (AGENTS.md, "CI").
+    // Only release.yml publishes (docs/releasing.md).
     it("publishes nothing", () => {
-        expect(existsSync(join(root, ".github/workflows/release.yml"))).toBe(
-            false,
-        );
         expect(workflow()).not.toMatch(
-            /npm publish|pnpm publish|changeset publish/,
+            /npm publish|pnpm publish|changeset publish|id-token/,
         );
     });
 });
 
-/** The workflow's jobs, by id: the text of each job's block under `jobs:`. */
-function jobs(): Map<string, string> {
-    const body = workflow().split(/^jobs:\n/m)[1] ?? "";
+const release = () => read(".github/workflows/release.yml");
+
+/** A workflow's jobs, by id: the text of each job's block under `jobs:`. */
+function jobsOf(text: string): Map<string, string> {
+    const body = text.split(/^jobs:\n/m)[1] ?? "";
     const blocks = new Map<string, string>();
     for (const block of body.split(/^(?= {2}[\w-]+:\s*$)/m)) {
         const id = /^ {2}([\w-]+):/.exec(block)?.[1];
@@ -90,6 +89,67 @@ function jobs(): Map<string, string> {
     }
     return blocks;
 }
+
+// npm trusts the publisher by this repository, the file `release.yml` and the `npm` environment
+// (docs/releasing.md, "The first release"): renaming either breaks every publish.
+describe("the release workflow", () => {
+    it("runs on a push to main only, in this repository only", () => {
+        expect(release()).toMatch(
+            /^on:\n {2}push:\n {4}branches: \[main\]\n\n/m,
+        );
+        expect(jobsOf(release()).get("select-mode")).toContain(
+            "if: github.repository == 'fragiola/primitives'",
+        );
+    });
+
+    it("has the select-mode, version, pack and publish jobs, publish after pack", () => {
+        const jobs = jobsOf(release());
+        expect([...jobs.keys()]).toEqual([
+            "select-mode",
+            "version",
+            "pack",
+            "publish",
+        ]);
+        expect(jobs.get("publish")).toContain("needs: pack\n");
+    });
+
+    it("grants no permission by default, and an OIDC token only to publish, from the npm environment", () => {
+        expect(release()).toMatch(/^permissions: \{\}$/m);
+        for (const [id, job] of jobsOf(release())) {
+            expect(job.includes("id-token: write"), id).toBe(id === "publish");
+            expect(job.includes("environment: npm\n"), id).toBe(
+                id === "publish",
+            );
+        }
+    });
+
+    it("pins every action by commit and persists no git credentials", () => {
+        const uses = [...release().matchAll(/uses: (\S+)/g)].map(
+            (match) => match[1] ?? "",
+        );
+        expect(uses.length).toBeGreaterThan(0);
+        for (const action of uses) {
+            expect(action).toMatch(/@[0-9a-f]{40}$/);
+        }
+        const checkouts = release().match(/uses: actions\/checkout@/g) ?? [];
+        const kept = release().match(/persist-credentials: false/g) ?? [];
+        expect(kept.length).toBe(checkouts.length);
+    });
+
+    it("checks the very tarballs it publishes, and restores no cache", () => {
+        const pack = jobsOf(release()).get("pack") ?? "";
+        expect(pack).toContain('run: pnpm --filter "./packages/*" build');
+        expect(pack).toContain("changesets/action/pack@");
+        expect(pack).toContain("node scripts/check-package.ts --tarballs");
+        expect(jobsOf(release()).get("publish")).toContain(
+            "needs.pack.outputs.pack-dir-artifact-id",
+        );
+        expect(release()).not.toMatch(/cache:|secrets\./);
+    });
+});
+
+/** The CI workflow's jobs, by id. */
+const jobs = () => jobsOf(workflow());
 
 // A push to main asks fragiola/www to rebuild fragiola.com (guidelines, repository.md#ci and
 // docs/site.md "sync"), and runs nothing else: main is what its pull request tested.

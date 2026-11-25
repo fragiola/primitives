@@ -48,9 +48,8 @@
 # shards: add `--shard` only for a suite whose tests take more than ~3 min.
 #
 # Tests run only on pull requests (and on a manual run). A push to main runs nothing but the www
-# trigger: with one coordinator merging one PR at a time, main is what its PR tested. Nothing is
-# released or published: release.yml and the npm releases come after the maintainer validates the
-# library (AGENTS.md, "CI").
+# trigger: with one coordinator merging one PR at a time, main is what its PR tested. Nothing here
+# publishes: releasing is release.yml's (docs/releasing.md).
 
 name: CI
 
