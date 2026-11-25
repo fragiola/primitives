@@ -164,6 +164,7 @@ import MultipleCalendarForm from "../scenarios/multiple-calendar/multiple-calend
 import NavigationMenuBasic from "../scenarios/navigation-menu/navigation-menu-basic.vue";
 import NavigationMenuNested from "../scenarios/navigation-menu/navigation-menu-nested.vue";
 import NumberFieldBasic from "../scenarios/number-field/number-field-basic.vue";
+import NumberFieldCommit from "../scenarios/number-field/number-field-commit.vue";
 import NumberFieldField from "../scenarios/number-field/number-field-field.vue";
 import NumberFieldFormat from "../scenarios/number-field/number-field-format.vue";
 import NumberFieldScrub from "../scenarios/number-field/number-field-scrub.vue";
@@ -450,6 +451,7 @@ export const routes: Record<string, Component> = {
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,
     "/number-field/scrub": NumberFieldScrub,
+    "/number-field/commit": NumberFieldCommit,
     "/date-field/basic": DateFieldBasic,
     "/date-field/min-max": DateFieldMinMax,
     "/date-field/form": DateFieldForm,

@@ -164,6 +164,7 @@ import { MultipleCalendarForm } from "../scenarios/multiple-calendar/multiple-ca
 import { NavigationMenuBasic } from "../scenarios/navigation-menu/navigation-menu-basic.tsx";
 import { NavigationMenuNested } from "../scenarios/navigation-menu/navigation-menu-nested.tsx";
 import { NumberFieldBasic } from "../scenarios/number-field/number-field-basic.tsx";
+import { NumberFieldCommit } from "../scenarios/number-field/number-field-commit.tsx";
 import { NumberFieldField } from "../scenarios/number-field/number-field-field.tsx";
 import { NumberFieldFormat } from "../scenarios/number-field/number-field-format.tsx";
 import { NumberFieldScrub } from "../scenarios/number-field/number-field-scrub.tsx";
@@ -435,6 +436,7 @@ export const routes: Record<
     "/number-field/field": NumberFieldField,
     "/number-field/format": NumberFieldFormat,
     "/number-field/scrub": NumberFieldScrub,
+    "/number-field/commit": NumberFieldCommit,
     "/date-field/basic": DateFieldBasic,
     "/date-field/min-max": DateFieldMinMax,
     "/date-field/form": DateFieldForm,

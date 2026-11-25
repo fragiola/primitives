@@ -386,3 +386,76 @@ test.describe("number-field / field", () => {
         await expect(input).toBeFocused();
     });
 });
+
+test.describe("number-field / commit", () => {
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/number-field/commit");
+    });
+
+    /** The last commit the scenario printed, and how many there were. */
+    async function expectCommit(
+        page: Page,
+        value: string,
+        reason: string,
+        count: number,
+    ) {
+        await expectOutput(page, "committed", value);
+        await expectOutput(page, "commitReason", reason);
+        await expectOutput(page, "commits", String(count));
+    }
+
+    test("typing commits once, on blur; a key step commits at once", async ({
+        page,
+    }) => {
+        const input = spin(page, "Amount");
+        await typeOver(input, "120");
+        await expectChange(page, "120", "input-change");
+        await expectOutput(page, "commits", "0");
+        await input.press("Tab");
+        await expectChange(page, "100", "input-blur");
+        await expectCommit(page, "100", "input-blur", 1);
+        await typeOver(input, "7");
+        await input.press("ArrowUp");
+        await expectCommit(page, "8", "keyboard", 2);
+        // a blur with nothing typed since commits nothing
+        await input.press("Tab");
+        await expectOutput(page, "commits", "2");
+        await input.focus();
+        await input.press("End");
+        await expectCommit(page, "100", "keyboard", 3);
+        // a step at a bound changes nothing and commits nothing
+        await input.press("ArrowUp");
+        await expectOutput(page, "commits", "3");
+    });
+
+    test("a button press commits once, at its release, after a held repeat too", async ({
+        page,
+    }) => {
+        const increase = page.getByRole("button", { name: "Increase" });
+        await increase.click();
+        await expectCommit(page, "51", "increment-press", 1);
+        await page.getByRole("button", { name: "Decrease" }).hover();
+        await page.mouse.down();
+        await expect
+            .poll(async () =>
+                Number(
+                    await spin(page, "Amount").getAttribute("aria-valuenow"),
+                ),
+            )
+            .toBeLessThan(48);
+        await expectOutput(page, "commits", "1");
+        await page.mouse.up();
+        const value = await spin(page, "Amount").getAttribute("aria-valuenow");
+        await expectCommit(page, value ?? "", "decrement-press", 2);
+    });
+
+    test("a form reset commits nothing", async ({ page }) => {
+        const input = spin(page, "Amount");
+        await input.focus();
+        await input.press("ArrowUp");
+        await expectCommit(page, "51", "keyboard", 1);
+        await page.getByRole("button", { name: "Reset" }).click();
+        await expectChange(page, "50", "none");
+        await expectOutput(page, "commits", "1");
+    });
+});

@@ -37,6 +37,9 @@ One entry, `/number-field` (D8), built on Field (`ENTRY_DEPENDENCIES`: `number-f
 - `value`, `defaultValue` (`null`), `onValueChange(value, details)`: a number, or `null` for an
   empty field. `details` is `{ reason, event }` (spec/README.md, "Change details"), not
   cancelable.
+- `onValueCommitted(value, details)` (Vue: the `valueCommitted` emit; Angular: the
+  `(valueCommitted)` output, `{ value, details }`): the value once a change is complete, see
+  [Committing](#committing) (Base UI).
 - `min`, `max`: the bounds (none when not given). Every step, the buttons, the keys, the wheel and
   the scrub stay inside them; a typed value is clamped on blur (`clampOnBlur`).
 - `step` (`1`), `smallStep` (`0.1`), `largeStep` (`10`): the amount of a step; Alt makes it
@@ -111,6 +114,24 @@ A step adds its amount and clamps to `[min, max]`; the result carries no floatin
 (`0.1 + 0.2` is `0.3`). A step from an empty field gives `0` clamped into the bounds (Base UI's
 seed, no step added). A step that leaves the value unchanged (at a bound) reports nothing. A step
 from typed text first reads that text.
+
+### Committing
+
+`onValueChange` reports every change, a keystroke included; `onValueCommitted` reports the value
+once the change is complete, so an app can save it once. It is called once per gesture that
+changed the value, with the value and the reason of the gesture's last change:
+
+| gesture | commits |
+| --- | --- |
+| typing | on the Input's blur, after `clampOnBlur` (reason `input-blur` when the blur clamped it, else the last typed change's `input-change` or `input-clear`) |
+| a key (ArrowUp, ArrowDown, PageUp, PageDown, Home, End) | at once (`keyboard`); typed text it stepped from is committed with it |
+| an Increment or Decrement press | at its release (or when the pointer leaves the button, the window blurs or a bound stops the repeat), once after a held repeat (`increment-press`, `decrement-press`); a click no press started commits at once |
+| a scrub | at the release (`scrub`) |
+| the wheel | at once, each step (`wheel`) |
+
+A gesture that changed nothing (a step at a bound, a blur with nothing typed) commits nothing; a
+form reset (`none`) and a controlled value the consumer sets are not commits. The toolkit's
+`watchAutoRepeat` reports the end of a press (`onEnd`), and `watchScrub` the end of a scrub.
 
 ### Forms
 
@@ -229,6 +250,24 @@ Checks:
    `form: quantity=1`.
 8. Axe finds no violation.
 
+### `/number-field/commit`
+
+A native `<form>` with a NumberField, `id="amount"`, `name="amount"`, `defaultValue` `50`, `min`
+`0`, `max` `100`, `locale="en-US"`, named by a [Label](label.md) **"Amount"**: a Group with a
+Decrement (`aria-label` **"Decrease"**), the Input and an Increment (`aria-label`
+**"Increase"**); a button **"Reset"** (`type="reset"`). It also prints `committed: <the last
+commit's value>`, `commitReason: <its reason>` (`none` before any) and `commits: <how many>`.
+
+Checks:
+
+1. Typing `120` over the text gives `value: 120` and `commits: 0`; Tab gives `100`
+   (`input-blur`) and `committed: 100`, `commitReason: input-blur`, `commits: 1`.
+2. Typing `7`, then ArrowUp: `committed: 8` (`keyboard`, `commits: 2`); a blur then commits
+   nothing; End commits `100` (`commits: 3`); ArrowUp at `max` commits nothing.
+3. A click on "Increase" commits `51` (`increment-press`); holding "Decrease" steps it several
+   times with no commit, and its release commits the value shown (`decrement-press`), once.
+4. ArrowUp commits `51`; "Reset" gives `value: 50` (`none`) and no commit.
+
 ### `/number-field/format`
 
 Two NumberFields in the locale `?locale=` names (`en-US` without it), each named by a Label:
@@ -297,4 +336,4 @@ Checks:
 | Base UI's Increment and Decrement have `aria-label="Increase"` / `"Decrease"` | no name of their own (no text): the consumer's `aria-label` |
 | Base UI's `allowOutOfRange` | `clampOnBlur` (`true`), its inverse (the Issue's name); steps always clamp, as Base UI's |
 | Base UI's hidden input takes `step` | `step="any"`: `smallStep` and `largeStep` give values on no grid of `step`, which a native form would refuse |
-| Base UI's `onValueCommitted`, `inputRef`, `form`, `teleportDistance`, cancelable change details, the `input-paste` reason | out of scope: a paste is `input-change` |
+| Base UI's `inputRef`, `form`, `teleportDistance`, cancelable change details, the `input-paste` reason | out of scope: a paste is `input-change` |

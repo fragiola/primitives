@@ -30,6 +30,11 @@ export interface NumberFieldRootProps extends PartProps<NumberFieldState> {
     value?: number | null;
     defaultValue?: number | null;
     onValueChange?: (value: number | null, details: ChangeDetails) => void;
+    /**
+     * The value once a change is complete: on blur after typing, at a key or wheel step, at the
+     * release of a button press or a scrub (spec/number-field.md, "Committing").
+     */
+    onValueCommitted?: (value: number | null, details: ChangeDetails) => void;
     min?: number;
     max?: number;
     /** The amount of a step (default `1`). */
@@ -66,6 +71,7 @@ export function NumberFieldRoot({
     value: valueProp,
     defaultValue = null,
     onValueChange,
+    onValueCommitted,
     min,
     max,
     step = 1,
@@ -112,6 +118,8 @@ export function NumberFieldRoot({
     // the value as of the last change, so a held button's steps never read a stale render
     const current = useRef(value);
     current.current = value;
+    // the reason of the last change not committed yet
+    const pending = useRef<ChangeReason | null>(null);
     const latest = useRef({
         value,
         typed,
@@ -128,6 +136,7 @@ export function NumberFieldRoot({
         readOnly,
         defaultValue,
         setOwnValue,
+        onValueCommitted,
         reset: field.reset,
     });
     latest.current = {
@@ -146,11 +155,13 @@ export function NumberFieldRoot({
         readOnly,
         defaultValue,
         setOwnValue,
+        onValueCommitted,
         reset: field.reset,
     };
 
     const actions = useMemo(() => {
         const setValue = (next: number | null, details: ChangeDetails) => {
+            pending.current = details.reason === "none" ? null : details.reason;
             current.current = next;
             latest.current.setOwnValue(next, details);
             // an override for the steps of this task only: a consumer that refused the value
@@ -159,6 +170,21 @@ export function NumberFieldRoot({
                 current.current = latest.current.value;
             });
         };
+        /** Reports the value when a change is pending (spec/number-field.md, "Committing"). */
+        const commit = (event: Event | undefined) => {
+            const reason = pending.current;
+            if (reason === null) {
+                return;
+            }
+            pending.current = null;
+            latest.current.onValueCommitted?.(current.current, {
+                reason,
+                event,
+            });
+        };
+        /** A key or the wheel commits its step at once. */
+        const commitsAtOnce = (reason: ChangeReason) =>
+            reason === "keyboard" || reason === "wheel";
         /** The value a step starts from: the typed text when it reads as a number. */
         const base = (): number | null => {
             const {
@@ -176,6 +202,7 @@ export function NumberFieldRoot({
         };
         return {
             setValue,
+            commit,
             amount: (
                 event: { altKey?: boolean; shiftKey?: boolean } | undefined,
             ) => {
@@ -208,6 +235,9 @@ export function NumberFieldRoot({
                 if (!Object.is(next, current.current)) {
                     setValue(next, { reason, event });
                 }
+                if (commitsAtOnce(reason)) {
+                    commit(event);
+                }
                 const bound = amount > 0 ? state.max : state.min;
                 return bound === undefined || next !== bound;
             },
@@ -223,6 +253,9 @@ export function NumberFieldRoot({
                 setTyped(null);
                 if (!Object.is(next, current.current)) {
                     setValue(next, { reason, event });
+                }
+                if (commitsAtOnce(reason)) {
+                    commit(event);
                 }
             },
             onInputText: (text: string, event: Event) => {
@@ -259,6 +292,7 @@ export function NumberFieldRoot({
                 if (!Object.is(next, current.current)) {
                     setValue(next, { reason: "input-blur", event });
                 }
+                commit(event);
             },
         };
     }, []);
@@ -314,6 +348,7 @@ export function NumberFieldRoot({
         amount: actions.amount,
         stepBy: actions.stepBy,
         stepTo: actions.stepTo,
+        commit: actions.commit,
         onInputText: actions.onInputText,
         onInputBlur: actions.onInputBlur,
         setInputElement,

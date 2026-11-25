@@ -84,6 +84,11 @@ export class NumberFieldRoot {
     readonly valueChange = output<number | null>();
     readonly defaultValue = input<number | null>(null);
     readonly valueChangeDetails = output<ValueChangeEvent<number | null>>();
+    /**
+     * The value once a change is complete: on blur after typing, at a key or wheel step, at the
+     * release of a button press or a scrub (spec/number-field.md, "Committing").
+     */
+    readonly valueCommitted = output<ValueChangeEvent<number | null>>();
     readonly min = input(undefined, { transform: optionalNumber });
     readonly max = input(undefined, { transform: optionalNumber });
     /** The amount of a step (default `1`). */
@@ -120,6 +125,8 @@ export class NumberFieldRoot {
         () => this.defaultValue(),
         (value, details) => this.valueChangeDetails.emit({ value, details }),
     );
+    /** The reason of the last change not committed yet. */
+    private pending: ChangeReason | null = null;
     /** The text the user typed, until the blur formats it (`null`: the formatted value). */
     private readonly typed = signal<string | null>(null);
     /** A ScrubArea scrubs. */
@@ -267,6 +274,9 @@ export class NumberFieldRoot {
         }
         this.typed.set(null);
         this.setValue(next, { reason, event });
+        if (commitsAtOnce(reason)) {
+            this.commit(event);
+        }
         const bound = amount > 0 ? max : min;
         return bound === undefined || next !== bound;
     }
@@ -278,6 +288,9 @@ export class NumberFieldRoot {
         }
         this.typed.set(null);
         this.setValue(next, { reason, event });
+        if (commitsAtOnce(reason)) {
+            this.commit(event);
+        }
     }
 
     /**
@@ -319,6 +332,20 @@ export class NumberFieldRoot {
         }
         this.typed.set(null);
         this.setValue(next, { reason: "input-blur", event });
+        this.commit(event);
+    }
+
+    /** Reports the value when a change is pending (spec/number-field.md, "Committing"). */
+    commit(event: Event | undefined): void {
+        const reason = this.pending;
+        if (reason === null) {
+            return;
+        }
+        this.pending = null;
+        this.valueCommitted.emit({
+            value: untracked(this.own.value),
+            details: { reason, event },
+        });
     }
 
     private interactive(): boolean {
@@ -345,6 +372,11 @@ export class NumberFieldRoot {
      * "Porting", 8).
      */
     private setValue(next: number | null, details: ChangeDetails): void {
+        if (details.reason === "none") {
+            this.pending = null;
+        } else if (!Object.is(untracked(this.own.value), next)) {
+            this.pending = details.reason;
+        }
         this.own.set(next, details);
         this.flush();
     }
@@ -352,4 +384,9 @@ export class NumberFieldRoot {
     private attribute(value: number | undefined): string | null {
         return value === undefined ? null : String(value);
     }
+}
+
+/** A key or the wheel commits its step at once. */
+function commitsAtOnce(reason: ChangeReason): boolean {
+    return reason === "keyboard" || reason === "wheel";
 }

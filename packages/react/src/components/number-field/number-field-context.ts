@@ -47,6 +47,8 @@ export interface NumberFieldContextValue extends NumberFieldState {
         reason: ChangeReason,
         event: Event | undefined,
     ) => void;
+    /** A button press or a scrub ended: reports a pending change (onValueCommitted). */
+    commit: (event: Event | undefined) => void;
     /** The Input's text changed. */
     onInputText: (text: string, event: Event) => boolean;
     /** The Input lost focus. */

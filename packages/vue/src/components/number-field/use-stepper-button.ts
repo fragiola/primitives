@@ -28,6 +28,7 @@ export function useStepperButton(
                                 : "decrement-press",
                             event,
                         ),
+                    onEnd: (event) => context.commit(event),
                 }),
             );
         },

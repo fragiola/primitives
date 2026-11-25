@@ -55,7 +55,10 @@ export function NumberFieldScrubArea({
                     Math.abs(steps),
                 );
             },
-            onEnd: () => latest.current.setScrubbing(false),
+            onEnd: (event) => {
+                latest.current.setScrubbing(false);
+                latest.current.commit(event);
+            },
             onCursor: (point) => latest.current.setCursor(point),
         });
     }, [element, direction, pixelSensitivity]);

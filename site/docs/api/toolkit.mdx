@@ -262,9 +262,9 @@ component imports it) with Select's mechanisms (`/collection`, `/overlay`, `/pos
   negative in parentheses; `null` for a text with no digit, `NaN` for one that is no number.
   `isNumberText` says whether a text holds only those characters (a field refuses the others as
   they are typed). `stepNumber(value, amount, { min, max, snapOnStep })` steps and clamps with no
-  floating-point noise (an empty field starts at `0`). `watchAutoRepeat(button, { onStep, delay,
+  floating-point noise (an empty field starts at `0`). `watchAutoRepeat(button, { onStep, onEnd, delay,
   interval })` steps at a press, then every 60 ms after 400 ms (a click no press started steps
-  once; a mouse press keeps the focus). `watchScrub(element, { direction, pixelSensitivity,
+  once; a mouse press keeps the focus), and calls `onEnd` once the press is over. `watchScrub(element, { direction, pixelSensitivity,
   onStart, onScrub, onEnd, onCursor })` reports steps per pixels moved, under the pointer lock for
   a mouse, with the virtual cursor's point wrapped around the viewport.
 - **Selection**: the collections mechanism (Epic #55), pure functions over a list's options; the

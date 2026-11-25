@@ -43,6 +43,32 @@ describe("watchAutoRepeat", () => {
         stop();
     });
 
+    it("ends a press once, at its release or at a bound, and after a click's single step", () => {
+        const onEnd = vi.fn();
+        let left = 2;
+        const stop = watchAutoRepeat(element, {
+            onStep: () => {
+                left -= 1;
+                return left > 0;
+            },
+            onEnd,
+        });
+        element.dispatchEvent(pointer("pointerdown"));
+        vi.advanceTimersByTime(400 + 60 * 5);
+        expect(onEnd).toHaveBeenCalledTimes(1);
+        document.dispatchEvent(pointer("pointerup"));
+        expect(onEnd).toHaveBeenCalledTimes(1);
+        left = 10;
+        element.dispatchEvent(pointer("pointerdown"));
+        vi.advanceTimersByTime(400 + 60 * 2);
+        document.dispatchEvent(pointer("pointerup"));
+        expect(onEnd).toHaveBeenCalledTimes(2);
+        vi.advanceTimersByTime(10);
+        element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(onEnd).toHaveBeenCalledTimes(3);
+        stop();
+    });
+
     it("steps once for a click no press started (the keyboard, assistive technology)", () => {
         const onStep = vi.fn(() => true);
         const stop = watchAutoRepeat(element, { onStep });

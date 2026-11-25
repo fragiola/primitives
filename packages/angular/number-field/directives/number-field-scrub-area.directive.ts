@@ -66,7 +66,10 @@ export class NumberFieldScrubArea {
                         Math.abs(steps),
                     );
                 },
-                onEnd: () => root.scrubbing.set(false),
+                onEnd: (event) => {
+                    root.scrubbing.set(false);
+                    root.commit(event);
+                },
                 onCursor: (point) => root.cursor.set(point),
             });
             onCleanup(stop);

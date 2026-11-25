@@ -51,6 +51,8 @@ export interface NumberFieldContext {
     onInputText: (text: string, event: Event) => boolean;
     /** The Input lost focus. */
     onInputBlur: (event: Event) => void;
+    /** A button press or a scrub ended: reports a pending change (`valueCommitted`). */
+    commit: (event: Event | undefined) => void;
     setInputElement: (value: unknown) => void;
     scrubbing: Ref<boolean>;
     /** The virtual cursor of a locked scrub, `null` otherwise. */

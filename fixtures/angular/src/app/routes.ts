@@ -161,6 +161,7 @@ export const ROUTES: readonly string[] = [
     "/number-field/field",
     "/number-field/format",
     "/number-field/scrub",
+    "/number-field/commit",
     "/date-field/basic",
     "/date-field/min-max",
     "/date-field/form",
