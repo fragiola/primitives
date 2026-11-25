@@ -63,6 +63,7 @@ import ColorSwatchPickerBasic from "../scenarios/color-swatch-picker/color-swatc
 import ColorSwatchPickerField from "../scenarios/color-swatch-picker/color-swatch-picker-field.vue";
 import ColorWheelBasic from "../scenarios/color-wheel/color-wheel-basic.vue";
 import ColorWheelDisabled from "../scenarios/color-wheel/color-wheel-disabled.vue";
+import ComboboxAutoHighlight from "../scenarios/combobox/combobox-auto-highlight.vue";
 import ComboboxBasic from "../scenarios/combobox/combobox-basic.vue";
 import ComboboxControlled from "../scenarios/combobox/combobox-controlled.vue";
 import ComboboxField from "../scenarios/combobox/combobox-field.vue";
@@ -326,6 +327,7 @@ export const routes: Record<string, Component> = {
     "/context-menu/rtl": ContextMenuBasic,
     "/context-menu/lifecycle": ContextMenuLifecycle,
     "/combobox/basic": ComboboxBasic,
+    "/combobox/auto-highlight": ComboboxAutoHighlight,
     "/combobox/controlled": ComboboxControlled,
     "/combobox/rejected-input": ComboboxRejectedInput,
     "/combobox/filtered": ComboboxFiltered,

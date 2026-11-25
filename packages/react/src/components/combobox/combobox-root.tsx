@@ -48,6 +48,8 @@ interface ComboboxRootCommonProps<Item> extends OverlayRootProps {
     /** The most items the list renders; `-1` for no limit. */
     limit?: number;
     locale?: string;
+    /** Typing highlights the first item the filter keeps, so Enter chooses it (default `false`). */
+    autoHighlight?: boolean;
     inputValue?: string;
     defaultInputValue?: string;
     onInputValueChange?: (inputValue: string, details: ChangeDetails) => void;
@@ -91,6 +93,7 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
         limit = -1,
         locale,
         multiple = false,
+        autoHighlight = false,
         inputValue: inputValueProp,
         defaultInputValue,
         onInputValueChange,
@@ -342,6 +345,7 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
             setOpen,
             field,
             multiple,
+            autoHighlight,
             value,
             values,
             inputValue,
@@ -380,6 +384,7 @@ export function ComboboxRoot<Item>(props: ComboboxRootProps<Item>) {
             setOpen,
             field,
             multiple,
+            autoHighlight,
             value,
             values,
             inputValue,

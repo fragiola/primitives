@@ -27,7 +27,8 @@ These are decided (D10): the APG allows them or says nothing about them.
   text and the value.
 - **A press on the input opens the list** (reason `input-press`), on the selected item.
 - **Focus**: DOM focus stays on the input; the highlighted item is announced with
-  `aria-activedescendant`. Typing highlights nothing until the user navigates; ArrowDown past the
+  `aria-activedescendant`. Typing highlights nothing until the user navigates (with
+  `autoHighlight`, the first item the text keeps, so Enter chooses it); ArrowDown past the
   last item returns to the input.
 - **Forms**: hidden inputs carry `name` and `itemToStringValue(value)` (one per value with
   `multiple`), and a visually hidden input carries `required`. A form reset returns an
@@ -189,6 +190,7 @@ it forwards. The names below are React's; Vue binds them the same way (`v-model:
 | `limit` | `number` | `-1` | the most items the List renders |
 | `locale` | `string` | the document's | the collator's locale |
 | `multiple` | `boolean` | `false` | a list of values, with chips |
+| `autoHighlight` | `boolean` | `false` | typing highlights the first item the text keeps, so Enter chooses it |
 | `value` | `Item \| null`, or `Item[]` | | the value, controlled |
 | `defaultValue` | `Item \| null`, or `Item[]` | `null`, or `[]` | the initial value, uncontrolled |
 | `onValueChange` | `(value, details: { reason }) => void` | | every change (`item-press`, `clear-press`, `chip-remove-press`, `escape-key`, `none`) |
@@ -323,7 +325,7 @@ No props of its own.
 
 | key | action |
 | --- | --- |
-| typing | filters and opens; nothing is highlighted yet |
+| typing | filters and opens; nothing is highlighted yet (with `autoHighlight`, the first match) |
 | ArrowDown / ArrowUp | closed: opens on the selected item, else the first (last); open: the next (previous) item, then back to the input |
 | Alt+ArrowDown / Alt+ArrowUp | opens without highlighting / closes |
 | Enter | chooses the highlighted item; never submits a form while the list is open |

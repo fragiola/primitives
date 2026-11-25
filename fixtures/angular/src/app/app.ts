@@ -66,6 +66,7 @@ import { ColorSwatchPickerBasic } from "../scenarios/color-swatch-picker/color-s
 import { ColorSwatchPickerField } from "../scenarios/color-swatch-picker/color-swatch-picker-field.ts";
 import { ColorWheelBasic } from "../scenarios/color-wheel/color-wheel-basic.ts";
 import { ColorWheelDisabled } from "../scenarios/color-wheel/color-wheel-disabled.ts";
+import { ComboboxAutoHighlight } from "../scenarios/combobox/combobox-auto-highlight.ts";
 import { ComboboxBasic } from "../scenarios/combobox/combobox-basic.ts";
 import { ComboboxControlled } from "../scenarios/combobox/combobox-controlled.ts";
 import { ComboboxField } from "../scenarios/combobox/combobox-field.ts";
@@ -343,6 +344,7 @@ import { ROUTES } from "./routes.ts";
         CheckboxControlledForm,
         CheckboxGroupScenario,
         ComboboxBasic,
+        ComboboxAutoHighlight,
         ComboboxControlled,
         ComboboxField,
         ComboboxFiltered,
@@ -611,6 +613,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/context-menu/rtl") { <main class="p-6" scenario-context-menu-basic></main> }
             @case ("/context-menu/lifecycle") { <main class="p-6" scenario-context-menu-lifecycle [cancel]="query.cancel"></main> }
             @case ("/combobox/basic") { <main class="p-6" scenario-combobox-basic></main> }
+            @case ("/combobox/auto-highlight") { <main class="p-6" scenario-combobox-auto-highlight></main> }
             @case ("/combobox/controlled") { <main class="p-6" scenario-combobox-controlled></main> }
             @case ("/combobox/rejected-input") { <main class="p-6" scenario-combobox-rejected-input></main> }
             @case ("/combobox/filtered") { <main class="p-6" scenario-combobox-filtered></main> }

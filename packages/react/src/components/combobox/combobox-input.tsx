@@ -140,7 +140,11 @@ export function ComboboxInput(
                 context.setInputValue(event.target.value, "input-change");
                 context.setHighlighted(null);
                 context.markTyped();
-                context.pendingHighlight.current = null;
+                // autoHighlight: the first item the text keeps, once the list renders
+                context.pendingHighlight.current =
+                    context.autoHighlight && event.target.value !== ""
+                        ? "typed"
+                        : null;
                 if (!open) {
                     context.setOpen(true, "input-change", event.nativeEvent);
                 }

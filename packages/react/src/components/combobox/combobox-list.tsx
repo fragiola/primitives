@@ -19,9 +19,16 @@ export function ComboboxList<Entry = unknown>({
     ...props
 }: ComboboxListProps<Entry>) {
     const context = useRequiredContext(ComboboxContext, "Combobox.List");
-    const { list, pendingHighlight, setHighlighted, itemCount, open } = context;
+    const {
+        list,
+        pendingHighlight,
+        setHighlighted,
+        itemCount,
+        open,
+        inputValue,
+    } = context;
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the list opens, or its items change
+    // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the list opens, its items or its text change
     useLayoutEffect(() => {
         const pending = pendingHighlight.current;
         if (list === null || pending === null) {
@@ -29,13 +36,17 @@ export function ComboboxList<Entry = unknown>({
         }
         pendingHighlight.current = null;
         const items = orderedItems(context);
+        if (pending === "typed") {
+            setHighlighted(items[0]?.id ?? null);
+            return;
+        }
         const selected = context.multiple
             ? undefined
             : items.find((item) => context.isSelected(item.value));
         const edge = pending === "first" ? items[0] : items.at(-1);
         const target = selected ?? (pending === "selected" ? undefined : edge);
         setHighlighted(target?.id ?? null);
-    }, [list, itemCount, open]);
+    }, [list, itemCount, open, inputValue]);
 
     const empty = context.hasItems
         ? context.entries.length === 0

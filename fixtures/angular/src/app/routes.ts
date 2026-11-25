@@ -56,6 +56,7 @@ export const ROUTES: readonly string[] = [
     "/context-menu/rtl",
     "/context-menu/lifecycle",
     "/combobox/basic",
+    "/combobox/auto-highlight",
     "/combobox/controlled",
     "/combobox/rejected-input",
     "/combobox/filtered",
