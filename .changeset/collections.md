@@ -1,8 +1,0 @@
----
-"@fragiola/primitives": minor
-"@fragiola/primitives-react": minor
-"@fragiola/primitives-vue": minor
-"@fragiola/primitives-angular": minor
----
-
-Collections, natively in React, Vue and Angular, each in its own entry. `/listbox` (`Root`, `Item`, `ItemIndicator`, `Group`, `GroupLabel`, `Separator`): the APG listbox that stays on the page, single or `multiple`, the APG's two selection models (`selectionBehavior`: `"toggle"`, where Space toggles and a move never selects, or `"replace"`, where the selection follows the focus and Ctrl moves without selecting), Shift and Ctrl ranges from the keyboard and the pointer, Ctrl+A to select all, the arrows along `orientation` (mirrored in RTL), Home, End, PageUp, PageDown and typeahead, `loopFocus`, focusable disabled options that are never selected, a roving tab stop on the first selected option, hidden inputs for native forms and the Field layer. `/autocomplete` (`Root`, `InputGroup`, `Input`, `Trigger`, `Clear`, `Value`, `Status`, `Portal`, `Positioner`, `Popup`, `Empty`, `List`, `Group`, `GroupLabel`, `Separator`, `Item`): a free-text input whose value is the text, with the APG's four autocomplete behaviours (`mode`: `list`, `both` and `inline` with the inline completion selected after the caret and accepted on blur, `none`), Combobox's built-in filtering (`filter`, `limit`, `locale`, groups), suggestions that may change as they load, `openOnInputClick`, `autoHighlight`, Escape that closes the list then clears the text, and the Input as the form control and the Field's. The toolkit gains `/selection`, the collections mechanism (`createListModel`, `applySelection`, `listKeyTarget`, `listPressSelection`, `pageTarget`), which only list collections import.

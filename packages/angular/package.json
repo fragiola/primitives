@@ -1,6 +1,6 @@
 {
     "name": "@fragiola/primitives-angular",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "Headless, accessible Angular primitives (Dialog, Tabs, ...) of Fragiola Primitives: standalone directives, one secondary entry point per component, styled by you.",
     "keywords": [
         "angular",

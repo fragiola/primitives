@@ -1,8 +1,0 @@
----
-"@fragiola/primitives": minor
-"@fragiola/primitives-react": minor
-"@fragiola/primitives-vue": minor
-"@fragiola/primitives-angular": minor
----
-
-Inputs, natively in React, Vue and Angular, each in its own entry. `/label`: a standalone `<label>` that names its control by `for` or by wrapping it, focuses a target `for` cannot label (a Slider's thumb) and selects no text on a double press. `/number-field` (`Root`, `Group`, `Input`, `Increment`, `Decrement`, `ScrubArea`, `ScrubAreaCursor`): the APG spinbutton, a number or `null` with `min`, `max`, `step`, `smallStep`, `largeStep`, `snapOnStep` and `clampOnBlur`, the arrows, Page Up/Down, Home and End, held buttons that repeat, an opt-in wheel (`allowWheelScrub`), a scrub area under the pointer lock with its virtual cursor, `format` and `locale` through `Intl.NumberFormat` with the localized text read back (grouping, decimal separators, Arabic-Indic digits, currency and percent), a hidden number input for native forms and the Field layer. `/meter`: the APG meter (`Root`, `Label`, `Value`, `Track`, `Indicator`), its value written by `format`/`locale`. `/otp-field` (`Root`, `Input`): one native input per slot in a named group with one tab stop, typing forward, Backspace back, Delete, the arrows (mirrored in RTL), paste and one-time-code autofill, `length`, `validationType` (digits, letters, both, any, or a `RegExp`), `mask`, `onValueComplete`, `onValueInvalid`, a hidden input whose pattern refuses an incomplete code, and the Field layer. The toolkit gains `/number` (`formatNumber`, `parseNumber`, `isNumberText`, `stepNumber`, `clampNumber`, `watchAutoRepeat`, `watchScrub`), and `/form` a Label's press and the OTP value rules.
