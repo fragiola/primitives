@@ -1,6 +1,6 @@
 {
     "name": "@fragiola/primitives-react",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Headless, accessible React primitives (Dialog, Tabs, ...) of Fragiola Primitives: behaviour and ARIA, one entry per component, styled by you.",
     "keywords": [
         "react",

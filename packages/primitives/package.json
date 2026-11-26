@@ -1,6 +1,6 @@
 {
     "name": "@fragiola/primitives",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "The framework-free DOM toolkit of Fragiola Primitives: overlays, layers, focus, scroll lock, positioning, collections, dates and more, one entry per mechanism.",
     "keywords": [
         "headless",
