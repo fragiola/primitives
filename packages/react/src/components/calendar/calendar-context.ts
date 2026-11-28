@@ -57,6 +57,8 @@ export interface CalendarContextValue {
     requestFocus: () => void;
     /** Whether a focus is pending (a cell that mounts as the focused date takes it). */
     focusPending: { current: boolean };
+    /** Whether a pending focus may be taken now (not while its picker's popup is no layer yet). */
+    focusReady: boolean;
 }
 
 export const CalendarContext = createContext<CalendarContextValue | null>(null);

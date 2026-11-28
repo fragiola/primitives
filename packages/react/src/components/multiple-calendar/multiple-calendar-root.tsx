@@ -116,6 +116,8 @@ export function MultipleCalendarRoot({
                 focusPending.current = true;
             },
             focusPending,
+            // never in a picker
+            focusReady: true,
         };
     }, [state, dates, maxSelected, setDates]);
     const { cells } = state;

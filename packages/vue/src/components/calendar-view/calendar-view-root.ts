@@ -199,6 +199,8 @@ export const CalendarViewRoot: PublicComponent<
                 },
                 mode: "single",
                 open,
+                // a view inside a picker: its month or year calendar waits for the popup's layer too
+                layered: () => picker?.layered() ?? true,
                 focusOnMount: () => switched || (picker !== null && open()),
                 value: () => null,
                 options: () => ({

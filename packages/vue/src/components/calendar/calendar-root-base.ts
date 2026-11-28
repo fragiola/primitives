@@ -88,7 +88,9 @@ export function defineCalendarRoot(
                 }
             });
             const focusPendingCell = () => {
-                if (!context.focusPending.current) {
+                // its picker's popup is no layer yet: the focus waits for it (spec/calendar.md,
+                // "Focus")
+                if (!context.focusPending.current || !context.focusReady()) {
                     return;
                 }
                 const cell = context.cells.get(
@@ -99,6 +101,17 @@ export function defineCalendarRoot(
                     cell.focus({ preventScroll: true });
                 }
             };
+            // the popup just became a layer: the pending focus is taken once the cells it renders
+            // meanwhile (a language read at mount) are in place
+            watch(
+                context.focusReady,
+                (ready) => {
+                    if (ready) {
+                        void nextTick().then(focusPendingCell);
+                    }
+                },
+                { flush: "post" },
+            );
             // after a render while a focus is pending: the focused date's cell may have mounted
             // in it (a new month, a picker opening; AGENTS.md "Porting", 5); a cell that mounts
             // later takes the focus itself

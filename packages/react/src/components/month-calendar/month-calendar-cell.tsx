@@ -29,14 +29,14 @@ export function MonthCalendarCell({
     const { units } = context;
     const index = units.index(value);
     const state = context.cellState(index);
-    const { cells, focusPending } = context;
+    const { cells, focusPending, focusReady } = context;
     useLayoutEffect(() => {
         if (element === null) {
             return undefined;
         }
         cells.set(index, element);
         // a cell of a page just shown mounts after the keyboard moved the focus to it
-        if (focusPending.current && state.focused) {
+        if (focusPending.current && state.focused && focusReady) {
             focusPending.current = false;
             element.focus({ preventScroll: true });
         }
@@ -45,7 +45,7 @@ export function MonthCalendarCell({
                 cells.delete(index);
             }
         };
-    }, [element, index, state.focused, cells, focusPending]);
+    }, [element, index, state.focused, cells, focusPending, focusReady]);
 
     return renderElement(
         "td",

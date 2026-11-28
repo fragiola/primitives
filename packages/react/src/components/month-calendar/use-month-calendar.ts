@@ -249,7 +249,7 @@ export function useMonthCalendar(
 
     const context: Omit<
         MonthCalendarContextValue,
-        "requestFocus" | "focusPending"
+        "requestFocus" | "focusPending" | "focusReady"
     > = {
         component,
         kind,
@@ -284,5 +284,7 @@ export function useMonthCalendar(
         focusOnMount: bound && binding.focusOnMount && binding.open,
         opened,
         reopened,
+        /** A bound calendar takes the focus once its picker's popup is a layer. */
+        focusReady: !bound || binding.layered,
     };
 }

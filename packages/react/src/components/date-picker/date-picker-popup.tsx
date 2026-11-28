@@ -29,13 +29,23 @@ const RETURNS_FOCUS_UNFOCUSED = new Set([
 /** The non-modal dialog holding the bound calendar (spec/calendar.md, pickers). */
 export function DatePickerPopup(props: DatePickerPopupProps) {
     const context = useRequiredContext(DatePickerContext, "DatePicker.Popup");
-    const { open, popup, positioner, trigger, setOpen, lastReason } = context;
+    const {
+        open,
+        popup,
+        positioner,
+        trigger,
+        setOpen,
+        lastReason,
+        setLayered,
+    } = context;
 
     useEffect(() => {
         if (!open || popup === null) {
             return undefined;
         }
-        // the bound calendar focuses its focused date itself (spec/calendar.md, "Focus")
+        // the bound calendar focuses its focused date itself, once the popup is a layer: inside
+        // another overlay (a Dialog's focus trap), the focus then moves into a child layer of it
+        // (spec/calendar.md, "Focus")
         const session = openOverlaySession(popup.ownerDocument, {
             elements: () => [positioner ?? popup],
             ignore: () => [trigger],
@@ -48,8 +58,12 @@ export function DatePickerPopup(props: DatePickerPopupProps) {
                 to: () => trigger,
             },
         });
-        return session.end;
-    }, [open, popup, positioner, trigger, setOpen, lastReason]);
+        setLayered(true);
+        return () => {
+            setLayered(false);
+            session.end();
+        };
+    }, [open, popup, positioner, trigger, setOpen, lastReason, setLayered]);
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key !== "Tab" || popup === null || event.defaultPrevented) {

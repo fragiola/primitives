@@ -176,10 +176,12 @@ export function DatePickerRootBase({
             calendar,
         ],
     );
+    // whether the popup is a layer: its calendar takes the focus only then (spec/calendar.md, "Focus")
+    const [layered, setLayered] = useState(false);
     const { open } = root;
     const binding = useMemo(
-        () => ({ mode, open, value, choose, options, readOnly }),
-        [mode, open, value, choose, options, readOnly],
+        () => ({ mode, open, layered, value, choose, options, readOnly }),
+        [mode, open, layered, value, choose, options, readOnly],
     );
     const context = useMemo(
         () => ({
@@ -187,6 +189,7 @@ export function DatePickerRootBase({
             component,
             placed,
             setPlaced,
+            setLayered,
             field,
             disabled,
             readOnly,

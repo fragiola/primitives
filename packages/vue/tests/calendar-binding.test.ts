@@ -16,6 +16,7 @@ describe("a Vue calendar's picker binding", () => {
         const picker: PickerBinding = {
             mode: "single",
             open: () => false,
+            layered: () => false,
             value: computed(() => ({ year: 2026, month: 11, day: 20 })),
             choose: (value) => chosen.push(value),
             options: () => ({}),

@@ -169,6 +169,8 @@ export function CalendarViewRoot({
             kind,
             mode: "single",
             open,
+            // a view inside a picker: its month or year calendar waits for the popup's layer too
+            layered: picker?.layered ?? true,
             focusOnMount: switched.current || (picker !== null && open),
             value: null,
             options: { locale: calendar.locale, calendar: calendar.calendar },

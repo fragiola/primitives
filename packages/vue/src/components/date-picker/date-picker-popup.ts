@@ -90,7 +90,9 @@ export const DatePickerPopup: PartComponent<
                         return;
                     }
                     const trigger = context.trigger.value;
-                    // the bound calendar focuses its focused date itself (spec/calendar.md, "Focus")
+                    // the bound calendar focuses its focused date itself, once the popup is a layer:
+                    // inside another overlay (a Dialog's focus trap), the focus then moves into a
+                    // child layer of it (spec/calendar.md, "Focus")
                     const session = openOverlaySession(popup.ownerDocument, {
                         elements: () => [positioner ?? popup],
                         ignore: () => [trigger],
@@ -108,8 +110,10 @@ export const DatePickerPopup: PartComponent<
                     // than the listener's, which a fixed clock (the tests' "today") makes equal
                     // once a child's Vue listener (the calendar cell's keydown) has seen the event
                     popup.addEventListener("keydown", onKeydown);
+                    context.layered.value = true;
                     onCleanup(() => {
                         popup.removeEventListener("keydown", onKeydown);
+                        context.layered.value = false;
                         session.end();
                     });
                 },

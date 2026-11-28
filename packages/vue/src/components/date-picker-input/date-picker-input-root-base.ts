@@ -346,7 +346,11 @@ export function defineDatePickerInputRoot(
                     };
                 },
             };
+            // whether the popup is a layer: its calendar takes the focus only then
+            // (spec/calendar.md, "Focus")
+            const layered = ref(false);
             provide(DatePickerKey, {
+                layered,
                 ...root,
                 component,
                 placed: ref<{ side: Side; align: Align }>({
@@ -380,6 +384,7 @@ export function defineDatePickerInputRoot(
             provide(PickerBindingKey, {
                 mode,
                 open: () => root.open.value,
+                layered: () => layered.value,
                 value: computed(() => own.value.value as CalendarValue),
                 choose(chosen) {
                     if (readOnly()) {
