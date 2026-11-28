@@ -95,6 +95,61 @@ export class CopyCommand {}
 
 </Framework>
 
+### A label that follows the status
+
+A button whose visible label changes ("Copy link", then "Copied") is named by that label, from
+its content, with no `aria-label`: a fixed `aria-label` would stop containing the visible text
+once it reads "Copied" (WCAG 2.5.3 Label in Name). Put the label in the Trigger, beside the
+Indicator, which stays hidden from the accessibility tree for its icons.
+
+<Framework name="react">
+
+```tsx
+<Clipboard.Root value={link}>
+    <Clipboard.Trigger>
+        {({ copied }) => (
+            <>
+                <Clipboard.Indicator>{({ copied }) => (copied ? <CheckIcon /> : <LinkIcon />)}</Clipboard.Indicator>
+                {copied ? "Copied" : "Copy link"}
+            </>
+        )}
+    </Clipboard.Trigger>
+</Clipboard.Root>;
+```
+
+</Framework>
+
+<Framework name="vue">
+
+```vue
+<template>
+    <Clipboard.Root :value="link">
+        <Clipboard.Trigger v-slot="{ state }">
+            <Clipboard.Indicator v-slot="{ state: indicator }">
+                <CheckIcon v-if="indicator.copied" />
+                <LinkIcon v-else />
+            </Clipboard.Indicator>
+            {{ state.copied ? "Copied" : "Copy link" }}
+        </Clipboard.Trigger>
+    </Clipboard.Root>
+</template>
+```
+
+</Framework>
+
+<Framework name="angular">
+
+```html
+<div clipboardRoot [value]="link">
+    <button clipboardTrigger #trigger="clipboardTrigger">
+        <span clipboardIndicator>@if (trigger.state().copied) { <check-icon /> } @else { <link-icon /> }</span>
+        {{ trigger.state().copied ? "Copied" : "Copy link" }}
+    </button>
+</div>
+```
+
+</Framework>
+
 ## Props
 
 Every part also takes what the [primitive contract](/docs/concepts/primitive-contract) gives:
@@ -114,7 +169,10 @@ Angular as inputs and an output (`(statusChange)` with `{ status, details }`).
 
 ### Trigger
 
-No props of its own.
+No props of its own. Its children may be a function of the state, `{ status, copied, failed }`
+(Vue: the default scoped slot, `{ state }`; Angular: `state()` through `exportAs`,
+`#trigger="clipboardTrigger"`), so a visible label can follow the status and name the button in
+both states (below).
 
 ### Indicator
 
