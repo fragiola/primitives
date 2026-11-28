@@ -8,6 +8,28 @@ export interface ExitRecord {
     running: number;
     /** Milliseconds from `data-ending-style` to its removal, `null` while it is still mounted. */
     unmountedAfter: number | null;
+    /**
+     * The opacity of each frame painted while the part was still in the document, with
+     * `data-ending-style`, after its exit animations had finished (spec/README.md, "Lifecycle": the
+     * unmount is never a frame late). Empty when it unmounted before the next paint.
+     */
+    paintedAfterEnd: number[];
+}
+
+/**
+ * Makes the part's exit a keyframe animation with `animation-fill-mode: none` (tw-animate-css's
+ * `animate-out`), over `--pr-motion`: its resting style while ending stays visible (opacity 1),
+ * which it is back at once the animation ends, so a frame painted before the unmount shows it.
+ */
+export async function keyframeExit(page: Page, part: string): Promise<void> {
+    await page.addStyleTag({
+        content: `@keyframes pr-conformance-exit { from { opacity: 1; } to { opacity: 0; } }
+[data-primitives-part="${part}"][data-ending-style] {
+    opacity: 1;
+    transition: none;
+    animation: pr-conformance-exit var(--pr-motion) linear;
+}`,
+    });
 }
 
 /**
@@ -48,6 +70,10 @@ export async function slowMotion(page: Page, ms = 600): Promise<void> {
  * Starts watching the mounted `data-primitives-part="<part>"` element (spec/dialog.md,
  * "Animation": the element stays mounted with `data-ending-style` until its exit animation ends).
  * Returns a reader of what it did since.
+ *
+ * Each frame is checked right before its paint: a probe element resized on every animation frame
+ * makes a `ResizeObserver` report after the frame's layout, the last script before the paint,
+ * once the animation frame callbacks and their microtasks (an animation's `finished`) have run.
  */
 export async function recordExit(
     page: Page,
@@ -66,8 +92,56 @@ export async function recordExit(
                 ending: false,
                 running: 0,
                 unmountedAfter: null as number | null,
+                paintedAfterEnd: [] as number[],
             };
             let endingAt = 0;
+            // an animation of the exit ran: once none runs, the exit has finished
+            let animated = false;
+            const running = () =>
+                element
+                    .getAnimations()
+                    .some(
+                        (animation) =>
+                            animation.pending ||
+                            animation.playState === "running",
+                    );
+            const probe = document.createElement("div");
+            probe.style.cssText =
+                "position: fixed; inset-block-start: -10px; inset-inline-start: 0; block-size: 1px; inline-size: 1px; pointer-events: none;";
+            document.body.append(probe);
+            let frame = 0;
+            let stopped = false;
+            const resize = () => {
+                if (stopped) {
+                    return;
+                }
+                frame += 1;
+                probe.style.inlineSize = `${1 + (frame % 2)}px`;
+                requestAnimationFrame(resize);
+            };
+            requestAnimationFrame(resize);
+            const beforePaint = new ResizeObserver(() => {
+                if (
+                    stopped ||
+                    !element.isConnected ||
+                    !element.hasAttribute("data-ending-style")
+                ) {
+                    return;
+                }
+                if (running()) {
+                    animated = true;
+                } else if (animated) {
+                    record.paintedAfterEnd.push(
+                        Number(getComputedStyle(element).opacity),
+                    );
+                }
+            });
+            beforePaint.observe(probe);
+            const stop = () => {
+                stopped = true;
+                beforePaint.disconnect();
+                probe.remove();
+            };
             const check = () => {
                 if (
                     !record.ending &&
@@ -83,6 +157,7 @@ export async function recordExit(
                         ? performance.now() - endingAt
                         : 0;
                     observer.disconnect();
+                    stop();
                 }
             };
             const observer = new MutationObserver(check);

@@ -6,7 +6,12 @@ import {
     recordPanelMoments,
     sizeVariable,
 } from "../../src/panel.ts";
-import { slowMotion } from "../../src/presence.ts";
+import {
+    keyframeExit,
+    recordExit,
+    settleAnimations,
+    slowMotion,
+} from "../../src/presence.ts";
 import { openScenario } from "../../src/scenario.ts";
 
 // spec/collapsible.md
@@ -109,6 +114,26 @@ test.describe("collapsible / basic", () => {
         // it transitions from its height: not from auto, which would jump to 0 at once
         expect(closing?.height).toBeGreaterThan(0);
         expect(closing?.running).toBeGreaterThan(0);
+    });
+
+    test("a keyframe exit is never painted at rest before the panel unmounts", async ({
+        page,
+    }) => {
+        // spec/README.md, "Lifecycle": unmounted in the frame its exit animation ended
+        await slowMotion(page, 300);
+        await keyframeExit(page, "collapsible-panel");
+        const recovery = trigger(page, "Recovery keys");
+        await recovery.click();
+        const panel = panels(page).filter({ hasText: "alpha-1234" });
+        await expect(panel).toBeVisible();
+        await settleAnimations(page);
+        const exit = await recordExit(page, "collapsible-panel");
+        await recovery.click();
+        await expect(panel).toHaveCount(0);
+        const record = await exit();
+        expect(record.ending).toBe(true);
+        expect(record.running).toBeGreaterThan(0);
+        expect(record.paintedAfterEnd).toEqual([]);
     });
 
     test("has no axe violation, closed and open", async ({ page }) => {
