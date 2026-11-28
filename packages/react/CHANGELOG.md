@@ -1,5 +1,19 @@
 # @fragiola/primitives-react
 
+## 0.3.0
+
+### Minor Changes
+
+- [#132](https://github.com/fragiola/primitives/pull/132) [`1c50df4`](https://github.com/fragiola/primitives/commit/1c50df453129fb1d55d372aa19797bcd8fa7f814) Thanks [@maurodesouza](https://github.com/maurodesouza)! - Clipboard's Trigger content can follow the status, as the Indicator's: in React its children may be a function of the state (`{({ copied }) => (copied ? "Copied" : "Copy link")}`), so a visible label that changes names the button in both states with no `aria-label` (WCAG 2.5.3 Label in Name). Vue's Trigger default scoped slot (`v-slot="{ state }"`) and Angular's `state()` through `exportAs` (`#trigger="clipboardTrigger"`) already gave it; the Indicator stays `aria-hidden`.
+
+### Patch Changes
+
+- [#131](https://github.com/fragiola/primitives/pull/131) [`8c9499a`](https://github.com/fragiola/primitives/commit/8c9499abd0986dab01f0450752642a90c6ed0946) Thanks [@maurodesouza](https://github.com/maurodesouza)! - Closing overlays and disclosure panels no longer flash: once the exit animations finish, the popup is unmounted before the browser paints again. Before this, an exit made with a keyframe animation whose `animation-fill-mode` is `none` (tw-animate-css's `animate-out`) showed the popup back at full opacity for one frame. React now ends the exit inside `flushSync` (popups and the Collapsible, Accordion and Tabs panels), and Angular renders it with `ApplicationRef.tick()`. Vue already rendered it in time. The toolkit's `waitForAnimations` also waits for an animation that starts while it is waiting.
+
+- [#132](https://github.com/fragiola/primitives/pull/132) [`78742c9`](https://github.com/fragiola/primitives/commit/78742c959a0124b697d18826f37d10f6e1e53434) Thanks [@maurodesouza](https://github.com/maurodesouza)! - A picker's calendar keeps its focus inside a Dialog: every picker (DatePicker, DateRangePicker, the month and year pickers and the typed DatePickerInput and DateRangePickerInput) focuses the grid's focused cell once its popup is a layer of the overlay tree, so an enclosing Dialog's focus trap no longer takes the focus back to its first tabbable; the arrows and Enter reach the grid, and Escape closes the popup first, then the dialog. Angular already did.
+- Updated dependencies [[`8c9499a`](https://github.com/fragiola/primitives/commit/8c9499abd0986dab01f0450752642a90c6ed0946)]:
+  - @fragiola/primitives@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

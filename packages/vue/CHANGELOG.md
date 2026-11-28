@@ -1,5 +1,13 @@
 # @fragiola/primitives-vue
 
+## 0.3.0
+
+### Patch Changes
+
+- [#132](https://github.com/fragiola/primitives/pull/132) [`78742c9`](https://github.com/fragiola/primitives/commit/78742c959a0124b697d18826f37d10f6e1e53434) Thanks [@maurodesouza](https://github.com/maurodesouza)! - A picker's calendar keeps its focus inside a Dialog: every picker (DatePicker, DateRangePicker, the month and year pickers and the typed DatePickerInput and DateRangePickerInput) focuses the grid's focused cell once its popup is a layer of the overlay tree, so an enclosing Dialog's focus trap no longer takes the focus back to its first tabbable; the arrows and Enter reach the grid, and Escape closes the popup first, then the dialog. Angular already did.
+- Updated dependencies [[`8c9499a`](https://github.com/fragiola/primitives/commit/8c9499abd0986dab01f0450752642a90c6ed0946)]:
+  - @fragiola/primitives@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
