@@ -10,6 +10,7 @@ import {
     useRef,
     useState,
 } from "react";
+import { flushSync } from "react-dom";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
 
@@ -140,7 +141,10 @@ export function usePresence(
             const at = epoch.current;
             void waitForAnimations(node).then(() => {
                 if (epoch.current === at && !held.current) {
-                    finish();
+                    // committed now, in the microtask of the animation's end: a commit after the
+                    // next paint would show a keyframe exit back at its resting style for a frame
+                    // (spec/README.md, "Lifecycle"; Base UI's `useAnimationsFinished`)
+                    flushSync(finish);
                 }
             });
         }

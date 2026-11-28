@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import {
     isSameElement,
+    keyframeExit,
     markElement,
     recordExit,
     settleAnimations,
@@ -10,7 +11,8 @@ import { openScenario } from "../../src/scenario.ts";
 
 // spec/dialog.md and popover.md, "Animation": every overlay's popup stays mounted with `data-ending-style` until
 // its exit transition has finished, then unmounts; reopened during that exit, it is the same
-// element again. The recipes animate opacity and scale over `--pr-motion`.
+// element again; it unmounts before the next paint once its exit has finished (README,
+// "Lifecycle"). The recipes animate opacity and scale over `--pr-motion`.
 
 interface Overlay {
     path: string;
@@ -104,6 +106,28 @@ for (const [name, overlay] of Object.entries(OVERLAYS)) {
             expect(record.running).toBeGreaterThan(0);
             // the transition lasts 600ms: the popup stayed for most of it
             expect(record.unmountedAfter).toBeGreaterThanOrEqual(400);
+            // unmounted in the frame its transition ended (spec/README.md, "Lifecycle")
+            expect(record.paintedAfterEnd).toEqual([]);
+        });
+
+        test("a keyframe exit is never painted at rest before it unmounts", async ({
+            page,
+        }) => {
+            // spec/README.md, "Lifecycle": an `animation-fill-mode: none` exit is back at opacity
+            // 1 once it ends, so a frame painted before the unmount would show the popup again
+            await slowMotion(page, 300);
+            await keyframeExit(page, overlay.part);
+            await overlay.open(page);
+            await expect(popup(page, overlay.part)).toBeVisible();
+            await settleAnimations(page);
+            const exit = await recordExit(page, overlay.part);
+            await page.keyboard.press("Escape");
+            await expect(popup(page, overlay.part)).toHaveCount(0);
+            const record = await exit();
+            expect(record.ending).toBe(true);
+            expect(record.running).toBeGreaterThan(0);
+            expect(record.unmountedAfter).toBeGreaterThanOrEqual(200);
+            expect(record.paintedAfterEnd).toEqual([]);
         });
 
         test("reopened during its exit, it is the same element, open again", async ({

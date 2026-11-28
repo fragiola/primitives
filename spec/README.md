@@ -403,6 +403,15 @@ scope).
   ended and every animation on the popup has finished; `false` once the exit's animations have
   finished (the popup is unmounted, or hidden when kept mounted). It is not called on the first
   render, nor for an exit a reopening interrupted.
+- **The unmount is never a frame late**: once the exit's animations have finished, the popup is
+  unmounted (or hidden when kept mounted) before the browser paints again, in the same frame.
+  An exit made with a keyframe animation whose `animation-fill-mode` is `none` (tw-animate-css's
+  `animate-out`) is back at its resting style once it ends: a frame painted between the end and
+  the unmount shows the popup again, which then disappears (a flash). Base UI ends its exits
+  inside `flushSync` for this reason (D4): React does the same, Vue's scheduler already renders
+  the unmount in the microtask of the animation's `finished`, and zoneless Angular renders it
+  there with `ApplicationRef.tick()`. An animation that starts while the exit waits (a property
+  changed mid-exit) is awaited too.
 - **Actions** (Base UI's `actionsRef`): `close()` closes the overlay (reason `imperative-action`);
   `unmount()` ends a running exit at once, or the exit held by `preventUnmountOnClose()`.
 - **`keepMounted`** on every overlay's **Portal** (Base UI's place): the portal's content stays
