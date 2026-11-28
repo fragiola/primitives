@@ -149,7 +149,9 @@ item (the key does nothing). A key that moves the focus renders before the next 
 - After a choice the focus stays on the chosen cell.
 - **Pickers**: as the DatePicker's ([calendar.md](calendar.md#focus)): opening focuses the focused
   item's cell, a choice (a range's end) closes and focuses the Trigger, Escape closes, Tab out
-  closes, the popup is not modal, a reopened picker starts again from its value.
+  closes, the popup is not modal, a reopened picker starts again from its value; the calendar
+  takes the focus once the popup is a layer, so a picker inside a Dialog keeps it
+  (`/date-picker/in-dialog`).
 
 ## Pointer
 

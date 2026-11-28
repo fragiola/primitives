@@ -837,6 +837,20 @@ and drop stays `@fragiola/dnd`'s (D5); there is no upload transport (the Epic's 
 | Known limits (#105) | The detached file input of `openFileDialog` is verified in Chromium only; old iOS Safari versions are reported not to fire `change` on an input outside the document (not verified here). Angular's ItemName and ItemSizeText always write their text (above). Vue's FileUpload Root slot gets the state's fields (`v-slot="{ value, rejectedFiles }"`), TagsInput's shape | | |
 | Size rows (#105) | Every existing row of `docs/size.md` is byte-identical but the root entries (which re-export the new entries) and Angular's `/internal` (+844 B minified: the shared drop target and live region the two Angular entries use, shared code a reused `/internal` module carries, as Epic #104's change details did). Angular's `/file-upload` is 58.7 KB minified as published (Ivy's partial metadata of 13 directives with signal inputs), 11 KB gzip | | |
 
+## Fixes from Fragiola UI: details decided during Epic #128 (Issues #125–#127)
+
+Two bugs Fragiola UI found while styling the primitives (fragiola/ui#177, fragiola/ui#180), fixed
+here at their cause, not left as workarounds in a consumer (the maintainer's rule, 2026-11-28). No
+rule of the handoff changed; no golden screenshot changed.
+
+| topic | decision | alternatives discarded | spec |
+| --- | --- | --- | --- |
+| A picker's focus inside a Dialog (#125) | **The bound calendar takes its pending focus once its picker's popup is a layer.** The picker binding (`PickerBinding`, `MonthCalendarBinding`) gains `layered`, which the Popup sets once its overlay session is open and clears when it ends; the calendars' contexts gain `focusReady` (`!bound \|\| layered`), which the root's and the cells' pending focus wait for. The focus moves once, after the layer exists, so the Dialog's focus trap (and a Popover's focus watch) sees it move into its own child layer. React and Vue had the bug (the calendar focused in its mount effects, which run before the Popup's session); Angular passed the new scenario on `main` and is unchanged | opening the session before the descendants' effects (React and Vue run a child's effects before its parent's, and a session opened from the Root's press handler misses the controlled `open`); a trap that ignores focus moving into a layer still registering (it cannot know one is coming); a timer or a second focus call (Fragiola UI's `FocusSettler`) | `calendar.md` "Focus", `/date-picker/in-dialog` |
+| The scenario (#125) | One page, `/date-picker/in-dialog`, holds all eight picker kinds (the day, range, typed and month and year pickers) in one Dialog; the test loops over them. Behaviour layer only | one page per picker (eight routes in three fixtures for one check) | `calendar.md` |
+| Size (#125) | The gate costs about 35–60 B (min + gzip) in every React and Vue calendar and picker entry; the 22 date budgets it passes are recorded with the reason in `scripts/size-budgets.ts` (`FOCUS_GATE`) | | |
+| Clipboard's label in name (#126) | **The Trigger's content can follow the status**, as the Indicator's: React's Trigger takes children as a function of the state; Vue's default scoped slot (`{ state }`) and Angular's `state()` (`exportAs: "clipboardTrigger"`) already gave it, now specified. A visible label ("Copy link", then "Copied") names the button from its content in both states; the Indicator stays `aria-hidden` for icons, and the library still renders no text (rule 7) | a label part inside the Indicator that is not hidden (the Indicator is for icons, which must stay hidden); a library text or a status-keyed `aria-label` prop (rule 7) | `clipboard.md` "API", `/clipboard/label` |
+| The bump (#127) | One `minor` for the fixed group (`0.2.0` → `0.3.0`): Clipboard's Trigger gains a capability (a new prop shape in React), as `0.2.0` released new props as a minor; the focus fix alone is a patch | a patch release | |
+
 ## Behaviour differences
 
 The differences between the POC and Base UI, decided with the behaviour rule (D4: APG first,

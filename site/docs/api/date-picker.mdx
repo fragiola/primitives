@@ -22,7 +22,10 @@ example), and so is the popup's name (`aria-label`).
 ## Behaviour
 
 - **Open**: a press on the Trigger toggles it. The calendar focuses its focused date: the value
-  (the chosen date), else today, kept inside `min` and `max`.
+  (the chosen date), else today, kept inside `min` and `max`, once the popup is a layer of the
+  overlay tree. So a picker inside a [Dialog](/docs/api/dialog) keeps that focus: the dialog's
+  focus trap sees it move into a layer opened from the dialog, and Escape closes the popup first,
+  then the dialog. Every picker (the range, month, year and typed ones) does the same.
 - **Choose**: choosing a date sets the value, closes the popup (reason `item-press`) and
   focuses the Trigger.
 - **Close**: Escape (`escape-key`) and the Trigger (`trigger-press`) return focus to the trigger;

@@ -14,6 +14,12 @@ export interface PickerBinding {
     mode: CalendarMode;
     /** Whether the picker's popup is open (a closing picker's calendar takes no focus). */
     open: () => boolean;
+    /**
+     * Whether the popup is a layer of the overlay tree (its overlay session is open). Its calendar
+     * takes the focus only then, so an enclosing overlay (a Dialog's focus trap, a Popover's focus
+     * watch) sees the focus move into its own child layer (spec/calendar.md, "Focus").
+     */
+    layered: () => boolean;
     value: ComputedRef<CalendarValue>;
     /** Sets the picker's value and closes its popup (reason `item-press`). */
     choose: (value: CalendarValue) => void;

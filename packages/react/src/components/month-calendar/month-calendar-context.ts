@@ -56,6 +56,8 @@ export interface MonthCalendarContextValue {
     /** Asks for the focused item's cell to take focus once it is rendered. */
     requestFocus: () => void;
     focusPending: { current: boolean };
+    /** Whether a pending focus may be taken now (not while its picker's popup is no layer yet). */
+    focusReady: boolean;
 }
 
 export const MonthCalendarContext =

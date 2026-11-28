@@ -194,19 +194,22 @@ export function MonthPickerRootBase({
         () => ({ min, max, isUnavailable, locale, columns, calendar }),
         [min, max, isUnavailable, locale, columns, calendar],
     );
+    // whether the popup is a layer: its calendar takes the focus only then (spec/calendar.md, "Focus")
+    const [layered, setLayered] = useState(false);
     const { open } = root;
     const binding = useMemo(
         () => ({
             kind,
             mode,
             open,
+            layered,
             focusOnMount: true,
             value,
             choose,
             options,
             readOnly,
         }),
-        [kind, mode, open, value, choose, options, readOnly],
+        [kind, mode, open, layered, value, choose, options, readOnly],
     );
     const context = useMemo(
         () => ({
@@ -214,6 +217,7 @@ export function MonthPickerRootBase({
             component,
             placed,
             setPlaced,
+            setLayered,
             field,
             disabled,
             readOnly,

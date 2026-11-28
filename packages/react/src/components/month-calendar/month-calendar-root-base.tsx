@@ -82,6 +82,7 @@ export function MonthCalendarRootBase({
         focusOnMount,
         opened,
         reopened,
+        focusReady,
     } = useMonthCalendar(
         component,
         kind,
@@ -102,8 +103,9 @@ export function MonthCalendarRootBase({
                 focusPending.current = true;
             },
             focusPending,
+            focusReady,
         }),
-        [state],
+        [state, focusReady],
     );
     const { cells, focused } = state;
     // after every render while a focus is pending: the focused item's cell may have mounted in
@@ -114,6 +116,10 @@ export function MonthCalendarRootBase({
         }
         if (bound && !opened) {
             focusPending.current = false;
+            return;
+        }
+        // its picker's popup is no layer yet: the focus waits for it (spec/calendar.md, "Focus")
+        if (!focusReady) {
             return;
         }
         const cell = cells.get(focused);

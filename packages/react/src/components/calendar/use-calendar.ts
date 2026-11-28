@@ -309,33 +309,35 @@ export function useCalendar(
         setAnchor(null);
         setHovered(null);
     }, []);
-    const context: Omit<CalendarContextValue, "requestFocus" | "focusPending"> =
-        {
-            component,
-            mode,
-            // with a system, `Intl` writes its names (`-u-ca-`)
-            locale: system ? system.locale(locale) : locale,
-            math,
-            calendar: system,
-            firstDay,
-            visibleMonths,
-            visibleStart,
-            focusedDate,
-            disabled,
-            readOnly,
-            headingId: (offset) => `${baseId}-heading-${offset}`,
-            gridId: (offset) => `${baseId}-grid-${offset}`,
-            cellState,
-            moveFocus,
-            page,
-            canPage,
-            select,
-            anchor,
-            cancelRange,
-            setHovered,
-            cells,
-            rangeValue,
-        };
+    const context: Omit<
+        CalendarContextValue,
+        "requestFocus" | "focusPending" | "focusReady"
+    > = {
+        component,
+        mode,
+        // with a system, `Intl` writes its names (`-u-ca-`)
+        locale: system ? system.locale(locale) : locale,
+        math,
+        calendar: system,
+        firstDay,
+        visibleMonths,
+        visibleStart,
+        focusedDate,
+        disabled,
+        readOnly,
+        headingId: (offset) => `${baseId}-heading-${offset}`,
+        gridId: (offset) => `${baseId}-grid-${offset}`,
+        cellState,
+        moveFocus,
+        page,
+        canPage,
+        select,
+        anchor,
+        cancelRange,
+        setHovered,
+        cells,
+        rangeValue,
+    };
     return {
         context,
         bound,
@@ -343,6 +345,8 @@ export function useCalendar(
         opened,
         /** How many times its picker reopened while it stayed mounted. */
         reopened,
+        /** A bound calendar takes the focus once its picker's popup is a layer. */
+        focusReady: !bound || picker.layered,
         focusKey: toIsoDate(focusedDate),
     };
 }

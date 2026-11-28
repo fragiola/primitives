@@ -17,6 +17,12 @@ export interface MonthCalendarBinding {
     mode: MonthCalendarMode;
     /** Whether its picker's popup is open (a closing picker's calendar takes no focus). */
     open: boolean;
+    /**
+     * Whether its picker's popup is a layer of the overlay tree (its overlay session is open). The calendar
+     * takes the focus only then, so an enclosing overlay (a Dialog's focus trap, a Popover's focus
+     * watch) sees the focus move into its own child layer (spec/calendar.md, "Focus").
+     */
+    layered: boolean;
     /** Whether the calendar takes the focus when it mounts (a picker opening, a view switched). */
     focusOnMount: boolean;
     value: MonthCalendarValue;

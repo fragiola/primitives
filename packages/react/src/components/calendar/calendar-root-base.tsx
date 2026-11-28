@@ -58,6 +58,7 @@ export function CalendarRootBase({
         opened,
         reopened,
         focusKey,
+        focusReady,
     } = useCalendar(component, mode, stateProps as CalendarStateProps);
     // a calendar in a picker focuses its focused date when it opens (spec/calendar.md, "Focus")
     const focusPending = useRef(bound);
@@ -75,8 +76,9 @@ export function CalendarRootBase({
                 focusPending.current = true;
             },
             focusPending,
+            focusReady,
         }),
-        [state],
+        [state, focusReady],
     );
     const { cells } = state;
     // after every render while a focus is pending: the focused date's cell may have mounted in
@@ -88,6 +90,10 @@ export function CalendarRootBase({
         // a calendar inside a closing picker takes no focus: the picker returns it to its trigger
         if (bound && !opened) {
             focusPending.current = false;
+            return;
+        }
+        // its picker's popup is no layer yet: the focus waits for it (spec/calendar.md, "Focus")
+        if (!focusReady) {
             return;
         }
         const cell = cells.get(focusKey);

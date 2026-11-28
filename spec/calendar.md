@@ -361,7 +361,14 @@ ArrowLeft in RTL:
 - PrevButton and NextButton keep focus on themselves; the focused date moves by the same number
   of months (clamped).
 - After a choice, focus stays on the chosen cell (Calendar, RangeCalendar).
-- **Pickers**: opening focuses the focused date's cell. Choosing a date (DatePicker) or a range's
+- **Pickers**: opening focuses the focused date's cell, **once the popup is a layer** of the
+  overlay tree (its overlay session is open): the bound calendar's pending focus waits for it.
+  So an enclosing overlay sees the focus move into its own child layer, and inside a modal
+  Dialog the dialog's focus trap leaves it on the cell (Epic #128). The reason: the calendar
+  used to take the focus while it mounted, before its popup registered as a layer, and the
+  dialog's trap, seeing the focus leave for an element of no layer of its own, pulled it back
+  to its first tabbable, so Enter and the arrows acted on the dialog. No timer and no second
+  focus call: the focus moves once, after the layer exists. Choosing a date (DatePicker) or a range's
   end (DateRangePicker) closes the popup (reason `item-press`) and focuses the Trigger. Escape
   closes (reason `escape-key`) and focuses the Trigger. Focus is not trapped: as in
   [popover.md](popover.md#focus), the popup's content comes right after the Trigger in the tab
@@ -603,6 +610,30 @@ Positioner is the kept-mounted part); the Popup (`aria-label` **"Choose date"**)
 Calendar with PrevButton **"Previous month"** and NextButton **"Next month"**.
 
 Checks: the common checks (no "Close with actions"); reopened, focus is on November 20 (today).
+
+### `/date-picker/in-dialog`
+
+Every picker kind inside a modal Dialog, en-US: a Dialog Trigger **"Plan the trip"** opening a
+Dialog (Title **"Plan the trip"**) that holds a DatePicker (Trigger **"Date"**, Popup **"Choose
+date"**), a DateRangePicker (**"Dates"**, **"Choose dates"**), a DatePickerInput in a Field
+labelled **"Arrival"** (Trigger `aria-label` **"Choose arrival"**, Popup **"Arrival date"**), a
+DateRangePickerInput in a Field labelled **"Stay"** (ends **"Check-in"** and **"Check-out"**,
+Trigger **"Choose stay"**, Popup **"Stay dates"**), a MonthPicker (**"Month"**, **"Choose
+month"**), a MonthRangePicker (**"Months"**, **"Choose months"**), a YearPicker (**"Year"**,
+**"Choose year"**) and a YearRangePicker (**"Years"**, **"Choose years"**), each popup holding
+its bound calendar, and a Close button **"Close"**. Output: `value: ...` (the DatePicker's).
+
+Checks, for each picker:
+
+1. Open the Dialog, click the picker's Trigger: its popup is shown and the focus is on the
+   focused cell (November 20, 2026; November 2026; 2026), not on the dialog's first tabbable.
+2. ArrowRight moves the focus to the next cell (the keys reach the grid).
+3. Escape closes only the popup: the Dialog stays open and the focus is on the picker's Trigger.
+   A second Escape closes the Dialog and focuses "Plan the trip".
+
+And: in the DatePicker, Enter chooses November 20 (`value: 2026-11-20`), the popup closes, the
+Dialog stays open and the focus is on its Trigger; axe finds no violation with a picker open in
+the Dialog. Behaviour layer only.
 
 ### `/date-picker-input/basic`
 

@@ -56,7 +56,11 @@ export const MonthCalendarCell: PartComponent<
                     }
                     context.cells.set(key, node);
                     // a cell of a page just shown mounts after the keyboard moved the focus to it
-                    if (context.focusPending.current && focused) {
+                    if (
+                        context.focusPending.current &&
+                        focused &&
+                        context.focusReady()
+                    ) {
                         context.focusPending.current = false;
                         node.focus({ preventScroll: true });
                     }

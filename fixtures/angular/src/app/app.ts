@@ -46,6 +46,7 @@ import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlle
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.ts";
 import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.ts";
 import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.ts";
+import { ClipboardLabel } from "../scenarios/clipboard/clipboard-label.ts";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.ts";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.ts";
 import { ColorAreaBasic } from "../scenarios/color-area/color-area-basic.ts";
@@ -91,6 +92,7 @@ import { DateFieldForm } from "../scenarios/date-field/date-field-form.ts";
 import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
+import { DatePickerInDialog } from "../scenarios/date-picker/date-picker-in-dialog.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
@@ -391,6 +393,7 @@ import { ROUTES } from "./routes.ts";
         CalendarViewTyped,
         DatePickerBasic,
         DatePickerRange,
+        DatePickerInDialog,
         DatePickerForm,
         DatePickerMixedForm,
         DatePickerLifecycle,
@@ -530,6 +533,7 @@ import { ROUTES } from "./routes.ts";
         SearchFieldField,
         ClipboardBasic,
         ClipboardFailure,
+        ClipboardLabel,
         DropZoneBasic,
         DropZoneSingle,
         DropZoneDisabled,
@@ -704,6 +708,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/calendar-view/typed") { <main class="p-6" scenario-calendar-view-typed></main> }
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
+            @case ("/date-picker/in-dialog") { <main class="p-6" scenario-date-picker-in-dialog></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
             @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }
@@ -798,6 +803,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/search-field/field") { <main class="p-6" scenario-search-field-field></main> }
             @case ("/clipboard/basic") { <main class="p-6" scenario-clipboard-basic></main> }
             @case ("/clipboard/failure") { <main class="p-6" scenario-clipboard-failure></main> }
+            @case ("/clipboard/label") { <main class="p-6" scenario-clipboard-label></main> }
             @case ("/drop-zone/basic") { <main class="p-6" scenario-drop-zone-basic></main> }
             @case ("/drop-zone/single") { <main class="p-6" scenario-drop-zone-single></main> }
             @case ("/drop-zone/disabled") { <main class="p-6" scenario-drop-zone-disabled></main> }

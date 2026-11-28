@@ -174,7 +174,8 @@ The checklist that carries a framework's model from one component to the next (f
 4. **Children normalization**: an element's children must be what the framework expects (Vue's
    `h()` reads a single vnode as a slots object).
 5. **The calendar's focus after render**: a cell that mounts after the keyboard moved to it (a new
-   month, a picker opening) takes the pending focus itself.
+   month, a picker opening) takes the pending focus itself; in a picker, only once its popup is a
+   layer (the binding's `layered`), or an enclosing Dialog's focus trap takes it back (Epic #128).
 6. **Fixture DOM identical to React's**, text nodes included: JSX splits `{label} settings` into
    two text nodes; a template that merges them changes glyph positions in CI's screenshots.
 7. **Never a framework-specific snapshot or test**: fix the DOM.

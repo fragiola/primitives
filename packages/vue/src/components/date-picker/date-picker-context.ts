@@ -17,6 +17,8 @@ export type PickerComponent =
 export interface DatePickerContext extends OverlayRoot {
     component: PickerComponent;
     placed: Ref<{ side: Side; align: Align }>;
+    /** Whether the Popup is a layer (its overlay session is open): its calendar waits for it. */
+    layered: Ref<boolean>;
     /** The enclosing field's binding, for the trigger (spec/field.md). */
     field: FieldControlBinding;
     /** Its own `disabled`, or its Field's (or a Fieldset's). */

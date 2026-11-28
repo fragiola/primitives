@@ -280,6 +280,8 @@ export function useMonthCalendar(
             }
         },
         focusPending,
+        // a bound calendar takes the focus once its picker's popup is a layer
+        focusReady: () => binding.value?.layered() ?? true,
     };
     return { context, bound: binding, opened };
 }

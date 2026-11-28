@@ -123,7 +123,11 @@ export function defineDatePickerRoot(
             const disabled = () => props.disabled || field.disabled();
             const readOnly = () => props.readOnly;
             const inputName = () => field.name() ?? props.name;
+            // whether the popup is a layer: its calendar takes the focus only then
+            // (spec/calendar.md, "Focus")
+            const layered = ref(false);
             provide(DatePickerKey, {
+                layered,
                 ...root,
                 component,
                 placed: ref<{ side: Side; align: Align }>({
@@ -138,6 +142,7 @@ export function defineDatePickerRoot(
             provide(PickerBindingKey, {
                 mode,
                 open: () => root.open.value,
+                layered: () => layered.value,
                 value: current,
                 choose(next) {
                     if (readOnly()) {

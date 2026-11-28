@@ -25,7 +25,7 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
     const [element, ref] = useElement<HTMLElement>();
     const state = context.cellState(date, month);
     const key = toIsoDate(date);
-    const { cells, focusPending } = context;
+    const { cells, focusPending, focusReady } = context;
     useLayoutEffect(() => {
         if (element === null || state.outsideMonth) {
             return undefined;
@@ -33,7 +33,7 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
         cells.set(key, element);
         // a cell of a month just shown mounts after the keyboard moved the focus to it
         // (AGENTS.md "Porting", 5)
-        if (focusPending.current && state.focused) {
+        if (focusPending.current && state.focused && focusReady) {
             focusPending.current = false;
             element.focus({ preventScroll: true });
         }
@@ -42,7 +42,15 @@ export function CalendarCell({ date, children, ...props }: CalendarCellProps) {
                 cells.delete(key);
             }
         };
-    }, [element, key, state.outsideMonth, state.focused, cells, focusPending]);
+    }, [
+        element,
+        key,
+        state.outsideMonth,
+        state.focused,
+        cells,
+        focusPending,
+        focusReady,
+    ]);
 
     const choosable = !state.outsideMonth;
     return renderElement(

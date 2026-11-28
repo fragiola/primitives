@@ -426,11 +426,21 @@ export function DatePickerInputRootBase({
             calendar,
         ],
     );
+    // whether the popup is a layer: its calendar takes the focus only then (spec/calendar.md, "Focus")
+    const [layered, setLayered] = useState(false);
     const { open } = root;
     const calendarValue = value as CalendarValue;
     const binding = useMemo(
-        () => ({ mode, open, value: calendarValue, choose, options, readOnly }),
-        [mode, open, calendarValue, choose, options, readOnly],
+        () => ({
+            mode,
+            open,
+            layered,
+            value: calendarValue,
+            choose,
+            options,
+            readOnly,
+        }),
+        [mode, open, layered, calendarValue, choose, options, readOnly],
     );
     // the Trigger: named by the label and its own content, as the picker's
     const triggerId = root.trigger?.id || root.triggerId;
@@ -453,6 +463,7 @@ export function DatePickerInputRootBase({
             component,
             placed,
             setPlaced,
+            setLayered,
             field: triggerField,
             disabled,
             readOnly,

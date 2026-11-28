@@ -18,6 +18,8 @@ export interface DatePickerContextValue extends OverlayRoot {
     component: PickerComponent;
     placed: { side: Side; align: Align };
     setPlaced: (placed: { side: Side; align: Align }) => void;
+    /** The Popup reports whether it is a layer (its overlay session is open), for its calendar. */
+    setLayered: (layered: boolean) => void;
     /** The enclosing field's binding, for the trigger (spec/field.md). */
     field: FieldControlBinding;
     disabled: boolean;

@@ -43,6 +43,7 @@ import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlle
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
 import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.tsx";
 import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.tsx";
+import { ClipboardLabel } from "../scenarios/clipboard/clipboard-label.tsx";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
 import { ColorAreaBasic } from "../scenarios/color-area/color-area-basic.tsx";
@@ -88,6 +89,7 @@ import { DateFieldForm } from "../scenarios/date-field/date-field-form.tsx";
 import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
+import { DatePickerInDialog } from "../scenarios/date-picker/date-picker-in-dialog.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
@@ -413,6 +415,7 @@ export const routes: Record<
     "/calendar-preset/picker": CalendarPresetPicker,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
+    "/date-picker/in-dialog": DatePickerInDialog,
     "/date-picker/form": DatePickerForm,
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,
@@ -523,6 +526,7 @@ export const routes: Record<
     "/search-field/field": SearchFieldField,
     "/clipboard/basic": ClipboardBasic,
     "/clipboard/failure": ClipboardFailure,
+    "/clipboard/label": ClipboardLabel,
     "/drop-zone/basic": DropZoneBasic,
     "/drop-zone/single": DropZoneSingle,
     "/drop-zone/disabled": DropZoneDisabled,
