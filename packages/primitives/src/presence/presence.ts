@@ -11,14 +11,26 @@ export function nextFrame(element: Element, callback: () => void): () => void {
 
 /**
  * Resolves when every animation and transition running on the element has finished, or at once
- * when there is none (spec/dialog.md, "Animation": unmount after the exit animation).
+ * when there is none (spec/dialog.md, "Animation": unmount after the exit animation). One that
+ * starts while it waits (a property changed mid-exit cancels the running one, whose `finished`
+ * rejects) is awaited too. It resolves in the microtask of the last one's `finished`, before that
+ * frame is painted (spec/README.md, "Lifecycle").
  */
 export async function waitForAnimations(element: Element): Promise<void> {
-    const animations =
-        typeof element.getAnimations === "function"
-            ? element.getAnimations()
-            : [];
-    await Promise.allSettled(animations.map((animation) => animation.finished));
+    for (;;) {
+        // neither finished nor canceled (a finished one filling forwards is still listed)
+        const running = (element.getAnimations?.() ?? []).filter(
+            (animation) =>
+                animation.playState !== "finished" &&
+                animation.playState !== "idle",
+        );
+        if (running.length === 0) {
+            return;
+        }
+        await Promise.allSettled(
+            running.map((animation) => animation.finished),
+        );
+    }
 }
 
 /**

@@ -40,6 +40,8 @@ const MONTH =
 const MONTH_ANGULAR = `${MONTH}, with its input's Ivy metadata`;
 const MONTH_PICKER_ANGULAR =
     "the month calendar, date picker and day calendar entries it is built on (above)";
+const PRESENCE =
+    "Epic #130's unmount before the next paint, which every overlay's presence shares (the re-check of an animation that started mid-exit, React's `flushSync`, Angular's tick; spec/README.md, \"Lifecycle\")";
 const VIEW =
     "the day and month calendars it is built on (above) and its calendar system branch";
 
@@ -77,8 +79,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     "@fragiola/primitives-react/date-picker": { before: 14235, budget: 14335 },
     "@fragiola/primitives-react/date-picker-input": {
         before: 20388,
-        budget: 20730,
-        reason: `${PICKER_INPUT}; ${FOCUS_GATE}`,
+        budget: 20783,
+        reason: `${PICKER_INPUT}; ${PRESENCE}; ${FOCUS_GATE}`,
     },
     "@fragiola/primitives-react/date-range-field": {
         before: 8787,
@@ -91,15 +93,19 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-react/date-range-picker-input": {
         before: 20509,
-        budget: 20850,
-        reason: `${PICKER_INPUT}; ${FOCUS_GATE}`,
+        budget: 20903,
+        reason: `${PICKER_INPUT}; ${PRESENCE}; ${FOCUS_GATE}`,
     },
     "@fragiola/primitives-react/month-calendar": {
         before: 4489,
         budget: 4664,
         reason: `${MONTH}; ${FOCUS_GATE}`,
     },
-    "@fragiola/primitives-react/month-picker": { before: 14524, budget: 14624 },
+    "@fragiola/primitives-react/month-picker": {
+        before: 14524,
+        budget: 14651,
+        reason: FOCUS_GATE,
+    },
     "@fragiola/primitives-react/month-range-calendar": {
         before: 4520,
         budget: 4697,
@@ -107,7 +113,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-react/month-range-picker": {
         before: 14534,
-        budget: 14634,
+        budget: 14661,
+        reason: FOCUS_GATE,
     },
     "@fragiola/primitives-react/multiple-calendar": {
         before: 5514,
@@ -134,7 +141,11 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
         budget: 4696,
         reason: `${MONTH}; ${FOCUS_GATE}`,
     },
-    "@fragiola/primitives-react/year-picker": { before: 14524, budget: 14624 },
+    "@fragiola/primitives-react/year-picker": {
+        before: 14524,
+        budget: 14651,
+        reason: FOCUS_GATE,
+    },
     "@fragiola/primitives-react/year-range-calendar": {
         before: 4529,
         budget: 4705,
@@ -142,7 +153,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-react/year-range-picker": {
         before: 14534,
-        budget: 14634,
+        budget: 14661,
+        reason: FOCUS_GATE,
     },
     "@fragiola/primitives-vue/calendar": {
         before: 5036,
@@ -167,8 +179,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     "@fragiola/primitives-vue/date-picker": { before: 13969, budget: 14069 },
     "@fragiola/primitives-vue/date-picker-input": {
         before: 19802,
-        budget: 20140,
-        reason: `${PICKER_INPUT}; ${FOCUS_GATE}`,
+        budget: 20172,
+        reason: `${PICKER_INPUT}; ${PRESENCE}; ${FOCUS_GATE}`,
     },
     "@fragiola/primitives-vue/date-range-field": {
         before: 8807,
@@ -181,8 +193,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-vue/date-range-picker-input": {
         before: 20068,
-        budget: 20415,
-        reason: `${PICKER_INPUT}; ${FOCUS_GATE}`,
+        budget: 20446,
+        reason: `${PICKER_INPUT}; ${PRESENCE}; ${FOCUS_GATE}`,
     },
     "@fragiola/primitives-vue/month-calendar": {
         before: 4476,
@@ -256,13 +268,13 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/date-picker": {
         before: 24564,
-        budget: 24801,
-        reason: DATE_PICKER_ANGULAR,
+        budget: 24842,
+        reason: `${DATE_PICKER_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/date-picker-input": {
         before: 35333,
-        budget: 36344,
-        reason: PICKER_INPUT_ANGULAR,
+        budget: 36388,
+        reason: `${PICKER_INPUT_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/date-range-field": {
         before: 15616,
@@ -271,13 +283,13 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/date-range-picker": {
         before: 24608,
-        budget: 24843,
-        reason: DATE_PICKER_ANGULAR,
+        budget: 24884,
+        reason: `${DATE_PICKER_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/date-range-picker-input": {
         before: 34761,
-        budget: 35775,
-        reason: PICKER_INPUT_ANGULAR,
+        budget: 35817,
+        reason: `${PICKER_INPUT_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/month-calendar": {
         before: 6207,
@@ -286,8 +298,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/month-picker": {
         before: 29458,
-        budget: 29968,
-        reason: MONTH_PICKER_ANGULAR,
+        budget: 30009,
+        reason: `${MONTH_PICKER_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/month-range-calendar": {
         before: 6227,
@@ -296,8 +308,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/month-range-picker": {
         before: 29512,
-        budget: 30020,
-        reason: MONTH_PICKER_ANGULAR,
+        budget: 30061,
+        reason: `${MONTH_PICKER_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/multiple-calendar": {
         before: 7570,
@@ -326,8 +338,8 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/year-picker": {
         before: 29511,
-        budget: 30019,
-        reason: MONTH_PICKER_ANGULAR,
+        budget: 30060,
+        reason: `${MONTH_PICKER_ANGULAR}; ${PRESENCE}`,
     },
     "@fragiola/primitives-angular/year-range-calendar": {
         before: 6236,
@@ -336,7 +348,7 @@ export const SIZE_BUDGETS: Readonly<Record<string, SizeBudget>> = {
     },
     "@fragiola/primitives-angular/year-range-picker": {
         before: 29522,
-        budget: 30030,
-        reason: MONTH_PICKER_ANGULAR,
+        budget: 30071,
+        reason: `${MONTH_PICKER_ANGULAR}; ${PRESENCE}`,
     },
 };

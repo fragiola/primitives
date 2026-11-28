@@ -10,6 +10,7 @@ import {
     nextFrame,
     waitForAnimations,
 } from "@fragiola/primitives/presence";
+import { injectFlush } from "./flush.ts";
 
 export type TransitionStatus = "starting" | "ending" | undefined;
 
@@ -44,6 +45,8 @@ export interface PresenceOptions {
  * The effect runs after rendering (`afterRenderEffect`), as React's and Vue's post-render effects:
  * the exit is awaited once the element carries `data-ending-style`, so its transition has started.
  * A plain `effect` runs before the view is refreshed, finds no animation, and unmounts at once.
+ * An exit that waited for its animations is rendered at once when they end (`ApplicationRef.tick()`),
+ * before the browser paints that frame. Call it in an injection context.
  */
 export function createPresence(
     open: Signal<boolean>,
@@ -72,6 +75,7 @@ export function createPresence(
     let epoch = 0;
     let entering = false;
     let held = false;
+    const flush = injectFlush();
 
     const finish = () => {
         if (untracked(status) !== "ending") {
@@ -126,14 +130,24 @@ export function createPresence(
         }
         let cancelled = false;
         const at = epoch;
-        const end = () => {
-            if (!cancelled && epoch === at && !held) {
-                finish();
+        const end = (): boolean => {
+            if (cancelled || epoch !== at || held) {
+                return false;
             }
+            finish();
+            return true;
         };
         // nothing to animate: it ends in the same render, before a paint
         if (node && isAnimating(node)) {
-            void waitForAnimations(node).then(end);
+            void waitForAnimations(node).then(() => {
+                if (!end()) {
+                    return;
+                }
+                // rendered in the microtask of the animation's end: the zoneless scheduler's
+                // later render can come after that frame's paint, which shows a keyframe exit
+                // back at its resting style (spec/README.md, "Lifecycle")
+                flush();
+            });
         } else {
             end();
         }
