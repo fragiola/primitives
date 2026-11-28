@@ -91,6 +91,7 @@ import { DateFieldForm } from "../scenarios/date-field/date-field-form.ts";
 import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.ts";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.ts";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.ts";
+import { DatePickerInDialog } from "../scenarios/date-picker/date-picker-in-dialog.ts";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.ts";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.ts";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.ts";
@@ -391,6 +392,7 @@ import { ROUTES } from "./routes.ts";
         CalendarViewTyped,
         DatePickerBasic,
         DatePickerRange,
+        DatePickerInDialog,
         DatePickerForm,
         DatePickerMixedForm,
         DatePickerLifecycle,
@@ -704,6 +706,7 @@ import { ROUTES } from "./routes.ts";
             @case ("/calendar-view/typed") { <main class="p-6" scenario-calendar-view-typed></main> }
             @case ("/date-picker/basic") { <main class="p-6" scenario-date-picker-basic [locale]="query.locale"></main> }
             @case ("/date-picker/range") { <main class="p-6" scenario-date-picker-range [locale]="query.locale"></main> }
+            @case ("/date-picker/in-dialog") { <main class="p-6" scenario-date-picker-in-dialog></main> }
             @case ("/date-picker/form") { <main class="p-6" scenario-date-picker-form></main> }
             @case ("/date-picker/mixed-form") { <main class="p-6" scenario-date-picker-mixed-form></main> }
             @case ("/date-picker/lifecycle") { <main class="p-6" scenario-date-picker-lifecycle [locale]="query.locale" [cancel]="query.cancel"></main> }

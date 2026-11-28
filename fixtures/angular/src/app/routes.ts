@@ -147,6 +147,7 @@ export const ROUTES: readonly string[] = [
     "/calendar-view/typed",
     "/date-picker/basic",
     "/date-picker/range",
+    "/date-picker/in-dialog",
     "/date-picker/form",
     "/date-picker/mixed-form",
     "/date-picker/lifecycle",

@@ -88,6 +88,7 @@ import { DateFieldForm } from "../scenarios/date-field/date-field-form.tsx";
 import { DateFieldMinMax } from "../scenarios/date-field/date-field-min-max.tsx";
 import { DatePickerBasic } from "../scenarios/date-picker/date-picker-basic.tsx";
 import { DatePickerForm } from "../scenarios/date-picker/date-picker-form.tsx";
+import { DatePickerInDialog } from "../scenarios/date-picker/date-picker-in-dialog.tsx";
 import { DatePickerLifecycle } from "../scenarios/date-picker/date-picker-lifecycle.tsx";
 import { DatePickerMixedForm } from "../scenarios/date-picker/date-picker-mixed-form.tsx";
 import { DatePickerRange } from "../scenarios/date-picker/date-picker-range.tsx";
@@ -413,6 +414,7 @@ export const routes: Record<
     "/calendar-preset/picker": CalendarPresetPicker,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
+    "/date-picker/in-dialog": DatePickerInDialog,
     "/date-picker/form": DatePickerForm,
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,

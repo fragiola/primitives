@@ -88,6 +88,7 @@ import DateFieldForm from "../scenarios/date-field/date-field-form.vue";
 import DateFieldMinMax from "../scenarios/date-field/date-field-min-max.vue";
 import DatePickerBasic from "../scenarios/date-picker/date-picker-basic.vue";
 import DatePickerForm from "../scenarios/date-picker/date-picker-form.vue";
+import DatePickerInDialog from "../scenarios/date-picker/date-picker-in-dialog.vue";
 import DatePickerLifecycle from "../scenarios/date-picker/date-picker-lifecycle.vue";
 import DatePickerMixedForm from "../scenarios/date-picker/date-picker-mixed-form.vue";
 import DatePickerRange from "../scenarios/date-picker/date-picker-range.vue";
@@ -424,6 +425,7 @@ export const routes: Record<string, Component> = {
     "/calendar-preset/picker": CalendarPresetPicker,
     "/date-picker/basic": DatePickerBasic,
     "/date-picker/range": DatePickerRange,
+    "/date-picker/in-dialog": DatePickerInDialog,
     "/date-picker/form": DatePickerForm,
     "/date-picker/mixed-form": DatePickerMixedForm,
     "/date-picker/lifecycle": DatePickerLifecycle,

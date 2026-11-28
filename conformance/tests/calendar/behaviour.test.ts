@@ -1,6 +1,11 @@
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
-import { fullDate, monthHeading, shortWeekday } from "../../src/dates.ts";
+import {
+    fullDate,
+    monthHeading,
+    shortWeekday,
+    yearName,
+} from "../../src/dates.ts";
 import { expectFocusWithin } from "../../src/focus.ts";
 import { expectOutput } from "../../src/output.ts";
 import { openScenario } from "../../src/scenario.ts";
@@ -677,6 +682,143 @@ test.describe("date-picker / form", () => {
     });
 
     test("has no axe violation", async ({ page }) => {
+        await expectNoAxeViolations(page);
+    });
+});
+
+// spec/calendar.md, `/date-picker/in-dialog`: every picker kind inside a modal Dialog, whose focus
+// trap must leave the popup's calendar its focus (the popup is a layer of the dialog before its
+// calendar takes the focus)
+test.describe("date-picker / in-dialog", () => {
+    const monthCell = (page: Page, month: number) =>
+        page.getByRole("gridcell", {
+            name: monthHeading("en-US", 2026, month),
+            exact: true,
+        });
+    const yearCell = (page: Page, year: number) =>
+        page.getByRole("gridcell", {
+            name: yearName("en-US", year),
+            exact: true,
+        });
+    const PICKERS: readonly {
+        trigger: string | RegExp;
+        popup: string;
+        focused: (page: Page) => ReturnType<Page["getByRole"]>;
+        next: (page: Page) => ReturnType<Page["getByRole"]>;
+    }[] = [
+        {
+            trigger: "Date",
+            popup: "Choose date",
+            focused: (page) => cell(page, 11, 20),
+            next: (page) => cell(page, 11, 21),
+        },
+        {
+            trigger: "Dates",
+            popup: "Choose dates",
+            focused: (page) => cell(page, 11, 20),
+            next: (page) => cell(page, 11, 21),
+        },
+        {
+            trigger: /Choose arrival$/,
+            popup: "Arrival date",
+            focused: (page) => cell(page, 11, 20),
+            next: (page) => cell(page, 11, 21),
+        },
+        {
+            trigger: /Choose stay$/,
+            popup: "Stay dates",
+            focused: (page) => cell(page, 11, 20),
+            next: (page) => cell(page, 11, 21),
+        },
+        {
+            trigger: "Month",
+            popup: "Choose month",
+            focused: (page) => monthCell(page, 11),
+            next: (page) => monthCell(page, 12),
+        },
+        {
+            trigger: "Months",
+            popup: "Choose months",
+            focused: (page) => monthCell(page, 11),
+            next: (page) => monthCell(page, 12),
+        },
+        {
+            trigger: "Year",
+            popup: "Choose year",
+            focused: (page) => yearCell(page, 2026),
+            next: (page) => yearCell(page, 2027),
+        },
+        {
+            trigger: "Years",
+            popup: "Choose years",
+            focused: (page) => yearCell(page, 2026),
+            next: (page) => yearCell(page, 2027),
+        },
+    ];
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/date-picker/in-dialog", { today: true });
+        await page.getByRole("button", { name: "Plan the trip" }).click();
+        await expect(
+            page.getByRole("dialog", { name: "Plan the trip" }),
+        ).toBeVisible();
+    });
+
+    for (const picker of PICKERS) {
+        test(`${picker.popup}: opening focuses the focused cell; Escape closes the popup, then the dialog`, async ({
+            page,
+        }) => {
+            const dialog = page.getByRole("dialog", { name: "Plan the trip" });
+            const trigger = dialog.getByRole("button", {
+                name: picker.trigger,
+                exact: typeof picker.trigger === "string",
+            });
+            await trigger.click();
+            const popup = page.getByRole("dialog", { name: picker.popup });
+            await expect(popup).toBeVisible();
+            await expectFocusWithin(picker.focused(page));
+            // the keys reach the grid, not the dialog
+            await page.keyboard.press("ArrowRight");
+            await expectFocusWithin(picker.next(page));
+            await page.keyboard.press("Escape");
+            await expect(popup).toBeHidden();
+            await expect(dialog).toBeVisible();
+            await expect(trigger).toBeFocused();
+            await page.keyboard.press("Escape");
+            await expect(dialog).toBeHidden();
+            await expect(
+                page.getByRole("button", { name: "Plan the trip" }),
+            ).toBeFocused();
+        });
+    }
+
+    test("Enter chooses the focused date: the popup closes, the dialog stays open", async ({
+        page,
+    }) => {
+        const dialog = page.getByRole("dialog", { name: "Plan the trip" });
+        const trigger = dialog.getByRole("button", {
+            name: "Date",
+            exact: true,
+        });
+        await trigger.click();
+        await expectFocusWithin(cell(page, 11, 20));
+        await page.keyboard.press("Enter");
+        await expectOutput(page, "value", "2026-11-20");
+        await expect(
+            page.getByRole("dialog", { name: "Choose date" }),
+        ).toBeHidden();
+        await expect(dialog).toBeVisible();
+        await expect(trigger).toBeFocused();
+    });
+
+    test("has no axe violation with a picker open in the dialog", async ({
+        page,
+    }) => {
+        await page
+            .getByRole("dialog", { name: "Plan the trip" })
+            .getByRole("button", { name: "Date", exact: true })
+            .click();
+        await expectFocusWithin(cell(page, 11, 20));
         await expectNoAxeViolations(page);
     });
 });
