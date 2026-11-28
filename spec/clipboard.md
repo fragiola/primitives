@@ -31,7 +31,7 @@ never copied). Where they are silent, the APG-closest option is decided here (D4
 | part | element | `data-primitives-part` | notes |
 | --- | --- | --- | --- |
 | Root | `div` | `clipboard-root` | holds the status; renders the announcer as its last child |
-| Trigger | `button` | `clipboard-trigger` | copies the value; `type="button"` |
+| Trigger | `button` | `clipboard-trigger` | copies the value; `type="button"`; its content may follow the status (a visible label that names it) |
 | Indicator | `span` | `clipboard-indicator` | follows the status (the app's icons); `aria-hidden="true"` |
 | Input | `input` | `clipboard-input` | optional: shows the value, read-only |
 | (announcer) | `span` | `clipboard-announcer` | rendered by the Root: the polite live region, visually hidden (Angular: the Root's directive appends it once the page renders in the browser, as its hidden inputs, since a directive renders no child; a server render has none, and the region is there before any copy) |
@@ -54,7 +54,16 @@ the toolkit's `/clipboard` (`writeClipboard`, `announceText`).
 - `failedAnnouncement` (a string, optional): written into the live region when a copy fails.
 
 **Trigger**: a native `button`; its content and its name are the app's ("Copy", or an icon with
-`aria-label="Copy install command"`). A click copies the Root's value.
+`aria-label="Copy install command"`). A click copies the Root's value. Its content may follow the
+status, as the Indicator's does: its children function of the state in React
+(`{(state) => state.copied ? "Copied" : "Copy link"}`), its default scoped slot in Vue
+(`v-slot="{ state }"`), `state()` through `exportAs` in Angular
+(`#trigger="clipboardTrigger"`, `{{ trigger.state().copied ? "Copied" : "Copy link" }}`). A
+visible label that changes with the status ("Copy link", then "Copied") then names the button in
+both states, from its content, with no `aria-label` (WCAG 2.5.3 Label in Name; Epic #128). The
+reason: the Indicator is `aria-hidden` (it holds icons), so a label inside it is no part of the
+name, and a fixed `aria-label` stops containing the visible text once it reads "Copied". The
+text is still the app's: the library renders none.
 
 **Indicator**: renders its children (the app's icons; the recipe shows one or the other by
 `data-copied`), or its children function of the state.
@@ -62,9 +71,10 @@ the toolkit's `/clipboard` (`writeClipboard`, `announceText`).
 **Input**: a native `input`, `readonly`, its value the Root's; every attribute is forwarded (an
 `id` for a `<label for>`, `aria-label`).
 
-Every part's `render` and `className` functions, and the Indicator's children function (Vue: the
-`render` slot and the Indicator's default scoped slot; Angular: `state()` through `exportAs`,
-`#clipboard="clipboardRoot"`), receive the state `{ status, copied, failed }`.
+Every part's `render` and `className` functions, and the Trigger's and the Indicator's children
+functions (Vue: the `render` slot and their default scoped slots; Angular: `state()` through
+`exportAs`, `#clipboard="clipboardRoot"`, `#trigger="clipboardTrigger"`), receive the state
+`{ status, copied, failed }`.
 
 ## State attributes and ARIA
 
@@ -146,6 +156,22 @@ Checks:
 2. The focus is on the Input, with its whole text selected.
 3. After the timeout, `status: idle` and no part has `data-failed`.
 
+### `/clipboard/label`
+
+A Root with `value="https://fragiola.com/primitives"`, `timeout={1000}`, holding only a Trigger
+with no `aria-label`, whose content follows the status: the Indicator (its icons), then the text
+**"Copy link"** while idle and **"Copied"** while copied. Output: `status: ...`.
+
+Checks:
+
+1. The Trigger has no `aria-label`; its text and its accessible name are "Copy link", and axe's
+   `label-content-name-mismatch` rule passes.
+2. A click writes `https://fragiola.com/primitives` to the clipboard, reports `status: copied`;
+   the Trigger's text and name are both "Copied" (the rule passes again), the focus stays on it,
+   and the Indicator is still `aria-hidden="true"`.
+3. After the timeout, `status: idle`, and the text and name are "Copy link" again.
+4. Axe finds no violation, at rest and copied. Behaviour layer only.
+
 ## Differences from Base UI and the references
 
 Base UI has no Clipboard. The decisions where the APG is silent:
@@ -157,3 +183,4 @@ Base UI has no Clipboard. The decisions where the APG is silent:
 | The fallback | none: a failed write is a `failed` status, the Input focused and selected | `execCommand("copy")` is deprecated; selecting the text lets the user copy it |
 | `defaultValue`, `onValueChange` | not offered: `value` only | the text is the app's (Zag's value is too); nothing in the component edits it |
 | `onStatusChange` | `"idle"`, `"copied"`, `"failed"` with a reason | Zag reports `{ copied }`; the failure is a state the app shows |
+| A label that follows the status | the Trigger's own content follows the state (a children function, a scoped slot, `state()`); the Indicator stays `aria-hidden` | the name comes from the visible text in both states (WCAG 2.5.3), still with no text of the library's (Epic #128) |
