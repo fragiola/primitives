@@ -149,7 +149,13 @@ export function usePanelTransition({
             return undefined;
         }
         const cancelFrame = nextFrame(element, () => {
-            void waitForAnimations(element).then(finish);
+            // committed in the microtask of the transition's end, before that frame is painted
+            // (spec/README.md, "Lifecycle")
+            void waitForAnimations(element).then(() => {
+                if (!cancelled) {
+                    flushSync(finish);
+                }
+            });
         });
         return () => {
             cancelled = true;
