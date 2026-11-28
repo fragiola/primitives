@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { expectNoAxeViolations } from "../../src/axe.ts";
 import { part } from "../../src/contract.ts";
@@ -87,5 +88,50 @@ test.describe("clipboard / failure", () => {
 
         await expectOutput(page, "status", "idle");
         await expect(announcer(page)).toHaveText("");
+    });
+});
+
+// spec/clipboard.md, `/clipboard/label`: the Trigger's visible label follows the status, and names
+// it in both states (WCAG 2.5.3 Label in Name), with no `aria-label`
+test.describe("clipboard / label", () => {
+    const trigger = (page: Page) => part(page, "clipboard", "trigger");
+
+    /** The button's accessible name is its visible text, and axe's label-in-name rule passes. */
+    async function expectLabelInName(page: Page, label: string) {
+        await expect(trigger(page)).toHaveText(label);
+        await expect(trigger(page)).toHaveAccessibleName(label);
+        await expect(page.getByRole("button", { name: label })).toBeVisible();
+        const results = await new AxeBuilder({ page })
+            .withRules(["label-content-name-mismatch"])
+            .analyze();
+        expect(results.violations.map((violation) => violation.id)).toEqual([]);
+    }
+
+    test.beforeEach(async ({ page }) => {
+        await openScenario(page, "/clipboard/label");
+    });
+
+    test("the name follows the visible label, idle and copied", async ({
+        page,
+    }) => {
+        await expect(trigger(page)).not.toHaveAttribute("aria-label");
+        await expectLabelInName(page, "Copy link");
+        await expectNoAxeViolations(page);
+
+        await trigger(page).click();
+        await expectOutput(page, "status", "copied");
+        expect(await readClipboard(page)).toBe(
+            "https://fragiola.com/primitives",
+        );
+        await expectLabelInName(page, "Copied");
+        await expect(trigger(page)).toBeFocused();
+        await expect(part(page, "clipboard", "indicator")).toHaveAttribute(
+            "aria-hidden",
+            "true",
+        );
+        await expectNoAxeViolations(page);
+
+        await expectOutput(page, "status", "idle");
+        await expectLabelInName(page, "Copy link");
     });
 });

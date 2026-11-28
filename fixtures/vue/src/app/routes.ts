@@ -43,6 +43,7 @@ import CheckboxControlledForm from "../scenarios/checkbox/checkbox-controlled-fo
 import CheckboxGroupScenario from "../scenarios/checkbox/checkbox-group.vue";
 import ClipboardBasic from "../scenarios/clipboard/clipboard-basic.vue";
 import ClipboardFailure from "../scenarios/clipboard/clipboard-failure.vue";
+import ClipboardLabel from "../scenarios/clipboard/clipboard-label.vue";
 import CollapsibleBasic from "../scenarios/collapsible/collapsible-basic.vue";
 import CollapsibleHiddenUntilFound from "../scenarios/collapsible/collapsible-hidden-until-found.vue";
 import ColorAreaBasic from "../scenarios/color-area/color-area-basic.vue";
@@ -520,6 +521,7 @@ export const routes: Record<string, Component> = {
     "/search-field/field": SearchFieldField,
     "/clipboard/basic": ClipboardBasic,
     "/clipboard/failure": ClipboardFailure,
+    "/clipboard/label": ClipboardLabel,
     "/drop-zone/basic": DropZoneBasic,
     "/drop-zone/single": DropZoneSingle,
     "/drop-zone/disabled": DropZoneDisabled,

@@ -242,6 +242,7 @@ export const ROUTES: readonly string[] = [
     "/search-field/field",
     "/clipboard/basic",
     "/clipboard/failure",
+    "/clipboard/label",
     "/drop-zone/basic",
     "/drop-zone/single",
     "/drop-zone/disabled",

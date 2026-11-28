@@ -43,6 +43,7 @@ import { CheckboxControlledForm } from "../scenarios/checkbox/checkbox-controlle
 import { CheckboxGroupScenario } from "../scenarios/checkbox/checkbox-group.tsx";
 import { ClipboardBasic } from "../scenarios/clipboard/clipboard-basic.tsx";
 import { ClipboardFailure } from "../scenarios/clipboard/clipboard-failure.tsx";
+import { ClipboardLabel } from "../scenarios/clipboard/clipboard-label.tsx";
 import { CollapsibleBasic } from "../scenarios/collapsible/collapsible-basic.tsx";
 import { CollapsibleHiddenUntilFound } from "../scenarios/collapsible/collapsible-hidden-until-found.tsx";
 import { ColorAreaBasic } from "../scenarios/color-area/color-area-basic.tsx";
@@ -525,6 +526,7 @@ export const routes: Record<
     "/search-field/field": SearchFieldField,
     "/clipboard/basic": ClipboardBasic,
     "/clipboard/failure": ClipboardFailure,
+    "/clipboard/label": ClipboardLabel,
     "/drop-zone/basic": DropZoneBasic,
     "/drop-zone/single": DropZoneSingle,
     "/drop-zone/disabled": DropZoneDisabled,
