@@ -149,7 +149,8 @@ None: the popup is centred by the consumer's styles. The primitive sets no posit
 
 Backdrop, Viewport and Popup carry `data-starting-style` for the first frame after mounting, and
 `data-ending-style` while closing. They unmount when every animation on the popup has finished
-(`element.getAnimations()`), or at once when there is none; with the Portal's `keepMounted` they
+(`element.getAnimations()`), before the next paint (no frame shows the popup at rest after a
+keyframe exit, [README](README.md#lifecycle)), or at once when there is none; with the Portal's `keepMounted` they
 are hidden instead (`hidden`, `data-closed`). Focus returns on close immediately, not after the
 exit animation. `onOpenChangeComplete` reports the end of each transition, a close's
 `details.preventUnmountOnClose()` holds the exit until the actions' `unmount()`
